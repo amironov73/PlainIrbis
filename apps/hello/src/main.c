@@ -9,8 +9,11 @@ int main (int argc, char **argv)
     int bufSize = sizeof (buffer);
     void *space;
 
-    //printf ("Library version: %d\n", magna_version());
-    //_mkdir ("test");
+    printf ("Library version: %d\n", magna_version());
+
+#ifdef _M_IX86
+
+    _mkdir ("test");
 
     irbis64_dll_version (buffer, bufSize);
     printf ("Library version: %s\n", buffer);
@@ -19,6 +22,8 @@ int main (int argc, char **argv)
     printf ("Space: %p\n", space);
     irbis64_dll_init_new_db ("test\\db");
     irbis64_dll_close (space);
+
+#endif
 
     return 0;
 }

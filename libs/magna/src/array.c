@@ -9,12 +9,13 @@ MAGNA_API Array* MAGNA_CALL array_clone (Array *array)
 {
     Array *result;
     void *item;
+    size_t index;
 
     assert (array != NULL);
 
     result = (Array*) malloc (sizeof (Array));
     array_create (result, array->len);
-    for (size_t index = 0; index < array->len; ++index) {
+    for (index = 0; index < array->len; ++index) {
         item = array->ptr [index];
         if (array->liberator != NULL) {
             result->ptr [index] = array->cloner (item);
@@ -38,11 +39,13 @@ MAGNA_API void MAGNA_CALL array_copy (Array *target, Array *source)
 
 MAGNA_API void MAGNA_CALL array_concat (Array *target, Array *source)
 {
+    size_t index;
+
     assert (target != NULL);
     assert (source != NULL);
 
     array_grow (target, target->len + source->len);
-    for (size_t index = 0; index < source->len; ++index) {
+    for (index = 0; index < source->len; ++index) {
         target->ptr [target->len] = source->ptr [source->len];
         ++(target->len);
     }
@@ -60,10 +63,12 @@ MAGNA_API void MAGNA_CALL array_create (Array *array, size_t capacity)
 
 MAGNA_API void MAGNA_CALL array_free (Array *array)
 {
+    size_t index;
+
     assert (array != NULL);
 
     if (array->liberator != NULL) {
-        for (size_t index = 0; index < array->len; ++index) {
+        for (index = 0; index < array->len; ++index) {
             array->liberator (array->ptr [index]);
         }
         array->len = 0;
@@ -112,6 +117,7 @@ MAGNA_API void* MAGNA_CALL array_pop_back (Array *array)
 
 MAGNA_API void* MAGNA_CALL array_pop_front (Array *array)
 {
+    size_t index;
     void *result;
 
     assert (array != NULL);
@@ -119,7 +125,7 @@ MAGNA_API void* MAGNA_CALL array_pop_front (Array *array)
 
     result = array->ptr [0];
     --(array->len);
-    for (size_t index = 0; index < array->len; ++index) {
+    for (index = 0; index < array->len; ++index) {
         array->ptr [index] = array->ptr [index + 1];
     }
 
@@ -137,10 +143,12 @@ MAGNA_API void MAGNA_CALL array_push_back (Array *array, void *item)
 
 MAGNA_API void MAGNA_CALL array_push_front (Array *array, void *item)
 {
+    size_t index;
+
     assert (array != NULL);
 
     array_grow (array, array->len + 1);
-    for (size_t index = array->len; index != 0; --index) {
+    for (index = array->len; index != 0; --index) {
         array->ptr [index] = array->ptr [index - 1];
     }
     array->ptr [0] = item;
@@ -161,11 +169,13 @@ MAGNA_API void MAGNA_CALL array_set (Array *array, size_t index, void *item)
 
 MAGNA_API void MAGNA_CALL array_truncate (Array *array, size_t newSize)
 {
+    size_t index;
+
     assert (array != NULL);
     assert (newSize > 0);
 
     if (array->liberator != NULL) {
-        for (size_t index = array->len; index < newSize; ++index) {
+        for (index = array->len; index < newSize; ++index) {
             array->liberator (array->ptr [index]);
             array->ptr [index] = NULL;
         }
