@@ -13,6 +13,7 @@ set(HeaderFiles
 set(CFiles
     src/array.c
     src/buffer.c
+    src/delphi.c
     src/magna.c
 )
 

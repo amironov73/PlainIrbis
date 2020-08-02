@@ -3,7 +3,7 @@
 
 #include "magna/core.h"
 
-int magna_version ()
+MAGNA_API int magna_version ()
 {
     return 0;
 }

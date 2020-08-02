@@ -5,7 +5,7 @@
 
 #include <assert.h>
 
-Array* array_clone (Array *array)
+MAGNA_API Array* MAGNA_CALL array_clone (Array *array)
 {
     Array *result;
     void *item;
@@ -27,7 +27,7 @@ Array* array_clone (Array *array)
     return result;
 }
 
-void array_copy (Array *target, Array *source)
+MAGNA_API void MAGNA_CALL array_copy (Array *target, Array *source)
 {
     assert (target != NULL);
     assert (source != NULL);
@@ -36,7 +36,7 @@ void array_copy (Array *target, Array *source)
     array_concat (target, source);
 }
 
-void array_concat (Array *target, Array *source)
+MAGNA_API void MAGNA_CALL array_concat (Array *target, Array *source)
 {
     assert (target != NULL);
     assert (source != NULL);
@@ -48,23 +48,23 @@ void array_concat (Array *target, Array *source)
     }
 }
 
-void array_create (Array *array, size_t capacity)
+MAGNA_API void MAGNA_CALL array_create (Array *array, size_t capacity)
 {
     assert (array != NULL);
-    assert (capacity >= 0);
+    assert (capacity > 0);
 
     array->ptr = (void**) calloc (capacity, sizeof (void*));
     array->len = 0;
     array->capacity = capacity;
 }
 
-void array_free (Array *array)
+MAGNA_API void MAGNA_CALL array_free (Array *array)
 {
     assert (array != NULL);
 
     if (array->liberator != NULL) {
-        for (size_t i = 0; i < array->len; ++i) {
-            array->liberator (array->ptr [i]);
+        for (size_t index = 0; index < array->len; ++index) {
+            array->liberator (array->ptr [index]);
         }
         array->len = 0;
         array->capacity = 0;
@@ -73,20 +73,20 @@ void array_free (Array *array)
     }
 }
 
-void* array_get (Array *array, size_t index)
+MAGNA_API void* MAGNA_CALL array_get (Array *array, size_t index)
 {
     assert (array != NULL);
-    assert ((index >= 0) && (index < array->len));
+    assert (index < array->len);
 
     return NULL;
 }
 
-void array_grow (Array *array, size_t newSize)
+MAGNA_API void MAGNA_CALL array_grow (Array *array, size_t newSize)
 {
     void **newPtr;
 
     assert (array != NULL);
-    assert (newSize >= 0);
+    assert (newSize > 0);
 
     if (newSize > array->capacity) {
         newPtr = calloc (newSize, sizeof (void*));
@@ -97,7 +97,7 @@ void array_grow (Array *array, size_t newSize)
     }
 }
 
-void* array_pop_back (Array *array)
+MAGNA_API void* MAGNA_CALL array_pop_back (Array *array)
 {
     void *result;
 
@@ -110,7 +110,7 @@ void* array_pop_back (Array *array)
     return result;
 }
 
-void* array_pop_front (Array *array)
+MAGNA_API void* MAGNA_CALL array_pop_front (Array *array)
 {
     void *result;
 
@@ -126,7 +126,7 @@ void* array_pop_front (Array *array)
     return result;
 }
 
-void array_push_back (Array *array, void *item)
+MAGNA_API void MAGNA_CALL array_push_back (Array *array, void *item)
 {
     assert (array != NULL);
 
@@ -135,7 +135,7 @@ void array_push_back (Array *array, void *item)
     ++(array->len);
 }
 
-void array_push_front (Array *array, void *item)
+MAGNA_API void MAGNA_CALL array_push_front (Array *array, void *item)
 {
     assert (array != NULL);
 
@@ -147,10 +147,10 @@ void array_push_front (Array *array, void *item)
     ++(array->len);
 }
 
-void array_set (Array *array, size_t index, void *item)
+MAGNA_API void MAGNA_CALL array_set (Array *array, size_t index, void *item)
 {
     assert (array != NULL);
-    assert ((index >= 0) && (index < array->len));
+    assert (index < array->len);
 
     if (array->liberator != NULL) {
         array->liberator (array->ptr [index]);
@@ -159,10 +159,10 @@ void array_set (Array *array, size_t index, void *item)
     array->ptr [index] = item;
 }
 
-void array_truncate (Array *array, size_t newSize)
+MAGNA_API void MAGNA_CALL array_truncate (Array *array, size_t newSize)
 {
     assert (array != NULL);
-    assert (newSize >= 0);
+    assert (newSize > 0);
 
     if (array->liberator != NULL) {
         for (size_t index = array->len; index < newSize; ++index) {

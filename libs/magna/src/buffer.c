@@ -5,7 +5,7 @@
 
 #include <assert.h>
 
-size_t buffer_calculate_size (size_t newSize)
+MAGNA_API size_t MAGNA_CALL buffer_calculate_size (size_t newSize)
 {
     if (newSize < 8) {
         newSize = 8;
@@ -13,7 +13,7 @@ size_t buffer_calculate_size (size_t newSize)
     return newSize * 2;
 }
 
-Buffer* buffer_clone (Buffer *buffer)
+MAGNA_API Buffer* MAGNA_CALL buffer_clone (Buffer *buffer)
 {
     assert (buffer != NULL);
 
@@ -26,7 +26,7 @@ Buffer* buffer_clone (Buffer *buffer)
     return result;
 }
 
-void buffer_copy (Buffer *target, Buffer *source)
+MAGNA_API void MAGNA_CALL buffer_copy (Buffer *target, Buffer *source)
 {
     assert (target != NULL);
     assert (source != NULL);
@@ -35,16 +35,16 @@ void buffer_copy (Buffer *target, Buffer *source)
     target->position = source->position;
 }
 
-void buffer_concat (Buffer *target, Buffer *source)
+MAGNA_API void MAGNA_CALL buffer_concat (Buffer *target, Buffer *source)
 {
     assert (target != NULL);
     assert (source != NULL);
 }
 
-void buffer_create (Buffer *buffer, char *data, size_t length)
+MAGNA_API void MAGNA_CALL buffer_create (Buffer *buffer, char *data, size_t length)
 {
     assert (buffer != NULL);
-    assert (length >= 0);
+    assert (length > 0);
     buffer->ptr = NULL;
     buffer->position = 0;
     buffer->capacity = 0;
@@ -57,7 +57,7 @@ void buffer_create (Buffer *buffer, char *data, size_t length)
     }
 }
 
-void buffer_free (Buffer *buffer)
+MAGNA_API void MAGNA_CALL buffer_free (Buffer *buffer)
 {
     assert (buffer != NULL);
 
@@ -69,12 +69,12 @@ void buffer_free (Buffer *buffer)
     buffer->capacity = 0;
 }
 
-void buffer_grow (Buffer *buffer, size_t newSize)
+MAGNA_API void MAGNA_CALL buffer_grow (Buffer *buffer, size_t newSize)
 {
     char *newPtr;
 
     assert (buffer != NULL);
-    assert (newSize >= 0);
+    assert (newSize > 0);
 
     if (newSize > buffer->capacity) {
         newSize = buffer_calculate_size (newSize);
@@ -85,14 +85,14 @@ void buffer_grow (Buffer *buffer, size_t newSize)
     }
 }
 
-void buffer_putc (Buffer *buffer, char c)
+MAGNA_API void MAGNA_CALL buffer_putc (Buffer *buffer, char c)
 {
     assert (buffer != NULL);
     buffer_grow (buffer, buffer->position + 1);
     buffer->ptr [buffer->position++] = c;
 }
 
-void buffer_puts (Buffer *buffer, char *str)
+MAGNA_API void MAGNA_CALL buffer_puts (Buffer *buffer, char *str)
 {
     assert (buffer != NULL);
     assert (str != NULL);
@@ -103,11 +103,11 @@ void buffer_puts (Buffer *buffer, char *str)
 }
 
 
-void buffer_write (Buffer *buffer, char *data, size_t length)
+MAGNA_API void MAGNA_CALL buffer_write (Buffer *buffer, char *data, size_t length)
 {
     assert (buffer != NULL);
     assert (data != NULL);
-    assert (length >= 0);
+    assert (length > 0);
     buffer_grow (buffer, buffer->position + length);
     memcpy (buffer->ptr + buffer->position, data, length);
     buffer->position += length;

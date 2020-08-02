@@ -13,6 +13,7 @@ set(HeaderFiles
 
 set(CFiles
     src/connection.c
+    src/dll.c
 )
 
 add_library(${PROJECT_NAME}

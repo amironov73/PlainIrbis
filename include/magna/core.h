@@ -128,7 +128,24 @@ typedef long long am_int64;
 
 //=========================================================
 
-MAGNA_API int MAGNA_CALL magna_version ();
+MAGNA_API int magna_version (void);
+
+//=========================================================
+
+#ifdef _M_IX86
+
+MAGNA_API int MAGNA_CALL delphi_call_1 (void *function, int arg1);
+MAGNA_API int MAGNA_CALL delphi_call_2 (void *function, int arg1, int arg2);
+MAGNA_API int MAGNA_CALL delphi_call_3 (void *function, int arg1, int arg2,
+                                        int arg3);
+MAGNA_API int MAGNA_CALL delphi_call_4 (void *function, int arg1, int arg2,
+                                        int arg3, int arg4);
+MAGNA_API int MAGNA_CALL delphi_call_5 (void *function, int arg1, int arg2,
+                                        int arg3, int arg4, int arg5);
+MAGNA_API int MAGNA_CALL delphi_call_6 (void *function, int arg1, int arg2,
+                                        int arg3, int arg4, int arg5, int arg6);
+
+#endif
 
 //=========================================================
 

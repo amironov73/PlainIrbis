@@ -1,6 +1,6 @@
 # Pure C library for IRBIS64 system
 
-Universal client software for IRBIS64 library automation system (ManagedClient ported to plain C99). 
+Universal client software for IRBIS64 library automation system (ManagedClient ported to plain C90). 
 
 ### Features
 
@@ -11,12 +11,15 @@ Universal client software for IRBIS64 library automation system (ManagedClient p
 * Support for database dictionary listing for terms and postings. 
 * Administrator functions: get list of (active) users, create/delete user, create/delete database and so on. 
 
-### Supported platforms and compilers
+### Supported platforms
 
 * 32-bit and 64-bit Windows (XP, 7, 8, 8.1, 10);
 * MacOS X 10.14 (64-bit);
 * 32-bit and 64-bit Linux (CentOS 7/8);
 * 64-bit FreeBSD (starting with version 11);
+
+### Supported compilers
+
 * MSVS 2015/2017/2019 Community Edition on Windows;
 * CMake 2.8 or higher on Linux.
 * GCC 4.8 or higher both on Windows (MinGW) and Linux/OS X;

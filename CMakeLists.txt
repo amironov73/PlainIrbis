@@ -8,8 +8,13 @@ cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 # top level project
 project(PlainIrbis)
 
-set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD 90)
 set(CMAKE_C_EXTENSIONS OFF)
+
+if(MSVC)
+    add_compile_options(/UTF-8 /permissive- /Wall)
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+endif()
 
 # headers of irbis and third-party libraries
 include_directories(${PROJECT_SOURCE_DIR}/include)
@@ -24,3 +29,4 @@ install(FILES ${PROJECT_SOURCE_DIR}/include/magna/irbis.h DESTINATION ${ARTIFACT
 # subdirectories
 add_subdirectory(libs)
 add_subdirectory(apps)
+add_subdirectory(tests)
