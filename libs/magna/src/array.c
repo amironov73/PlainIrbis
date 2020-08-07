@@ -3,32 +3,72 @@
 
 #include "magna/core.h"
 
+//=========================================================
+
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable: 5045)
+#endif
+
+//=========================================================
+
 #include <assert.h>
 
-MAGNA_API Array* MAGNA_CALL array_clone (Array *array)
+//=========================================================
+
+/**
+ * \file array.c
+ *
+ * Простой динамический массив.
+ *
+ */
+
+//=========================================================
+
+/**
+ * Клонирование (глубокое копирование) массива.
+ *
+ * @param target Массив назначения.
+ * @param source Источник.
+ */
+MAGNA_API void MAGNA_CALL array_clone
+    (
+        Array *target,
+        Array *source
+    )
 {
-    Array *result;
     void *item;
     size_t index;
 
-    assert (array != NULL);
+    assert (target != NULL);
+    assert (source != NULL);
 
-    result = (Array*) malloc (sizeof (Array));
-    array_create (result, array->len);
-    for (index = 0; index < array->len; ++index) {
-        item = array->ptr [index];
-        if (array->liberator != NULL) {
-            result->ptr [index] = array->cloner (item);
+    array_truncate (target, 0);
+    array_grow (target, source->len);
+    target->cloner = source->cloner;
+    target->liberator = source->liberator;
+    for (index = 0; index < source->len; ++index) {
+        item = source->ptr [index];
+        if (source->cloner != NULL) {
+            target->ptr [index] = source->cloner (item);
         }
         else {
-            result->ptr [index] = item;
+            target->ptr [index] = item;
         }
     }
-
-    return result;
 }
 
-MAGNA_API void MAGNA_CALL array_copy (Array *target, Array *source)
+/**
+ * Неглубокое копирование массива.
+ *
+ * @param target Массив назначения.
+ * @param source Источник.
+ */
+MAGNA_API void MAGNA_CALL array_copy
+    (
+        Array *target,
+        Array *source
+    )
 {
     assert (target != NULL);
     assert (source != NULL);
@@ -183,3 +223,11 @@ MAGNA_API void MAGNA_CALL array_truncate (Array *array, size_t newSize)
 
     array->len = newSize;
 }
+
+//=========================================================
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+
+//=========================================================

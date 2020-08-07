@@ -8,7 +8,14 @@
 
 //=========================================================
 
-typedef struct
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable: 4820)
+#endif
+
+//=========================================================
+
+typedef struct _SubField
 {
     char *value;
     char code;
@@ -17,16 +24,16 @@ typedef struct
 
 //=========================================================
 
-typedef struct
+typedef struct _MarcField
 {
     char *value;
     unsigned int tag;
 
-} Field;
+} MarcField;
 
 //=========================================================
 
-typedef struct
+typedef struct _MarcRecord
 {
     unsigned int mfn;
     unsigned int status;
@@ -37,7 +44,7 @@ typedef struct
 
 //=========================================================
 
-typedef struct
+typedef struct _Connection
 {
     char *host;
     int port;
@@ -89,6 +96,12 @@ MAGNA_API int   MAGNA_CALL irbis64_dll_read_version (void *space,
                                                      int mfn);
 MAGNA_API int   MAGNA_CALL irbis64_dll_max_mfn (void *space);
 
+#endif
+
+//=========================================================
+
+#ifdef _MSC_VER
+#pragma warning(pop)
 #endif
 
 #endif // MAGNA_IRBIS_H

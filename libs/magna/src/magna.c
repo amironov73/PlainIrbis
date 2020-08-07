@@ -3,7 +3,12 @@
 
 #include "magna/core.h"
 
-MAGNA_API int magna_version ()
+/**
+ * Версия библиотеки.
+ *
+ * @return Версия.
+ */
+MAGNA_API int magna_version (void)
 {
     return 0;
 }

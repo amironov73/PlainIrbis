@@ -12,9 +12,11 @@ set(HeaderFiles
 
 set(CFiles
     src/array.c
+    src/beep.c
     src/buffer.c
     src/delphi.c
     src/magna.c
+    src/string.c
 )
 
 add_library(${PROJECT_NAME}

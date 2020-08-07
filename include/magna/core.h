@@ -116,6 +116,15 @@
 
 //=========================================================
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable: 4668)
+#pragma warning(disable: 4820)
+#pragma warning(disable: 5045)
+#endif
+
+//=========================================================
+
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -149,7 +158,7 @@ MAGNA_API int MAGNA_CALL delphi_call_6 (void *function, int arg1, int arg2,
 
 //=========================================================
 
-typedef struct
+typedef struct _Span
 {
     char *ptr;
     int len;
@@ -163,7 +172,7 @@ typedef void  (*Liberator) (void*);
 
 //=========================================================
 
-typedef struct
+typedef struct _Array
 {
     void **ptr;
     size_t len;
@@ -174,7 +183,7 @@ typedef struct
 
 } Array;
 
-MAGNA_API Array* MAGNA_CALL array_clone      (Array *array);
+MAGNA_API void   MAGNA_CALL array_clone      (Array *target, Array *source);
 MAGNA_API void   MAGNA_CALL array_copy       (Array *target, Array *source);
 MAGNA_API void   MAGNA_CALL array_concat     (Array *target, Array *source);
 MAGNA_API void   MAGNA_CALL array_create     (Array *array,  size_t capacity);
@@ -190,7 +199,7 @@ MAGNA_API void   MAGNA_CALL array_truncate   (Array *array,  size_t newSize);
 
 //=========================================================
 
-typedef struct
+typedef struct _Buffer
 {
     char *ptr;
     size_t position;
@@ -208,6 +217,16 @@ MAGNA_API void    MAGNA_CALL buffer_grow   (Buffer *buffer, size_t newSize);
 MAGNA_API void    MAGNA_CALL buffer_putc   (Buffer *buffer, char c);
 MAGNA_API void    MAGNA_CALL buffer_puts   (Buffer *buffer, char *str);
 MAGNA_API void    MAGNA_CALL buffer_write  (Buffer *target, char *data, size_t length);
+
+//=========================================================
+
+MAGNA_API void beep (void);
+
+//=========================================================
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 //=========================================================
 
