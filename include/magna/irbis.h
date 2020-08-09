@@ -1,19 +1,19 @@
-// This is an open source non-commercial project. Dear PVS-Studio, please check it.
-// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+/* This is an open source non-commercial project. Dear PVS-Studio, please check it.
+ * PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com */
 
 #ifndef MAGNA_IRBIS_H
 #define MAGNA_IRBIS_H
 
 #include "magna/core.h"
 
-//=========================================================
+/*=========================================================*/
 
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable: 4820)
 #endif
 
-//=========================================================
+/*=========================================================*/
 
 typedef struct _SubField
 {
@@ -22,7 +22,7 @@ typedef struct _SubField
 
 } SubField;
 
-//=========================================================
+/*=========================================================*/
 
 typedef struct _MarcField
 {
@@ -31,7 +31,7 @@ typedef struct _MarcField
 
 } MarcField;
 
-//=========================================================
+/*=========================================================*/
 
 typedef struct _MarcRecord
 {
@@ -42,7 +42,7 @@ typedef struct _MarcRecord
 
 } MarcRecord;
 
-//=========================================================
+/*=========================================================*/
 
 typedef struct _Connection
 {
@@ -62,13 +62,13 @@ typedef struct _Connection
 MAGNA_API void MAGNA_CALL connection_init (Connection *connection);
 MAGNA_API void MAGNA_CALL connection_free (Connection *connection);
 
-//=========================================================
+/*=========================================================*/
 
 #ifdef _M_IX86
 
 MAGNA_API void  MAGNA_CALL irbis64_dll_version (char *buffer, int bufSize);
 MAGNA_API void  MAGNA_CALL irbis64_dll_main_ini_init (char *path);
-MAGNA_API void* irbis64_dll_init ();
+MAGNA_API void* irbis64_dll_init (void);
 MAGNA_API void  MAGNA_CALL irbis64_dll_set_options (int cacheable,
                                                     int precompiled,
                                                     int firstBreak);
@@ -98,10 +98,12 @@ MAGNA_API int   MAGNA_CALL irbis64_dll_max_mfn (void *space);
 
 #endif
 
-//=========================================================
+/*=========================================================*/
 
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
 
-#endif // MAGNA_IRBIS_H
+/*=========================================================*/
+
+#endif

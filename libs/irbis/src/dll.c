@@ -1,11 +1,13 @@
-// This is an open source non-commercial project. Dear PVS-Studio, please check it.
-// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+/* This is an open source non-commercial project. Dear PVS-Studio, please check it.
+ * PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com */
 
 #include "magna/irbis.h"
 
-// ReSharper disable StringLiteralTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable CommentTypo
+/* ReSharper disable StringLiteralTypo */
+/* ReSharper disable IdentifierTypo */
+/* ReSharper disable CommentTypo */
+
+/*=========================================================*/
 
 /*!
  * \file dll.c
@@ -21,9 +23,12 @@
 
 #if defined(_MSC_VER)
 #pragma warning(disable: 4068)
+#pragma warning(disable: 4152)
 #endif
 
 #pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
+
+/*=========================================================*/
 
 static HANDLE hdll = NULL;
 
@@ -31,7 +36,7 @@ static HANDLE hdll = NULL;
  * Загрузка irbis64.dll в память.
  * В случае неудачи аварийно завершает программу.
  */
-static void load_irbis64_dll()
+static void load_irbis64_dll(void)
 {
     if (hdll == NULL) {
         hdll = LoadLibrary ("irbis64.dll");
@@ -74,6 +79,8 @@ static void* get_irbis64_function
     return result;
 }
 
+/*=========================================================*/
+
 static void *IrbisDLLVersion = NULL;
 
 /**
@@ -105,6 +112,8 @@ MAGNA_API void MAGNA_CALL irbis64_dll_version
         );
 }
 
+/*=========================================================*/
+
 static void *IrbisMainIniInit = NULL;
 
 /**
@@ -131,6 +140,8 @@ MAGNA_API void MAGNA_CALL irbis64_dll_main_ini_init
             (int) path
         );
 }
+
+/*=========================================================*/
 
 static void *IrbisSetOptions = NULL;
 
@@ -163,6 +174,8 @@ MAGNA_API void MAGNA_CALL irbis64_dll_set_options
         );
 }
 
+/*=========================================================*/
+
 static void *IrbisInit = NULL;
 
 /**
@@ -175,7 +188,7 @@ static void *IrbisInit = NULL;
  *
  * @return Указатель на размещенное пространство.
  */
-MAGNA_API void* irbis64_dll_init ()
+MAGNA_API void* irbis64_dll_init (void)
 {
     IrbisInit = get_irbis64_function
         (
@@ -187,6 +200,8 @@ MAGNA_API void* irbis64_dll_init ()
 
     return (void*) function ();
 }
+
+/*=========================================================*/
 
 static void *IrbisInitDepositPath = NULL;
 
@@ -215,6 +230,8 @@ MAGNA_API int MAGNA_CALL irbis64_dll_init_deposit_path
             (int) path
         );
 }
+
+/*=========================================================*/
 
 static void *IrbisUatabInit = NULL;
 
@@ -254,6 +271,8 @@ MAGNA_API int MAGNA_CALL irbis64_dll_uatab_init
         );
 }
 
+/*=========================================================*/
+
 static void *IrbisClose = NULL;
 
 /**
@@ -281,6 +300,8 @@ MAGNA_API void MAGNA_CALL irbis64_dll_close
             (int) space
         );
 }
+
+/*=========================================================*/
 
 static void *IrbisInitMst = NULL;
 
@@ -319,6 +340,8 @@ MAGNA_API int MAGNA_CALL irbis64_dll_init_mst
         );
 }
 
+/*=========================================================*/
+
 static void *IrbisCloseMst = NULL;
 
 /**
@@ -345,6 +368,8 @@ MAGNA_API void MAGNA_CALL irbis64_dll_close_mst
             (int) space
         );
 }
+
+/*=========================================================*/
 
 static void *IrbisInitTerm = NULL;
 
@@ -379,6 +404,8 @@ MAGNA_API int MAGNA_CALL irbis64_dll_init_term
         );
 }
 
+/*=========================================================*/
+
 static void *IrbisCloseTerm = NULL;
 
 /**
@@ -406,6 +433,8 @@ MAGNA_API void MAGNA_CALL irbis64_dll_close_term
         );
 }
 
+/*=========================================================*/
+
 static void *IrbisNewRec = NULL;
 
 MAGNA_API int  MAGNA_CALL irbis64_dll_new_record
@@ -429,6 +458,8 @@ MAGNA_API int  MAGNA_CALL irbis64_dll_new_record
             shelf
         );
 }
+
+/*=========================================================*/
 
 static void *IrbisInitNewDb;
 
@@ -461,6 +492,8 @@ MAGNA_API int MAGNA_CALL irbis64_dll_init_new_db
             (int) path
         );
 }
+
+/*=========================================================*/
 
 static void *IrbisRecord = NULL;
 
@@ -499,6 +532,8 @@ MAGNA_API int MAGNA_CALL irbis64_dll_record
         );
 }
 
+/*=========================================================*/
+
 static void *IrbisReadVersion = NULL;
 
 /**
@@ -532,6 +567,8 @@ MAGNA_API int MAGNA_CALL irbis64_dll_read_version
         );
 }
 
+/*=========================================================*/
+
 static void *IrbisIsDBLocked = NULL;
 
 /**
@@ -561,6 +598,8 @@ MAGNA_API int MAGNA_CALL irbis64_dll_is_db_locked
         );
 }
 
+/*=========================================================*/
+
 static void *IrbisMaxMfn = NULL;
 
 /**
@@ -588,5 +627,7 @@ MAGNA_API int MAGNA_CALL irbis64_dll_max_mfn
             (int) space
         );
 }
+
+/*=========================================================*/
 
 #endif

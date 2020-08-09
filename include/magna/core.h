@@ -1,12 +1,12 @@
-// This is an open source non-commercial project. Dear PVS-Studio, please check it.
-// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+/* This is an open source non-commercial project. Dear PVS-Studio, please check it.
+ * PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com */
 
 #ifndef MAGNA_CORE_H
 #define MAGNA_CORE_H
 
-#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
+#define WIN32_LEAN_AND_MEAN /* Exclude rarely-used stuff from Windows headers */
 
-//=========================================================
+/*=========================================================*/
 
 #if !defined(MAGNA_WINDOWS) && !defined (MAGNA_UNIX)
 
@@ -40,27 +40,27 @@
 
 #endif
 
-//=========================================================
+/*=========================================================*/
 
 #ifdef MAGNA_DYNAMIC_LIBRARY
 
 #if defined(_MSC_VER)
 
-        // Microsoft
+        /* Microsoft */
         #define MAGNA_EXPORT __declspec(dllexport)
         #define MAGNA_IMPORT __declspec(dllimport)
         #define MAGNA_HIDDEN
 
 #elif defined(__GNUC__)
 
-        //  GCC
+        /*  GCC */
         #define MAGNA_EXPORT __attribute__((visibility("default")))
         #define MAGNA_IMPORT
         #define MAGNA_HIDDEN __attribute__((visibility("hidden")))
 
 #else
 
-        //  do nothing and hope for the best?
+        /*  do nothing and hope for the best? */
         #define MAGNA_EXPORT
         #define MAGNA_IMPORT
         #define MAGNA_HIDDEN
@@ -76,7 +76,7 @@
 
 #endif
 
-//=========================================================
+/*=========================================================*/
 
 #ifndef MAGNA_API
 
@@ -88,33 +88,49 @@
 
         #define MAGNA_API MAGNA_IMPORT
 
-    #endif // MAGNA_LIBRARY
+    #endif
 
-#endif // IRBIS_API
+#endif
 
-// для функций: int __fastcall func (int arg).
+/* для функций: int __fastcall func (int arg). */
 #ifndef MAGNA_CALL
 
     #if defined(_MSC_VER)
 
-        // Microsoft
+        /* Microsoft */
         #define MAGNA_CALL __fastcall
 
     #elif defined(__GNUC__)
 
-        //  GCC
+        /*  GCC */
         #define MAGNA_CALL
 
     #else
 
-        //  do nothing and hope for the best?
+        /*  do nothing and hope for the best? */
         #define MAGNA_CALL
 
     #endif
 
-#endif // IRBIS_CALL
+#endif
 
-//=========================================================
+/*=========================================================*/
+
+#if !defined(MAGNA_64BIT) && !defined(MAGNA_32BIT) && !defined(MAGNA_16BIT)
+
+    #if defined(_WIN64)
+
+        #define MAGNA_64BIT
+
+    #else
+
+        #define MAGNA_32BIT
+
+    #endif
+
+#endif
+
+/*=========================================================*/
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -123,7 +139,7 @@
 #pragma warning(disable: 5045)
 #endif
 
-//=========================================================
+/*=========================================================*/
 
 #include <stddef.h>
 #include <stdio.h>
@@ -135,7 +151,7 @@ typedef short     am_int16;
 typedef int       am_int32;
 typedef long long am_int64;
 
-//=========================================================
+/*=========================================================*/
 
 MAGNA_API int magna_version (void);
 
@@ -156,7 +172,7 @@ MAGNA_API int MAGNA_CALL delphi_call_6 (void *function, int arg1, int arg2,
 
 #endif
 
-//=========================================================
+/*=========================================================*/
 
 typedef struct _Span
 {
@@ -165,12 +181,12 @@ typedef struct _Span
 
 } Span;
 
-//=========================================================
+/*=========================================================*/
 
 typedef void* (*Cloner)    (void*);
 typedef void  (*Liberator) (void*);
 
-//=========================================================
+/*=========================================================*/
 
 typedef struct _Array
 {
@@ -197,7 +213,7 @@ MAGNA_API void   MAGNA_CALL array_push_front (Array *array,  void *item);
 MAGNA_API void   MAGNA_CALL array_set        (Array *array,  size_t index, void *item);
 MAGNA_API void   MAGNA_CALL array_truncate   (Array *array,  size_t newSize);
 
-//=========================================================
+/*=========================================================*/
 
 typedef struct _Buffer
 {
@@ -218,16 +234,16 @@ MAGNA_API void    MAGNA_CALL buffer_putc   (Buffer *buffer, char c);
 MAGNA_API void    MAGNA_CALL buffer_puts   (Buffer *buffer, char *str);
 MAGNA_API void    MAGNA_CALL buffer_write  (Buffer *target, char *data, size_t length);
 
-//=========================================================
+/*=========================================================*/
 
 MAGNA_API void beep (void);
 
-//=========================================================
+/*=========================================================*/
 
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
 
-//=========================================================
+/*=========================================================*/
 
 #endif // MAGNA_CORE_H

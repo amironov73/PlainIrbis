@@ -6,6 +6,9 @@
 # offline safe tests
 project(offline CXX)
 
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 set(CppFiles
     src/main.cpp
 )
