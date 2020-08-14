@@ -630,4 +630,547 @@ MAGNA_API int MAGNA_CALL irbis64_dll_max_mfn
 
 /*=========================================================*/
 
+static void *IrbisRecordBack = NULL;
+
+/**
+ * Чтение предыдущей версии записи.
+ *
+ * @param space
+ * @param shelf
+ * @param mfn
+ * @param step
+ * @return
+ */
+MAGNA_API int MAGNA_CALL irbis64_dll_record_back
+    (
+        void *space,
+        int shelf,
+        int mfn,
+        int step
+    )
+{
+    assert (space != NULL);
+    assert (shelf >= 0);
+    assert (mfn > 0);
+
+    IrbisRecordBack = get_irbis64_function
+        (
+            "IrbisRecordBack", // sic!
+            IrbisRecordBack
+        );
+
+    return delphi_call_4
+        (
+            IrbisMaxMfn,
+            (int) space,
+            shelf,
+            mfn,
+            step
+        );
+}
+
+/*=========================================================*/
+
+static void *IrbisRecordLock0 = NULL;
+
+/**
+ * Чтение с блокировкой записи.
+ *
+ * @param space
+ * @param shelf
+ * @param mfn
+ * @return
+ */
+MAGNA_API int MAGNA_CALL irbis64_dll_record_lock_0
+    (
+        void *space,
+        int shelf,
+        int mfn
+    )
+{
+    assert (space != NULL);
+    assert (shelf >= 0);
+    assert (mfn > 0);
+
+    IrbisRecordLock0 = get_irbis64_function
+        (
+            "IrbisRecLock0", // sic!
+            IrbisRecordLock0
+        );
+
+    return delphi_call_3
+        (
+            IrbisRecordLock0,
+            (int) space,
+            shelf,
+            mfn
+        );
+}
+
+/*=========================================================*/
+
+static void *IrbisRecordUnlock0 = NULL;
+
+/**
+ *
+ * @param space
+ * @param mfn
+ * @return
+ */
+MAGNA_API int MAGNA_CALL irbis64_dll_record_unlock_0
+    (
+        void *space,
+        int mfn
+    )
+{
+    assert (space != NULL);
+    assert (mfn > 0);
+
+    IrbisRecordUnlock0 = get_irbis64_function
+        (
+            "IrbisRecUnLock0", // sic!
+            IrbisRecordUnlock0
+        );
+
+    return delphi_call_2
+        (
+            IrbisRecordUnlock0,
+            (int) space,
+            mfn
+        );
+}
+
+/*=========================================================*/
+
+static void *IrbisRecordUpdate0 = NULL;
+
+/**
+ *
+ * @param space
+ * @param shelf
+ * @param keepLock
+ * @return
+ */
+MAGNA_API int MAGNA_CALL irbis64_dll_record_update_0
+    (
+        void *space,
+        int shelf,
+        int keepLock
+    )
+{
+    assert (space != NULL);
+    assert (shelf >= 0);
+
+    IrbisRecordUpdate0 = get_irbis64_function
+        (
+            "IrbisRecUpdate0", // sic!
+            IrbisRecordUpdate0
+        );
+
+    return delphi_call_3
+        (
+            IrbisRecordUpdate0,
+            (int) space,
+            shelf,
+            keepLock
+        );
+}
+
+/*=========================================================*/
+
+static void *IrbisRecordIfUpdate0 = NULL;
+
+/**
+ *
+ * @param space
+ * @param shelf
+ * @param mfn
+ * @return
+ */
+MAGNA_API int MAGNA_CALL irbis_dll_record_if_update_0
+    (
+        void *space,
+        int shelf,
+        int mfn
+    )
+{
+    assert (space != NULL);
+    assert (shelf >= 0);
+    assert (mfn > 0);
+
+    IrbisRecordIfUpdate0 = get_irbis64_function
+        (
+            "IrbisRecIfUpdate0", // sic!
+            IrbisRecordIfUpdate0
+        );
+
+    return delphi_call_3
+        (
+            IrbisRecordIfUpdate0,
+            (int) space,
+            shelf,
+            mfn
+        );
+}
+
+/*=========================================================*/
+
+static void *IrbisDbEmptyTime = NULL;
+
+/**
+ *
+ * @param space
+ * @param seconds
+ * @return
+ */
+MAGNA_API int MAGNA_CALL irbis_dll_db_empty_time
+    (
+        void *space,
+        int seconds
+    )
+{
+    assert (space != NULL);
+    assert (seconds > 0);
+
+    IrbisDbEmptyTime = get_irbis64_function
+        (
+            "IrbisDBEmptyTime", // sic!
+            IrbisDbEmptyTime
+        );
+
+    return delphi_call_2
+        (
+            IrbisDbEmptyTime,
+            (int) space,
+            seconds
+        );
+}
+
+/*=========================================================*/
+
+static void *IrbisLockDbTime = NULL;
+
+/*=========================================================*/
+
+static void *IrbisUnlockDbTime = NULL;
+
+/*=========================================================*/
+
+static void *IrbisRecordUpdateTime = NULL;
+
+/*=========================================================*/
+
+static void *IrbisRecordIfUpdateFullTextTime = NULL;
+
+/*=========================================================*/
+
+static void *IrbisSetFullTextActualizedBitTime = NULL;
+
+/*=========================================================*/
+
+static void *IrbisRecordLockTime = NULL;
+
+MAGNA_API int MAGNA_CALL irbis_dll_record_lock_time
+    (
+        void *space,
+        int shelf,
+        int mfn,
+        int seconds
+    )
+{
+    assert (space != NULL);
+    assert (shelf >= 0);
+    assert (mfn > 0);
+    assert (seconds > 0);
+
+    IrbisRecordLockTime = get_irbis64_function
+        (
+            "IrbisRecLockTime", // sic!
+            IrbisRecordLockTime
+        );
+
+    return delphi_call_4
+        (
+            IrbisRecordLockTime,
+            (int) space,
+            shelf,
+            mfn,
+            seconds
+        );
+}
+
+/*=========================================================*/
+
+static void *IrbisRecordUnlockTime = NULL;
+
+MAGNA_API int MAGNA_CALL irbis_dll_record_unlock_time
+    (
+        void *space,
+        int mfn,
+        int seconds
+    )
+{
+    assert (space != NULL);
+    assert (mfn > 0);
+    assert (seconds > 0);
+
+    IrbisRecordUnlockTime = get_irbis64_function
+        (
+            "IrbisRecUnLockTime", // sic!
+            IrbisRecordUnlockTime
+        );
+
+    return delphi_call_3
+        (
+            IrbisRecordUnlockTime,
+            (int) space,
+            mfn,
+            seconds
+        );
+}
+
+/*==========================================================*/
+
+static void *IrbisNotActList = NULL;
+
+/*==========================================================*/
+
+static void *IrbisIsReallyLocked = NULL;
+
+/**
+ * Без чтения, только проверка флага в XRF.
+ *
+ * @param space
+ * @param mfn
+ * @return
+ */
+MAGNA_API int MAGNA_CALL irbis_dll_is_really_locked
+    (
+        void *space,
+        int mfn
+    )
+{
+    assert (space != NULL);
+    assert (mfn > 0);
+
+    IrbisIsReallyLocked = get_irbis64_function
+        (
+            "IrbisIsRealyLocked", // sic!
+            IrbisIsReallyLocked
+        );
+
+    return delphi_call_2
+        (
+            IrbisIsReallyLocked,
+            (int) space,
+            mfn
+        );
+}
+
+/*=========================================================*/
+
+static void *IrbisIsReallyActualized = NULL;
+
+/**
+ * Без чтения, только проверка флага в XRF
+ *
+ * @param space
+ * @param mfn
+ * @return
+ */
+MAGNA_API int MAGNA_CALL irbis_dll_is_really_actualized
+    (
+        void *space,
+        int mfn
+    )
+{
+    assert (space != NULL);
+    assert (mfn > 0);
+
+    IrbisIsReallyActualized = get_irbis64_function
+        (
+            "IrbisIsRealyActualized", // sic!
+            IrbisIsReallyActualized
+        );
+
+    return delphi_call_2
+        (
+            IrbisIsReallyActualized,
+            (int) space,
+            mfn
+        );
+}
+
+/*=========================================================*/
+
+static void *IrbisIsLocked = NULL;
+
+/**
+ * Запись на полке заблокирована?
+ *
+ * @param space
+ * @param shelf
+ * @return
+ */
+MAGNA_API int MAGNA_CALL irbis_dll_is_locked
+    (
+        void *space,
+        int shelf
+    )
+{
+    assert (space != NULL);
+    assert (shelf >= 0);
+
+    IrbisIsLocked = get_irbis64_function
+        (
+            "IrbisIsLocked", // sic!
+            IrbisIsLocked
+        );
+
+    return delphi_call_2
+        (
+            IrbisIsLocked,
+            (int) space,
+            shelf
+        );
+}
+
+/*=========================================================*/
+
+static void *IrbisIsDeleted = NULL;
+
+/**
+ * Запись на полке удалена?
+ *
+ * @param space
+ * @param shelf
+ * @return
+ */
+MAGNA_API int MAGNA_CALL irbis_dll_is_deleted
+    (
+        void *space,
+        int shelf
+    )
+{
+    assert (space != NULL);
+    assert (shelf >= 0);
+
+    IrbisIsDeleted = get_irbis64_function
+        (
+            "IrbisIsDeleted", // sic!
+            IrbisIsDeleted
+        );
+
+    return delphi_call_2
+        (
+            IrbisIsDeleted,
+            (int) space,
+            shelf
+        );
+}
+
+/*=========================================================*/
+
+static void *IrbisIsActualized = NULL;
+
+/**
+ * Запись на полке актуализирована?
+ *
+ * @param space
+ * @param shelf
+ * @return
+ */
+MAGNA_API int MAGNA_CALL irbis_dll_is_actualized
+    (
+        void *space,
+        int shelf
+    )
+{
+    assert (space != NULL);
+    assert (shelf >= 0);
+
+    IrbisIsActualized = get_irbis64_function
+        (
+            "IrbisIsActualized", // sic!
+            IrbisIsActualized
+        );
+
+    return delphi_call_2
+        (
+            IrbisIsActualized,
+            (int) space,
+            shelf
+        );
+}
+
+/*=========================================================*/
+
+static void *IrbisRecordDelete = NULL;
+
+/**
+ * Удаление записи на полке.
+ *
+ * @param space
+ * @param shelf
+ * @return
+ */
+MAGNA_API int MAGNA_CALL irbis_dll_record_delete
+    (
+        void *space,
+        int shelf
+    )
+{
+    assert (space != NULL);
+    assert (shelf >= 0);
+
+    IrbisRecordDelete = get_irbis64_function
+        (
+            "Irbisrecdel", // sic!
+            IrbisRecordDelete
+        );
+
+    return delphi_call_2
+        (
+            IrbisRecordDelete,
+            (int) space,
+            shelf
+        );
+}
+
+/*=========================================================*/
+
+static void *IrbisRecordUndelete = NULL;
+
+/**
+ * Восстановление записи на полке.
+ *
+ * @param space
+ * @param shelf
+ * @return
+ */
+MAGNA_API int MAGNA_CALL irbis_dll_record_undelete
+    (
+        void *space,
+        int shelf
+    )
+{
+    assert (space != NULL);
+    assert (shelf >= 0);
+
+    IrbisRecordUndelete = get_irbis64_function
+        (
+            "Irbisrecundelete", // sic!
+            IrbisRecordUndelete
+        );
+
+    return delphi_call_2
+        (
+            IrbisRecordUndelete,
+            (int) space,
+            shelf
+        );
+}
+
+/*=========================================================*/
+
 #endif
