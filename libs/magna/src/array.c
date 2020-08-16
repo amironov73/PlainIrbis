@@ -3,18 +3,18 @@
 
 #include "magna/core.h"
 
-//=========================================================
+/*=========================================================*/
 
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable: 5045)
 #endif
 
-//=========================================================
+/*=========================================================*/
 
 #include <assert.h>
 
-//=========================================================
+/*=========================================================*/
 
 /**
  * \file array.c
@@ -23,7 +23,7 @@
  *
  */
 
-//=========================================================
+/*=========================================================*/
 
 /**
  * Клонирование (глубокое копирование) массива.
@@ -77,7 +77,16 @@ MAGNA_API void MAGNA_CALL array_copy
     array_concat (target, source);
 }
 
-MAGNA_API void MAGNA_CALL array_concat (Array *target, Array *source)
+/**
+ *
+ * @param target
+ * @param source
+ */
+MAGNA_API void MAGNA_CALL array_concat
+    (
+        Array *target,
+        Array *source
+    )
 {
     size_t index;
 
@@ -91,7 +100,16 @@ MAGNA_API void MAGNA_CALL array_concat (Array *target, Array *source)
     }
 }
 
-MAGNA_API void MAGNA_CALL array_create (Array *array, size_t capacity)
+/**
+ *
+ * @param array
+ * @param capacity
+ */
+MAGNA_API void MAGNA_CALL array_create
+    (
+        Array *array,
+        size_t capacity
+    )
 {
     assert (array != NULL);
     assert (capacity > 0);
@@ -101,7 +119,14 @@ MAGNA_API void MAGNA_CALL array_create (Array *array, size_t capacity)
     array->capacity = capacity;
 }
 
-MAGNA_API void MAGNA_CALL array_free (Array *array)
+/**
+ *
+ * @param array
+ */
+MAGNA_API void MAGNA_CALL array_free
+    (
+        Array *array
+    )
 {
     size_t index;
 
@@ -118,7 +143,17 @@ MAGNA_API void MAGNA_CALL array_free (Array *array)
     }
 }
 
-MAGNA_API void* MAGNA_CALL array_get (Array *array, size_t index)
+/**
+ *
+ * @param array
+ * @param index
+ * @return
+ */
+MAGNA_API void* MAGNA_CALL array_get
+    (
+        Array *array,
+        size_t index
+    )
 {
     assert (array != NULL);
     assert (index < array->len);
@@ -126,7 +161,16 @@ MAGNA_API void* MAGNA_CALL array_get (Array *array, size_t index)
     return NULL;
 }
 
-MAGNA_API void MAGNA_CALL array_grow (Array *array, size_t newSize)
+/**
+ *
+ * @param array
+ * @param newSize
+ */
+MAGNA_API void MAGNA_CALL array_grow
+    (
+        Array *array,
+        size_t newSize
+    )
 {
     void **newPtr;
 
@@ -142,7 +186,15 @@ MAGNA_API void MAGNA_CALL array_grow (Array *array, size_t newSize)
     }
 }
 
-MAGNA_API void* MAGNA_CALL array_pop_back (Array *array)
+/**
+ *
+ * @param array
+ * @return
+ */
+MAGNA_API void* MAGNA_CALL array_pop_back
+    (
+        Array *array
+    )
 {
     void *result;
 
@@ -155,7 +207,15 @@ MAGNA_API void* MAGNA_CALL array_pop_back (Array *array)
     return result;
 }
 
-MAGNA_API void* MAGNA_CALL array_pop_front (Array *array)
+/**
+ *
+ * @param array
+ * @return
+ */
+MAGNA_API void* MAGNA_CALL array_pop_front
+    (
+        Array *array
+    )
 {
     size_t index;
     void *result;
@@ -172,7 +232,16 @@ MAGNA_API void* MAGNA_CALL array_pop_front (Array *array)
     return result;
 }
 
-MAGNA_API void MAGNA_CALL array_push_back (Array *array, void *item)
+/**
+ *
+ * @param array
+ * @param item
+ */
+MAGNA_API void MAGNA_CALL array_push_back
+    (
+        Array *array,
+        void *item
+    )
 {
     assert (array != NULL);
 
@@ -181,7 +250,16 @@ MAGNA_API void MAGNA_CALL array_push_back (Array *array, void *item)
     ++(array->len);
 }
 
-MAGNA_API void MAGNA_CALL array_push_front (Array *array, void *item)
+/**
+ *
+ * @param array
+ * @param item
+ */
+MAGNA_API void MAGNA_CALL array_push_front
+    (
+        Array *array,
+        void *item
+    )
 {
     size_t index;
 
@@ -195,7 +273,18 @@ MAGNA_API void MAGNA_CALL array_push_front (Array *array, void *item)
     ++(array->len);
 }
 
-MAGNA_API void MAGNA_CALL array_set (Array *array, size_t index, void *item)
+/**
+ *
+ * @param array
+ * @param index
+ * @param item
+ */
+MAGNA_API void MAGNA_CALL array_set
+    (
+        Array *array,
+        size_t index,
+        void *item
+    )
 {
     assert (array != NULL);
     assert (index < array->len);
@@ -207,7 +296,16 @@ MAGNA_API void MAGNA_CALL array_set (Array *array, size_t index, void *item)
     array->ptr [index] = item;
 }
 
-MAGNA_API void MAGNA_CALL array_truncate (Array *array, size_t newSize)
+/**
+ *
+ * @param array
+ * @param newSize
+ */
+MAGNA_API void MAGNA_CALL array_truncate
+    (
+        Array *array,
+        size_t newSize
+    )
 {
     size_t index;
 
@@ -224,10 +322,10 @@ MAGNA_API void MAGNA_CALL array_truncate (Array *array, size_t newSize)
     array->len = newSize;
 }
 
-//=========================================================
+/*=========================================================*/
 
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
 
-//=========================================================
+/*=========================================================*/

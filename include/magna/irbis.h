@@ -54,7 +54,7 @@ typedef struct _Connection
     int clientId;
     int queryId;
     int lastError;
-    // char *serverVersion;
+    char *serverVersion;
     int interval;
 
 } Connection;
