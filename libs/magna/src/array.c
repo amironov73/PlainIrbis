@@ -108,7 +108,7 @@ MAGNA_API void MAGNA_CALL array_concat
 MAGNA_API void MAGNA_CALL array_create
     (
         Array *array,
-        size_t capacity
+        am_size capacity
     )
 {
     assert (array != NULL);
@@ -152,7 +152,7 @@ MAGNA_API void MAGNA_CALL array_free
 MAGNA_API void* MAGNA_CALL array_get
     (
         Array *array,
-        size_t index
+        am_size index
     )
 {
     assert (array != NULL);
@@ -169,7 +169,7 @@ MAGNA_API void* MAGNA_CALL array_get
 MAGNA_API void MAGNA_CALL array_grow
     (
         Array *array,
-        size_t newSize
+        am_size newSize
     )
 {
     void **newPtr;
@@ -282,7 +282,7 @@ MAGNA_API void MAGNA_CALL array_push_front
 MAGNA_API void MAGNA_CALL array_set
     (
         Array *array,
-        size_t index,
+        am_size index,
         void *item
     )
 {
@@ -304,7 +304,7 @@ MAGNA_API void MAGNA_CALL array_set
 MAGNA_API void MAGNA_CALL array_truncate
     (
         Array *array,
-        size_t newSize
+        am_size newSize
     )
 {
     size_t index;

@@ -15,7 +15,12 @@ set(CFiles
     src/beep.c
     src/buffer.c
     src/delphi.c
+    src/encoding.c
+    src/error.c
+    src/io.c
+    src/keyboard.c
     src/magna.c
+    src/screen.c
     src/string.c
 )
 

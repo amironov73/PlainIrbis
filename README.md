@@ -25,3 +25,15 @@ Universal client software for IRBIS64 library automation system (ManagedClient p
 * GCC 4.8 or higher both on Windows (MinGW) and Linux/OS X;
 * Clang compiler 9 both on Windows and Linux;
 * Intel C compiler 19 on Windows, Linux/OS X.
+
+### Build status
+
+[![Issues](https://img.shields.io/github/issues/amironov73/PlainIrbis.svg)](https://github.com/amironov73/PlainIrbis/issues)
+[![Build status](https://img.shields.io/appveyor/ci/AlexeyMironov/plainirbis.svg)](https://ci.appveyor.com/project/AlexeyMironov/plainirbis/)
+[![Build status](https://api.travis-ci.org/amironov73/PlainIrbis.svg)](https://travis-ci.org/amironov73/PlainIrbis/)
+
+#### Documentation (in russian)
+
+* [**Общее описание**](docs/chapter1.md)
+* [**Структура Connection**](docs/chapter2.md)
+* [**Структуры MarcRecord, RecordField и SubField**](docs/chapter3.md)

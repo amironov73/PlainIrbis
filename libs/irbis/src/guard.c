@@ -154,6 +154,8 @@ MAGNA_API int server_guard_close (void)
         CloseHandle (stopHandle);
         stopHandle = NULL;
     }
+
+    return 1;
 }
 
 /*=========================================================*/

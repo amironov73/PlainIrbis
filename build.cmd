@@ -2,9 +2,10 @@
 
 mkdir build     > nul 2> nul
 mkdir artifacts > nul 2> nul
+cd build
 
-set CMAKE="cmake"
+cmake ..
+cmake --build .
+cmake --build . --target install
 
-%CMAKE% -B ./build -D CMAKE_BUILD_TYPE=Release .
-%CMAKE% --build ./build --config Release -j 4
-%CMAKE% --install ./build --config Release 
+cd ..

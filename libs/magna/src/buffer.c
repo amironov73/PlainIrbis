@@ -3,61 +3,165 @@
 
 #include "magna/core.h"
 
+/*=========================================================*/
+
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable: 5045)
+#endif
+
+/*=========================================================*/
+
 #include <assert.h>
 
-MAGNA_API size_t MAGNA_CALL buffer_calculate_size (size_t newSize)
+/*=========================================================*/
+
+/**
+ * \file buffer.c
+ *
+ * Простой динамический буфер для данных.
+ *
+ */
+
+/*=========================================================*/
+
+MAGNA_API am_size MAGNA_CALL buffer_calculate_size
+    (
+        am_size newSize
+    )
 {
     if (newSize < 8) {
         newSize = 8;
     }
+
     return newSize * 2;
 }
 
-MAGNA_API Buffer* MAGNA_CALL buffer_clone (Buffer *buffer)
-{
-    assert (buffer != NULL);
-
-    Buffer *result = malloc (sizeof (Buffer));
-    result->position = buffer->position;
-    result->capacity = buffer->capacity;
-    result->ptr = malloc (buffer->capacity);
-    memcpy (result->ptr, buffer->ptr, buffer->position);
-
-    return result;
-}
-
-MAGNA_API void MAGNA_CALL buffer_copy (Buffer *target, Buffer *source)
+/**
+ * Клонирование буфера.
+ *
+ * @param buffer
+ * @return
+ */
+MAGNA_API Buffer* MAGNA_CALL buffer_clone
+    (
+        Buffer* target,
+        Buffer *source
+    )
 {
     assert (target != NULL);
     assert (source != NULL);
-    buffer_grow (target, source->position);
+
+    target->position = source->position;
+    target->capacity = source->capacity;
+    target->ptr = malloc (source->capacity);
     memcpy (target->ptr, source->ptr, source->position);
+
+    return target;
+}
+
+/**
+ * Копирует один буфер в другой.
+ *
+ * @param target
+ * @param source
+ */
+MAGNA_API void MAGNA_CALL buffer_copy
+    (
+        Buffer *target,
+        Buffer *source
+    )
+{
+    assert (target != NULL);
+    assert (source != NULL);
+
+    buffer_grow (target, source->position);
+    if (source->position != 0) {
+        memcpy(target->ptr, source->ptr, source->position);
+    }
     target->position = source->position;
 }
 
-MAGNA_API void MAGNA_CALL buffer_concat (Buffer *target, Buffer *source)
+/**
+ * Дописывает один буфер в конец другого.
+ *
+ * @param target
+ * @param source
+ */
+MAGNA_API void MAGNA_CALL buffer_concat
+    (
+        Buffer *target,
+        Buffer *source
+    )
 {
     assert (target != NULL);
     assert (source != NULL);
+
+    buffer_grow (target, target->position + source->position);
+    memcpy (target-> ptr + target->position, source->ptr, source->position);
+    target->position += source->position;
 }
 
-MAGNA_API void MAGNA_CALL buffer_create (Buffer *buffer, char *data, size_t length)
+/**
+ * Создаёт буфер, предназначенный для динамического роста, копируя
+ * уже имеющиеся данные в кучк.
+ *
+ * @param buffer
+ * @param data
+ * @param length
+ */
+MAGNA_API void MAGNA_CALL buffer_create
+    (
+        Buffer *buffer,
+        am_byte *data,
+        am_size length
+    )
 {
     assert (buffer != NULL);
-    assert (length > 0);
+
     buffer->ptr = NULL;
     buffer->position = 0;
     buffer->capacity = 0;
 
     if (length != 0) {
-        assert (data != NULL);
         buffer_grow (buffer, length);
-        memcpy (buffer->ptr, data, length);
-        buffer->position = length;
+        if (data != NULL) {
+            memcpy(buffer->ptr, data, length);
+            buffer->position = length;
+        }
     }
 }
 
-MAGNA_API void MAGNA_CALL buffer_free (Buffer *buffer)
+/**
+ * Создаёт статический буфер, не предназначенный для роста.
+ *
+ * @param buffer
+ * @param data
+ * @param newSize
+ */
+MAGNA_API void MAGNA_CALL buffer_static
+    (
+        Buffer *buffer,
+        am_byte *data,
+        am_size newSize
+    )
+{
+    assert (buffer != NULL);
+
+    buffer->ptr = data;
+    buffer->position = 0;
+    buffer->capacity = newSize;
+}
+
+/**
+ * Освобождает буфер. Статические буферы освобождать нельзя!
+ *
+ * @param buffer
+ */
+MAGNA_API void MAGNA_CALL buffer_free
+    (
+        Buffer *buffer
+    )
 {
     assert (buffer != NULL);
 
@@ -69,9 +173,19 @@ MAGNA_API void MAGNA_CALL buffer_free (Buffer *buffer)
     buffer->capacity = 0;
 }
 
-MAGNA_API void MAGNA_CALL buffer_grow (Buffer *buffer, size_t newSize)
+/**
+ * При необходимости увеличивает размер буфера.
+ *
+ * @param buffer
+ * @param newSize
+ */
+MAGNA_API void MAGNA_CALL buffer_grow
+    (
+        Buffer *buffer,
+        am_size newSize
+    )
 {
-    char *newPtr;
+    am_byte *newPtr;
 
     assert (buffer != NULL);
     assert (newSize > 0);
@@ -79,36 +193,79 @@ MAGNA_API void MAGNA_CALL buffer_grow (Buffer *buffer, size_t newSize)
     if (newSize > buffer->capacity) {
         newSize = buffer_calculate_size (newSize);
         newPtr = malloc (newSize);
-        memcpy (newPtr, buffer->ptr, buffer->position);
-        free (buffer->ptr);
+        if (buffer->ptr != NULL) {
+            memcpy(newPtr, buffer->ptr, buffer->position);
+            free (buffer->ptr);
+        }
+        buffer->ptr = newPtr;
         buffer->capacity = newSize;
     }
 }
 
-MAGNA_API void MAGNA_CALL buffer_putc (Buffer *buffer, char c)
+/**
+ * Дописывает байт в конец буфера.
+ * @param buffer
+ * @param c
+ */
+MAGNA_API void MAGNA_CALL buffer_putc
+    (
+        Buffer *buffer,
+        am_byte c
+    )
 {
     assert (buffer != NULL);
+
     buffer_grow (buffer, buffer->position + 1);
     buffer->ptr [buffer->position++] = c;
 }
 
-MAGNA_API void MAGNA_CALL buffer_puts (Buffer *buffer, char *str)
+/**
+ * Пишет строку в буфер.
+ *
+ * @param buffer
+ * @param str
+ */
+MAGNA_API void MAGNA_CALL buffer_puts
+    (
+        Buffer *buffer,
+        char *str
+    )
 {
     assert (buffer != NULL);
     assert (str != NULL);
+
     size_t delta = strlen (str);
     buffer_grow (buffer, buffer->position + delta);
     memcpy (buffer->ptr + buffer->position, str, delta);
     buffer->position += delta;
 }
 
-
-MAGNA_API void MAGNA_CALL buffer_write (Buffer *buffer, char *data, size_t length)
+/**
+ * Пишет данные в буфер.
+ *
+ * @param buffer
+ * @param data
+ * @param length
+ */
+MAGNA_API void MAGNA_CALL buffer_write
+    (
+        Buffer *buffer,
+        am_byte *data,
+        am_size length
+    )
 {
     assert (buffer != NULL);
     assert (data != NULL);
-    assert (length > 0);
+
     buffer_grow (buffer, buffer->position + length);
     memcpy (buffer->ptr + buffer->position, data, length);
     buffer->position += length;
 }
+
+/*=========================================================*/
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+
+/*=========================================================*/

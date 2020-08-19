@@ -22,7 +22,7 @@
 
            #define MAGNA_FREEBSD
 
-	    #endif
+        #endif
 
         #if defined(__ANDROID__)
 
@@ -146,10 +146,24 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef char      am_byte;
-typedef short     am_int16;
-typedef int       am_int32;
-typedef long long am_int64;
+/*=========================================================*/
+
+/*
+ * Some primitive types.
+ */
+
+typedef          char      am_byte;
+typedef          short     am_int16;
+typedef unsigned short     am_uint16;
+typedef          int       am_int32;
+typedef unsigned int       am_uint32;
+typedef          long long am_int64;
+typedef unsigned long long am_uint64;
+
+typedef unsigned short am_wchar;
+
+typedef unsigned int am_size;
+typedef          int am_ssize;
 
 /*=========================================================*/
 
@@ -202,41 +216,48 @@ typedef struct _Array
 MAGNA_API void   MAGNA_CALL array_clone      (Array *target, Array *source);
 MAGNA_API void   MAGNA_CALL array_copy       (Array *target, Array *source);
 MAGNA_API void   MAGNA_CALL array_concat     (Array *target, Array *source);
-MAGNA_API void   MAGNA_CALL array_create     (Array *array,  size_t capacity);
+MAGNA_API void   MAGNA_CALL array_create     (Array *array,  am_size capacity);
 MAGNA_API void   MAGNA_CALL array_free       (Array *array);
-MAGNA_API void*  MAGNA_CALL array_get        (Array *array,  size_t index);
-MAGNA_API void   MAGNA_CALL array_grow       (Array *array,  size_t newSize);
+MAGNA_API void*  MAGNA_CALL array_get        (Array *array,  am_size index);
+MAGNA_API void   MAGNA_CALL array_grow       (Array *array,  am_size newSize);
 MAGNA_API void*  MAGNA_CALL array_pop_back   (Array *array);
 MAGNA_API void*  MAGNA_CALL array_pop_front  (Array *array);
 MAGNA_API void   MAGNA_CALL array_push_back  (Array *array,  void *item);
 MAGNA_API void   MAGNA_CALL array_push_front (Array *array,  void *item);
-MAGNA_API void   MAGNA_CALL array_set        (Array *array,  size_t index, void *item);
-MAGNA_API void   MAGNA_CALL array_truncate   (Array *array,  size_t newSize);
+MAGNA_API void   MAGNA_CALL array_set        (Array *array,  am_size index, void *item);
+MAGNA_API void   MAGNA_CALL array_truncate   (Array *array,  am_size newSize);
 
 /*=========================================================*/
 
 typedef struct _Buffer
 {
-    char *ptr;
-    size_t position;
-    size_t capacity;
+    am_byte *ptr;
+    am_size position;
+    am_size capacity;
 
 } Buffer;
 
-MAGNA_API size_t  MAGNA_CALL buffer_calculate_size (size_t newSize);
-MAGNA_API Buffer* MAGNA_CALL buffer_clone  (Buffer *buffer);
+MAGNA_API am_size MAGNA_CALL buffer_calculate_size (am_size newSize);
+MAGNA_API Buffer* MAGNA_CALL buffer_clone  (Buffer *target, Buffer *source);
 MAGNA_API void    MAGNA_CALL buffer_copy   (Buffer *target, Buffer *source);
 MAGNA_API void    MAGNA_CALL buffer_concat (Buffer *target, Buffer *source);
-MAGNA_API void    MAGNA_CALL buffer_create (Buffer *buffer, char *data, size_t length);
+MAGNA_API void    MAGNA_CALL buffer_create (Buffer *buffer, am_byte *data, am_size length);
 MAGNA_API void    MAGNA_CALL buffer_free   (Buffer *buffer);
-MAGNA_API void    MAGNA_CALL buffer_grow   (Buffer *buffer, size_t newSize);
+MAGNA_API void    MAGNA_CALL buffer_grow   (Buffer *buffer, am_size newSize);
 MAGNA_API void    MAGNA_CALL buffer_putc   (Buffer *buffer, char c);
 MAGNA_API void    MAGNA_CALL buffer_puts   (Buffer *buffer, char *str);
-MAGNA_API void    MAGNA_CALL buffer_write  (Buffer *target, char *data, size_t length);
+MAGNA_API void    MAGNA_CALL buffer_static (Buffer *buffer, am_byte *data, am_size newSize);
+MAGNA_API void    MAGNA_CALL buffer_write  (Buffer *target, char *data, am_size length);
 
 /*=========================================================*/
 
 MAGNA_API void beep (void);
+
+#ifdef MAGNA_WINDOWS
+
+MAGNA_API void capsoff (void);
+
+#endif
 
 /*=========================================================*/
 
