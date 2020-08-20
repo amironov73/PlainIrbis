@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="src\connection.c" />
     <ClCompile Include="src\dll.c" />
+    <ClCompile Include="src\ean.c" />
     <ClCompile Include="src\guard.c" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

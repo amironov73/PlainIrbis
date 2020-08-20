@@ -14,6 +14,7 @@ set(HeaderFiles
 set(CFiles
     src/connection.c
     src/dll.c
+    src/ean.c
     src/guard.c
 )
 

@@ -12,9 +12,60 @@
 
 /*=========================================================*/
 
+#include <assert.h>
 #include <ctype.h>
 
 /*=========================================================*/
+
+/**
+ * Совпадают ли символы с точностью до регистра?
+ *
+ * @param first
+ * @param second
+ * @return
+ */
+MAGNA_API am_bool MAGNA_CALL same_char
+    (
+        int first,
+        int second
+    )
+{
+    return toupper(first) == toupper(second);
+}
+
+/**
+ * Совпадают ли строки с точностью до регистра?
+ *
+ * @param first
+ * @param second
+ * @return
+ */
+MAGNA_API am_bool  MAGNA_CALL same_text
+    (
+        char *first,
+        char *second
+    )
+{
+    int result;
+    char c1, c2;
+
+    assert (first != NULL);
+    assert (second != NULL);
+
+    while (1) {
+        c1 = *first++;
+        c2 = *second++;
+        result = toupper(c1) - toupper(c2);
+        if (result != 0) {
+            return result;
+        }
+
+        if (!c1) {
+            return 0;
+        }
+    }
+}
+
 
 /**
  * Determines if a given string is blank (contains
@@ -23,7 +74,7 @@
  * @param str string to check.
  * @return Zero if the string is not blank, otherwise it is.
  */
-MAGNA_API int MAGNA_CALL strblank
+MAGNA_API am_bool MAGNA_CALL strblank
     (
         char *str
     )
@@ -79,13 +130,13 @@ MAGNA_API int MAGNA_CALL strchg
  * @return The number of occurrences of the given character
  * in the string.
  */
-MAGNA_API int MAGNA_CALL strocc
+MAGNA_API am_size MAGNA_CALL strocc
     (
         char *str,
         int ch
     )
 {
-    int result = 0;
+    am_size result = 0;
     char *ptr = str;
 
     while (*ptr) {

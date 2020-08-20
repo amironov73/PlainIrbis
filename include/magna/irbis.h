@@ -15,6 +15,9 @@
 
 /*=========================================================*/
 
+/**
+ * Подполе.
+ */
 typedef struct _SubField
 {
     char *value;
@@ -61,6 +64,13 @@ typedef struct _Connection
 
 MAGNA_API void MAGNA_CALL connection_init (Connection *connection);
 MAGNA_API void MAGNA_CALL connection_free (Connection *connection);
+
+/*=========================================================*/
+
+MAGNA_API am_byte MAGNA_CALL ean13_compute_check_digit (Span text);
+MAGNA_API am_bool MAGNA_CALL ean13_check_control_digit (Span text);
+MAGNA_API am_byte MAGNA_CALL ean8_compute_check_digit  (Span text);
+MAGNA_API am_bool MAGNA_CALL ean8_check_control_digit  (Span text);
 
 /*=========================================================*/
 

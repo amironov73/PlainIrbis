@@ -21,6 +21,7 @@ set(CFiles
     src/keyboard.c
     src/magna.c
     src/screen.c
+    src/span.c
     src/string.c
 )
 

@@ -11,7 +11,9 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(CppFiles
     src/buffer.cpp
+    src/ean.cpp
     src/main.cpp
+    src/span.cpp
 )
 
 set(HeaderFiles

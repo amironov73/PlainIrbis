@@ -152,6 +152,7 @@
  * Some primitive types.
  */
 
+typedef          int       am_bool;
 typedef          char      am_byte;
 typedef          short     am_int16;
 typedef unsigned short     am_uint16;
@@ -164,6 +165,11 @@ typedef unsigned short am_wchar;
 
 typedef unsigned int am_size;
 typedef          int am_ssize;
+
+typedef am_uint32  am_mfn;
+typedef am_uint32  am_flag;
+typedef am_uint64  am_offset;
+typedef void      *am_pointer;
 
 /*=========================================================*/
 
@@ -190,10 +196,13 @@ MAGNA_API int MAGNA_CALL delphi_call_6 (void *function, int arg1, int arg2,
 
 typedef struct _Span
 {
-    char *ptr;
-    int len;
+    am_byte *ptr;
+    am_size len;
 
 } Span;
+
+MAGNA_API Span MAGNA_CALL span_init (am_byte *ptr, am_size len);
+MAGNA_API Span MAGNA_CALL span_from_text (char *str);
 
 /*=========================================================*/
 
