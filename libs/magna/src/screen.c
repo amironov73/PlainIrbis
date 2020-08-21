@@ -46,3 +46,11 @@ MAGNA_API int screen_set_encoding (int encoding)
 }
 
 #endif
+
+/*=========================================================*/
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+
+/*=========================================================*/

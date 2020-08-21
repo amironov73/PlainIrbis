@@ -246,17 +246,18 @@ typedef struct _Buffer
 
 } Buffer;
 
+MAGNA_API void    MAGNA_CALL buffer_assign         (Buffer *buffer, am_byte *data, am_size length);
 MAGNA_API am_size MAGNA_CALL buffer_calculate_size (am_size newSize);
-MAGNA_API Buffer* MAGNA_CALL buffer_clone  (Buffer *target, Buffer *source);
-MAGNA_API void    MAGNA_CALL buffer_copy   (Buffer *target, Buffer *source);
-MAGNA_API void    MAGNA_CALL buffer_concat (Buffer *target, Buffer *source);
-MAGNA_API void    MAGNA_CALL buffer_create (Buffer *buffer, am_byte *data, am_size length);
-MAGNA_API void    MAGNA_CALL buffer_free   (Buffer *buffer);
-MAGNA_API void    MAGNA_CALL buffer_grow   (Buffer *buffer, am_size newSize);
-MAGNA_API void    MAGNA_CALL buffer_putc   (Buffer *buffer, char c);
-MAGNA_API void    MAGNA_CALL buffer_puts   (Buffer *buffer, char *str);
-MAGNA_API void    MAGNA_CALL buffer_static (Buffer *buffer, am_byte *data, am_size newSize);
-MAGNA_API void    MAGNA_CALL buffer_write  (Buffer *target, char *data, am_size length);
+MAGNA_API Buffer* MAGNA_CALL buffer_clone          (Buffer *target, Buffer *source);
+MAGNA_API void    MAGNA_CALL buffer_copy           (Buffer *target, Buffer *source);
+MAGNA_API void    MAGNA_CALL buffer_concat         (Buffer *target, Buffer *source);
+MAGNA_API void    MAGNA_CALL buffer_create         (Buffer *buffer, am_byte *data, am_size length);
+MAGNA_API void    MAGNA_CALL buffer_free           (Buffer *buffer);
+MAGNA_API void    MAGNA_CALL buffer_grow           (Buffer *buffer, am_size newSize);
+MAGNA_API void    MAGNA_CALL buffer_putc           (Buffer *buffer, char c);
+MAGNA_API void    MAGNA_CALL buffer_puts           (Buffer *buffer, char *str);
+MAGNA_API void    MAGNA_CALL buffer_static         (Buffer *buffer, am_byte *data, am_size newSize);
+MAGNA_API void    MAGNA_CALL buffer_write          (Buffer *target, char *data, am_size length);
 
 /*=========================================================*/
 

@@ -23,7 +23,7 @@ void beep (void)
 {
 #ifdef MAGNA_WINDOWS
 
-    //MessageBeep(0xFFFFFFFF);
+    /*MessageBeep(0xFFFFFFFF);*/
     Beep (750, 300);
 
 #endif

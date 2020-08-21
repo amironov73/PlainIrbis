@@ -97,7 +97,7 @@ MAGNA_API void capson (void)
  */
 MAGNA_API void clearkeys (void)
 {
-    // TODO implement
+    /* TODO implement */
 }
 
 /**
@@ -204,3 +204,11 @@ MAGNA_API int MAGNA_CALL waitkeyt (int duration)
 }
 
 #endif
+
+/*=========================================================*/
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+
+/*=========================================================*/

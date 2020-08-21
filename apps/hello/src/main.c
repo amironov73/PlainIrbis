@@ -11,6 +11,9 @@ int main (int argc, char **argv)
     int bufSize = sizeof (buffer);
     void *space;
 
+    (void) argc;
+    (void) argv;
+
     printf ("Library version: %d\n", magna_version());
 
 #ifdef _M_IX86

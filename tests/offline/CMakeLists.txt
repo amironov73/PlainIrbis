@@ -4,16 +4,13 @@
 ###########################################################
 
 # offline safe tests
-project(offline CXX)
+project(offline C)
 
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_EXTENSIONS OFF)
-
-set(CppFiles
-    src/buffer.cpp
-    src/ean.cpp
-    src/main.cpp
-    src/span.cpp
+set(CFiles
+    src/buffer.c
+    src/ean.c
+    src/main.c
+    src/span.c
 )
 
 set(HeaderFiles
@@ -21,7 +18,7 @@ set(HeaderFiles
 )
 
 add_executable(${PROJECT_NAME}
-    ${CppFiles}
+    ${CFiles}
     ${HeaderFiles}
 )
 

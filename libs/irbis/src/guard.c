@@ -110,10 +110,10 @@ MAGNA_API int server_guard_create (void)
     if (startHandle == NULL) {
         startHandle = CreateEventA
             (
-                NULL,   // lpEventAttributes
-                TRUE,   // bManualReset
-                FALSE,  // bInitialState
-                STARTED // lpName
+                NULL,   /* lpEventAttributes */
+                TRUE,   /* bManualReset */
+                FALSE,  /* bInitialState */
+                STARTED /* lpName */
             );
         if (startHandle == NULL) {
             return 0;
@@ -123,10 +123,10 @@ MAGNA_API int server_guard_create (void)
     if (stopHandle == NULL) {
         stopHandle = CreateEventA
             (
-                NULL,   // lpEventAttributes
-                TRUE,   // bManualReset
-                FALSE,  // bInitialState
-                STOPPED // lpName
+                NULL,   /* lpEventAttributes */
+                TRUE,   /* bManualReset */
+                FALSE,  /* bInitialState */
+                STOPPED /* lpName */
             );
         if (stopHandle == NULL) {
             CloseHandle(stopHandle);
@@ -170,8 +170,8 @@ MAGNA_API int check_other_server_running (void)
 
     HRESULT hr = WaitForSingleObject
         (
-            startHandle, // handle
-            1 // milliseconds
+            startHandle, /* handle */
+            1 /* milliseconds */
         );
 
     return (hr != WAIT_TIMEOUT);
@@ -188,8 +188,8 @@ MAGNA_API int check_server_stop_requested (void)
 
     HRESULT hr = WaitForSingleObject
         (
-            stopHandle, // handle
-            1 // milliseconds
+            stopHandle, /* handle */
+            1 /* milliseconds */
         );
 
     return (hr == WAIT_OBJECT_0);
@@ -238,4 +238,4 @@ MAGNA_API void request_server_stop (void)
 
 /*=========================================================*/
 
-#endif /* IRBIS_WINDOWS */
+#endif

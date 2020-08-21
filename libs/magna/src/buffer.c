@@ -255,11 +255,38 @@ MAGNA_API void MAGNA_CALL buffer_write
     )
 {
     assert (buffer != NULL);
-    assert (data != NULL);
 
-    buffer_grow (buffer, buffer->position + length);
-    memcpy (buffer->ptr + buffer->position, data, length);
-    buffer->position += length;
+    if (data != NULL && length > 0) {
+        buffer_grow (buffer, buffer->position + length);
+        memcpy (buffer->ptr + buffer->position, data, length);
+        buffer->position += length;
+    }
+}
+
+/**
+ * Присваивает буферу новые данные, полностью заменяя старые.
+ *
+ * @param buffer
+ * @param data
+ * @param length
+ */
+MAGNA_API void MAGNA_CALL buffer_assign
+    (
+        Buffer *buffer,
+        am_byte *data,
+        am_size length
+    )
+{
+    assert (buffer != NULL);
+
+    if (data == NULL || length == 0) {
+        buffer->position = 0;
+    }
+    else {
+        buffer_grow (buffer, length);
+        memcpy (buffer->ptr, data, length);
+        buffer->position = length;
+    }
 }
 
 /*=========================================================*/
