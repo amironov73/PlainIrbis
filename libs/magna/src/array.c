@@ -56,6 +56,7 @@ MAGNA_API void MAGNA_CALL array_clone
             target->ptr [index] = item;
         }
     }
+    target->len = source->len;
 }
 
 /**
@@ -88,14 +89,14 @@ MAGNA_API void MAGNA_CALL array_concat
         Array *source
     )
 {
-    size_t index;
+    am_size index;
 
     assert (target != NULL);
     assert (source != NULL);
 
     array_grow (target, target->len + source->len);
     for (index = 0; index < source->len; ++index) {
-        target->ptr [target->len] = source->ptr [source->len];
+        target->ptr [target->len] = source->ptr [index];
         ++(target->len);
     }
 }
@@ -114,6 +115,8 @@ MAGNA_API void MAGNA_CALL array_create
     assert (array != NULL);
     assert (capacity > 0);
 
+    array->cloner = NULL;
+    array->liberator = NULL;
     array->ptr = (void**) calloc (capacity, sizeof (void*));
     array->len = 0;
     array->capacity = capacity;
@@ -158,7 +161,7 @@ MAGNA_API void* MAGNA_CALL array_get
     assert (array != NULL);
     assert (index < array->len);
 
-    return NULL;
+    return array->ptr[index];
 }
 
 /**
@@ -310,7 +313,6 @@ MAGNA_API void MAGNA_CALL array_truncate
     size_t index;
 
     assert (array != NULL);
-    assert (newSize > 0);
 
     if (array->liberator != NULL) {
         for (index = array->len; index < newSize; ++index) {
