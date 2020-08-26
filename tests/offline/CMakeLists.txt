@@ -7,6 +7,7 @@
 project(offline C)
 
 set(CFiles
+    src/array.c
     src/buffer.c
     src/ean.c
     src/main.c
@@ -28,3 +29,5 @@ target_include_directories(${PROJECT_NAME}
 )
 
 target_link_libraries(${PROJECT_NAME} magna irbis)
+
+install(TARGETS ${PROJECT_NAME} DESTINATION ${ARTIFACTS})

@@ -21,24 +21,58 @@ typedef struct
 
 #ifdef _MSC_VER
 
-#pragma section("tester",read,write)
 #define TESTER_SECTION(_name) __declspec(allocate("tester")) _name
 
 #else
 
-#define TESTER_SECTION(_name) _name __attribute__((used, section ("tester"), aligned (1)))
+  #ifdef __APPLE__
+
+    #define TESTER_SECTION(_name) _name __attribute__((used, section ("__DATA, tester"), aligned (1)))
+
+  #else
+
+    #define TESTER_SECTION(_name) _name __attribute__((used, section ("tester"), aligned (1)))
+
+  #endif
 
 #endif
 
+#ifdef _MSC_VER
+
 #define TESTER(name)                                     \
 static void tester_ ## name ## _function (void);         \
-static Tester TESTER_SECTION(tester_ ## name ## _data) = \
+                                                         \
+static Tester tester_ ## name ## _data =                 \
 {                                                        \
     #name,                                               \
     tester_ ## name ## _function,                        \
     TESTER_MAGIC                                         \
 };                                                       \
+                                                         \
+__pragma(data_seg(push, "tester"))                       \
+static __declspec(align(4)) Tester *tester_ ## name ## _pointer =             \
+  &tester_ ## name ## _data;                             \
+__pragma(data_seg(pop))                                  \
+                                                         \
 static void tester_ ## name ## _function (void)
+
+#else
+
+#define TESTER(name) \
+static char tester_ ## name ## _name[] = {#name};        \
+                     \
+static void tester_ ## name ## _function (void);         \
+                     \
+static Tester TESTER_SECTION(tester_ ## name ## _data) = \
+{                                                        \
+    tester_ ## name ## _name,                            \
+    tester_ ## name ## _function,                        \
+    TESTER_MAGIC                                         \
+};                                                       \
+                                                         \
+static void tester_ ## name ## _function (void)
+
+#endif
 
 /*=========================================================*/
 
@@ -142,6 +176,7 @@ static int tester_main (int argc, const char **argv)
     Tester *end = begin;
     Tester *ptr;
     int rc;
+    int success = 0, failure = 0;
 
     (void) argc;
     (void) argv;
@@ -163,14 +198,22 @@ static int tester_main (int argc, const char **argv)
 
     for (ptr = begin; ptr != end; ++ptr) {
         if (ptr->run != tester__anchor__function) {
-            printf ("%s ", ptr->test_name);
+            printf ("%-30s", ptr->test_name);
             rc = setjmp (tester_err);
             if (rc == 0) {
                 ptr->run();
             }
-            printf (" \t[%s]\n", rc ? "FAIL" : "OK");
+            printf (" [%s]\n", rc ? "FAIL" : "OK");
+            if (rc) {
+                ++failure;
+            }
+            else {
+                ++success;
+            }
         }
     }
+
+    printf ("\nTOTAL: success=%d, failure=%d\n", success, failure);
 
     return 0;
 }
