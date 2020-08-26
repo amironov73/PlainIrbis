@@ -15,10 +15,39 @@
 
 /*=========================================================*/
 
-/**
- * Подполе.
- */
-typedef struct _SubField
+/* Статус записи */
+
+#define LOGICALLY_DELETED  1u  /* Запись логически удалена     */
+#define PHYSICALLY_DELETED 2u  /* Запись физически удалена     */
+#define ABSENT             4u  /* Запись отсутствует           */
+#define NON_ACTUALIZED     8u  /* Запись не актуализирована    */
+#define LAST_VERSION       32u /* Последняя версия записи      */
+#define LOCKED_RECORD      64u /* Запись заблокирована на ввод */
+
+/* Коды АРМ */
+
+#define ADMINISTRATOR 'A' /* Адмнистратор        */
+#define CATALOGER     'C' /* Каталогизатор       */
+#define ACQUSITIONS   'M' /* Комплектатор        */
+#define READER        'R' /* Читатель            */
+#define CIRCULATION   'B' /* Книговыдача         */
+#define BOOKLAND      'B' /* Книговыдача         */
+#define PROVISION     'K' /* Книгообеспеченность */
+
+/* Разделитель строк в ИРБИС. */
+
+#define IRBIS_DELIMITER "\x1F\x1E"
+
+/* Короткие версии разделителя строк ИРБИС. */
+
+#define SHORT_DELIMITER "\x1E"
+#define ALT_DELIMITER   "\x1F"
+
+
+/*=========================================================*/
+
+/* Подполе */
+typedef struct
 {
     char *value;
     char code;
@@ -27,7 +56,9 @@ typedef struct _SubField
 
 /*=========================================================*/
 
-typedef struct _MarcField
+/* Поле записи */
+
+typedef struct
 {
     char *value;
     unsigned int tag;
@@ -36,7 +67,9 @@ typedef struct _MarcField
 
 /*=========================================================*/
 
-typedef struct _MarcRecord
+/* Раскодированная запись */
+
+typedef struct
 {
     unsigned int mfn;
     unsigned int status;
@@ -47,7 +80,58 @@ typedef struct _MarcRecord
 
 /*=========================================================*/
 
-typedef struct _Connection
+/* Опережающее объявление */
+
+struct IrbisConnection;
+
+/*=========================================================*/
+
+/* Клиентский запрос */
+
+typedef struct {
+    Buffer buffer;
+} Query;
+
+MAGNA_API void MAGNA_CALL query_create      (struct IrbisConnection *connection, Query *query);
+MAGNA_API void MAGNA_CALL query_add_ansi    (Query *query, const char *text);
+MAGNA_API void MAGNA_CALL query_add_format  (Query *query, const char *text);
+MAGNA_API void MAGNA_CALL query_add_int32   (Query *query, am_int32 value);
+MAGNA_API void MAGNA_CALL query_add_utf     (Query *query, const char *text);
+MAGNA_API void MAGNA_CALL query_new_line    (Query *query);
+
+/*=========================================================*/
+
+/* Ответ сервера */
+
+typedef struct {
+    Buffer answer;
+    Span command;
+    am_int32 clientId;
+    am_int32 queryId;
+    am_int32 returnCode;
+    am_int32 answerSize;
+    Span serverVersion;
+    struct IrbisConnection *connection;
+} Response;
+
+MAGNA_API am_int32 MAGNA_CALL response_create                (struct IrbisConnection *connection,
+                                                                Response *response);
+MAGNA_API am_bool             response_check                 (Response *response, ...);
+MAGNA_API Span     MAGNA_CALL response_get_line              (Response *response);
+MAGNA_API am_int32 MAGNA_CALL response_get_return_code       (Response *response);
+MAGNA_API Span     MAGNA_CALL response_read_ansi             (Response *response);
+MAGNA_API am_int32 MAGNA_CALL response_read_int32            (Response *response);
+MAGNA_API Span     MAGNA_CALL response_read_utf              (Response *response);
+MAGNA_API Array    MAGNA_CALL response_remaining_ansi_lines  (Response *response);
+MAGNA_API Span     MAGNA_CALL response_remaining_ansi_text   (Response *response);
+MAGNA_API Array    MAGNA_CALL response_remaining_utf_lines   (Response *response);
+MAGNA_API Span     MAGNA_CALL response_remaining_utf_text    (Response *response);
+
+/*=========================================================*/
+
+/* Подключение к серверу */
+
+typedef struct
 {
     char *host;
     int port;

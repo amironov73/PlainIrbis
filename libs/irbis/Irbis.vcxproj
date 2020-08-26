@@ -19,10 +19,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\connection.c" />
+    <ClCompile Include="src\connect.c" />
     <ClCompile Include="src\dll.c" />
     <ClCompile Include="src\ean.c" />
+    <ClCompile Include="src\error.c" />
     <ClCompile Include="src\guard.c" />
+    <ClCompile Include="src\query.c" />
+    <ClCompile Include="src\response.c" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

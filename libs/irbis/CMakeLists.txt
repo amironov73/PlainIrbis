@@ -12,10 +12,13 @@ set(HeaderFiles
 )
 
 set(CFiles
-    src/connection.c
+    src/connect.c
     src/dll.c
     src/ean.c
+    src/error.c
     src/guard.c
+    src/query.c
+    src/response.c
 )
 
 add_library(${PROJECT_NAME}
