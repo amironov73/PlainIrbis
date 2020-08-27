@@ -17,8 +17,12 @@ set(CFiles
     src/ean.c
     src/error.c
     src/guard.c
+    src/ini.c
+    src/menu.c
     src/query.c
+    src/record.c
     src/response.c
+    src/tree.c
 )
 
 add_library(${PROJECT_NAME}

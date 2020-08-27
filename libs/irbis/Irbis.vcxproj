@@ -24,8 +24,12 @@
     <ClCompile Include="src\ean.c" />
     <ClCompile Include="src\error.c" />
     <ClCompile Include="src\guard.c" />
+    <ClCompile Include="src\ini.c" />
+    <ClCompile Include="src\menu.c" />
     <ClCompile Include="src\query.c" />
+    <ClCompile Include="src\record.c" />
     <ClCompile Include="src\response.c" />
+    <ClCompile Include="src\tree.c" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
