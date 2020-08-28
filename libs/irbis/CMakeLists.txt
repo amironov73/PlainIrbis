@@ -16,12 +16,15 @@ set(CFiles
     src/dll.c
     src/ean.c
     src/error.c
+    src/field.c
     src/guard.c
     src/ini.c
     src/menu.c
     src/query.c
     src/record.c
     src/response.c
+    src/spec.c
+    src/subfield.c
     src/tree.c
 )
 

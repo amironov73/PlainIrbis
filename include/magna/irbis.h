@@ -192,10 +192,17 @@
 
 typedef struct
 {
-    char *value;
+    Buffer value;
     char code;
 
 } SubField;
+
+MAGNA_API SubField* MAGNA_CALL subfield_clone     (SubField *target, const SubField *source);
+MAGNA_API SubField* MAGNA_CALL subfield_decode    (SubField *subfield, Span span);
+MAGNA_API am_bool   MAGNA_CALL subfield_empty     (const SubField *subfield);
+MAGNA_API SubField* MAGNA_CALL subfield_init      (SubField *subfield, char code, const char *value);
+MAGNA_API Buffer*   MAGNA_CALL subfield_to_string (const SubField *subfield, Buffer *buffer);
+MAGNA_API am_bool   MAGNA_CALL subfield_verify    (const SubField *subfield);
 
 /*=========================================================*/
 
@@ -203,10 +210,26 @@ typedef struct
 
 typedef struct
 {
-    char *value;
-    unsigned int tag;
+    Buffer value;
+    am_uint32 tag;
+    Array subfields;
 
 } MarcField;
+
+MAGNA_API SubField*  MAGNA_CALL field_add                      (MarcField *field, char code, const char *value);
+MAGNA_API MarcField* MAGNA_CALL field_clear                    (MarcField *field);
+MAGNA_API MarcField* MAGNA_CALL field_clone                    (MarcField *target, const MarcField *source);
+MAGNA_API MarcField* MAGNA_CALL field_decode                   (MarcField *field, Span span);
+MAGNA_API am_bool    MAGNA_CALL field_empty                    (const MarcField *field);
+MAGNA_API Array*     MAGNA_CALL field_get_embedded_fields      (const MarcField *field, Array *array);
+MAGNA_API SubField*  MAGNA_CALL field_get_first_subfield       (const MarcField *field, char code);
+MAGNA_API Span       MAGNA_CALL field_get_first_subfield_value (const MarcField *field, char code);
+MAGNA_API MarcField* MAGNA_CALL field_init                     (MarcField *field, am_uint32 tag);
+MAGNA_API MarcField* MAGNA_CALL field_insert_at                (MarcField *field, am_size index, const SubField *subfield);
+MAGNA_API MarcField* MAGNA_CALL field_remove_at                (MarcField *field, am_size index);
+MAGNA_API MarcField* MAGNA_CALL field_remove_subfield          (MarcField *field, char code);
+MAGNA_API Buffer*    MAGNA_CALL field_to_string                (const MarcField *field, Buffer *buffer);
+MAGNA_API am_bool    MAGNA_CALL field_verify                   (const MarcField *field);
 
 /*=========================================================*/
 
@@ -224,9 +247,29 @@ typedef struct
 
 /*=========================================================*/
 
+/* Спецификация файла на сервере */
+
+typedef struct
+{
+    int path;
+    Buffer database;
+    Buffer filename;
+    Buffer content;
+    am_bool binary;
+
+} Specification;
+
+MAGNA_API Specification* MAGNA_CALL spec_init      (Specification *spec, int path, const char *database, const char *filename);
+MAGNA_API am_bool        MAGNA_CALL spec_parse     (Specification *spec, Buffer *buffer);
+MAGNA_API Buffer*        MAGNA_CALL spec_to_string (const Specification *spec, Buffer *buffer);
+MAGNA_API am_bool        MAGNA_CALL spec_verify    (const Specification *spec);
+
+/*=========================================================*/
+
 /* Опережающее объявление */
 
 struct IrbisConnection;
+typedef struct IrbisConnection Connection;
 
 /*=========================================================*/
 
@@ -236,12 +279,12 @@ typedef struct {
     Buffer buffer;
 } Query;
 
-MAGNA_API void MAGNA_CALL query_create      (struct IrbisConnection *connection, Query *query);
-MAGNA_API void MAGNA_CALL query_add_ansi    (Query *query, const char *text);
-MAGNA_API void MAGNA_CALL query_add_format  (Query *query, const char *text);
-MAGNA_API void MAGNA_CALL query_add_int32   (Query *query, am_int32 value);
-MAGNA_API void MAGNA_CALL query_add_utf     (Query *query, const char *text);
-MAGNA_API void MAGNA_CALL query_new_line    (Query *query);
+MAGNA_API am_bool MAGNA_CALL query_create      (Connection *connection, Query *query, const char *command);
+MAGNA_API am_bool MAGNA_CALL query_add_ansi    (Query *query, const char *text);
+MAGNA_API am_bool MAGNA_CALL query_add_format  (Query *query, const char *text);
+MAGNA_API am_bool MAGNA_CALL query_add_int32   (Query *query, am_int32 value);
+MAGNA_API am_bool MAGNA_CALL query_add_utf     (Query *query, const char *text);
+MAGNA_API am_bool MAGNA_CALL query_new_line    (Query *query);
 
 /*=========================================================*/
 
@@ -258,8 +301,7 @@ typedef struct {
     struct IrbisConnection *connection;
 } Response;
 
-MAGNA_API am_int32 MAGNA_CALL response_create                (struct IrbisConnection *connection,
-                                                                Response *response);
+MAGNA_API am_int32 MAGNA_CALL response_create                (struct IrbisConnection *connection, Response *response);
 MAGNA_API am_bool             response_check                 (Response *response, ...);
 MAGNA_API Span     MAGNA_CALL response_get_line              (Response *response);
 MAGNA_API am_int32 MAGNA_CALL response_get_return_code       (Response *response);
@@ -275,23 +317,39 @@ MAGNA_API Span     MAGNA_CALL response_remaining_utf_text    (Response *response
 
 /* Подключение к серверу */
 
-typedef struct
+struct IrbisConnection
 {
-    char *host;
-    int port;
-    char *username;
-    char *password;
-    char *database;
-    int clientId;
-    int queryId;
-    int lastError;
-    char *serverVersion;
-    int interval;
+    Buffer host;
+    am_int16 port;
+    Buffer username;
+    Buffer password;
+    Buffer database;
+    am_int32 clientId;
+    am_int32 queryId;
+    am_int32 lastError;
+    Buffer serverVersion;
+    am_int32 interval;
+    am_bool connected;
 
-} Connection;
+};
 
-MAGNA_API void MAGNA_CALL connection_init (Connection *connection);
-MAGNA_API void MAGNA_CALL connection_free (Connection *connection);
+MAGNA_API am_bool MAGNA_CALL connection_actualize_database (Connection *connection, const char *database);
+MAGNA_API am_bool MAGNA_CALL connection_actualize_record   (Connection *connection, const char *database, am_mfn mfn);
+MAGNA_API am_bool MAGNA_CALL connection_check              (Connection *connection);
+MAGNA_API am_bool MAGNA_CALL connection_connect            (Connection *connection);
+MAGNA_API am_bool MAGNA_CALL connection_create_database    (Connection *connection, const char *database, const char *description, am_bool readerAccess);
+MAGNA_API am_bool MAGNA_CALL connection_create_dictionary  (Connection *connection, const char *database);
+MAGNA_API am_bool MAGNA_CALL connection_delete_database    (Connection *connection, const char *database);
+MAGNA_API am_bool MAGNA_CALL connection_delete_file        (Connection *connection, const char *fileName);
+MAGNA_API am_bool MAGNA_CALL connection_delete_record      (Connection *connection, am_mfn mfn);
+MAGNA_API am_bool MAGNA_CALL connection_disconnect         (Connection *connection);
+MAGNA_API am_bool MAGNA_CALL connection_execute            (Connection *connection, Query *query, Response *response);
+MAGNA_API void    MAGNA_CALL connection_free               (Connection *connection);
+MAGNA_API am_mfn  MAGNA_CALL connection_get_max_mfn        (Connection *connection, const char *database);
+MAGNA_API void    MAGNA_CALL connection_init               (Connection *connection);
+MAGNA_API am_bool MAGNA_CALL connection_no_operation       (Connection *connection);
+MAGNA_API am_bool MAGNA_CALL connection_parse_string       (Connection *connection, Buffer *connectionString);
+MAGNA_API am_bool MAGNA_CALL connection_read_text_file     (Connection *connection, Specification *specification, Buffer *buffer);
 
 /*=========================================================*/
 

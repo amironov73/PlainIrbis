@@ -3,6 +3,10 @@
 
 #include "magna/irbis.h"
 
+/* ReSharper disable StringLiteralTypo */
+/* ReSharper disable IdentifierTypo */
+/* ReSharper disable CommentTypo */
+
 #include <assert.h>
 
 /*=========================================================*/
@@ -44,7 +48,9 @@ MAGNA_API am_bool MAGNA_CALL connection_actualize_database
         const char *database
     )
 {
-    assert (connection != NULL);
+    if (!connection_check (connection)) {
+        return 0;
+    }
 
     return 0;
 }
@@ -64,9 +70,32 @@ MAGNA_API am_bool MAGNA_CALL connection_actualize_record
         am_mfn mfn
     )
 {
-    assert (connection != NULL);
+    if (!connection_check (connection)) {
+        return 0;
+    }
 
     return 0;
+}
+
+/**
+ * Проверка, активно ли подключение.
+ *
+ * @param connection Подключение для проверки.
+ * @return Результат проверки.
+ */
+MAGNA_API am_bool MAGNA_CALL connection_check
+    (
+        Connection *connection
+    )
+{
+    assert (connection != NULL);
+
+    if (!connection->connected) {
+        connection->lastError = 100500;
+        return 0;
+    }
+
+    return 1;
 }
 
 /**
@@ -81,6 +110,10 @@ MAGNA_API am_bool MAGNA_CALL connection_connect
     )
 {
     assert (connection != NULL);
+
+    if (connection->connected) {
+        return 1;
+    }
 
     return 0;
 }
@@ -102,8 +135,11 @@ MAGNA_API am_bool MAGNA_CALL connection_create_database
         am_bool readerAccess
     )
 {
-    assert (connection != NULL);
     assert (database != NULL);
+
+    if (!connection_check (connection)) {
+        return 0;
+    }
 
     return 0;
 }
@@ -121,8 +157,11 @@ MAGNA_API am_bool MAGNA_CALL connection_create_dictionary
         const char *database
     )
 {
-    assert (connection != NULL);
     assert (database != NULL);
+
+    if (!connection_check (connection)) {
+        return 0;
+    }
 
     return 0;
 }
@@ -140,8 +179,11 @@ MAGNA_API am_bool MAGNA_CALL connection_delete_database
         const char *database
     )
 {
-    assert (connection != NULL);
     assert (database != NULL);
+
+    if (!connection_check (connection)) {
+        return 0;
+    }
 
     return 0;
 }
@@ -159,8 +201,11 @@ MAGNA_API am_bool MAGNA_CALL connection_delete_file
         const char *fileName
     )
 {
-    assert (connection != NULL);
     assert (fileName != NULL);
+
+    if (!connection_check (connection)) {
+        return 0;
+    }
 
     return 0;
 }
@@ -178,8 +223,13 @@ MAGNA_API am_bool MAGNA_CALL connection_delete_record
         am_mfn mfn
     )
 {
-    assert (connection != NULL);
     assert (mfn > 0);
+
+    if (!connection_check (connection)) {
+        return 0;
+    }
+
+    return 0;
 }
 
 /**
@@ -195,7 +245,44 @@ MAGNA_API am_bool MAGNA_CALL connection_disconnect
 {
     assert (connection != NULL);
 
+    if (!connection->connected) {
+        return 1;
+    }
+
     return 0;
+}
+
+/**
+ * Получение максимального MFN для указанной базы данных.
+ *
+ * @param connection Активное подключение.
+ * @param database Имя базы данных. NULL означает текущую базу данных.
+ * @return Максимальный MFN + 1 в случае успеха либо код ошибки.
+ */
+MAGNA_API am_mfn MAGNA_CALL connection_get_max_mfn
+    (
+        Connection *connection,
+        const char *database
+    )
+{
+    Query query;
+    Response response;
+
+    if (!connection_check (connection)
+        || !query_create(connection, &query, "N")) {
+        return 0;
+    }
+
+    if (!database) {
+        database = connection->database.ptr;
+    }
+
+    if (!query_add_ansi (&query, database)
+        || !connection_execute (connection, &query, &response)) {
+        return 0;
+    }
+
+    return response.returnCode;
 }
 
 /**
@@ -233,13 +320,20 @@ MAGNA_API am_bool MAGNA_CALL connection_no_operation
         Connection *connection
     )
 {
-    assert (connection != NULL);
+    Query query;
+    Response response;
 
-    return 0;
+    if (!connection_check (connection)
+        || !query_create(connection, &query, "N")
+        || !connection_execute (connection, &query, &response)) {
+        return 0;
+    }
+
+    return 1;
 }
 
 /**
- *  Разбор строки подключения.
+ * Разбор строки подключения.
  *
  * @param connection Неактивное подключение.
  * @param connectionString Строка с параметрами подключения.
@@ -248,9 +342,10 @@ MAGNA_API am_bool MAGNA_CALL connection_no_operation
 MAGNA_API am_bool MAGNA_CALL connection_parse_string
     (
         Connection *connection,
-        Buffer connectionString
+        Buffer *connectionString
     )
 {
+    assert (connection != NULL);
     assert (connection != NULL);
 
     return 0;
@@ -267,11 +362,16 @@ MAGNA_API am_bool MAGNA_CALL connection_parse_string
 MAGNA_API am_bool MAGNA_CALL connection_read_text_file
     (
         Connection *connection,
-        Buffer specification,
-        Buffer buffer
+        Specification *specification,
+        Buffer *buffer
     )
 {
-    assert (connection != NULL);
+    assert (specification != NULL);
+    assert (buffer != NULL);
+
+    if (!connection_check (connection)) {
+        return 0;
+    }
 
     return 0;
 }

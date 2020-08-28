@@ -7,4 +7,16 @@
 /* ReSharper disable IdentifierTypo */
 /* ReSharper disable CommentTypo */
 
+#include <assert.h>
+
 /*=========================================================*/
+
+MAGNA_API MarcRecord* MAGNA_CALL record_init
+    (
+        MarcRecord *record
+    )
+{
+    assert (record != NULL);
+
+    return record;
+}

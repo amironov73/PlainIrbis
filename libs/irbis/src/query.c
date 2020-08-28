@@ -5,7 +5,7 @@
 
 #include <assert.h>
 
-MAGNA_API void MAGNA_CALL query_add_ansi
+MAGNA_API am_bool MAGNA_CALL query_add_ansi
     (
         Query *query,
         const char *text
@@ -13,9 +13,11 @@ MAGNA_API void MAGNA_CALL query_add_ansi
 {
     assert (query != NULL);
     assert (text != NULL);
+
+    return 1;
 }
 
-MAGNA_API void MAGNA_CALL query_add_format
+MAGNA_API am_bool MAGNA_CALL query_add_format
     (
         Query *query,
         const char *text
@@ -23,18 +25,22 @@ MAGNA_API void MAGNA_CALL query_add_format
 {
     assert (query != NULL);
     assert (text != NULL);
+
+    return 1;
 }
 
-MAGNA_API void MAGNA_CALL query_add_int32
+MAGNA_API am_bool MAGNA_CALL query_add_int32
     (
         Query *query,
         am_int32 value
     )
 {
     assert (query != NULL);
+
+    return 1;
 }
 
-MAGNA_API void MAGNA_CALL query_add_utf
+MAGNA_API am_bool MAGNA_CALL query_add_utf
     (
         Query *query,
         const char *text
@@ -42,22 +48,36 @@ MAGNA_API void MAGNA_CALL query_add_utf
 {
     assert (query != NULL);
     assert (text != NULL);
+
+    return 1;
 }
 
-MAGNA_API void MAGNA_CALL query_new_line
+MAGNA_API am_bool MAGNA_CALL query_new_line
     (
         Query *query
     )
 {
     assert (query != NULL);
+
+    return 1;
 }
 
-MAGNA_API void MAGNA_CALL query_create
+/**
+ * Создание пользовательского запроса.
+ *
+ * @param connection Подключение.
+ * @param query Создаваемый запрос.
+ * @param command Команда.
+ */
+MAGNA_API am_bool MAGNA_CALL query_create
     (
         struct IrbisConnection *connection,
-        Query *query
+        Query *query,
+        const char *command
     )
 {
     assert (connection != NULL);
     assert (query != NULL);
+
+    return 1;
 }

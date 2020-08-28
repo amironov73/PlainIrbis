@@ -228,7 +228,7 @@ MAGNA_API void MAGNA_CALL buffer_putc
 MAGNA_API void MAGNA_CALL buffer_puts
     (
         Buffer *buffer,
-        char *str
+        const char *str
     )
 {
     assert (buffer != NULL);
@@ -250,7 +250,7 @@ MAGNA_API void MAGNA_CALL buffer_puts
 MAGNA_API void MAGNA_CALL buffer_write
     (
         Buffer *buffer,
-        am_byte *data,
+        const am_byte *data,
         am_size length
     )
 {
@@ -270,10 +270,10 @@ MAGNA_API void MAGNA_CALL buffer_write
  * @param data
  * @param length
  */
-MAGNA_API void MAGNA_CALL buffer_assign
+MAGNA_API Buffer* MAGNA_CALL buffer_assign
     (
         Buffer *buffer,
-        am_byte *data,
+        const am_byte *data,
         am_size length
     )
 {
@@ -287,6 +287,72 @@ MAGNA_API void MAGNA_CALL buffer_assign
         memcpy (buffer->ptr, data, length);
         buffer->position = length;
     }
+
+    return buffer;
+}
+
+/**
+ * Присвоение буферу текстовой строки (вместе с завершающим 0).
+ *
+ * @param buffer
+ * @param text
+ * @return
+ */
+MAGNA_API Buffer* MAGNA_CALL buffer_assign_text
+    (
+        Buffer *buffer,
+        const char *text
+    )
+{
+    am_size len;
+
+    assert (buffer != NULL);
+
+    if (text == NULL) {
+        buffer_grow (buffer, 1);
+        buffer->ptr[0] = '\0';
+        buffer->position = 0;
+    }
+    else {
+        len = strlen (text) + 1;
+        buffer_grow (buffer, len);
+        memcpy (buffer->ptr, text, len);
+        buffer->position = len - 1;
+    }
+
+    return buffer;
+}
+
+/**
+ * Инициализирует буфер строкой.
+ *
+ * @param buffer Буфер, подлежащий инициализации.
+ * @param text Текст. Может быть NULL.
+ * @return buffer.
+ */
+MAGNA_API Buffer* MAGNA_CALL buffer_from_text
+    (
+        Buffer *buffer,
+        const char *text
+    )
+{
+    am_size len;
+
+    assert (buffer != NULL);
+
+    if (text == NULL) {
+        buffer_grow (buffer, 1);
+        buffer->ptr[0] = '\0';
+        buffer->position = 0;
+    }
+    else {
+        len = strlen (text) + 1;
+        buffer_grow (buffer, len);
+        memcpy (buffer->ptr, text, len);
+        buffer->position = len - 1;
+    }
+
+    return buffer;
 }
 
 /*=========================================================*/

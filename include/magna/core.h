@@ -194,7 +194,7 @@ MAGNA_API int MAGNA_CALL delphi_call_6 (void *function, int arg1, int arg2,
 
 /*=========================================================*/
 
-typedef struct _Span
+typedef struct
 {
     am_byte *ptr;
     am_size len;
@@ -204,6 +204,8 @@ typedef struct _Span
 MAGNA_API Span MAGNA_CALL span_init (am_byte *ptr, am_size len);
 MAGNA_API Span MAGNA_CALL span_from_text (char *str);
 
+#define SPAN_INIT { NULL, 0 }
+
 /*=========================================================*/
 
 typedef void* (*Cloner)    (void*);
@@ -211,7 +213,7 @@ typedef void  (*Liberator) (void*);
 
 /*=========================================================*/
 
-typedef struct _Array
+typedef struct
 {
     void **ptr;
     size_t len;
@@ -236,9 +238,11 @@ MAGNA_API void   MAGNA_CALL array_push_front (Array *array,  void *item);
 MAGNA_API void   MAGNA_CALL array_set        (Array *array,  am_size index, void *item);
 MAGNA_API void   MAGNA_CALL array_truncate   (Array *array,  am_size newSize);
 
+#define ARRAY_INIT { NULL, 0, 0, NULL, NULL }
+
 /*=========================================================*/
 
-typedef struct _Buffer
+typedef struct
 {
     am_byte *ptr;
     am_size position;
@@ -246,18 +250,22 @@ typedef struct _Buffer
 
 } Buffer;
 
-MAGNA_API void    MAGNA_CALL buffer_assign         (Buffer *buffer, am_byte *data, am_size length);
+MAGNA_API Buffer* MAGNA_CALL buffer_assign         (Buffer *buffer, const am_byte *data, am_size length);
+MAGNA_API Buffer* MAGNA_CALL buffer_assign_text    (Buffer *buffer, const char *text);
 MAGNA_API am_size MAGNA_CALL buffer_calculate_size (am_size newSize);
 MAGNA_API Buffer* MAGNA_CALL buffer_clone          (Buffer *target, Buffer *source);
 MAGNA_API void    MAGNA_CALL buffer_copy           (Buffer *target, Buffer *source);
 MAGNA_API void    MAGNA_CALL buffer_concat         (Buffer *target, Buffer *source);
 MAGNA_API void    MAGNA_CALL buffer_create         (Buffer *buffer, am_byte *data, am_size length);
 MAGNA_API void    MAGNA_CALL buffer_free           (Buffer *buffer);
+MAGNA_API Buffer* MAGNA_CALL buffer_from_text      (Buffer *buffer, const char *text);
 MAGNA_API void    MAGNA_CALL buffer_grow           (Buffer *buffer, am_size newSize);
 MAGNA_API void    MAGNA_CALL buffer_putc           (Buffer *buffer, char c);
-MAGNA_API void    MAGNA_CALL buffer_puts           (Buffer *buffer, char *str);
+MAGNA_API void    MAGNA_CALL buffer_puts           (Buffer *buffer, const char *str);
 MAGNA_API void    MAGNA_CALL buffer_static         (Buffer *buffer, am_byte *data, am_size newSize);
-MAGNA_API void    MAGNA_CALL buffer_write          (Buffer *target, char *data, am_size length);
+MAGNA_API void    MAGNA_CALL buffer_write          (Buffer *target, const am_byte *data, am_size length);
+
+#define BUFFER_INIT { NULL, 0, 0 }
 
 /*=========================================================*/
 

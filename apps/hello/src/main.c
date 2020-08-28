@@ -7,28 +7,49 @@
 
 int main (int argc, char **argv)
 {
-    char buffer [128];
-    int bufSize = sizeof (buffer);
-    void *space;
+//    char buffer [128];
+//    int bufSize = sizeof (buffer);
+//    void *space;
+    Connection connection;
+    am_int32 maxMfn;
 
     (void) argc;
     (void) argv;
 
     printf ("Library version: %d\n", magna_version());
+    connection_init (&connection);
+    buffer_from_text (&connection.host, "localhost");
+    connection.port = 6666;
+    buffer_from_text (&connection.username, "librarian");
+    buffer_from_text (&connection.password, "secret");
+    buffer_from_text (&connection.database, "IBIS");
 
-#ifdef _M_IX86
+    if (!connection_connect (&connection)) {
+        fputs ("Connection failed", stderr);
+        connection_free (&connection);
+        return 1;
+    }
 
-    _mkdir ("test");
+    maxMfn = connection_get_max_mfn (&connection, NULL);
+    printf ("Max MFN=%d\n", maxMfn);
 
-    irbis64_dll_version (buffer, bufSize);
-    printf ("Library version: %s\n", buffer);
+    connection_disconnect (&connection);
 
-    space = irbis64_dll_init();
-    printf ("Space: %p\n", space);
-    irbis64_dll_init_new_db ("test\\db");
-    irbis64_dll_close (space);
+    connection_free (&connection);
 
-#endif
+//#ifdef _M_IX86
+//
+//    _mkdir ("test");
+//
+//    irbis64_dll_version (buffer, bufSize);
+//    printf ("Library version: %s\n", buffer);
+//
+//    space = irbis64_dll_init();
+//    printf ("Space: %p\n", space);
+//    irbis64_dll_init_new_db ("test\\db");
+//    irbis64_dll_close (space);
+//
+//#endif
 
     return 0;
 }

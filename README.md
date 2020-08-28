@@ -26,6 +26,41 @@ Universal client software for IRBIS64 library automation system (ManagedClient p
 * Clang compiler 9 both on Windows and Linux;
 * Intel C compiler 19 on Windows, Linux/OS X.
 
+### Simple example
+
+```c
+#include "magna/irbis.h"
+
+int main (int argc, char **argv)
+{
+    Connection connection;
+    am_int32 maxMfn;
+
+    printf ("Library version: %d\n", magna_version());
+
+    connection_init (&connection);
+    buffer_from_text (&connection.host, "localhost");
+    connection.port = 6666;
+    buffer_from_text (&connection.username, "librarian");
+    buffer_from_text (&connection.password, "secret");
+    buffer_from_text (&connection.database, "IBIS");
+
+    if (!connection_connect (&connection)) {
+        fputs ("Connection failed", stderr);
+        connection_free (&connection);
+        return 1;
+    }
+
+    maxMfn = connection_get_max_mfn (&connection, NULL);
+    printf ("Max MFN=%d\n", maxMfn);
+
+    connection_disconnect (&connection);
+    connection_free (&connection);
+
+    return 0;
+}
+```
+
 ### Build status
 
 [![Issues](https://img.shields.io/github/issues/amironov73/PlainIrbis.svg)](https://github.com/amironov73/PlainIrbis/issues)
