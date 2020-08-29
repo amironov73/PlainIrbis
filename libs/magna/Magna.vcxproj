@@ -25,10 +25,12 @@
     <ClCompile Include="src\delphi.c" />
     <ClCompile Include="src\encoding.c" />
     <ClCompile Include="src\error.c" />
+    <ClCompile Include="src\fastbuf.c" />
     <ClCompile Include="src\io.c" />
     <ClCompile Include="src\keyboard.c" />
     <ClCompile Include="src\magna.c" />
     <ClCompile Include="src\screen.c" />
+    <ClCompile Include="src\span.c" />
     <ClCompile Include="src\string.c" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

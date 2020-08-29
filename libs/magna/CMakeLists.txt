@@ -17,6 +17,7 @@ set(CFiles
     src/delphi.c
     src/encoding.c
     src/error.c
+    src/fastbuf.c
     src/io.c
     src/keyboard.c
     src/magna.c

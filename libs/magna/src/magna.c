@@ -8,8 +8,8 @@
  *
  * @return Версия.
  */
-MAGNA_API int magna_version (void)
+MAGNA_API am_int32 magna_version (void)
 {
-    return 0;
+    return (MAGNA_VERSION_MAJOR << 16u) + MAGNA_VERSION_MINOR;
 }
 

@@ -7,9 +7,9 @@
 
 int main (int argc, char **argv)
 {
-//    char buffer [128];
-//    int bufSize = sizeof (buffer);
-//    void *space;
+/*    char buffer [128];
+    int bufSize = sizeof (buffer);
+    void *space;*/
     Connection connection;
     am_int32 maxMfn;
 
@@ -37,19 +37,21 @@ int main (int argc, char **argv)
 
     connection_free (&connection);
 
-//#ifdef _M_IX86
-//
-//    _mkdir ("test");
-//
-//    irbis64_dll_version (buffer, bufSize);
-//    printf ("Library version: %s\n", buffer);
-//
-//    space = irbis64_dll_init();
-//    printf ("Space: %p\n", space);
-//    irbis64_dll_init_new_db ("test\\db");
-//    irbis64_dll_close (space);
-//
-//#endif
+/*
+#ifdef _M_IX86
+
+    _mkdir ("test");
+
+    irbis64_dll_version (buffer, bufSize);
+    printf ("Library version: %s\n", buffer);
+
+    space = irbis64_dll_init();
+    printf ("Space: %p\n", space);
+    irbis64_dll_init_new_db ("test\\db");
+    irbis64_dll_close (space);
+
+#endif
+*/
 
     return 0;
 }

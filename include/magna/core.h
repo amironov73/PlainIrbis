@@ -171,9 +171,21 @@ typedef am_uint32  am_flag;
 typedef am_uint64  am_offset;
 typedef void      *am_pointer;
 
+#ifdef MAGNA_WINDOWS
+typedef void *am_handle;
+#else
+typedef int  am_handle;
+#endif
+
+#define AM_FALSE 0
+#define AM_TRUE  1
+
 /*=========================================================*/
 
-MAGNA_API int magna_version (void);
+#define MAGNA_VERSION_MAJOR 0u
+#define MAGNA_VERSION_MINOR 1u
+
+MAGNA_API am_int32 magna_version (void);
 
 /*=========================================================*/
 
@@ -266,6 +278,34 @@ MAGNA_API void    MAGNA_CALL buffer_static         (Buffer *buffer, am_byte *dat
 MAGNA_API void    MAGNA_CALL buffer_write          (Buffer *target, const am_byte *data, am_size length);
 
 #define BUFFER_INIT { NULL, 0, 0 }
+
+/*=========================================================*/
+
+/* Буфер, хранящий часть данных на стеке */
+
+typedef struct
+{
+    am_byte *static_data;
+    am_byte *dynamic_data;
+    am_size capacity;
+    am_size size;
+    am_size static_capacity;
+} FastBuffer;
+
+MAGNA_API FastBuffer* MAGNA_CALL fastbuf_clear     (FastBuffer *buffer);
+MAGNA_API am_bool     MAGNA_CALL fastbuf_empty     (const FastBuffer *buffer);
+MAGNA_API void        MAGNA_CALL fastbuf_free      (FastBuffer *buffer);
+MAGNA_API am_int32    MAGNA_CALL fastbuf_getc      (FastBuffer *buffer);
+MAGNA_API am_int32    MAGNA_CALL fastbuf_getc_utf8 (FastBuffer *buffer);
+MAGNA_API am_size     MAGNA_CALL fastbuf_gets      (FastBuffer *buffer, Buffer *text);
+MAGNA_API am_bool     MAGNA_CALL fastbuf_grow      (FastBuffer *buffer, am_size newSize);
+MAGNA_API void        MAGNA_CALL fastbuf_init      (FastBuffer *buffer, am_size static_capacity);
+MAGNA_API am_bool     MAGNA_CALL fastbuf_puts      (FastBuffer *buffer, const char *text);
+MAGNA_API am_bool     MAGNA_CALL fastbuf_putc      (FastBuffer *buffer, char c        );
+MAGNA_API am_bool     MAGNA_CALL fastbuf_put_utf8  (FastBuffer *buffer, int c);
+MAGNA_API am_size     MAGNA_CALL fastbuf_read      (FastBuffer *buffer, am_byte *data, am_size size);
+MAGNA_API void        MAGNA_CALL fastbuf_rewind    (FastBuffer *buffer);
+MAGNA_API am_bool     MAGNA_CALL fastbuf_write     (FastBuffer *buffer, const am_byte *data, am_size dataSize);
 
 /*=========================================================*/
 

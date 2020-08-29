@@ -3,6 +3,12 @@
 
 #include "magna/irbis.h"
 
+/* ReSharper disable StringLiteralTypo */
+/* ReSharper disable IdentifierTypo */
+/* ReSharper disable CommentTypo */
+
+#include <assert.h>
+
 /**
  * \file spec.c
  *
@@ -34,12 +40,6 @@
  *  где `@` означает двоичный файл
  *  `&` означает наличие содержимого и отделяет имя файла от его содержимого
  */
-
-/* ReSharper disable StringLiteralTypo */
-/* ReSharper disable IdentifierTypo */
-/* ReSharper disable CommentTypo */
-
-#include <assert.h>
 
 /*=========================================================*/
 
