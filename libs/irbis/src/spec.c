@@ -73,7 +73,7 @@ MAGNA_API am_bool MAGNA_CALL spec_parse
     assert (spec != NULL);
     assert (buffer != NULL);
 
-    return 0;
+    return AM_FALSE;
 }
 
 MAGNA_API Buffer* MAGNA_CALL spec_to_string
@@ -95,5 +95,5 @@ MAGNA_API am_bool MAGNA_CALL spec_verify
 {
     assert (spec != NULL);
 
-    return 0;
+    return AM_FALSE;
 }

@@ -103,8 +103,8 @@ MAGNA_API am_bool MAGNA_CALL strblank
 MAGNA_API int MAGNA_CALL strchg
     (
         char *str,
-        int oldch,
-        int newch
+        char oldch,
+        char newch
     )
 {
     int result = 0;
@@ -112,7 +112,7 @@ MAGNA_API int MAGNA_CALL strchg
 
     while (*ptr) {
         if (*ptr == oldch) {
-            *ptr = (char) newch;
+            *ptr = newch;
             ++result;
         }
         ++ptr;

@@ -215,7 +215,7 @@ static int tester_main (int argc, const char **argv)
 
     printf ("\nTOTAL: success=%d, failure=%d\n", success, failure);
 
-    return 0;
+    return failure;
 }
 
 #endif

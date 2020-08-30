@@ -185,7 +185,8 @@ typedef int  am_handle;
 #define MAGNA_VERSION_MAJOR 0u
 #define MAGNA_VERSION_MINOR 1u
 
-MAGNA_API am_int32 magna_version (void);
+MAGNA_API am_int32 magna_version    (void);
+MAGNA_API am_bool  magna_on_windows (void);
 
 /*=========================================================*/
 
@@ -306,6 +307,14 @@ MAGNA_API am_bool     MAGNA_CALL fastbuf_put_utf8  (FastBuffer *buffer, int c);
 MAGNA_API am_size     MAGNA_CALL fastbuf_read      (FastBuffer *buffer, am_byte *data, am_size size);
 MAGNA_API void        MAGNA_CALL fastbuf_rewind    (FastBuffer *buffer);
 MAGNA_API am_bool     MAGNA_CALL fastbuf_write     (FastBuffer *buffer, const am_byte *data, am_size dataSize);
+
+/*=========================================================*/
+
+/* Работа с путями */
+
+MAGNA_API am_bool MAGNA_CALL path_get_current_directory (Buffer *path);
+MAGNA_API Span    MAGNA_CALL path_get_extension         (const Buffer *path);
+MAGNA_API am_bool MAGNA_CALL path_set_current_directory (const Buffer *path);
 
 /*=========================================================*/
 

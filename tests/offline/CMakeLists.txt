@@ -11,6 +11,7 @@ set(CFiles
     src/buffer.c
     src/ean.c
     src/main.c
+    src/path.c
     src/span.c
 )
 

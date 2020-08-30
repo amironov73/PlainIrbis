@@ -9,7 +9,18 @@
 TESTER(get_magna_version)
 {
     int version = magna_version();
-    CHECK (version == 0);
+    CHECK (version == 0x0001);
+}
+
+TESTER(magna_on_windows)
+{
+    am_bool rc = magna_on_windows();
+
+#ifdef MAGNA_WINDOWS
+    CHECK (rc);
+#else
+    CHECK (!rc);
+#endif
 }
 
 /*=========================================================*/

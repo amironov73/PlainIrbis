@@ -9,12 +9,20 @@
 
 #ifdef _MSC_VER
 
-#include <malloc.h>
-#define alloca _alloca
+    #include <malloc.h>
+    #define alloca _alloca
 
 #else
 
-#include <alloca.h>
+    #if defined(__MINGW32__) || defined(__MINGW64__)
+
+        #include <malloc.h>
+
+    #else
+
+        #include <alloca.h>
+
+    #endif
 
 #endif
 

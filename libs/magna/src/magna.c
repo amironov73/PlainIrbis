@@ -13,3 +13,20 @@ MAGNA_API am_int32 magna_version (void)
     return (MAGNA_VERSION_MAJOR << 16u) + MAGNA_VERSION_MINOR;
 }
 
+/**
+ * Запущено на Windows?
+ *
+ * @return Да или нет.
+ */
+MAGNA_API am_bool magna_on_windows (void)
+{
+#ifdef MAGNA_WINDOWS
+
+    return AM_TRUE;
+
+#else
+
+    return AM_FALSE;
+
+#endif
+}
