@@ -22,6 +22,7 @@ set(CFiles
     src/io.c
     src/keyboard.c
     src/magna.c
+    src/navigatr.c
     src/path.c
     src/screen.c
     src/span.c

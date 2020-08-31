@@ -348,6 +348,34 @@ MAGNA_API am_bool     MAGNA_CALL fastbuf_write     (FastBuffer *buffer, const am
 
 /*=========================================================*/
 
+/* Навигация по тексту */
+
+typedef struct
+{
+    const am_byte *data;
+    am_size column, length, line, position;
+
+} TextNavigator;
+
+#define NAV_EOT (-1)
+
+MAGNA_API TextNavigator* MAGNA_CALL nav_init         (TextNavigator* nav, const am_byte *data, am_size dataSize);
+MAGNA_API const am_byte* MAGNA_CALL nav_end          (const TextNavigator *nav);
+MAGNA_API const am_byte* MAGNA_CALL nav_current      (const TextNavigator *nav);
+MAGNA_API am_bool        MAGNA_CALL nav_eot          (const TextNavigator *nav);
+MAGNA_API int            MAGNA_CALL nav_at           (const TextNavigator *nav, am_size position);
+MAGNA_API int            MAGNA_CALL nav_front        (const TextNavigator *nav);
+MAGNA_API int            MAGNA_CALL nav_back         (const TextNavigator *nav);
+MAGNA_API int            MAGNA_CALL nav_look_ahead   (const TextNavigator *nav, am_size distance);
+MAGNA_API int            MAGNA_CALL nav_look_behind  (const TextNavigator *nav, am_size distance);
+MAGNA_API TextNavigator* MAGNA_CALL nav_move         (TextNavigator *nav, am_ssize distance);
+MAGNA_API int            MAGNA_CALL nav_peek         (const TextNavigator * nav);
+MAGNA_API int            MAGNA_CALL nav_peek_no_crlf (const TextNavigator *nav);
+MAGNA_API int            MAGNA_CALL nav_read         (TextNavigator *nav);
+MAGNA_API int            MAGNA_CALL nav_read_no_crlf (TextNavigator *nav);
+
+/*=========================================================*/
+
 /* Работа с путями */
 
 MAGNA_API am_bool MAGNA_CALL path_get_current_directory (Buffer *path);
