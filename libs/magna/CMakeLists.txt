@@ -14,6 +14,7 @@ set(CFiles
     src/array.c
     src/beep.c
     src/buffer.c
+    src/chunked.c
     src/delphi.c
     src/encoding.c
     src/error.c

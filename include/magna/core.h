@@ -282,6 +282,44 @@ MAGNA_API void    MAGNA_CALL buffer_write          (Buffer *target, const am_byt
 
 /*=========================================================*/
 
+/* Блок памяти */
+
+typedef struct MagnaMemoryChunk
+{
+    am_byte *data;
+    struct MagnaMemoryChunk *next;
+
+} MemoryChunk;
+
+/* Буфер, состоящий из блоков */
+typedef struct
+{
+    MemoryChunk *first, *current, *last;
+    am_size chunkSize, position, read;
+
+} ChunkedBuffer;
+
+MAGNA_API Buffer*        MAGNA_CALL chunked_all            (const ChunkedBuffer *chunked, Buffer *buffer);
+MAGNA_API am_size        MAGNA_CALL chunked_capacity       (const ChunkedBuffer *chunked);
+MAGNA_API am_bool        MAGNA_CALL chunked_eof            (const ChunkedBuffer *chunked);
+MAGNA_API void           MAGNA_CALL chunked_free           (ChunkedBuffer *chunked);
+MAGNA_API am_bool        MAGNA_CALL chunked_grow           (ChunkedBuffer *chunked, am_size newSize);
+MAGNA_API ChunkedBuffer* MAGNA_CALL chunked_init           (ChunkedBuffer *chunked, am_size chunkSize);
+MAGNA_API int            MAGNA_CALL chunked_peek           (const ChunkedBuffer *chunked);
+MAGNA_API am_size        MAGNA_CALL chunked_position       (const ChunkedBuffer *chunked);
+MAGNA_API int            MAGNA_CALL chunked_read_byte      (ChunkedBuffer *chunked);
+MAGNA_API am_size        MAGNA_CALL chunked_read           (ChunkedBuffer *chunked, Buffer *buffer, am_size count);
+MAGNA_API am_size        MAGNA_CALL chunked_read_line      (ChunkedBuffer *chunked, Buffer *buffer);
+MAGNA_API am_size        MAGNA_CALL chunked_read_remaining (ChunkedBuffer *chunked, Buffer *buffer);
+MAGNA_API am_size        MAGNA_CALL chunked_remaining_size (const ChunkedBuffer *chunked);
+MAGNA_API ChunkedBuffer* MAGNA_CALL chunked_rewind         (ChunkedBuffer *chunked);
+MAGNA_API am_size        MAGNA_CALL chunked_size           (const ChunkedBuffer *chunked);
+MAGNA_API am_bool        MAGNA_CALL chunked_write          (ChunkedBuffer *chunked, am_byte *data, am_size dataSize);
+MAGNA_API am_bool        MAGNA_CALL chunked_write_byte     (ChunkedBuffer *chunked, am_byte value);
+MAGNA_API am_bool        MAGNA_CALL chunked_write_text     (ChunkedBuffer *chunked, const char *text);
+
+/*=========================================================*/
+
 /* Буфер, хранящий часть данных на стеке */
 
 typedef struct

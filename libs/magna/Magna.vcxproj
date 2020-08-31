@@ -22,6 +22,7 @@
     <ClCompile Include="src\array.c" />
     <ClCompile Include="src\beep.c" />
     <ClCompile Include="src\buffer.c" />
+    <ClCompile Include="src\chunked.c" />
     <ClCompile Include="src\delphi.c" />
     <ClCompile Include="src\encoding.c" />
     <ClCompile Include="src\error.c" />
