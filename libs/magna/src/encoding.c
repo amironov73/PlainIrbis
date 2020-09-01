@@ -27,13 +27,13 @@
  * @param length Длина текста в символах.
  * @return Длина заданного текста в UTF-8 в байтах.
  */
-MAGNA_API am_size count_utf
+MAGNA_API am_size_t count_utf
     (
-        am_wchar *src,
-        am_size length
+            am_wchar *src,
+            am_size_t length
     )
 {
-    am_size result = 0;
+    am_size_t result = 0;
     unsigned int c;
 
     while (length != 0) {

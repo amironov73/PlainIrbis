@@ -7,6 +7,12 @@
 /* ReSharper disable IdentifierTypo */
 /* ReSharper disable CommentTypo */
 
+/*!
+ * \file record.c
+ *
+ * Запись в формате MARC.
+ */
+
 /*=========================================================*/
 
 #ifdef _MSC_VER
@@ -78,7 +84,7 @@ MAGNA_API MarcRecord* MAGNA_CALL record_clone
         const MarcRecord *source
     )
 {
-    am_size index;
+    am_size_t index;
     const MarcField *src;
     MarcField *dst;
 
@@ -163,7 +169,7 @@ MAGNA_API Span MAGNA_CALL record_fm
         char code
     )
 {
-    am_size i, j;
+    am_size_t i, j;
     const MarcField *field;
     const SubField *subfield;
 
@@ -226,13 +232,13 @@ MAGNA_API am_bool MAGNA_CALL record_fma
  */
 MAGNA_API MarcField* MAGNA_CALL record_get_field
     (
-        const MarcRecord *record,
-        am_uint32 tag,
-        am_size occurrence
+            const MarcRecord *record,
+            am_uint32 tag,
+            am_size_t occurrence
     )
 {
     const MarcField *field;
-    am_size i;
+    am_size_t i;
 
     assert (record != NULL);
 
@@ -247,6 +253,152 @@ MAGNA_API MarcField* MAGNA_CALL record_get_field
     }
 
     return NULL;
+}
+
+/**
+ * Получение массива ссылок на поля с указанной меткой.
+ *
+ * @param record Запись.
+ * @param array Массив, заполняемый ссылками на поля.
+ * @param tag Искомая метка поля.
+ * @return Признак успешности выполнения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL record_get_fields
+    (
+        const MarcRecord *record,
+        Array *array,
+        am_uint32 tag
+    )
+{
+    am_size_t i;
+    const MarcField *field;
+
+    assert (record != NULL);
+    assert (array != NULL);
+
+    for (i = 0; i < record->fields.len; ++i) {
+        field = (const MarcField *) array_get (&record->fields, i);
+        if (field->tag == tag) {
+            if (!array_push_back (array, (void*) field)) {
+                return AM_FALSE;
+            }
+        }
+    }
+
+    return AM_TRUE;
+}
+
+/**
+ * Выяснение количества полей с указанной меткой.
+ *
+ * @param record
+ * @param tag
+ * @return
+ */
+MAGNA_API am_size_t MAGNA_CALL record_count_fields
+    (
+        const MarcRecord *record,
+        am_uint32 tag
+    )
+{
+    am_size_t i, result = 0;
+    const MarcField *field;
+
+    assert (record != NULL);
+
+    for (i = 0; i < record->fields.len; ++i) {
+        field = (const MarcField *) array_get (&record->fields, i);
+        if (field->tag == tag) {
+            ++result;
+        }
+    }
+
+    return result;
+}
+
+/**
+ * Удаление всех повторений поля с указанной меткой.
+ *
+ * @param record Запись.
+ * @param tag Метка поля, подлежащая удалению.
+ */
+MAGNA_API void MAGNA_CALL record_remove_field
+    (
+        MarcRecord *record,
+        am_uint32 tag
+    )
+{
+    assert (record != NULL);
+}
+
+/**
+ * Установка значения поля.
+ *
+ * @param record
+ * @param tag
+ * @param value
+ * @return
+ */
+MAGNA_API am_bool MAGNA_CALL record_set_field
+    (
+        MarcRecord *record,
+        am_uint32 tag,
+        const char *value
+    )
+{
+    assert (record != NULL);
+
+    return AM_FALSE;
+}
+
+/**
+ * Сброс состояния записи. Может потребоваться, например,
+ * при переносе записи в другую базу данных.
+ *
+ * @param record Запись.
+ * @return Запись.
+ */
+MAGNA_API MarcRecord* MAGNA_CALL record_reset
+    (
+        MarcRecord *record
+    )
+{
+    assert (record != NULL);
+
+    record->mfn = 0;
+    record->status = 0;
+    record->version = 0;
+    record->database.position = 0;
+
+    return record;
+}
+
+/**
+ * Верификация записи.
+ *
+ * @param record Запись.
+ * @return Результат выполнения верификации.
+ */
+MAGNA_API am_bool MAGNA_CALL record_verify
+    (
+        const MarcRecord *record
+    )
+{
+    am_bool result;
+    am_size_t i;
+    const MarcField *field;
+
+    assert (record != NULL);
+
+    result = record->fields.len != 0;
+    for (i = 0; i < record->fields.len; ++i) {
+        field = (const MarcField *) array_get (&record->fields, i);
+        if (!field_verify(field)) {
+            result = AM_FALSE;
+        }
+    }
+
+    return result;
 }
 
 /*=========================================================*/

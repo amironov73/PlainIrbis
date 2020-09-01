@@ -89,7 +89,7 @@ MAGNA_API void MAGNA_CALL array_concat
         Array *source
     )
 {
-    am_size index;
+    am_size_t index;
 
     assert (target != NULL);
     assert (source != NULL);
@@ -108,8 +108,8 @@ MAGNA_API void MAGNA_CALL array_concat
  */
 MAGNA_API void MAGNA_CALL array_create
     (
-        Array *array,
-        am_size capacity
+            Array *array,
+            am_size_t capacity
     )
 {
     assert (array != NULL);
@@ -154,8 +154,8 @@ MAGNA_API void MAGNA_CALL array_free
  */
 MAGNA_API void* MAGNA_CALL array_get
     (
-        const Array *array,
-        am_size index
+            const Array *array,
+            am_size_t index
     )
 {
     assert (array != NULL);
@@ -171,8 +171,8 @@ MAGNA_API void* MAGNA_CALL array_get
  */
 MAGNA_API am_bool MAGNA_CALL array_grow
     (
-        Array *array,
-        am_size newSize
+            Array *array,
+            am_size_t newSize
     )
 {
     void **newPtr;
@@ -242,7 +242,7 @@ MAGNA_API void* MAGNA_CALL array_pop_front
  * @param array
  * @param item
  */
-MAGNA_API void MAGNA_CALL array_push_back
+MAGNA_API am_bool MAGNA_CALL array_push_back
     (
         Array *array,
         void *item
@@ -250,9 +250,14 @@ MAGNA_API void MAGNA_CALL array_push_back
 {
     assert (array != NULL);
 
-    array_grow (array, array->len + 1);
+    if (!array_grow (array, array->len + 1)) {
+        return AM_FALSE;
+    }
+
     array->ptr [array->len] = item;
     ++(array->len);
+
+    return AM_TRUE;
 }
 
 /**
@@ -260,7 +265,7 @@ MAGNA_API void MAGNA_CALL array_push_back
  * @param array
  * @param item
  */
-MAGNA_API void MAGNA_CALL array_push_front
+MAGNA_API am_bool MAGNA_CALL array_push_front
     (
         Array *array,
         void *item
@@ -270,12 +275,18 @@ MAGNA_API void MAGNA_CALL array_push_front
 
     assert (array != NULL);
 
-    array_grow (array, array->len + 1);
+    if (!array_grow (array, array->len + 1)) {
+        return AM_FALSE;
+    }
+
     for (index = array->len; index != 0; --index) {
         array->ptr [index] = array->ptr [index - 1];
     }
+
     array->ptr [0] = item;
     ++(array->len);
+
+    return AM_TRUE;
 }
 
 /**
@@ -286,9 +297,9 @@ MAGNA_API void MAGNA_CALL array_push_front
  */
 MAGNA_API void MAGNA_CALL array_set
     (
-        Array *array,
-        am_size index,
-        void *item
+            Array *array,
+            am_size_t index,
+            void *item
     )
 {
     assert (array != NULL);
@@ -308,8 +319,8 @@ MAGNA_API void MAGNA_CALL array_set
  */
 MAGNA_API void MAGNA_CALL array_truncate
     (
-        Array *array,
-        am_size newSize
+            Array *array,
+            am_size_t newSize
     )
 {
     size_t index;

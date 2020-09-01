@@ -225,8 +225,8 @@ MAGNA_API Array*     MAGNA_CALL field_get_embedded_fields      (const MarcField 
 MAGNA_API SubField*  MAGNA_CALL field_get_first_subfield       (const MarcField *field, char code);
 MAGNA_API Span       MAGNA_CALL field_get_first_subfield_value (const MarcField *field, char code);
 MAGNA_API MarcField* MAGNA_CALL field_init                     (MarcField *field, am_uint32 tag);
-MAGNA_API MarcField* MAGNA_CALL field_insert_at                (MarcField *field, am_size index, const SubField *subfield);
-MAGNA_API MarcField* MAGNA_CALL field_remove_at                (MarcField *field, am_size index);
+MAGNA_API MarcField* MAGNA_CALL field_insert_at                (MarcField *field, am_size_t index, const SubField *subfield);
+MAGNA_API MarcField* MAGNA_CALL field_remove_at                (MarcField *field, am_size_t index);
 MAGNA_API MarcField* MAGNA_CALL field_remove_subfield          (MarcField *field, char code);
 MAGNA_API Buffer*    MAGNA_CALL field_to_string                (const MarcField *field, Buffer *buffer);
 MAGNA_API am_bool    MAGNA_CALL field_verify                   (const MarcField *field);
@@ -251,7 +251,7 @@ MAGNA_API am_bool     MAGNA_CALL record_decode_lines (MarcRecord *record, Array 
 MAGNA_API am_bool     MAGNA_CALL record_encode       (const MarcRecord *record, const char *delimiter, Buffer *buffer);
 MAGNA_API Span        MAGNA_CALL record_fm           (const MarcRecord *record, am_uint32 tag, char code);
 MAGNA_API am_bool     MAGNA_CALL record_fma          (const MarcRecord *record, Array *array, am_uint32 tag, char code);
-MAGNA_API MarcField*  MAGNA_CALL record_get_field    (const MarcRecord *record, am_uint32 tag, am_size occurrence);
+MAGNA_API MarcField*  MAGNA_CALL record_get_field    (const MarcRecord *record, am_uint32 tag, am_size_t occurrence);
 
 /*=========================================================*/
 

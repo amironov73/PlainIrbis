@@ -30,6 +30,7 @@
     <ClCompile Include="src\io.c" />
     <ClCompile Include="src\keyboard.c" />
     <ClCompile Include="src\magna.c" />
+    <ClCompile Include="src\memory.c" />
     <ClCompile Include="src\navigatr.c" />
     <ClCompile Include="src\path.c" />
     <ClCompile Include="src\screen.c" />

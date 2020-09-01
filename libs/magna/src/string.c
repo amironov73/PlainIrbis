@@ -130,13 +130,13 @@ MAGNA_API int MAGNA_CALL strchg
  * @return The number of occurrences of the given character
  * in the string.
  */
-MAGNA_API am_size MAGNA_CALL strocc
+MAGNA_API am_size_t MAGNA_CALL strocc
     (
         char *str,
         int ch
     )
 {
-    am_size result = 0;
+    am_size_t result = 0;
     char *ptr = str;
 
     while (*ptr) {

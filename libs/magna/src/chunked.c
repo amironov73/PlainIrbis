@@ -33,8 +33,8 @@
  */
 MAGNA_API ChunkedBuffer* MAGNA_CALL chunked_init
     (
-        ChunkedBuffer *chunked,
-        am_size chunkSize
+            ChunkedBuffer *chunked,
+            am_size_t chunkSize
     )
 {
     assert (chunked != NULL);
@@ -100,7 +100,7 @@ MAGNA_API int MAGNA_CALL chunked_peek
  * @param chunked
  * @return
  */
-MAGNA_API am_size MAGNA_CALL chunked_position
+MAGNA_API am_size_t MAGNA_CALL chunked_position
     (
         const ChunkedBuffer *chunked
     )
@@ -134,11 +134,11 @@ MAGNA_API int MAGNA_CALL chunked_read_byte
  * @param count
  * @return
  */
-MAGNA_API am_size MAGNA_CALL chunked_read
+MAGNA_API am_size_t MAGNA_CALL chunked_read
     (
-        ChunkedBuffer *chunked,
-        Buffer *buffer,
-        am_size count
+            ChunkedBuffer *chunked,
+            Buffer *buffer,
+            am_size_t count
     )
 {
     assert (chunked != NULL);
@@ -154,7 +154,7 @@ MAGNA_API am_size MAGNA_CALL chunked_read
  * @param buffer
  * @return
  */
-MAGNA_API am_size MAGNA_CALL chunked_read_line
+MAGNA_API am_size_t MAGNA_CALL chunked_read_line
     (
         ChunkedBuffer *chunked,
         Buffer *buffer
@@ -173,7 +173,7 @@ MAGNA_API am_size MAGNA_CALL chunked_read_line
  * @param buffer
  * @return
  */
-MAGNA_API am_size MAGNA_CALL chunked_read_remaining
+MAGNA_API am_size_t MAGNA_CALL chunked_read_remaining
     (
         ChunkedBuffer *chunked,
         Buffer *buffer
@@ -191,7 +191,7 @@ MAGNA_API am_size MAGNA_CALL chunked_read_remaining
  * @param chunked Буфер.
  * @return
  */
-MAGNA_API am_size MAGNA_CALL chunked_remaining_size
+MAGNA_API am_size_t MAGNA_CALL chunked_remaining_size
     (
         const ChunkedBuffer *chunked
     )
@@ -223,7 +223,7 @@ MAGNA_API ChunkedBuffer* MAGNA_CALL chunked_rewind
  * @param chunked
  * @return
  */
-MAGNA_API am_size MAGNA_CALL chunked_size
+MAGNA_API am_size_t MAGNA_CALL chunked_size
     (
         const ChunkedBuffer *chunked
     )
@@ -239,7 +239,7 @@ MAGNA_API am_size MAGNA_CALL chunked_size
  * @param chunked
  * @return
  */
-MAGNA_API am_size MAGNA_CALL chunked_capacity
+MAGNA_API am_size_t MAGNA_CALL chunked_capacity
     (
         const ChunkedBuffer *chunked
     )
@@ -277,8 +277,8 @@ MAGNA_API Buffer* MAGNA_CALL chunked_all
  */
 MAGNA_API am_bool MAGNA_CALL chunked_grow
     (
-        ChunkedBuffer *chunked,
-        am_size newSize
+            ChunkedBuffer *chunked,
+            am_size_t newSize
     )
 {
     assert (chunked != NULL);
@@ -296,9 +296,9 @@ MAGNA_API am_bool MAGNA_CALL chunked_grow
  */
 MAGNA_API am_bool MAGNA_CALL chunked_write
     (
-        ChunkedBuffer *chunked,
-        am_byte *data,
-        am_size dataSize
+            ChunkedBuffer *chunked,
+            am_byte *data,
+            am_size_t dataSize
     )
 {
     assert (chunked != NULL);

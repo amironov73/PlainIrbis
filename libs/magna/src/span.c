@@ -34,7 +34,7 @@
 MAGNA_API Span MAGNA_CALL span_init
     (
         am_byte *ptr,
-        am_size len
+        am_size_t len
     )
 {
     Span result = { ptr, len };
@@ -50,14 +50,14 @@ MAGNA_API Span MAGNA_CALL span_init
  */
 MAGNA_API Span MAGNA_CALL span_from_text
     (
-        char *str
+        const char *str
     )
 {
     Span result;
 
     assert (str != NULL);
 
-    result.ptr = str;
+    result.ptr = (am_byte*) str;
     result.len = strlen (str);
 
     return result;
@@ -119,7 +119,7 @@ MAGNA_API Span MAGNA_CALL span_trim_end
  * @param span
  * @return
  */
-MAGNA_API Span  MAGNA_CALL span_trim
+MAGNA_API Span MAGNA_CALL span_trim
     (
         Span span
     )
@@ -143,7 +143,7 @@ MAGNA_API am_uint32 MAGNA_CALL span_to_uint_32
 {
     am_uint32 result = 0;
     am_byte *ptr = span.ptr;
-    am_size len = span.len;
+    am_size_t len = span.len;
 
     while (len--) {
         result = result * 10 + (*ptr++ - '0');
@@ -165,7 +165,7 @@ MAGNA_API am_uint64 MAGNA_CALL span_to_uint_64
 {
     am_uint64 result = 0;
     am_byte *ptr = span.ptr;
-    am_size len = span.len;
+    am_size_t len = span.len;
 
     while (len--) {
         result = result * 10 + (*ptr++ - '0');
@@ -179,18 +179,20 @@ MAGNA_API am_uint64 MAGNA_CALL span_to_uint_64
  *
  * @param span
  */
-MAGNA_API void MAGNA_CALL span_toupper
+MAGNA_API Span MAGNA_CALL span_toupper
     (
         Span span
     )
 {
     am_byte *ptr = span.ptr;
-    am_size len = span.len;
+    am_size_t len = span.len;
 
     while (len--) {
         *ptr = (am_byte) toupper (*ptr);
         ++ptr;
     }
+
+    return span;
 }
 
 /**
@@ -198,18 +200,20 @@ MAGNA_API void MAGNA_CALL span_toupper
  *
  * @param span
  */
-MAGNA_API void MAGNA_CALL span_tolower
+MAGNA_API Span MAGNA_CALL span_tolower
     (
         Span span
     )
 {
     am_byte *ptr = span.ptr;
-    am_size len = span.len;
+    am_size_t len = span.len;
 
     while (len--) {
         *ptr = (am_byte) tolower (*ptr);
         ++ptr;
     }
+
+    return span;
 }
 
 /**
@@ -233,24 +237,22 @@ MAGNA_API am_bool MAGNA_CALL span_is_empty
  * @param value
  * @return
  */
-MAGNA_API am_bool MAGNA_CALL span_contains
+MAGNA_API am_byte* MAGNA_CALL span_find_byte
     (
         Span span,
         am_byte value
     )
 {
-    am_bool result = 0;
     am_byte *ptr = span.ptr;
-    am_size len = span.len;
+    am_size_t len = span.len;
 
     while (len--) {
         if (*ptr++ == value) {
-            result = 1;
-            break;
+            return ptr;
         }
     }
 
-    return result;
+    return NULL;
 }
 
 /**
@@ -259,18 +261,20 @@ MAGNA_API am_bool MAGNA_CALL span_contains
  * @param span
  * @param value
  */
-MAGNA_API void MAGNA_CALL span_fill
+MAGNA_API Span MAGNA_CALL span_fill
     (
         Span span,
         am_byte value
     )
 {
     am_byte *ptr = span.ptr;
-    am_size len = span.len;
+    am_size_t len = span.len;
 
     while (len--) {
         *ptr++ = value;
     }
+
+    return span;
 }
 
 /**
@@ -280,17 +284,17 @@ MAGNA_API void MAGNA_CALL span_fill
  * @param value
  * @return
  */
-MAGNA_API am_ssize MAGNA_CALL span_index_of
+MAGNA_API am_ssize_t MAGNA_CALL span_index_of
     (
         Span span,
         am_byte value
     )
 {
-    am_size i;
+    am_size_t i;
 
     for (i = 0; i < span.len; ++i) {
         if (span.ptr[i] == value) {
-            return (am_ssize) i;
+            return (am_ssize_t) i;
         }
     }
 
@@ -304,13 +308,13 @@ MAGNA_API am_ssize MAGNA_CALL span_index_of
  * @param value
  * @return
  */
-MAGNA_API am_ssize MAGNA_CALL span_last_index_of
+MAGNA_API am_ssize_t MAGNA_CALL span_last_index_of
     (
         Span span,
         am_byte value
     )
 {
-    am_ssize i;
+    am_ssize_t i;
 
     for (i = span.len - 1; i >= 0; --i) {
         if (span.ptr[i] == value) {
@@ -332,8 +336,8 @@ MAGNA_API am_ssize MAGNA_CALL span_last_index_of
 MAGNA_API Span MAGNA_CALL span_slice
     (
         Span span,
-        am_ssize start,
-        am_ssize length
+        am_ssize_t start,
+        am_ssize_t length
     )
 {
     Span result = span;
@@ -363,7 +367,10 @@ MAGNA_API char* MAGNA_CALL span_to_string
         Span span
     )
 {
-    char *result = calloc (span.len + 1, 1);
+    char *result = mem_alloc (span.len + 1);
+    if (!result) {
+        return result;
+    }
 
     if (span.len != 0 && span.ptr != NULL) {
         memcpy (result, span.ptr, span.len);
@@ -384,7 +391,7 @@ MAGNA_API am_byte* MAGNA_CALL span_to_vector
         Span span
     )
 {
-    am_byte *result = malloc (span.len);
+    am_byte *result = mem_alloc (span.len);
 
     if (span.len != 0 && span.ptr != NULL) {
         memcpy (result, span.ptr, span.len);
@@ -438,6 +445,115 @@ MAGNA_API int MAGNA_CALL span_compare
         Span second
     )
 {
+    int result;
+    am_size_t i;
+
+    for (i = 0; ; ++i) {
+        if (i == first.len) {
+            if (i == second.len) {
+                return 0;
+            }
+
+            return -1;
+        }
+
+        if (i == second.len) {
+            return 1;
+        }
+
+        result = first.ptr[i] - second.ptr[i];
+        if (result) {
+            return result;
+        }
+    }
+}
+
+/**
+ * Разбиение по указанному символу.
+ *
+ * @param span
+ * @param array
+ * @param value
+ * @return
+ */
+MAGNA_API struct MagnaArray* MAGNA_CALL span_split_by_char
+    (
+        Span span,
+        struct MagnaArray *array,
+        am_byte value
+    )
+{
+    assert (array != NULL);
+
+    return array;
+}
+
+/**
+ * Разбиение по указанным символам.
+ *
+ * @param span
+ * @param array
+ * @param values
+ * @param valueCount
+ * @return
+ */
+MAGNA_API struct MagnaArray* MAGNA_CALL span_split_by_chars
+    (
+        Span span,
+        struct MagnaArray *array,
+        const am_byte *values,
+        am_size_t valueCount
+    )
+{
+    assert (array != NULL);
+    assert (values != NULL);
+
+    return array;
+}
+
+/**
+ * Разбиение по указанному символу.
+ *
+ * @param span
+ * @param array
+ * @param arraySize
+ * @param value
+ * @return
+ */
+MAGNA_API am_size_t MAGNA_CALL span_split_n_by_char
+    (
+        Span span,
+        Span *array,
+        size_t arraySize,
+        am_byte value
+    )
+{
+    assert (array != NULL);
+
+    return 0;
+}
+
+/**
+ * Разбиение по указанным символам.
+ *
+ * @param span
+ * @param array
+ * @param arraySize
+ * @param values
+ * @param valueCount
+ * @return
+ */
+MAGNA_API am_size_t MAGNA_CALL span_split_n_by_chars
+    (
+        Span span,
+        Span *array,
+        size_t arraySize,
+        am_byte *values,
+        am_size_t valueCount
+    )
+{
+    assert (array != NULL);
+
     return 0;
 }
 

@@ -36,9 +36,9 @@
  */
 MAGNA_API TextNavigator* MAGNA_CALL nav_init
     (
-        TextNavigator* nav,
-        const am_byte *data,
-        am_size dataSize
+            TextNavigator* nav,
+            const am_byte *data,
+            am_size_t dataSize
     )
 {
     assert (data != NULL);
@@ -107,7 +107,7 @@ MAGNA_API TextNavigator* MAGNA_CALL nav_from_text
     assert (nav != NULL);
     assert (text != NULL);
 
-    return nav_init (nav, (am_byte*) text, (am_size) strlen (text));
+    return nav_init (nav, (am_byte*) text, (am_size_t) strlen (text));
 }
 
 /**
@@ -168,8 +168,8 @@ MAGNA_API am_bool MAGNA_CALL nav_eot
  */
 MAGNA_API int MAGNA_CALL nav_at
     (
-        const TextNavigator *nav,
-        am_size position
+            const TextNavigator *nav,
+            am_size_t position
     )
 {
     assert (nav != NULL);
@@ -220,11 +220,11 @@ MAGNA_API int MAGNA_CALL nav_back
  */
 MAGNA_API int MAGNA_CALL nav_look_ahead
     (
-        const TextNavigator *nav,
-        am_size distance
+            const TextNavigator *nav,
+            am_size_t distance
     )
 {
-    am_size newPos;
+    am_size_t newPos;
 
     assert (nav != NULL);
 
@@ -242,11 +242,11 @@ MAGNA_API int MAGNA_CALL nav_look_ahead
  */
 MAGNA_API int MAGNA_CALL nav_look_behind
     (
-        const TextNavigator *nav,
-        am_size distance
+            const TextNavigator *nav,
+            am_size_t distance
     )
 {
-    am_size newPos;
+    am_size_t newPos;
 
     assert (nav != NULL);
 
@@ -264,8 +264,8 @@ MAGNA_API int MAGNA_CALL nav_look_behind
  */
 MAGNA_API TextNavigator* MAGNA_CALL nav_move
     (
-        TextNavigator *nav,
-        am_ssize distance
+            TextNavigator *nav,
+            am_ssize_t distance
     )
 {
     assert (nav != NULL);
@@ -303,7 +303,7 @@ MAGNA_API int MAGNA_CALL nav_peek_no_crlf
         const TextNavigator *nav
     )
 {
-    am_size distance = 0;
+    am_size_t distance = 0;
     int result;
 
     assert (nav != NULL);
@@ -382,12 +382,12 @@ MAGNA_API int MAGNA_CALL nav_read_no_crlf
  */
 MAGNA_API Span MAGNA_CALL nav_peek_string
     (
-        const TextNavigator *nav,
-        am_size length
+            const TextNavigator *nav,
+            am_size_t length
     )
 {
     int c;
-    am_size i;
+    am_size_t i;
     Span result = SPAN_INIT;
 
     assert (nav != NULL);
@@ -419,7 +419,7 @@ MAGNA_API Span MAGNA_CALL nav_peek_to
     )
 {
     int c;
-    am_size i, length;
+    am_size_t i, length;
     Span result = SPAN_INIT;
 
     assert (nav != NULL);
@@ -452,7 +452,7 @@ MAGNA_API Span MAGNA_CALL nav_peek_until
     )
 {
     int c;
-    am_size i, length;
+    am_size_t i, length;
     Span result = SPAN_INIT;
 
     assert (nav != NULL);
@@ -484,7 +484,7 @@ MAGNA_API Span MAGNA_CALL nav_read_line
     )
 {
     am_byte c;
-    am_size start;
+    am_size_t start;
     Span result = SPAN_INIT;
 
     assert (nav != NULL);
@@ -659,12 +659,12 @@ MAGNA_API Span MAGNA_CALL nav_extract_integer
  */
 MAGNA_API Span MAGNA_CALL nav_read_string
     (
-        TextNavigator *nav,
-        am_size length
+            TextNavigator *nav,
+            am_size_t length
     )
 {
     int c;
-    am_size i;
+    am_size_t i;
     Span result = SPAN_INIT;
 
     assert (nav != NULL);
@@ -865,9 +865,9 @@ MAGNA_API Span MAGNA_CALL nav_to_span
  */
 MAGNA_API Span MAGNA_CALL nav_slice
     (
-        const TextNavigator *nav,
-        am_size offset,
-        am_size size
+            const TextNavigator *nav,
+            am_size_t offset,
+            am_size_t size
     )
 {
     Span result;
@@ -890,11 +890,11 @@ MAGNA_API Span MAGNA_CALL nav_slice
  */
 MAGNA_API Span MAGNA_CALL nav_recent
     (
-        const TextNavigator *nav,
-        am_ssize length
+            const TextNavigator *nav,
+            am_ssize_t length
     )
 {
-    am_ssize start;
+    am_ssize_t start;
 
     assert (nav != NULL);
 
@@ -904,7 +904,7 @@ MAGNA_API Span MAGNA_CALL nav_recent
         start = 0;
     }
 
-    if (((am_size)start) >= nav->length) {
+    if (((am_size_t)start) >= nav->length) {
         start = 0;
         length = 0;
     }
@@ -913,7 +913,7 @@ MAGNA_API Span MAGNA_CALL nav_recent
         length = 0;
     }
 
-    return nav_slice (nav, (am_size) start, (am_size) length);
+    return nav_slice (nav, (am_size_t) start, (am_size_t) length);
 }
 
 /**
