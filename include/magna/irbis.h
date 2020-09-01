@@ -245,6 +245,14 @@ typedef struct
 
 } MarcRecord;
 
+MAGNA_API MarcField*  MAGNA_CALL record_add          (MarcRecord *record, am_uint32 tag, const char *value);
+MAGNA_API MarcRecord* MAGNA_CALL record_clone        (MarcRecord *target, const MarcRecord *source);
+MAGNA_API am_bool     MAGNA_CALL record_decode_lines (MarcRecord *record, Array *lines);
+MAGNA_API am_bool     MAGNA_CALL record_encode       (const MarcRecord *record, const char *delimiter, Buffer *buffer);
+MAGNA_API Span        MAGNA_CALL record_fm           (const MarcRecord *record, am_uint32 tag, char code);
+MAGNA_API am_bool     MAGNA_CALL record_fma          (const MarcRecord *record, Array *array, am_uint32 tag, char code);
+MAGNA_API MarcField*  MAGNA_CALL record_get_field    (const MarcRecord *record, am_uint32 tag, am_size occurrence);
+
 /*=========================================================*/
 
 /* Спецификация файла на сервере */
@@ -353,10 +361,19 @@ MAGNA_API am_bool MAGNA_CALL connection_read_text_file     (Connection *connecti
 
 /*=========================================================*/
 
+/* EAN-8 и EAN-13 */
+
 MAGNA_API am_byte MAGNA_CALL ean13_compute_check_digit (Span text);
 MAGNA_API am_bool MAGNA_CALL ean13_check_control_digit (Span text);
 MAGNA_API am_byte MAGNA_CALL ean8_compute_check_digit  (Span text);
 MAGNA_API am_bool MAGNA_CALL ean8_check_control_digit  (Span text);
+
+/*=========================================================*/
+
+/* UPC-12 */
+
+MAGNA_API am_byte MAGNA_CALL upc12_compute_check_digit (Span text);
+MAGNA_API am_bool MAGNA_CALL upc12_check_control_digit (Span text);
 
 /*=========================================================*/
 

@@ -26,6 +26,7 @@ set(CFiles
     src/spec.c
     src/subfield.c
     src/tree.c
+    src/upc.c
 )
 
 add_library(${PROJECT_NAME}

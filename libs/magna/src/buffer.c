@@ -46,7 +46,7 @@ MAGNA_API am_size MAGNA_CALL buffer_calculate_size
 MAGNA_API Buffer* MAGNA_CALL buffer_clone
     (
         Buffer* target,
-        Buffer *source
+        const Buffer *source
     )
 {
     assert (target != NULL);
@@ -353,6 +353,27 @@ MAGNA_API Buffer* MAGNA_CALL buffer_from_text
     }
 
     return buffer;
+}
+
+/**
+ * Преобразование буфера в фрагмент.
+ *
+ * @param buffer Буфер.
+ * @return Фрагмент.
+ */
+MAGNA_API Span MAGNA_CALL buffer_to_span
+    (
+        const Buffer *buffer
+    )
+{
+    Span result;
+
+    assert (buffer != NULL);
+
+    result.ptr = buffer->ptr;
+    result.len = buffer->position;
+
+    return result;
 }
 
 /*=========================================================*/

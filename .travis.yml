@@ -4,8 +4,8 @@ compiler: gcc
 sudo: required
 
 script:
- - python -m pip install --upgrade pip
- - pip install --upgrade pygount
+ - python3 -m pip install --upgrade pip
+ - python3 -m pip install --upgrade pygount
  - pygount libs -f summary -s c
  - source ./build.sh
  - source ./runtests.sh

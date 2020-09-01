@@ -40,10 +40,10 @@ MAGNA_API am_bool MAGNA_CALL same_char
  * @param second
  * @return
  */
-MAGNA_API am_bool  MAGNA_CALL same_text
+MAGNA_API am_bool MAGNA_CALL same_text
     (
-        char *first,
-        char *second
+        const char *first,
+        const char *second
     )
 {
     int result;

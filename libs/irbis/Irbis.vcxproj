@@ -33,13 +33,14 @@
     <ClCompile Include="src\spec.c" />
     <ClCompile Include="src\subfield.c" />
     <ClCompile Include="src\tree.c" />
+    <ClCompile Include="src\upc.c" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{A0C90717-B17E-4312-99BF-C658010E2254}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>Irbis</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

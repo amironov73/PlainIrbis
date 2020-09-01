@@ -154,7 +154,7 @@ MAGNA_API void MAGNA_CALL array_free
  */
 MAGNA_API void* MAGNA_CALL array_get
     (
-        Array *array,
+        const Array *array,
         am_size index
     )
 {
@@ -169,7 +169,7 @@ MAGNA_API void* MAGNA_CALL array_get
  * @param array
  * @param newSize
  */
-MAGNA_API void MAGNA_CALL array_grow
+MAGNA_API am_bool MAGNA_CALL array_grow
     (
         Array *array,
         am_size newSize
@@ -187,6 +187,8 @@ MAGNA_API void MAGNA_CALL array_grow
         array->ptr = newPtr;
         array->capacity = newSize;
     }
+
+    return AM_TRUE;
 }
 
 /**

@@ -237,19 +237,19 @@ typedef struct
 
 } Array;
 
-MAGNA_API void   MAGNA_CALL array_clone      (Array *target, Array *source);
-MAGNA_API void   MAGNA_CALL array_copy       (Array *target, Array *source);
-MAGNA_API void   MAGNA_CALL array_concat     (Array *target, Array *source);
-MAGNA_API void   MAGNA_CALL array_create     (Array *array,  am_size capacity);
-MAGNA_API void   MAGNA_CALL array_free       (Array *array);
-MAGNA_API void*  MAGNA_CALL array_get        (Array *array,  am_size index);
-MAGNA_API void   MAGNA_CALL array_grow       (Array *array,  am_size newSize);
-MAGNA_API void*  MAGNA_CALL array_pop_back   (Array *array);
-MAGNA_API void*  MAGNA_CALL array_pop_front  (Array *array);
-MAGNA_API void   MAGNA_CALL array_push_back  (Array *array,  void *item);
-MAGNA_API void   MAGNA_CALL array_push_front (Array *array,  void *item);
-MAGNA_API void   MAGNA_CALL array_set        (Array *array,  am_size index, void *item);
-MAGNA_API void   MAGNA_CALL array_truncate   (Array *array,  am_size newSize);
+MAGNA_API void    MAGNA_CALL array_clone      (Array *target, Array *source);
+MAGNA_API void    MAGNA_CALL array_copy       (Array *target, Array *source);
+MAGNA_API void    MAGNA_CALL array_concat     (Array *target, Array *source);
+MAGNA_API void    MAGNA_CALL array_create     (Array *array,  am_size capacity);
+MAGNA_API void    MAGNA_CALL array_free       (Array *array);
+MAGNA_API void*   MAGNA_CALL array_get        (const Array *array,  am_size index);
+MAGNA_API am_bool MAGNA_CALL array_grow       (Array *array,  am_size newSize);
+MAGNA_API void*   MAGNA_CALL array_pop_back   (Array *array);
+MAGNA_API void*   MAGNA_CALL array_pop_front  (Array *array);
+MAGNA_API void    MAGNA_CALL array_push_back  (Array *array,  void *item);
+MAGNA_API void    MAGNA_CALL array_push_front (Array *array,  void *item);
+MAGNA_API void    MAGNA_CALL array_set        (Array *array,  am_size index, void *item);
+MAGNA_API void    MAGNA_CALL array_truncate   (Array *array,  am_size newSize);
 
 #define ARRAY_INIT { NULL, 0, 0, NULL, NULL }
 
@@ -266,7 +266,7 @@ typedef struct
 MAGNA_API Buffer* MAGNA_CALL buffer_assign         (Buffer *buffer, const am_byte *data, am_size length);
 MAGNA_API Buffer* MAGNA_CALL buffer_assign_text    (Buffer *buffer, const char *text);
 MAGNA_API am_size MAGNA_CALL buffer_calculate_size (am_size newSize);
-MAGNA_API Buffer* MAGNA_CALL buffer_clone          (Buffer *target, Buffer *source);
+MAGNA_API Buffer* MAGNA_CALL buffer_clone          (Buffer *target, const Buffer *source);
 MAGNA_API void    MAGNA_CALL buffer_copy           (Buffer *target, Buffer *source);
 MAGNA_API void    MAGNA_CALL buffer_concat         (Buffer *target, Buffer *source);
 MAGNA_API void    MAGNA_CALL buffer_create         (Buffer *buffer, am_byte *data, am_size length);
@@ -276,6 +276,7 @@ MAGNA_API void    MAGNA_CALL buffer_grow           (Buffer *buffer, am_size newS
 MAGNA_API void    MAGNA_CALL buffer_putc           (Buffer *buffer, char c);
 MAGNA_API void    MAGNA_CALL buffer_puts           (Buffer *buffer, const char *str);
 MAGNA_API void    MAGNA_CALL buffer_static         (Buffer *buffer, am_byte *data, am_size newSize);
+MAGNA_API Span    MAGNA_CALL buffer_to_span        (const Buffer *buffer);
 MAGNA_API void    MAGNA_CALL buffer_write          (Buffer *target, const am_byte *data, am_size length);
 
 #define BUFFER_INIT { NULL, 0, 0 }
@@ -357,22 +358,51 @@ typedef struct
 
 } TextNavigator;
 
+/**
+ * Признак достигнутого конца данных.
+ */
 #define NAV_EOT (-1)
 
-MAGNA_API TextNavigator* MAGNA_CALL nav_init         (TextNavigator* nav, const am_byte *data, am_size dataSize);
-MAGNA_API const am_byte* MAGNA_CALL nav_end          (const TextNavigator *nav);
-MAGNA_API const am_byte* MAGNA_CALL nav_current      (const TextNavigator *nav);
-MAGNA_API am_bool        MAGNA_CALL nav_eot          (const TextNavigator *nav);
-MAGNA_API int            MAGNA_CALL nav_at           (const TextNavigator *nav, am_size position);
-MAGNA_API int            MAGNA_CALL nav_front        (const TextNavigator *nav);
-MAGNA_API int            MAGNA_CALL nav_back         (const TextNavigator *nav);
-MAGNA_API int            MAGNA_CALL nav_look_ahead   (const TextNavigator *nav, am_size distance);
-MAGNA_API int            MAGNA_CALL nav_look_behind  (const TextNavigator *nav, am_size distance);
-MAGNA_API TextNavigator* MAGNA_CALL nav_move         (TextNavigator *nav, am_ssize distance);
-MAGNA_API int            MAGNA_CALL nav_peek         (const TextNavigator * nav);
-MAGNA_API int            MAGNA_CALL nav_peek_no_crlf (const TextNavigator *nav);
-MAGNA_API int            MAGNA_CALL nav_read         (TextNavigator *nav);
-MAGNA_API int            MAGNA_CALL nav_read_no_crlf (TextNavigator *nav);
+MAGNA_API int            MAGNA_CALL nav_at               (const TextNavigator *nav, am_size position);
+MAGNA_API int            MAGNA_CALL nav_back             (const TextNavigator *nav);
+MAGNA_API const am_byte* MAGNA_CALL nav_current          (const TextNavigator *nav);
+MAGNA_API const am_byte* MAGNA_CALL nav_end              (const TextNavigator *nav);
+MAGNA_API am_bool        MAGNA_CALL nav_eot              (const TextNavigator *nav);
+MAGNA_API Span           MAGNA_CALL nav_extract_integer  (TextNavigator *nav);
+MAGNA_API TextNavigator* MAGNA_CALL nav_from_buffer      (TextNavigator *nav, const Buffer *buffer);
+MAGNA_API TextNavigator* MAGNA_CALL nav_from_span        (TextNavigator *nav, Span span);
+MAGNA_API TextNavigator* MAGNA_CALL nav_from_text        (TextNavigator *nav, const char *text);
+MAGNA_API int            MAGNA_CALL nav_front            (const TextNavigator *nav);
+MAGNA_API TextNavigator* MAGNA_CALL nav_init             (TextNavigator* nav, const am_byte *data, am_size dataSize);
+MAGNA_API am_bool        MAGNA_CALL nav_is_control       (const TextNavigator *nav);
+MAGNA_API am_bool        MAGNA_CALL nav_is_digit         (const TextNavigator *nav);
+MAGNA_API am_bool        MAGNA_CALL nav_is_letter        (const TextNavigator *nav);
+MAGNA_API am_bool        MAGNA_CALL nav_is_whitespace    (const TextNavigator *nav);
+MAGNA_API int            MAGNA_CALL nav_look_ahead       (const TextNavigator *nav, am_size distance);
+MAGNA_API int            MAGNA_CALL nav_look_behind      (const TextNavigator *nav, am_size distance);
+MAGNA_API TextNavigator* MAGNA_CALL nav_move             (TextNavigator *nav, am_ssize distance);
+MAGNA_API int            MAGNA_CALL nav_peek             (const TextNavigator * nav);
+MAGNA_API int            MAGNA_CALL nav_peek_no_crlf     (const TextNavigator *nav);
+MAGNA_API Span           MAGNA_CALL nav_peek_string      (const TextNavigator *nav, am_size length);
+MAGNA_API Span           MAGNA_CALL nav_peek_to          (const TextNavigator *nav, am_byte stopChar);
+MAGNA_API Span           MAGNA_CALL nav_peek_until       (const TextNavigator *nav, am_byte stopChar);
+MAGNA_API int            MAGNA_CALL nav_read             (TextNavigator *nav);
+MAGNA_API Span           MAGNA_CALL nav_read_integer     (TextNavigator *nav);
+MAGNA_API Span           MAGNA_CALL nav_read_line        (TextNavigator *nav);
+MAGNA_API int            MAGNA_CALL nav_read_no_crlf     (TextNavigator *nav);
+MAGNA_API Span           MAGNA_CALL nav_read_string      (TextNavigator *nav, am_size length);
+MAGNA_API Span           MAGNA_CALL nav_read_to          (TextNavigator *nav, am_byte stopChar);
+MAGNA_API Span           MAGNA_CALL nav_read_until       (TextNavigator *nav, am_byte stopChar);
+MAGNA_API Span           MAGNA_CALL nav_read_while       (TextNavigator *nav, am_byte goodChar);
+MAGNA_API Span           MAGNA_CALL nav_read_word        (TextNavigator *nav);
+MAGNA_API Span           MAGNA_CALL nav_recent           (const TextNavigator *nav, am_ssize length);
+MAGNA_API Span           MAGNA_CALL nav_remaining        (const TextNavigator *nav);
+MAGNA_API Span           MAGNA_CALL nav_to_span          (const TextNavigator *nav);
+MAGNA_API void           MAGNA_CALL nav_skip_non_word    (TextNavigator *nav);
+MAGNA_API void           MAGNA_CALL nav_skip_punctuation (TextNavigator *nav);
+MAGNA_API void           MAGNA_CALL nav_skip_whitespace  (TextNavigator *nav);
+MAGNA_API Span           MAGNA_CALL nav_slice            (const TextNavigator *nav, am_size offset, am_size size);
+
 
 /*=========================================================*/
 
@@ -381,6 +411,13 @@ MAGNA_API int            MAGNA_CALL nav_read_no_crlf (TextNavigator *nav);
 MAGNA_API am_bool MAGNA_CALL path_get_current_directory (Buffer *path);
 MAGNA_API Span    MAGNA_CALL path_get_extension         (const Buffer *path);
 MAGNA_API am_bool MAGNA_CALL path_set_current_directory (const Buffer *path);
+
+/*=========================================================*/
+
+/* Работа со строками */
+
+MAGNA_API am_bool MAGNA_CALL same_char (int first, int second);
+MAGNA_API am_bool MAGNA_CALL same_text (const char *first, const char *second);
 
 /*=========================================================*/
 

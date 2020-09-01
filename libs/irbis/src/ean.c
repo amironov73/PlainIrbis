@@ -170,5 +170,3 @@ MAGNA_API am_bool MAGNA_CALL ean8_check_control_digit
 #endif
 
 /*=========================================================*/
-
-
