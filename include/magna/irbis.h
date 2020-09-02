@@ -287,12 +287,16 @@ typedef struct {
     Buffer buffer;
 } Query;
 
-MAGNA_API am_bool MAGNA_CALL query_create      (Connection *connection, Query *query, const char *command);
-MAGNA_API am_bool MAGNA_CALL query_add_ansi    (Query *query, const char *text);
-MAGNA_API am_bool MAGNA_CALL query_add_format  (Query *query, const char *text);
-MAGNA_API am_bool MAGNA_CALL query_add_int32   (Query *query, am_int32 value);
-MAGNA_API am_bool MAGNA_CALL query_add_utf     (Query *query, const char *text);
-MAGNA_API am_bool MAGNA_CALL query_new_line    (Query *query);
+MAGNA_API am_bool MAGNA_CALL query_add_ansi        (Query *query, const char *text);
+MAGNA_API am_bool MAGNA_CALL query_add_ansi_buffer (Query *query, const Buffer *text);
+MAGNA_API am_bool MAGNA_CALL query_add_format      (Query *query, const char *text);
+MAGNA_API am_bool MAGNA_CALL query_add_int_32      (Query *query, am_int32 value);
+MAGNA_API am_bool MAGNA_CALL query_add_utf         (Query *query, const char *text);
+MAGNA_API am_bool MAGNA_CALL query_add_utf_buffer  (Query *query, const Buffer *text);
+MAGNA_API am_bool MAGNA_CALL query_create          (Connection *connection, Query *query, const char *command);
+MAGNA_API am_bool MAGNA_CALL query_encode          (const Query *query, Buffer *prefix);
+MAGNA_API void    MAGNA_CALL query_free            (Query *query);
+MAGNA_API am_bool MAGNA_CALL query_new_line        (Query *query);
 
 /*=========================================================*/
 
@@ -307,10 +311,12 @@ typedef struct {
     am_int32 answerSize;
     Span serverVersion;
     struct IrbisConnection *connection;
+
 } Response;
 
-MAGNA_API am_int32 MAGNA_CALL response_create                (struct IrbisConnection *connection, Response *response);
+MAGNA_API am_bool  MAGNA_CALL response_create                (struct IrbisConnection *connection, Response *response);
 MAGNA_API am_bool             response_check                 (Response *response, ...);
+MAGNA_API void     MAGNA_CALL response_free                  (Response *response);
 MAGNA_API Span     MAGNA_CALL response_get_line              (Response *response);
 MAGNA_API am_int32 MAGNA_CALL response_get_return_code       (Response *response);
 MAGNA_API Span     MAGNA_CALL response_read_ansi             (Response *response);
@@ -332,6 +338,7 @@ struct IrbisConnection
     Buffer username;
     Buffer password;
     Buffer database;
+    char workstation;
     am_int32 clientId;
     am_int32 queryId;
     am_int32 lastError;
@@ -352,6 +359,7 @@ MAGNA_API am_bool MAGNA_CALL connection_delete_file        (Connection *connecti
 MAGNA_API am_bool MAGNA_CALL connection_delete_record      (Connection *connection, am_mfn mfn);
 MAGNA_API am_bool MAGNA_CALL connection_disconnect         (Connection *connection);
 MAGNA_API am_bool MAGNA_CALL connection_execute            (Connection *connection, Query *query, Response *response);
+MAGNA_API am_bool            connection_execute_simple     (Connection *connection, Response *response, const char *command, int argCount, ...);
 MAGNA_API void    MAGNA_CALL connection_free               (Connection *connection);
 MAGNA_API am_mfn  MAGNA_CALL connection_get_max_mfn        (Connection *connection, const char *database);
 MAGNA_API void    MAGNA_CALL connection_init               (Connection *connection);

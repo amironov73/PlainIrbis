@@ -5,18 +5,41 @@
 
 #include <assert.h>
 
+/**
+ * Добавление строки в кодировке ANSI (плюс перевод строки).
+ *
+ * @param query Клиентский запрос.
+ * @param text Добавляемая строка (может быть пустой).
+ * @return Признак успешности завершения операции.
+ */
 MAGNA_API am_bool MAGNA_CALL query_add_ansi
     (
         Query *query,
         const char *text
     )
 {
+    Buffer temp;
+
     assert (query != NULL);
     assert (text != NULL);
 
-    return 1;
+    buffer_from_text (&temp, text);
+    if (!buffer_ansi_to_utf8 (&query->buffer, &temp)
+        || !buffer_putc (&query->buffer, 0x0A)) {
+        return AM_FALSE;
+    }
+
+    return AM_TRUE;
 }
 
+/**
+ * Добавление строки формата с предварительной подготовкой.
+ * Также добавляется перевод строки.
+ *
+ * @param query Клиентский запрос.
+ * @param text Добавляемая строка формата (может быть пустой).
+ * @return Признак успешности завершения операции.
+ */
 MAGNA_API am_bool MAGNA_CALL query_add_format
     (
         Query *query,
@@ -26,20 +49,40 @@ MAGNA_API am_bool MAGNA_CALL query_add_format
     assert (query != NULL);
     assert (text != NULL);
 
-    return 1;
+    /* TODO: implement */
+
+    return AM_TRUE;
 }
 
-MAGNA_API am_bool MAGNA_CALL query_add_int32
+/**
+ * Добавление целого числа без знака (плюс перевод строки).
+ *
+ * @param query Клиентский запрос
+ * @param value Целое число.
+ * @return Признак успешности завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL query_add_int_32
     (
         Query *query,
         am_int32 value
     )
 {
+    am_byte temp[16];
+
     assert (query != NULL);
 
-    return 1;
+    sprintf (temp, "%u", value);
+
+    return query_add_utf (query, temp);
 }
 
+/**
+ * Добавление строки в кодировке UTF-8 (плюс перевод строки).
+ *
+ * @param query Клиентский запрос.
+ * @param text Добавляемая строка (может быть пустой).
+ * @return Признак успешности завершения операции.
+ */
 MAGNA_API am_bool MAGNA_CALL query_add_utf
     (
         Query *query,
@@ -49,9 +92,21 @@ MAGNA_API am_bool MAGNA_CALL query_add_utf
     assert (query != NULL);
     assert (text != NULL);
 
-    return 1;
+    if (!buffer_puts (&query->buffer, text)
+        || !buffer_putc (&query->buffer, 0x0A)) {
+        return AM_FALSE;
+    }
+
+    return AM_TRUE;
 }
 
+/**
+ * Добавление символа перевода строки (например,
+ * для создания в буфере пустой строки).
+ *
+ * @param query Клиентский запрос.
+ * @return Признак успешности завершения операции.
+ */
 MAGNA_API am_bool MAGNA_CALL query_new_line
     (
         Query *query
@@ -59,7 +114,7 @@ MAGNA_API am_bool MAGNA_CALL query_new_line
 {
     assert (query != NULL);
 
-    return 1;
+    return buffer_putc (&query->buffer, 0x0A);
 }
 
 /**
@@ -67,7 +122,7 @@ MAGNA_API am_bool MAGNA_CALL query_new_line
  *
  * @param connection Подключение.
  * @param query Создаваемый запрос.
- * @param command Команда.
+ * @param command Код команды (в кодировке UTF-8).
  */
 MAGNA_API am_bool MAGNA_CALL query_create
     (
@@ -78,6 +133,109 @@ MAGNA_API am_bool MAGNA_CALL query_create
 {
     assert (connection != NULL);
     assert (query != NULL);
+    assert (strlen (command) != 0);
 
-    return 1;
+    if (!buffer_create (&query->buffer, NULL, 16)
+        || !query_add_ansi (query, command)
+        || !buffer_putc (&query->buffer, connection->workstation)
+        || !query_add_ansi (query, command)
+        || !query_add_int_32 (query, connection->clientId)
+        || !query_add_int_32 (query, connection->queryId)
+        || !query_add_ansi_buffer (query, &connection->password)
+        || !query_add_ansi_buffer (query, &connection->username)
+        || !query_new_line (query)
+        || !query_new_line (query)
+        || !query_new_line (query)) {
+        return AM_FALSE;
+    }
+
+    ++connection->queryId;
+
+    return AM_TRUE;
+}
+
+/**
+ * Освобождение ресурсов, занятых клиентским запросом.
+ *
+ * @param query Клиентский запрос.
+ */
+MAGNA_API void MAGNA_CALL query_free
+    (
+        Query *query
+    )
+{
+    assert (query != NULL);
+
+    buffer_free (&query->buffer);
+}
+
+/**
+ * Кодирование префикса запроса.
+ *
+ * @param query Клиентский запрос.
+ * @param prefix Инициализированный буфер для размещения префикса запроса.
+ * @return Признак успешности завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL query_encode
+    (
+        const Query *query,
+        Buffer *prefix
+    )
+{
+    char temp[16];
+
+    assert (query != NULL);
+    assert (prefix != NULL);
+
+    sprintf (temp, "%u\n", (unsigned int) query->buffer.position);
+
+    return buffer_puts (prefix, temp);
+}
+
+/**
+ * Добавление данных в кодировке ANSI (плюс перевод строки).
+ *
+ * @param query Клиентский запрос.
+ * @param text Добавляемые данные.
+ * @return Признак успешности завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL query_add_ansi_buffer
+    (
+        Query *query,
+        const Buffer *text
+    )
+{
+    assert (query != NULL);
+    assert (text != NULL);
+
+    if (!buffer_ansi_to_utf8 (&query->buffer, text)
+        || !buffer_putc (&query->buffer, 0x0A)) {
+        return AM_FALSE;
+    }
+
+    return AM_TRUE;
+}
+
+/**
+ * Добавление данных в кодировке UTF-8 (плюс перевод строки).
+ *
+ * @param query Клиентский запрос.
+ * @param text Добавляемые данные.
+ * @return Признак успешности завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL query_add_utf_buffer
+    (
+        Query *query,
+        const Buffer *text
+    )
+{
+    assert (query != NULL);
+    assert (text != NULL);
+
+    if (!buffer_concat (&query->buffer, text)
+        || !buffer_putc (&query->buffer, 0x0A)) {
+        return AM_FALSE;
+    }
+
+    return AM_TRUE;
 }

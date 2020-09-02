@@ -5,7 +5,7 @@
 
 #include <assert.h>
 
-MAGNA_API am_int32 MAGNA_CALL response_create
+MAGNA_API am_bool MAGNA_CALL response_create
     (
         struct IrbisConnection *connection,
         Response *response
@@ -14,7 +14,26 @@ MAGNA_API am_int32 MAGNA_CALL response_create
     assert (connection != NULL);
     assert (response != NULL);
 
+    memset (response, 0, sizeof (Response));
+    response->connection = connection;
+
     return 0;
+}
+
+/**
+ * Освобождение ресурсов, занятых ответом сервера.
+ *
+ * @param response Ответ сервера.
+ */
+MAGNA_API void MAGNA_CALL response_free
+    (
+        Response *response
+    )
+{
+    assert (response != NULL);
+
+    buffer_free (&response->answer);
+    memset (response, 0, sizeof (Response));
 }
 
 MAGNA_API am_bool response_check

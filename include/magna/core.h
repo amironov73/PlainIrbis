@@ -295,6 +295,8 @@ typedef struct MagnaArray
 
 } Array;
 
+#define ARRAY_INIT { NULL, 0, 0, NULL, NULL }
+
 MAGNA_API void    MAGNA_CALL array_clone      (Array *target, Array *source);
 MAGNA_API void    MAGNA_CALL array_copy       (Array *target, Array *source);
 MAGNA_API void    MAGNA_CALL array_concat     (Array *target, Array *source);
@@ -309,8 +311,6 @@ MAGNA_API am_bool MAGNA_CALL array_push_front (Array *array,  void *item);
 MAGNA_API void    MAGNA_CALL array_set        (Array *array, am_size_t index, void *item);
 MAGNA_API void    MAGNA_CALL array_truncate   (Array *array, am_size_t newSize);
 
-#define ARRAY_INIT { NULL, 0, 0, NULL, NULL }
-
 /*=========================================================*/
 
 typedef struct
@@ -323,26 +323,30 @@ typedef struct
 
 #define BUFFER_INIT { NULL, 0, 0 }
 
-MAGNA_API Buffer*   MAGNA_CALL buffer_assign         (Buffer *buffer, const am_byte *data, am_size_t length);
-MAGNA_API Buffer*   MAGNA_CALL buffer_assign_text    (Buffer *buffer, const char *text);
-MAGNA_API am_size_t MAGNA_CALL buffer_calculate_size (am_size_t newSize);
-MAGNA_API Buffer*   MAGNA_CALL buffer_clone          (Buffer *target, const Buffer *source);
-MAGNA_API int       MAGNA_CALL buffer_compare        (const Buffer *first, const Buffer *second);
-MAGNA_API int       MAGNA_CALL buffer_compare_text   (const Buffer *buffer, const am_byte *text);
-MAGNA_API am_bool   MAGNA_CALL buffer_concat         (Buffer *target, Buffer *source);
-MAGNA_API am_bool   MAGNA_CALL buffer_copy           (Buffer *target, Buffer *source);
-MAGNA_API am_bool   MAGNA_CALL buffer_create         (Buffer *buffer, am_byte *data, am_size_t length);
-MAGNA_API am_byte*  MAGNA_CALL buffer_find_text      (const Buffer *buffer, const am_byte *text);
-MAGNA_API void      MAGNA_CALL buffer_free           (Buffer *buffer);
-MAGNA_API Buffer*   MAGNA_CALL buffer_from_span      (Buffer *buffer, Span span);
-MAGNA_API Buffer*   MAGNA_CALL buffer_from_text      (Buffer *buffer, const char *text);
-MAGNA_API am_bool   MAGNA_CALL buffer_grow           (Buffer *buffer, am_size_t newSize);
-MAGNA_API am_bool   MAGNA_CALL buffer_putc           (Buffer *buffer, char c);
-MAGNA_API am_bool   MAGNA_CALL buffer_puts           (Buffer *buffer, const char *str);
-MAGNA_API am_bool   MAGNA_CALL buffer_replace_text   (Buffer *buffer, const am_byte *from, const am_byte *to);
-MAGNA_API Buffer*   MAGNA_CALL buffer_static         (Buffer *buffer, am_byte *data, am_size_t newSize);
-MAGNA_API Span      MAGNA_CALL buffer_to_span        (const Buffer *buffer);
-MAGNA_API void      MAGNA_CALL buffer_write          (Buffer *target, const am_byte *data, am_size_t length);
+MAGNA_API am_bool        MAGNA_CALL buffer_ansi_to_utf8   (Buffer *target, const Buffer *source);
+MAGNA_API Buffer*        MAGNA_CALL buffer_assign         (Buffer *buffer, const am_byte *data, am_size_t length);
+MAGNA_API Buffer*        MAGNA_CALL buffer_assign_text    (Buffer *buffer, const char *text);
+MAGNA_API am_size_t      MAGNA_CALL buffer_calculate_size (am_size_t newSize);
+MAGNA_API Buffer*        MAGNA_CALL buffer_clone          (Buffer *target, const Buffer *source);
+MAGNA_API int            MAGNA_CALL buffer_compare        (const Buffer *first, const Buffer *second);
+MAGNA_API int            MAGNA_CALL buffer_compare_text   (const Buffer *buffer, const am_byte *text);
+MAGNA_API am_bool        MAGNA_CALL buffer_concat         (Buffer *target, const Buffer *source);
+MAGNA_API am_bool        MAGNA_CALL buffer_copy           (Buffer *target, const Buffer *source);
+MAGNA_API am_bool        MAGNA_CALL buffer_create         (Buffer *buffer, am_byte *data, am_size_t length);
+MAGNA_API am_byte*       MAGNA_CALL buffer_find_text      (const Buffer *buffer, const am_byte *text);
+MAGNA_API void           MAGNA_CALL buffer_free           (Buffer *buffer);
+MAGNA_API Buffer*        MAGNA_CALL buffer_from_span      (Buffer *buffer, Span span);
+MAGNA_API Buffer*        MAGNA_CALL buffer_from_text      (Buffer *buffer, const char *text);
+MAGNA_API am_bool        MAGNA_CALL buffer_grow           (Buffer *buffer, am_size_t newSize);
+MAGNA_API am_bool        MAGNA_CALL buffer_putc           (Buffer *buffer, char c);
+MAGNA_API am_bool        MAGNA_CALL buffer_puts           (Buffer *buffer, const char *str);
+MAGNA_API am_bool        MAGNA_CALL buffer_replace_text   (Buffer *buffer, const am_byte *from, const am_byte *to);
+MAGNA_API Buffer*        MAGNA_CALL buffer_static         (Buffer *buffer, am_byte *data, am_size_t newSize);
+MAGNA_API Buffer*        MAGNA_CALL buffer_swap           (Buffer *first, Buffer *second);
+MAGNA_API const am_byte* MAGNA_CALL buffer_to_text        (Buffer *buffer);
+MAGNA_API Span           MAGNA_CALL buffer_to_span        (const Buffer *buffer);
+MAGNA_API am_bool        MAGNA_CALL buffer_utf8_to_ansi   (Buffer *target, const Buffer *source);
+MAGNA_API void           MAGNA_CALL buffer_write          (Buffer *target, const am_byte *data, am_size_t length);
 
 /*=========================================================*/
 
@@ -467,7 +471,6 @@ MAGNA_API void           MAGNA_CALL nav_skip_punctuation (TextNavigator *nav);
 MAGNA_API void           MAGNA_CALL nav_skip_whitespace  (TextNavigator *nav);
 MAGNA_API Span           MAGNA_CALL nav_slice            (const TextNavigator *nav, am_size_t offset, am_size_t size);
 
-
 /*=========================================================*/
 
 /* Работа с путями */
@@ -482,6 +485,12 @@ MAGNA_API am_bool MAGNA_CALL path_set_current_directory (const Buffer *path);
 
 MAGNA_API am_bool MAGNA_CALL same_char (int first, int second);
 MAGNA_API am_bool MAGNA_CALL same_text (const char *first, const char *second);
+
+/*=========================================================*/
+
+/* Работа с кодировками */
+
+MAGNA_API am_size_t MAGNA_CALL utf8_code_points (const am_byte *data, am_size_t dataLength);
 
 /*=========================================================*/
 

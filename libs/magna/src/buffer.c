@@ -75,7 +75,7 @@ MAGNA_API Buffer* MAGNA_CALL buffer_clone
 MAGNA_API am_bool MAGNA_CALL buffer_copy
     (
         Buffer *target,
-        Buffer *source
+        const Buffer *source
     )
 {
     assert (target != NULL);
@@ -105,7 +105,7 @@ MAGNA_API am_bool MAGNA_CALL buffer_copy
 MAGNA_API am_bool MAGNA_CALL buffer_concat
     (
         Buffer *target,
-        Buffer *source
+        const Buffer *source
     )
 {
     assert (target != NULL);
@@ -637,6 +637,121 @@ MAGNA_API am_byte* MAGNA_CALL buffer_find_text
             buffer->ptr + buffer->position,
             text
         );
+}
+
+/**
+ * Преобразование данных из кодировки UTF-8 в ANSI.
+ *
+ * @param target Инициализированный буфер назначения.
+ * @param source Буфер с исходными данными.
+ * @return Признак успешности завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL buffer_utf8_to_ansi
+    (
+        Buffer *target,
+        const Buffer *source
+    )
+{
+    am_size_t delta;
+
+    assert (target != NULL);
+    assert (source != NULL);
+
+    delta = utf8_code_points (source->ptr, source->position);
+    if (!buffer_grow (target, delta)) {
+        return AM_FALSE;
+    }
+
+    /* TODO: сделать собственно преобразование */
+
+    return AM_FALSE;
+}
+
+/**
+ * Преобразование данных из кодировки ANSI  в UTF-8.
+ *
+ * @param target Инициализированный буфер назначения.
+ * @param source Буфер с исходными данными.
+ * @return Признак успешности завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL buffer_ansi_to_utf8
+    (
+        Buffer *target,
+        const Buffer *source
+    )
+{
+    am_size_t delta;
+
+    assert (target != NULL);
+    assert (source != NULL);
+
+    delta = utf8_code_points (source->ptr, source->position);
+    if (!buffer_grow (target, delta)) {
+        return AM_FALSE;
+    }
+
+    /* TODO: собственно преобразование */
+
+    return AM_FALSE;
+}
+
+/**
+ * Представление буфера в виде строки. Если необходимо,
+ * сразу после данных  * добавляется нулевой байт.
+ *
+ * @param buffer Буфер.
+ * @return Указатель на строку.
+ */
+MAGNA_API const am_byte* MAGNA_CALL buffer_to_text
+    (
+        Buffer *buffer
+    )
+{
+    assert (buffer != NULL);
+
+    if (buffer->position == buffer->capacity) {
+        if (!buffer_grow (buffer, buffer->capacity + 1)) {
+            return NULL;
+        }
+    }
+
+    buffer->ptr[buffer->position] = 0;
+
+    return buffer->ptr;
+}
+
+/**
+ * Обмен содержимым между двумя буферами.
+ *
+ * @param first Первый буфер.
+ * @param second Второй буфер.
+ * @return Первый буфер.
+ */
+MAGNA_API Buffer* MAGNA_CALL buffer_swap
+    (
+        Buffer *first,
+        Buffer *second
+    )
+{
+    am_byte *tempPointer;
+    am_size_t tempNumber;
+
+    assert (first != NULL);
+    assert (second != NULL);
+
+    tempPointer = first->ptr;
+    first->ptr = second->ptr;
+    second->ptr = tempPointer;
+
+    tempNumber = first->capacity;
+    first->capacity = second->capacity;
+    second->capacity = tempNumber;
+
+    tempNumber = first->position;
+    first->position = second->position;
+    second->position = tempNumber;
+
+    return first;
 }
 
 /*=========================================================*/

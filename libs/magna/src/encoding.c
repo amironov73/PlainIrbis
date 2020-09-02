@@ -18,7 +18,29 @@
 #pragma warning(disable: 4820)
 #endif
 
+#include <assert.h>
+
 /*=========================================================*/
+
+/**
+ * Подсчитывает число code point в массиве данных в кодировке UTF-8.
+ *
+ * @param data Данные.
+ * @param dataLength Длина данных в байтах.
+ * @return Число code point.
+ */
+MAGNA_API am_size_t MAGNA_CALL utf8_code_points
+    (
+        const am_byte *data,
+        am_size_t dataLength
+    )
+{
+    assert (data != NULL);
+
+    /* TODO: implement */
+
+    return 0;
+}
 
 /**
  * Подсчитывает число байт, необходимых для размещения текста в UTF-8.
@@ -27,10 +49,10 @@
  * @param length Длина текста в символах.
  * @return Длина заданного текста в UTF-8 в байтах.
  */
-MAGNA_API am_size_t count_utf
+MAGNA_API am_size_t MAGNA_CALL count_utf
     (
-            am_wchar *src,
-            am_size_t length
+        const am_wchar *src,
+        am_size_t length
     )
 {
     am_size_t result = 0;

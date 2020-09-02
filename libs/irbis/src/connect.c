@@ -49,10 +49,10 @@ MAGNA_API am_bool MAGNA_CALL connection_actualize_database
     )
 {
     if (!connection_check (connection)) {
-        return 0;
+        return AM_FALSE;
     }
 
-    return 0;
+    return AM_FALSE;
 }
 
 /**
@@ -71,10 +71,10 @@ MAGNA_API am_bool MAGNA_CALL connection_actualize_record
     )
 {
     if (!connection_check (connection)) {
-        return 0;
+        return AM_FALSE;
     }
 
-    return 0;
+    return AM_FALSE;
 }
 
 /**
@@ -92,10 +92,10 @@ MAGNA_API am_bool MAGNA_CALL connection_check
 
     if (!connection->connected) {
         connection->lastError = 100500;
-        return 0;
+        return AM_FALSE;
     }
 
-    return 1;
+    return AM_TRUE;
 }
 
 /**
@@ -112,10 +112,10 @@ MAGNA_API am_bool MAGNA_CALL connection_connect
     assert (connection != NULL);
 
     if (connection->connected) {
-        return 1;
+        return AM_TRUE;
     }
 
-    return 0;
+    return AM_FALSE;
 }
 
 /**
@@ -138,10 +138,10 @@ MAGNA_API am_bool MAGNA_CALL connection_create_database
     assert (database != NULL);
 
     if (!connection_check (connection)) {
-        return 0;
+        return AM_FALSE;
     }
 
-    return 0;
+    return AM_FALSE;
 }
 
 /**
@@ -160,10 +160,10 @@ MAGNA_API am_bool MAGNA_CALL connection_create_dictionary
     assert (database != NULL);
 
     if (!connection_check (connection)) {
-        return 0;
+        return AM_FALSE;
     }
 
-    return 0;
+    return AM_FALSE;
 }
 
 /**
@@ -182,10 +182,10 @@ MAGNA_API am_bool MAGNA_CALL connection_delete_database
     assert (database != NULL);
 
     if (!connection_check (connection)) {
-        return 0;
+        return AM_FALSE;
     }
 
-    return 0;
+    return AM_FALSE;
 }
 
 /**
@@ -204,10 +204,10 @@ MAGNA_API am_bool MAGNA_CALL connection_delete_file
     assert (fileName != NULL);
 
     if (!connection_check (connection)) {
-        return 0;
+        return AM_FALSE;
     }
 
-    return 0;
+    return AM_FALSE;
 }
 
 /**
@@ -226,10 +226,10 @@ MAGNA_API am_bool MAGNA_CALL connection_delete_record
     assert (mfn > 0);
 
     if (!connection_check (connection)) {
-        return 0;
+        return AM_FALSE;
     }
 
-    return 0;
+    return AM_FALSE;
 }
 
 /**
@@ -243,13 +243,28 @@ MAGNA_API am_bool MAGNA_CALL connection_disconnect
         Connection *connection
     )
 {
+    am_bool result = AM_FALSE;
+    Query query;
+    Response response;
+
     assert (connection != NULL);
 
     if (!connection->connected) {
-        return 1;
+        return AM_TRUE;
     }
 
-    return 0;
+    if (!connection_check (connection)
+        || !query_create(connection, &query, "B")
+        || !connection_execute (connection, &query, &response)) {
+        goto DONE;
+    }
+
+    result = AM_TRUE;
+
+    DONE: query_free (&query);
+    response_free (&response);
+
+    return result;
 }
 
 /**
@@ -265,24 +280,27 @@ MAGNA_API am_mfn MAGNA_CALL connection_get_max_mfn
         const char *database
     )
 {
+    am_mfn result = 0;
     Query query;
     Response response;
 
-    if (!connection_check (connection)
-        || !query_create(connection, &query, "N")) {
-        return 0;
-    }
-
     if (!database) {
-        database = connection->database.ptr;
+        database = buffer_to_text (&connection->database);
     }
 
-    if (!query_add_ansi (&query, database)
+    if (!connection_check (connection)
+        || !query_create(connection, &query, "O")
+        || !query_add_ansi (&query, database)
         || !connection_execute (connection, &query, &response)) {
-        return 0;
+        goto DONE;
     }
 
-    return response.returnCode;
+    result = response.returnCode;
+
+    DONE: query_free (&query);
+    response_free (&response);
+
+    return result;
 }
 
 /**
@@ -301,11 +319,80 @@ MAGNA_API am_bool MAGNA_CALL connection_execute
         Response *response
     )
 {
+    am_bool result = 0;
+    Buffer prefix = BUFFER_INIT;
+    Buffer answerHeader = BUFFER_INIT;
+
     assert (connection != NULL);
     assert (query != NULL);
     assert (response != NULL);
 
-    return 0;
+    if (!response_create (connection, response)) {
+        goto DONE;
+    }
+
+    connection->lastError = 0;
+    if (!query_encode (query, &prefix)) {
+        goto DONE;
+    }
+
+    /* tcp4_connect(); */
+    /* tcp4_send_buffer (&prefix); */
+    /* tcp4_send_buffer (&query->buffer); */
+    /* tcp4_receive (&answerHeader); */
+    (void) buffer_swap (&answerHeader, &response->answer);
+    /* tcp4_receive (&response->answer); */
+    /* tcp4_disconnect(); */
+    /* initial_parse(); */
+
+    result = AM_TRUE;
+
+    DONE: buffer_free (&prefix);
+    buffer_free (&answerHeader);
+
+    return result;
+}
+
+/**
+ * Упрощенное исполнение запроса к серверу.
+ *
+ * @param connection
+ * @param command
+ * @param ...
+ * @return
+ */
+MAGNA_API am_bool connection_execute_simple
+    (
+        Connection *connection,
+        Response *response,
+        const char *command,
+        int argCount,
+        ...
+    )
+{
+    am_bool result = AM_FALSE;
+    Query query;
+
+    assert (connection != NULL);
+    assert (response != NULL);
+    assert (command != NULL);
+
+    if (!connection_check (connection)
+        || !query_create(connection, &query, command)) {
+        goto DONE;
+    }
+
+    /* TODO: обработка аргументов */
+
+    if (!connection_execute (connection, &query, response)) {
+        goto DONE;
+    }
+
+    result = AM_TRUE;
+
+    DONE: query_free (&query);
+
+    return result;
 }
 
 /**
@@ -320,16 +407,24 @@ MAGNA_API am_bool MAGNA_CALL connection_no_operation
         Connection *connection
     )
 {
+    am_bool result = AM_FALSE;
     Query query;
     Response response;
+
+    assert (connection != NULL);
 
     if (!connection_check (connection)
         || !query_create(connection, &query, "N")
         || !connection_execute (connection, &query, &response)) {
-        return 0;
+        goto DONE;
     }
 
-    return 1;
+    result = AM_TRUE;
+
+    DONE: query_free (&query);
+    response_free (&response);
+
+    return result;
 }
 
 /**
@@ -348,7 +443,7 @@ MAGNA_API am_bool MAGNA_CALL connection_parse_string
     assert (connection != NULL);
     assert (connection != NULL);
 
-    return 0;
+    return AM_FALSE;
 }
 
 /**
@@ -370,9 +465,9 @@ MAGNA_API am_bool MAGNA_CALL connection_read_text_file
     assert (buffer != NULL);
 
     if (!connection_check (connection)) {
-        return 0;
+        return AM_FALSE;
     }
 
-    return 0;
+    return AM_FALSE;
 }
 
