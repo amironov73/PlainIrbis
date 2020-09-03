@@ -3,32 +3,40 @@
 
 #include "magna/core.h"
 
-/**
- * \file error.c
- *
- * Обработка и демонстрация ошибок.
- *
- */
+/* ReSharper disable StringLiteralTypo */
+/* ReSharper disable IdentifierTypo */
+/* ReSharper disable CommentTypo */
 
 /*=========================================================*/
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable: 4255)
-#pragma warning(disable: 4820)
-#endif
+#include "warnpush.h"
 
 /*=========================================================*/
 
 #ifdef MAGNA_WINDOWS
+
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include <winsock2.h>
 #include <windows.h>
+
 #endif
 
 /*=========================================================*/
 
-MAGNA_API void display_error ()
+/**
+ * \file error.c
+ *
+ * Обработка и демонстрация ошибок.
+ */
+
+/*=========================================================*/
+
+/**
+ * Показ текста ошибки в окне.
+ * Работает только в Windows.
+ *
+ */
+MAGNA_API void display_error (void)
 {
 #ifdef MAGNA_WINDOWS
 
@@ -62,7 +70,10 @@ MAGNA_API void display_error ()
 
 /*=========================================================*/
 
-MAGNA_API void print_error ()
+/**
+ * Вывод ошибки в стандартный поток ошибок.
+ */
+MAGNA_API void print_error (void)
 {
 #ifdef MAGNA_WINDOWS
 
@@ -92,8 +103,6 @@ MAGNA_API void print_error ()
 
 /*=========================================================*/
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
+#include "warnpop.h"
 
 /*=========================================================*/

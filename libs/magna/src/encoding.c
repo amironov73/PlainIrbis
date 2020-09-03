@@ -3,22 +3,25 @@
 
 #include "magna/core.h"
 
+/* ReSharper disable StringLiteralTypo */
+/* ReSharper disable IdentifierTypo */
+/* ReSharper disable CommentTypo */
+
+/*=========================================================*/
+
+#include "warnpush.h"
+
+/*=========================================================*/
+
+#include <assert.h>
+
+/*=========================================================*/
+
 /**
  * \file encoding.c
  *
  * Работа с кодировками.
- *
  */
-
-/*=========================================================*/
-
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable: 4255)
-#pragma warning(disable: 4820)
-#endif
-
-#include <assert.h>
 
 /*=========================================================*/
 
@@ -143,8 +146,6 @@ static unsigned char _cp1251_xlat[256] = {
 
 /*=========================================================*/
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
+#include "warnpop.h"
 
 /*=========================================================*/

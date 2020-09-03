@@ -8,6 +8,7 @@
 /* ReSharper disable CommentTypo */
 
 #include <assert.h>
+#include <stdarg.h>
 
 /*=========================================================*/
 
@@ -243,8 +244,7 @@ MAGNA_API am_bool MAGNA_CALL connection_disconnect
         Connection *connection
     )
 {
-    am_bool result = AM_FALSE;
-    Query query;
+    am_bool result;
     Response response;
 
     assert (connection != NULL);
@@ -253,15 +253,14 @@ MAGNA_API am_bool MAGNA_CALL connection_disconnect
         return AM_TRUE;
     }
 
-    if (!connection_check (connection)
-        || !query_create(connection, &query, "B")
-        || !connection_execute (connection, &query, &response)) {
-        goto DONE;
-    }
+    result = connection_execute_simple
+        (
+            connection,
+            &response,
+            "B",
+            0
+        );
 
-    result = AM_TRUE;
-
-    DONE: query_free (&query);
     response_free (&response);
 
     return result;
@@ -281,23 +280,23 @@ MAGNA_API am_mfn MAGNA_CALL connection_get_max_mfn
     )
 {
     am_mfn result = 0;
-    Query query;
     Response response;
 
     if (!database) {
         database = buffer_to_text (&connection->database);
     }
 
-    if (!connection_check (connection)
-        || !query_create(connection, &query, "O")
-        || !query_add_ansi (&query, database)
-        || !connection_execute (connection, &query, &response)) {
-        goto DONE;
+    if (connection_execute_simple
+        (
+            connection,
+            &response,
+            "O",
+            1,
+            database
+        )) {
+        result = response.returnCode;
     }
 
-    result = response.returnCode;
-
-    DONE: query_free (&query);
     response_free (&response);
 
     return result;
@@ -370,6 +369,9 @@ MAGNA_API am_bool connection_execute_simple
         ...
     )
 {
+    int i;
+    va_list args;
+    const char *line;
     am_bool result = AM_FALSE;
     Query query;
 
@@ -382,7 +384,17 @@ MAGNA_API am_bool connection_execute_simple
         goto DONE;
     }
 
-    /* TODO: обработка аргументов */
+    if (argCount != 0) {
+        va_start (args, argCount);
+        for (i = 0; i < argCount; ++i) {
+            line = va_arg (args, const char*);
+            if (!query_add_ansi(&query, line)) {
+                va_end (args);
+                goto DONE;
+            }
+        }
+        va_end (args);
+    }
 
     if (!connection_execute (connection, &query, response)) {
         goto DONE;
@@ -407,21 +419,19 @@ MAGNA_API am_bool MAGNA_CALL connection_no_operation
         Connection *connection
     )
 {
-    am_bool result = AM_FALSE;
-    Query query;
+    am_bool result;
     Response response;
 
     assert (connection != NULL);
 
-    if (!connection_check (connection)
-        || !query_create(connection, &query, "N")
-        || !connection_execute (connection, &query, &response)) {
-        goto DONE;
-    }
+    result = connection_execute_simple
+        (
+            connection,
+            &response,
+            "N",
+            0
+        );
 
-    result = AM_TRUE;
-
-    DONE: query_free (&query);
     response_free (&response);
 
     return result;
@@ -451,13 +461,13 @@ MAGNA_API am_bool MAGNA_CALL connection_parse_string
  *
  * @param connection Активное подключение.
  * @param specification Спецификация.
- * @param buffer Буфер для результата.
+ * @param buffer Инициализированный буфер для результата.
  * @return Признак успешности выполнения операции.
  */
 MAGNA_API am_bool MAGNA_CALL connection_read_text_file
     (
         Connection *connection,
-        Specification *specification,
+        const Specification *specification,
         Buffer *buffer
     )
 {

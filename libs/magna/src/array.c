@@ -3,12 +3,13 @@
 
 #include "magna/core.h"
 
+/* ReSharper disable StringLiteralTypo */
+/* ReSharper disable IdentifierTypo */
+/* ReSharper disable CommentTypo */
+
 /*=========================================================*/
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable: 5045)
-#endif
+#include "warnpush.h"
 
 /*=========================================================*/
 
@@ -21,6 +22,12 @@
  *
  * Простой динамический массив.
  *
+ * Содержит указатели на элементы (в общем случае могут
+ * быть равны `NULL`).
+ *
+ * Владеет только собственной памятью. Памятью элементов
+ * распоряжаются сами элементы. Чтобы разрешить освобождение
+ * памяти элементов, необходимо задать `liberator`.
  */
 
 /*=========================================================*/
@@ -30,23 +37,28 @@
  *
  * @param target Массив назначения.
  * @param source Источник.
+ * @return Признак успешности завершения операции.
  */
-MAGNA_API void MAGNA_CALL array_clone
+MAGNA_API am_bool MAGNA_CALL array_clone
     (
         Array *target,
-        Array *source
+        const Array *source
     )
 {
     void *item;
-    size_t index;
+    am_size_t index;
 
     assert (target != NULL);
     assert (source != NULL);
 
     array_truncate (target, 0);
-    array_grow (target, source->len);
+    if (!array_grow (target, source->len)) {
+        return AM_FALSE;
+    }
+
     target->cloner = source->cloner;
     target->liberator = source->liberator;
+
     for (index = 0; index < source->len; ++index) {
         item = source->ptr [index];
         if (source->cloner != NULL) {
@@ -56,7 +68,10 @@ MAGNA_API void MAGNA_CALL array_clone
             target->ptr [index] = item;
         }
     }
+
     target->len = source->len;
+
+    return AM_TRUE;
 }
 
 /**
@@ -64,29 +79,33 @@ MAGNA_API void MAGNA_CALL array_clone
  *
  * @param target Массив назначения.
  * @param source Источник.
+ * @return Признак успешности завершения операции.
  */
-MAGNA_API void MAGNA_CALL array_copy
+MAGNA_API am_bool MAGNA_CALL array_copy
     (
         Array *target,
-        Array *source
+        const Array *source
     )
 {
     assert (target != NULL);
     assert (source != NULL);
 
     array_truncate (target, 0);
-    array_concat (target, source);
+
+    return array_concat (target, source);
 }
 
 /**
+ * Добавление массива в конец другого.
  *
- * @param target
- * @param source
+ * @param target Массив назначения.
+ * @param source Исходный массив.
+ * @return Признак успешности завершения операции.
  */
-MAGNA_API void MAGNA_CALL array_concat
+MAGNA_API am_bool MAGNA_CALL array_concat
     (
         Array *target,
-        Array *source
+        const Array *source
     )
 {
     am_size_t index;
@@ -94,22 +113,29 @@ MAGNA_API void MAGNA_CALL array_concat
     assert (target != NULL);
     assert (source != NULL);
 
-    array_grow (target, target->len + source->len);
+    if (!array_grow (target, target->len + source->len)) {
+        return AM_FALSE;
+    }
+
     for (index = 0; index < source->len; ++index) {
         target->ptr [target->len] = source->ptr [index];
         ++(target->len);
     }
+
+    return AM_TRUE;
 }
 
 /**
+ * Создание массива заданной емкости.
  *
- * @param array
- * @param capacity
+ * @param array Массив, подлежащий инициализации.
+ * @param capacity Требуемая емкость массива.
+ * @return Признак успешности завершения операции.
  */
-MAGNA_API void MAGNA_CALL array_create
+MAGNA_API am_bool MAGNA_CALL array_create
     (
-            Array *array,
-            am_size_t capacity
+        Array *array,
+        am_size_t capacity
     )
 {
     assert (array != NULL);
@@ -117,45 +143,54 @@ MAGNA_API void MAGNA_CALL array_create
 
     array->cloner = NULL;
     array->liberator = NULL;
-    array->ptr = (void**) calloc (capacity, sizeof (void*));
     array->len = 0;
     array->capacity = capacity;
+
+    array->ptr = (void**) calloc (capacity, sizeof (void*));
+    if (array->ptr == NULL) {
+        return AM_FALSE;
+    }
+
+    return AM_TRUE;
 }
 
 /**
+ * Освобождение ресурсов, занятых массивом.
  *
- * @param array
+ * @param array Массив, подлежащий освобождению.
  */
 MAGNA_API void MAGNA_CALL array_free
     (
         Array *array
     )
 {
-    size_t index;
+    am_size_t index;
 
     assert (array != NULL);
 
     if (array->liberator != NULL) {
         for (index = 0; index < array->len; ++index) {
-            array->liberator (array->ptr [index]);
+            array->liberator (array->ptr[index]);
         }
-        array->len = 0;
-        array->capacity = 0;
-        free (array->ptr);
-        array->ptr = NULL;
     }
+
+    array->len = 0;
+    array->capacity = 0;
+    free (array->ptr);
+    array->ptr = NULL;
 }
 
 /**
+ * Получение элемента массива по его индексу.
  *
- * @param array
- * @param index
- * @return
+ * @param array Массив.
+ * @param index Индекс.
+ * @return Элемент массива.
  */
 MAGNA_API void* MAGNA_CALL array_get
     (
-            const Array *array,
-            am_size_t index
+        const Array *array,
+        am_size_t index
     )
 {
     assert (array != NULL);
@@ -165,14 +200,18 @@ MAGNA_API void* MAGNA_CALL array_get
 }
 
 /**
+ * Увеличение емкости массива, если это необходимо.
+ * Если массив уже имеет необходимую или большую емкость,
+ * никаких действий не производится.
  *
- * @param array
- * @param newSize
+ * @param array Массив, емкость которого необходимо увеличить.
+ * @param newSize Требуемая емкость массива.
+ * @return Признак успешности завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL array_grow
     (
-            Array *array,
-            am_size_t newSize
+        Array *array,
+        am_size_t newSize
     )
 {
     void **newPtr;
@@ -181,7 +220,11 @@ MAGNA_API am_bool MAGNA_CALL array_grow
     assert (newSize > 0);
 
     if (newSize > array->capacity) {
-        newPtr = calloc (newSize, sizeof (void*));
+        newPtr = (void**) calloc (newSize, sizeof (void*));
+        if (newPtr == NULL) {
+            return AM_FALSE;
+        }
+
         memcpy (newPtr, array->ptr, array->len * sizeof (void*));
         free (array->ptr);
         array->ptr = newPtr;
@@ -192,9 +235,12 @@ MAGNA_API am_bool MAGNA_CALL array_grow
 }
 
 /**
+ * Извлечение элемента (с последующим удалением из массива).
+ * Оставшиеся элементы не перемещаются.
  *
- * @param array
- * @return
+ * @param array Массив.
+ * @return Извлеченный элемент.
+ * @warning На пустом массиве приводит к неопределенному поведению.
  */
 MAGNA_API void* MAGNA_CALL array_pop_back
     (
@@ -213,16 +259,20 @@ MAGNA_API void* MAGNA_CALL array_pop_back
 }
 
 /**
+ * Извлечение элемента (с последующим удалением из массива)
+ * из начала массива. Оставшиеся элементы соответственно
+ * сдвигаются к началу.
  *
- * @param array
- * @return
+ * @param array Массив.
+ * @return Извлеченный элемент.
+ * @warning На пустом массиве приводит к неопределенному поведению.
  */
 MAGNA_API void* MAGNA_CALL array_pop_front
     (
         Array *array
     )
 {
-    size_t index;
+    am_size_t index;
     void *result;
 
     assert (array != NULL);
@@ -238,9 +288,11 @@ MAGNA_API void* MAGNA_CALL array_pop_front
 }
 
 /**
+ * Помещение элемента в конец массива.
  *
- * @param array
- * @param item
+ * @param array Массив.
+ * @param item Помещаемый элемент.
+ * @return Признак успешности завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL array_push_back
     (
@@ -261,9 +313,11 @@ MAGNA_API am_bool MAGNA_CALL array_push_back
 }
 
 /**
+ * Помещение элемента в начало массива.
  *
- * @param array
- * @param item
+ * @param array Массив.
+ * @param item Помещаемый элемент.
+ * @return Признак успешности завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL array_push_front
     (
@@ -271,7 +325,7 @@ MAGNA_API am_bool MAGNA_CALL array_push_front
         void *item
     )
 {
-    size_t index;
+    am_size_t index;
 
     assert (array != NULL);
 
@@ -290,16 +344,17 @@ MAGNA_API am_bool MAGNA_CALL array_push_front
 }
 
 /**
+ * Установка элемента массива.
  *
- * @param array
- * @param index
- * @param item
+ * @param array Массив.
+ * @param index Индекс.
+ * @param item Новое значение для элемента массива.
  */
 MAGNA_API void MAGNA_CALL array_set
     (
-            Array *array,
-            am_size_t index,
-            void *item
+        Array *array,
+        am_size_t index,
+        void *item
     )
 {
     assert (array != NULL);
@@ -313,17 +368,19 @@ MAGNA_API void MAGNA_CALL array_set
 }
 
 /**
+ * Удаление элементов массива сверх указанного размера.
+ * Емкость массива при этом не уменьшается.
  *
- * @param array
- * @param newSize
+ * @param array Массив.
+ * @param newSize Новая длина массива.
  */
 MAGNA_API void MAGNA_CALL array_truncate
     (
-            Array *array,
-            am_size_t newSize
+        Array *array,
+        am_size_t newSize
     )
 {
-    size_t index;
+    am_size_t index;
 
     assert (array != NULL);
 
@@ -339,8 +396,6 @@ MAGNA_API void MAGNA_CALL array_truncate
 
 /*=========================================================*/
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
+#include "warnpop.h"
 
 /*=========================================================*/

@@ -64,7 +64,7 @@ static int coefficients[] = { 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1 };
  */
 MAGNA_API am_byte MAGNA_CALL ean13_compute_check_digit
     (
-        Span text
+        const Span text
     )
 {
     am_byte result = 0;
@@ -91,7 +91,7 @@ MAGNA_API am_byte MAGNA_CALL ean13_compute_check_digit
  */
 MAGNA_API am_bool MAGNA_CALL ean13_check_control_digit
     (
-        Span text
+        const Span text
     )
 {
     am_bool result = 0;
@@ -117,7 +117,7 @@ MAGNA_API am_bool MAGNA_CALL ean13_check_control_digit
  */
 MAGNA_API am_byte MAGNA_CALL ean8_compute_check_digit
     (
-        Span text
+        const Span text
     )
 {
     am_byte result = 0;
@@ -144,7 +144,7 @@ MAGNA_API am_byte MAGNA_CALL ean8_compute_check_digit
  */
 MAGNA_API am_bool MAGNA_CALL ean8_check_control_digit
     (
-        Span text
+        const Span text
     )
 {
     am_bool result = 0;

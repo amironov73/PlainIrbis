@@ -8,6 +8,8 @@ project(magna C)
 
 set(HeaderFiles
     ../../include/magna/core.h
+    ../include/warnpop.h
+    ../include/warnpush.h
 )
 
 set(CFiles
@@ -28,12 +30,18 @@ set(CFiles
     src/screen.c
     src/span.c
     src/string.c
+    src/tcp4.c
 )
 
 add_library(${PROJECT_NAME}
     STATIC
     ${HeaderFiles}
     ${CFiles}
+)
+
+target_include_directories(${PROJECT_NAME}
+    PRIVATE
+    ${PROJECT_SOURCE_DIR}/../include
 )
 
 target_compile_definitions(${PROJECT_NAME}

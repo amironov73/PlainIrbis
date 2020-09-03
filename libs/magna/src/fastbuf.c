@@ -7,6 +7,12 @@
 /* ReSharper disable IdentifierTypo */
 /* ReSharper disable CommentTypo */
 
+/*=========================================================*/
+
+#include "warnpush.h"
+
+/*=========================================================*/
+
 #ifdef _MSC_VER
 
     #include <malloc.h>
@@ -26,6 +32,8 @@
 
 #endif
 
+/*=========================================================*/
+
 #include <assert.h>
 
 /**
@@ -34,6 +42,8 @@
  * Буфер, накапливающий сначала данные на стеке,
  * и лишь при нехватке места использующий кучу.
  *
+ * Владеет собственной памятью. Для освобождения
+ * ресурсов используйте `fastbu_free`.
  */
 
 /*=========================================================*/
@@ -46,8 +56,8 @@
  */
 MAGNA_API void MAGNA_CALL fastbuf_init
     (
-            FastBuffer *buffer,
-            am_size_t static_capacity
+        FastBuffer *buffer,
+        am_size_t static_capacity
     )
 {
     assert (buffer != NULL);
@@ -74,6 +84,8 @@ MAGNA_API void MAGNA_CALL fastbuf_free
         free (buffer->dynamic_data);
         buffer->dynamic_data = NULL;
     }
+
+    buffer->size = 0;
 }
 
 /**
@@ -121,17 +133,19 @@ MAGNA_API am_bool MAGNA_CALL fastbuf_empty
  */
 MAGNA_API am_bool MAGNA_CALL fastbuf_grow
     (
-            FastBuffer *buffer,
-            am_size_t newSize
+        FastBuffer *buffer,
+        am_size_t newSize
     )
 {
     assert (buffer != NULL);
 
     if (buffer->capacity < newSize) {
-        return 0;
+        return AM_FALSE;
     }
 
-    return 0;
+    /* TODO: implement */
+
+    return AM_FALSE;
 }
 
 /**
@@ -144,19 +158,19 @@ MAGNA_API am_bool MAGNA_CALL fastbuf_grow
  */
 MAGNA_API am_bool MAGNA_CALL fastbuf_write
     (
-            FastBuffer *buffer,
-            const am_byte *data,
-            am_size_t dataSize
+        FastBuffer *buffer,
+        const am_byte *data,
+        am_size_t dataSize
     )
 {
     assert (buffer != NULL);
     assert (data != NULL);
 
     if (!fastbuf_grow (buffer, buffer->size + dataSize)) {
-        return 0;
+        return AM_FALSE;
     }
 
-    return 0;
+    return AM_FALSE;
 }
 
 MAGNA_API am_bool MAGNA_CALL fastbuf_putc
@@ -202,9 +216,9 @@ MAGNA_API void MAGNA_CALL fastbuf_rewind
 
 MAGNA_API am_size_t MAGNA_CALL fastbuf_read
     (
-            FastBuffer *buffer,
-            am_byte *data,
-            am_size_t size
+        FastBuffer *buffer,
+        am_byte *data,
+        am_size_t size
     )
 {
     assert (buffer != NULL);
@@ -241,5 +255,11 @@ MAGNA_API am_size_t MAGNA_CALL fastbuf_gets
     assert (buffer != NULL);
     assert (text != NULL);
 
-    return 0;
+    return AM_FALSE;
 }
+
+/*=========================================================*/
+
+#include "warnpop.h"
+
+/*=========================================================*/

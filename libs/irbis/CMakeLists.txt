@@ -9,6 +9,8 @@ project(irbis C)
 set(HeaderFiles
     ../../include/magna/core.h
     ../../include/magna/irbis.h
+    ../include/warnpop.h
+    ../include/warnpush.h
 )
 
 set(CFiles
@@ -19,20 +21,28 @@ set(CFiles
     src/field.c
     src/guard.c
     src/ini.c
+    src/isbn.c
     src/menu.c
     src/query.c
     src/record.c
     src/response.c
+    src/search.c
     src/spec.c
     src/subfield.c
     src/tree.c
     src/upc.c
+    src/version.c
 )
 
 add_library(${PROJECT_NAME}
     STATIC
     ${HeaderFiles}
     ${CFiles}
+)
+
+target_include_directories(${PROJECT_NAME}
+    PRIVATE
+    ${PROJECT_SOURCE_DIR}/../include
 )
 
 target_compile_definitions(${PROJECT_NAME}

@@ -49,7 +49,7 @@ static int coefficients[] = { 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1 };
  */
 MAGNA_API am_byte MAGNA_CALL upc12_compute_check_digit
     (
-        Span text
+        const Span text
     )
 {
     int sum, i, length;
@@ -75,7 +75,7 @@ MAGNA_API am_byte MAGNA_CALL upc12_compute_check_digit
  */
 MAGNA_API am_bool MAGNA_CALL upc12_check_control_digit
     (
-        Span text
+        const Span text
     )
 {
     int sum, i, length;

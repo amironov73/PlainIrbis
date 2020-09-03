@@ -274,6 +274,18 @@ MAGNA_API am_bool        MAGNA_CALL spec_verify    (const Specification *spec);
 
 /*=========================================================*/
 
+/* Информация о версии сервера */
+
+typedef struct {
+    Buffer organization;
+    Buffer version;
+    am_uint32 maxClients;
+    am_uint32 connected;
+
+} ServerVersion;
+
+/*=========================================================*/
+
 /* Опережающее объявление */
 
 struct IrbisConnection;
@@ -283,7 +295,8 @@ typedef struct IrbisConnection Connection;
 
 /* Клиентский запрос */
 
-typedef struct {
+typedef struct
+{
     Buffer buffer;
 } Query;
 
@@ -302,7 +315,8 @@ MAGNA_API am_bool MAGNA_CALL query_new_line        (Query *query);
 
 /* Ответ сервера */
 
-typedef struct {
+typedef struct
+{
     Buffer answer;
     Span command;
     am_int32 clientId;
@@ -322,10 +336,54 @@ MAGNA_API am_int32 MAGNA_CALL response_get_return_code       (Response *response
 MAGNA_API Span     MAGNA_CALL response_read_ansi             (Response *response);
 MAGNA_API am_int32 MAGNA_CALL response_read_int32            (Response *response);
 MAGNA_API Span     MAGNA_CALL response_read_utf              (Response *response);
-MAGNA_API Array    MAGNA_CALL response_remaining_ansi_lines  (Response *response);
+MAGNA_API am_bool  MAGNA_CALL response_remaining_ansi_lines  (Response *response, Array *array);
 MAGNA_API Span     MAGNA_CALL response_remaining_ansi_text   (Response *response);
-MAGNA_API Array    MAGNA_CALL response_remaining_utf_lines   (Response *response);
+MAGNA_API am_bool  MAGNA_CALL response_remaining_utf_lines   (Response *response, Array *array);
 MAGNA_API Span     MAGNA_CALL response_remaining_utf_text    (Response *response);
+
+/*=========================================================*/
+
+/* Поиск */
+
+/* Параметры для поиска записей */
+typedef struct
+{
+    Buffer expression;
+    Buffer database;
+    Buffer format;
+    Buffer sequential;
+    Buffer filter;
+    am_mfn firstRecord;
+    am_mfn minMfn;
+    am_mfn maxMfn;
+    am_mfn number;
+
+} SearchParameters;
+
+MAGNA_API am_bool MAGNA_CALL search_init (SearchParameters *parameters);
+MAGNA_API void    MAGNA_CALL search_free (SearchParameters *parameters);
+
+
+/* Сценарий поиска */
+typedef struct
+{
+    Buffer name;
+    Buffer prefix;
+    Buffer menuName;
+    Buffer oldFormat;
+    Buffer correction;
+    Buffer truncation;
+    Buffer hint;
+    Buffer modByDicAuto;
+    Buffer logic;
+    Buffer advance;
+    Buffer format;
+    am_int32 dictionaryType;
+
+} SearchScenario;
+
+MAGNA_API am_bool MAGNA_CALL scenario_init (SearchScenario *scenario);
+MAGNA_API void    MAGNA_CALL scenario_free (SearchScenario *scenario);
 
 /*=========================================================*/
 
@@ -365,23 +423,26 @@ MAGNA_API am_mfn  MAGNA_CALL connection_get_max_mfn        (Connection *connecti
 MAGNA_API void    MAGNA_CALL connection_init               (Connection *connection);
 MAGNA_API am_bool MAGNA_CALL connection_no_operation       (Connection *connection);
 MAGNA_API am_bool MAGNA_CALL connection_parse_string       (Connection *connection, Buffer *connectionString);
-MAGNA_API am_bool MAGNA_CALL connection_read_text_file     (Connection *connection, Specification *specification, Buffer *buffer);
+MAGNA_API am_bool MAGNA_CALL connection_read_text_file     (Connection *connection, const Specification *specification, Buffer *buffer);
 
 /*=========================================================*/
 
 /* EAN-8 и EAN-13 */
 
-MAGNA_API am_byte MAGNA_CALL ean13_compute_check_digit (Span text);
-MAGNA_API am_bool MAGNA_CALL ean13_check_control_digit (Span text);
-MAGNA_API am_byte MAGNA_CALL ean8_compute_check_digit  (Span text);
-MAGNA_API am_bool MAGNA_CALL ean8_check_control_digit  (Span text);
-
-/*=========================================================*/
+MAGNA_API am_byte MAGNA_CALL ean13_compute_check_digit (const Span text);
+MAGNA_API am_bool MAGNA_CALL ean13_check_control_digit (const Span text);
+MAGNA_API am_byte MAGNA_CALL ean8_compute_check_digit  (const Span text);
+MAGNA_API am_bool MAGNA_CALL ean8_check_control_digit  (const Span text);
 
 /* UPC-12 */
 
-MAGNA_API am_byte MAGNA_CALL upc12_compute_check_digit (Span text);
-MAGNA_API am_bool MAGNA_CALL upc12_check_control_digit (Span text);
+MAGNA_API am_byte MAGNA_CALL upc12_compute_check_digit (const Span text);
+MAGNA_API am_bool MAGNA_CALL upc12_check_control_digit (const Span text);
+
+/* ISBN */
+
+MAGNA_API am_bool MAGNA_CALL isbn_check_978           (const Span isbn);
+MAGNA_API am_bool MAGNA_CALL isbn_check_control_digit (const Span isbn);
 
 /*=========================================================*/
 

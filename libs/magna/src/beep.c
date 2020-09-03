@@ -3,18 +3,31 @@
 
 #include "magna/core.h"
 
+/* ReSharper disable StringLiteralTypo */
+/* ReSharper disable IdentifierTypo */
+/* ReSharper disable CommentTypo */
+
 /*=========================================================*/
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable: 4255)
-#endif
+#include "warnpush.h"
 
 /*=========================================================*/
 
 #ifdef MAGNA_WINDOWS
+
     #include <windows.h>
+
 #endif
+
+/*=========================================================*/
+
+/*!
+ * \file beep.c
+ *
+ * Простой звуковой сигнал (для отладки).
+ */
+
+/*=========================================================*/
 
 /**
  * Sounds a beep in the speaker or sound card.
@@ -31,8 +44,6 @@ void beep (void)
 
 /*=========================================================*/
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
+#include "warnpop.h"
 
 /*=========================================================*/

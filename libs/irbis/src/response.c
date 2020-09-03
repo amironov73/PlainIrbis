@@ -101,16 +101,16 @@ MAGNA_API Span MAGNA_CALL response_read_utf
     return result;
 }
 
-MAGNA_API Array MAGNA_CALL response_remaining_ansi_lines
+MAGNA_API am_bool MAGNA_CALL response_remaining_ansi_lines
     (
-        Response *response
+        Response *response,
+        Array *array
     )
 {
-    Array result = { NULL, 0, 0 };
-
     assert (response != NULL);
+    assert (array != NULL);
 
-    return result;
+    return AM_FALSE;
 }
 
 MAGNA_API Span MAGNA_CALL response_remaining_ansi_text
@@ -125,16 +125,16 @@ MAGNA_API Span MAGNA_CALL response_remaining_ansi_text
     return result;
 }
 
-MAGNA_API Array MAGNA_CALL response_remaining_utf_lines
+MAGNA_API am_bool MAGNA_CALL response_remaining_utf_lines
     (
-        Response *response
+        Response *response,
+        Array *array
     )
 {
-    Array result = { NULL, 0, 0 };
-
     assert (response != NULL);
+    assert (array != NULL);
 
-    return result;
+    return AM_FALSE;
 }
 
 MAGNA_API Span MAGNA_CALL response_remaining_utf_text

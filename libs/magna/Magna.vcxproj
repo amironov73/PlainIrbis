@@ -36,6 +36,7 @@
     <ClCompile Include="src\screen.c" />
     <ClCompile Include="src\span.c" />
     <ClCompile Include="src\string.c" />
+    <ClCompile Include="src\tcp4.c" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

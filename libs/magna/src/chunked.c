@@ -3,12 +3,13 @@
 
 #include "magna/core.h"
 
+/* ReSharper disable StringLiteralTypo */
+/* ReSharper disable IdentifierTypo */
+/* ReSharper disable CommentTypo */
+
 /*=========================================================*/
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable: 5045)
-#endif
+#include "warnpush.h"
 
 /*=========================================================*/
 
@@ -21,6 +22,8 @@
  *
  * Буфер, состоящий из мелких блоков.
  *
+ * Владеет своей памятью.
+ * Для освобождения ресурсов используйте `chunked_free`.
  */
 
 /*=========================================================*/
@@ -33,8 +36,8 @@
  */
 MAGNA_API ChunkedBuffer* MAGNA_CALL chunked_init
     (
-            ChunkedBuffer *chunked,
-            am_size_t chunkSize
+        ChunkedBuffer *chunked,
+        am_size_t chunkSize
     )
 {
     assert (chunked != NULL);
@@ -60,6 +63,8 @@ MAGNA_API void MAGNA_CALL chunked_free
     )
 {
     assert (chunked != NULL);
+
+    /* TODO: implement */
 }
 
 /**
@@ -346,9 +351,7 @@ MAGNA_API am_bool MAGNA_CALL chunked_write_text
 
 /*=========================================================*/
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
+#include "warnpop.h"
 
 /*=========================================================*/
 

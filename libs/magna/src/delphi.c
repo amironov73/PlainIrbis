@@ -3,10 +3,39 @@
 
 #include "magna/core.h"
 
+/* ReSharper disable StringLiteralTypo */
+/* ReSharper disable IdentifierTypo */
+/* ReSharper disable CommentTypo */
+
+/*=========================================================*/
+
+#include "warnpush.h"
+
+/*=========================================================*/
+
 #include <assert.h>
+
+/*=========================================================*/
+
+/**
+ * \file delphi.c
+ *
+ * Работа с 32-битными DLL, созданными Delphi.
+ * Работает только в 32-битной версии библиотеки,
+ * собранной MSVC.
+ */
+
+/*=========================================================*/
 
 #ifdef _M_IX86
 
+/**
+ * Вызов функции с одним 32-битным аргументом.
+ *
+ * @param function Указатель на функцию.
+ * @param arg1 Аргумент.
+ * @return Значение, возвращенное функцией (если имеет смысл).
+ */
 MAGNA_API int MAGNA_CALL delphi_call_1
     (
         void *function,
@@ -15,6 +44,7 @@ MAGNA_API int MAGNA_CALL delphi_call_1
 {
     int result;
 
+    (void) arg1;
     assert (function != NULL);
 
     _asm {
@@ -26,6 +56,14 @@ MAGNA_API int MAGNA_CALL delphi_call_1
     return result;
 }
 
+/**
+ * Вызов функции с двумя 32-битными аргументами.
+ *
+ * @param function Указатель на функцию.
+ * @param arg1 Первый аргумент.
+ * @param arg2 Второй аргумент.
+ * @return Значение, возвращенное функцией (если имеет смысл).
+ */
 MAGNA_API int MAGNA_CALL delphi_call_2
     (
         void *function,
@@ -35,6 +73,8 @@ MAGNA_API int MAGNA_CALL delphi_call_2
 {
     int result;
 
+    (void) arg1;
+    (void) arg2;
     assert (function != NULL);
 
     _asm {
@@ -47,6 +87,15 @@ MAGNA_API int MAGNA_CALL delphi_call_2
     return result;
 }
 
+/**
+ * Вызов функции с тремя 32-битными аргументами.
+ *
+ * @param function Указатель на функцию.
+ * @param arg1 Первый аргумент.
+ * @param arg2 Второй аргумент.
+ * @param arg3 Третий аргумент.
+ * @return Значение, возвращенное функцией (если имеет смысл).
+ */
 MAGNA_API int MAGNA_CALL delphi_call_3
     (
         void *function,
@@ -57,6 +106,9 @@ MAGNA_API int MAGNA_CALL delphi_call_3
 {
     int result;
 
+    (void) arg1;
+    (void) arg2;
+    (void) arg3;
     assert (function != NULL);
 
     _asm {
@@ -70,6 +122,16 @@ MAGNA_API int MAGNA_CALL delphi_call_3
     return result;
 }
 
+/**
+ * Вызов функции с четырьмя 32-битными аргументами.
+ *
+ * @param function Указатель на функцию.
+ * @param arg1 Первый аргумент.
+ * @param arg2 Второй аргумент.
+ * @param arg3 Третий аргумент.
+ * @param arg4 Четвертый аргумент.
+ * @return Значение, возвращенное функцией (если имеет смысл).
+ */
 MAGNA_API int MAGNA_CALL delphi_call_4
     (
         void *function,
@@ -81,6 +143,10 @@ MAGNA_API int MAGNA_CALL delphi_call_4
 {
     int result;
 
+    (void) arg1;
+    (void) arg2;
+    (void) arg3;
+    (void) arg4;
     assert (function != NULL);
 
     _asm {
@@ -95,6 +161,17 @@ MAGNA_API int MAGNA_CALL delphi_call_4
     return result;
 }
 
+/**
+ * Вызов функции с пятью 32-битными аргументами.
+ *
+ * @param function Указатель на функцию.
+ * @param arg1 Первый аргумент.
+ * @param arg2 Второй аргумент.
+ * @param arg3 Третий аргумент.
+ * @param arg4 Четвертый аргумент.
+ * @param arg5 Пятый аргумент.
+ * @return Значение, возвращенное функцией (если имеет смысл).
+ */
 MAGNA_API int MAGNA_CALL delphi_call_5
     (
         void *function,
@@ -107,6 +184,11 @@ MAGNA_API int MAGNA_CALL delphi_call_5
 {
     int result;
 
+    (void) arg1;
+    (void) arg2;
+    (void) arg3;
+    (void) arg4;
+    (void) arg5;
     assert (function != NULL);
 
     _asm {
@@ -122,6 +204,18 @@ MAGNA_API int MAGNA_CALL delphi_call_5
     return result;
 }
 
+/**
+ * Вызов функции с шестью 32-битными аргументами.
+ *
+ * @param function Указатель на функцию.
+ * @param arg1 Первый аргумент.
+ * @param arg2 Второй аргумент.
+ * @param arg3 Третий аргумент.
+ * @param arg4 Четвертый аргумент.
+ * @param arg5 Пятый аргумент.
+ * @param arg6 Шестой аргумент.
+ * @return Значение, возвращенное функцией (если имеет смысл).
+ */
 MAGNA_API int MAGNA_CALL delphi_call_6
     (
         void *function,
@@ -135,6 +229,12 @@ MAGNA_API int MAGNA_CALL delphi_call_6
 {
     int result;
 
+    (void) arg1;
+    (void) arg2;
+    (void) arg3;
+    (void) arg4;
+    (void) arg5;
+    (void) arg6;
     assert (function != NULL);
 
     _asm {
@@ -152,3 +252,9 @@ MAGNA_API int MAGNA_CALL delphi_call_6
 }
 
 #endif
+
+/*=========================================================*/
+
+#include "warnpop.h"
+
+/*=========================================================*/

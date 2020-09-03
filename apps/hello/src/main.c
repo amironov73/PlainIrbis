@@ -11,7 +11,7 @@ int main (int argc, char **argv)
     int bufSize = sizeof (buffer);
     void *space;*/
     Connection connection;
-    am_int32 maxMfn;
+    am_mfn maxMfn;
 
     (void) argc;
     (void) argv;
@@ -23,6 +23,7 @@ int main (int argc, char **argv)
     buffer_from_text (&connection.username, "librarian");
     buffer_from_text (&connection.password, "secret");
     buffer_from_text (&connection.database, "IBIS");
+    connection.workstation = CATALOGER;
 
     if (!connection_connect (&connection)) {
         fputs ("Connection failed", stderr);
@@ -31,7 +32,7 @@ int main (int argc, char **argv)
     }
 
     maxMfn = connection_get_max_mfn (&connection, NULL);
-    printf ("Max MFN=%d\n", maxMfn);
+    printf ("Max MFN=%u\n", maxMfn);
 
     connection_disconnect (&connection);
 
