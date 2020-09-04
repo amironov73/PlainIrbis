@@ -7,12 +7,39 @@
 /* ReSharper disable IdentifierTypo */
 /* ReSharper disable CommentTypo */
 
+/*=========================================================*/
+
+#include "warnpush.h"
+
+/*=========================================================*/
+
 #include <assert.h>
 #include <stdarg.h>
 
 /*=========================================================*/
 
-MAGNA_API void MAGNA_CALL connection_init
+/**
+ * \file connect.c
+ *
+ * Работа с подключением к серверу ИРБИС64.
+ *
+ * Перед использованием структура `Connection` должна быть
+ * проинициализирована. Для инициализации используйте
+ * `connection_init`.
+ *
+ * Структура `Connection` владеет собственной памятью.
+ * Для освобождения ресурсов используйте `connection_free`.
+ */
+
+/*=========================================================*/
+
+/**
+ * Инициализация структуры.
+ *
+ * @param connection Структура, подлежащая
+ * @return Признак успешности завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL connection_init
     (
         Connection *connection
     )
@@ -20,10 +47,21 @@ MAGNA_API void MAGNA_CALL connection_init
     assert (connection != NULL);
 
     memset (connection, 0, sizeof (Connection));
+    buffer_assign_text (&connection->host, "127.0.0.1");
+    buffer_assign_text (&connection->host, "IBIS");
+    connection->port = 6666;
+    connection->workstation = CATALOGER;
 }
 
 /*=========================================================*/
 
+/**
+ * Освобождение ресурсов, занятых подключением.
+ *
+ * @param connection
+ * @warning После освобождения структура больше непригодна
+ * для использования.
+ */
 MAGNA_API void MAGNA_CALL connection_free
     (
         Connection *connection
@@ -31,6 +69,11 @@ MAGNA_API void MAGNA_CALL connection_free
 {
     assert (connection != NULL);
 
+    buffer_free (&connection->host);
+    buffer_free (&connection->username);
+    buffer_free (&connection->password);
+    buffer_free (&connection->database);
+    buffer_free (&connection->serverVersion);
     memset (connection, 0, sizeof (Connection));
 }
 
@@ -257,7 +300,7 @@ MAGNA_API am_bool MAGNA_CALL connection_disconnect
         (
             connection,
             &response,
-            "B",
+            UNREGISTER_CLIENT,
             0
         );
 
@@ -290,7 +333,7 @@ MAGNA_API am_mfn MAGNA_CALL connection_get_max_mfn
         (
             connection,
             &response,
-            "O",
+            GET_MAX_MFN,
             1,
             database
         )) {
@@ -428,7 +471,7 @@ MAGNA_API am_bool MAGNA_CALL connection_no_operation
         (
             connection,
             &response,
-            "N",
+            NOP,
             0
         );
 
@@ -481,3 +524,49 @@ MAGNA_API am_bool MAGNA_CALL connection_read_text_file
     return AM_FALSE;
 }
 
+/**
+ * Число найденных записей.
+ *
+ * @param connection
+ * @param expression
+ * @return Число найденных записей.
+ */
+MAGNA_API am_int32 MAGNA_CALL connection_search_count
+    (
+        Connection *connection,
+        const char *expression
+    )
+{
+    assert (connection != NULL);
+    assert (expression != NULL);
+
+    return -1;
+}
+
+/**
+ * Расширенный поиск.
+ *
+ * @param connection
+ * @param parameters
+ * @param response
+ * @return Признак успешности завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL connection_search_ex
+    (
+        Connection *connection,
+        const SearchParameters *parameters,
+        Response *response
+    )
+{
+    assert (connection != NULL);
+    assert (parameters != NULL);
+    assert (response != NULL);
+
+    return AM_FALSE;
+}
+
+/*=========================================================*/
+
+#include "warnpop.h"
+
+/*=========================================================*/

@@ -8,7 +8,7 @@
 
 TESTER(get_magna_version)
 {
-    int version = magna_version();
+    int version = magna_get_version();
     CHECK (version == 0x0001);
 }
 

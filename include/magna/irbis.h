@@ -109,8 +109,7 @@
 
 #define BACKUP "M"
 
-/* Пустая операция. Периодическое подтверждение
-   соединения с сервером */
+/* Пустая операция. Периодическое подтверждение соединения с сервером */
 #define NOP "N"
 
 /* Получение максимального MFN для базы данных */
@@ -387,22 +386,71 @@ MAGNA_API void    MAGNA_CALL scenario_free (SearchScenario *scenario);
 
 /*=========================================================*/
 
+/* Глобальная корректировка */
+
+/* Параметр глобальной корректировки */
+typedef struct
+{
+    Buffer title;
+    Buffer value;
+
+} GblParameter;
+
+/* Оператор глобальной корректировки */
+typedef struct
+{
+    Buffer command;
+    Buffer parameter1;
+    Buffer parameter2;
+    Buffer format1;
+    Buffer format2;
+
+} GblStatement;
+
+/* Настройки для глобальной корректировки */
+typedef struct
+{
+    Buffer database;
+    Buffer fileName;
+    MfnList mfnList;
+    Buffer searchExpression;
+    Buffer sequentialSearch;
+    Array statements;
+    Array parameters;
+    am_bool actualize;
+    am_bool autoin;
+    am_mfn firstRecord;
+    am_mfn maxMfn;
+    am_mfn minMfn;
+    am_mfn numberOfRecords;
+
+} GblSettings;
+
+/* Результат глобальной корректировки */
+typedef struct
+{
+    /* TODO: implement */
+    int unused;
+} GblResult;
+
+/*=========================================================*/
+
 /* Подключение к серверу */
 
 struct IrbisConnection
 {
     Buffer host;
-    am_int16 port;
     Buffer username;
     Buffer password;
     Buffer database;
-    char workstation;
+    Buffer serverVersion;
     am_int32 clientId;
     am_int32 queryId;
     am_int32 lastError;
-    Buffer serverVersion;
     am_int32 interval;
     am_bool connected;
+    am_int16 port;
+    char workstation;
 
 };
 
@@ -420,12 +468,15 @@ MAGNA_API am_bool MAGNA_CALL connection_execute            (Connection *connecti
 MAGNA_API am_bool            connection_execute_simple     (Connection *connection, Response *response, const char *command, int argCount, ...);
 MAGNA_API void    MAGNA_CALL connection_free               (Connection *connection);
 MAGNA_API am_mfn  MAGNA_CALL connection_get_max_mfn        (Connection *connection, const char *database);
-MAGNA_API void    MAGNA_CALL connection_init               (Connection *connection);
+MAGNA_API am_bool MAGNA_CALL connection_init               (Connection *connection);
 MAGNA_API am_bool MAGNA_CALL connection_no_operation       (Connection *connection);
 MAGNA_API am_bool MAGNA_CALL connection_parse_string       (Connection *connection, Buffer *connectionString);
 MAGNA_API am_bool MAGNA_CALL connection_read_text_file     (Connection *connection, const Specification *specification, Buffer *buffer);
+MAGNA_API am_bool MAGNA_CALL connection_search_ex          (Connection *connection, const SearchParameters *parameters, Response *response);
 
 /*=========================================================*/
+
+/* Различные книжные идентификаторы */
 
 /* EAN-8 и EAN-13 */
 
@@ -448,35 +499,25 @@ MAGNA_API am_bool MAGNA_CALL isbn_check_control_digit (const Span isbn);
 
 #ifdef _M_IX86
 
-MAGNA_API void  MAGNA_CALL irbis64_dll_version (char *buffer, int bufSize);
-MAGNA_API void  MAGNA_CALL irbis64_dll_main_ini_init (char *path);
-MAGNA_API void* irbis64_dll_init (void);
-MAGNA_API void  MAGNA_CALL irbis64_dll_set_options (int cacheable,
-                                                    int precompiled,
-                                                    int firstBreak);
+/* Работа с irbis64.dll */
+
+MAGNA_API void  MAGNA_CALL irbis64_dll_close             (void *space);
+MAGNA_API void  MAGNA_CALL irbis64_dll_close_mst         (void *space);
+MAGNA_API void  MAGNA_CALL irbis64_dll_close_term        (void *space);
+MAGNA_API void*            irbis64_dll_init              (void);
 MAGNA_API int   MAGNA_CALL irbis64_dll_init_deposit_path (char *path);
-MAGNA_API int   MAGNA_CALL irbis64_dll_uatab_init (char *uctab,
-                                                   char *lctab,
-                                                   char *actab,
-                                                   char *exeDir,
-                                                   char *dataPath);
-MAGNA_API void  MAGNA_CALL irbis64_dll_close (void *space);
-MAGNA_API int   MAGNA_CALL irbis64_dll_init_mst (void *space,
-                                                 char *path,
-                                                 int shelfSize);
-MAGNA_API void  MAGNA_CALL irbis64_dll_close_mst (void *space);
-MAGNA_API int   MAGNA_CALL irbis64_dll_init_term (void *space,
-                                                  char *path);
-MAGNA_API void  MAGNA_CALL irbis64_dll_close_term (void *space);
-MAGNA_API int   MAGNA_CALL irbis64_dll_new_record (void *space, int shelf);
-MAGNA_API int   MAGNA_CALL irbis64_dll_init_new_db (char *path);
-MAGNA_API int   MAGNA_CALL irbis64_dll_is_db_locked (void *space);
-MAGNA_API int   MAGNA_CALL irbis64_dll_record (void *space,
-                                               int shelf,
-                                               int mfn);
-MAGNA_API int   MAGNA_CALL irbis64_dll_read_version (void *space,
-                                                     int mfn);
-MAGNA_API int   MAGNA_CALL irbis64_dll_max_mfn (void *space);
+MAGNA_API int   MAGNA_CALL irbis64_dll_init_mst          (void *space, char *path, int shelfSize);
+MAGNA_API int   MAGNA_CALL irbis64_dll_init_new_db       (char *path);
+MAGNA_API int   MAGNA_CALL irbis64_dll_init_term         (void *space, char *path);
+MAGNA_API int   MAGNA_CALL irbis64_dll_is_db_locked      (void *space);
+MAGNA_API void  MAGNA_CALL irbis64_dll_main_ini_init     (char *path);
+MAGNA_API int   MAGNA_CALL irbis64_dll_max_mfn           (void *space);
+MAGNA_API int   MAGNA_CALL irbis64_dll_new_record        (void *space, int shelf);
+MAGNA_API int   MAGNA_CALL irbis64_dll_read_version      (void *space, int mfn);
+MAGNA_API int   MAGNA_CALL irbis64_dll_record            (void *space, int shelf, int mfn);
+MAGNA_API void  MAGNA_CALL irbis64_dll_set_options       (int cacheable, int precompiled, int firstBreak);
+MAGNA_API int   MAGNA_CALL irbis64_dll_uatab_init        (char *uctab, char *lctab, char *actab, char *exeDir, char *dataPath);
+MAGNA_API void  MAGNA_CALL irbis64_dll_version           (char *buffer, int bufSize);
 
 #endif
 

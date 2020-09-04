@@ -8,6 +8,7 @@ project(magna C)
 
 set(HeaderFiles
     ../../include/magna/core.h
+    ../include/version.h
     ../include/warnpop.h
     ../include/warnpush.h
 )
@@ -21,6 +22,7 @@ set(CFiles
     src/encoding.c
     src/error.c
     src/fastbuf.c
+    src/file.c
     src/io.c
     src/keyboard.c
     src/magna.c

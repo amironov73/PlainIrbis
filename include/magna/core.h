@@ -196,9 +196,13 @@ typedef void      *am_pointer;
 
 typedef void *am_handle;
 
+#define AM_BAD_HANDLE ((void*)-1)
+
 #else
 
 typedef int  am_handle;
+
+#define AM_BAD_HANDLE (-1)
 
 #endif
 
@@ -207,11 +211,8 @@ typedef int  am_handle;
 
 /*=========================================================*/
 
-#define MAGNA_VERSION_MAJOR 0u
-#define MAGNA_VERSION_MINOR 1u
-
-MAGNA_API am_int32 magna_version    (void);
-MAGNA_API am_bool  magna_on_windows (void);
+MAGNA_API am_int32 magna_get_version (void);
+MAGNA_API am_bool  magna_on_windows  (void);
 
 /*=========================================================*/
 
@@ -321,6 +322,18 @@ MAGNA_API void    MAGNA_CALL array_truncate   (Array *array, am_size_t newSize);
 
 /*=========================================================*/
 
+/* Массив MFN */
+
+typedef struct
+{
+    am_mfn *ptr;
+    am_size_t len;
+    am_size_t capacity;
+} MfnList;
+
+/*=========================================================*/
+
+/* Буфер - замена строки */
 typedef struct
 {
     am_byte *ptr;
@@ -482,6 +495,32 @@ MAGNA_API void           MAGNA_CALL nav_skip_non_word    (TextNavigator *nav);
 MAGNA_API void           MAGNA_CALL nav_skip_punctuation (TextNavigator *nav);
 MAGNA_API void           MAGNA_CALL nav_skip_whitespace  (TextNavigator *nav);
 MAGNA_API Span           MAGNA_CALL nav_slice            (const TextNavigator *nav, am_size_t offset, am_size_t size);
+
+/*=========================================================*/
+
+/* Работа с файлами */
+
+MAGNA_API am_bool    MAGNA_CALL file_close        (am_handle handle);
+MAGNA_API am_handle  MAGNA_CALL file_create       (const char *fileName);
+MAGNA_API am_bool    MAGNA_CALL file_eof          (am_handle handle);
+MAGNA_API am_handle  MAGNA_CALL file_open_read    (const char *fileName);
+MAGNA_API am_handle  MAGNA_CALL file_open_write   (const char *fileName);
+MAGNA_API am_ssize_t MAGNA_CALL file_read         (am_handle handle, am_byte *buffer, am_ssize_t size);
+MAGNA_API am_ssize_t MAGNA_CALL file_read_all     (am_handle handle, Buffer *buffer);
+MAGNA_API int        MAGNA_CALL file_read_byte    (am_handle handle);
+MAGNA_API am_uint32  MAGNA_CALL file_read_int_32  (am_handle handle);
+MAGNA_API am_uint64  MAGNA_CALL file_read_int_64  (am_handle handle);
+MAGNA_API am_bool    MAGNA_CALL file_read_line    (am_handle handle, Buffer *buffer);
+MAGNA_API am_bool    MAGNA_CALL file_seek         (am_handle handle, am_int64 offset);
+MAGNA_API am_uint64  MAGNA_CALL file_size         (am_handle handle);
+MAGNA_API am_int64   MAGNA_CALL file_tell         (am_handle handle);
+MAGNA_API am_bool    MAGNA_CALL file_write        (am_handle handle, const am_byte *data, am_size_t size);
+MAGNA_API am_bool    MAGNA_CALL file_write_buffer (am_handle handle, const Buffer *buffer);
+MAGNA_API am_bool    MAGNA_CALL file_write_byte   (am_handle handle, am_byte value);
+MAGNA_API am_bool    MAGNA_CALL file_write_int_32 (am_handle handle, am_uint32 value);
+MAGNA_API am_bool    MAGNA_CALL file_write_int_64 (am_handle handle, am_uint64 value);
+MAGNA_API am_bool    MAGNA_CALL file_write_span   (am_handle handle, const Span span);
+MAGNA_API am_bool    MAGNA_CALL file_write_text   (am_handle handle, const char *text);
 
 /*=========================================================*/
 

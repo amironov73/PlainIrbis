@@ -2,15 +2,16 @@
  * PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com */
 
 #include "magna/core.h"
+#include "version.h"
 
 /**
  * Версия библиотеки.
  *
  * @return Версия.
  */
-MAGNA_API am_int32 magna_version (void)
+MAGNA_API am_int32 magna_get_version (void)
 {
-    return (MAGNA_VERSION_MAJOR << 16u) + MAGNA_VERSION_MINOR;
+    return MAGNA_VERSION;
 }
 
 /**
