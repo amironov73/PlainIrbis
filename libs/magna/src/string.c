@@ -149,6 +149,28 @@ MAGNA_API am_size_t MAGNA_CALL strocc
     return result;
 }
 
+/**
+ * Быстрый грязный разбор 32-битного целого без знака.
+ *
+ * @param text
+ * @param length
+ * @return
+ */
+MAGNA_API am_uint32 MAGNA_CALL fastParse32
+    (
+        const am_byte *text,
+        am_size_t length
+    )
+{
+    am_uint32 result = 0;
+
+    while (length--) {
+        result = result * 10 + (*text++ - '0');
+    }
+
+    return result;
+}
+
 /*=========================================================*/
 
 #ifdef _MSC_VER

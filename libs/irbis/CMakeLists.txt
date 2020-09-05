@@ -22,6 +22,7 @@ set(CFiles
     src/guard.c
     src/ini.c
     src/isbn.c
+    src/iso2709.c
     src/menu.c
     src/query.c
     src/record.c

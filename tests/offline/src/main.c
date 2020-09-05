@@ -6,10 +6,15 @@
 
 #include "offline.h"
 
-TESTER(get_magna_version)
+TESTER(magna_get_version)
 {
     int version = magna_get_version();
     CHECK (version == 0x0001);
+}
+
+TESTER(magna_require_version)
+{
+    CHECK (magna_require_version (0x0001));
 }
 
 TESTER(magna_on_windows)

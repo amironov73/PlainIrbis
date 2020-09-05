@@ -150,6 +150,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 /*=========================================================*/
 
@@ -211,8 +212,9 @@ typedef int  am_handle;
 
 /*=========================================================*/
 
-MAGNA_API am_int32 magna_get_version (void);
-MAGNA_API am_bool  magna_on_windows  (void);
+MAGNA_API am_int32            magna_get_version     (void);
+MAGNA_API am_bool  MAGNA_CALL magna_require_version (am_int32 version);
+MAGNA_API am_bool             magna_on_windows      (void);
 
 /*=========================================================*/
 
@@ -534,8 +536,9 @@ MAGNA_API am_bool MAGNA_CALL path_set_current_directory (const Buffer *path);
 
 /* Работа со строками */
 
-MAGNA_API am_bool MAGNA_CALL same_char (int first, int second);
-MAGNA_API am_bool MAGNA_CALL same_text (const char *first, const char *second);
+MAGNA_API am_uint32 MAGNA_CALL fastParse32 (const am_byte *text, am_size_t length);
+MAGNA_API am_bool   MAGNA_CALL same_char   (int first, int second);
+MAGNA_API am_bool   MAGNA_CALL same_text   (const char *first, const char *second);
 
 /*=========================================================*/
 
@@ -553,6 +556,23 @@ MAGNA_API am_bool               tcp4_initialize         (void);
 MAGNA_API am_ssize_t MAGNA_CALL tcp4_receive_all        (am_int32 handle, Buffer *buffer);
 MAGNA_API am_ssize_t MAGNA_CALL tcp4_receive_with_limit (am_int32 handle, Buffer *buffer, am_ssize_t limit);
 MAGNA_API am_ssize_t MAGNA_CALL tcp4_send               (am_int32 handle, const am_byte *data, am_ssize_t dataLength);
+
+/*=========================================================*/
+
+/* Работа с датой */
+
+MAGNA_API am_bool  MAGNA_CALL date_decode  (const struct tm *date, int *year, int *month, int *day);
+MAGNA_API am_bool  MAGNA_CALL date_init    (struct tm *date, int year, int month, int day);
+MAGNA_API am_bool  MAGNA_CALL date_parse   (struct tm *date, Span text);
+MAGNA_API am_byte* MAGNA_CALL date_to_text (const struct tm *date, am_byte *buffer);
+MAGNA_API am_bool  MAGNA_CALL date_today   (struct tm *date);
+
+/*=========================================================*/
+
+/* Работа с потоками */
+
+MAGNA_API am_handle MAGNA_CALL thread_create (void *start);
+MAGNA_API am_bool   MAGNA_CALL thread_join   (am_handle handle, am_int32 timeout);
 
 /*=========================================================*/
 

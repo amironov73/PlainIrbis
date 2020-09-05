@@ -70,6 +70,6 @@ int main (int argc, char **argv)
 
 #### Documentation (in russian)
 
-* [**Общее описание**](docs/chapter1.md)
-* [**Структура Connection**](docs/chapter2.md)
-* [**Структуры MarcRecord, RecordField и SubField**](docs/chapter3.md)
+* [**Introduction**](docs/chapter1.md)
+* [**Connection structure**](docs/chapter2.md)
+* [**MarcRecord, MarcField and SubField structures**](docs/chapter3.md)

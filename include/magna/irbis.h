@@ -196,6 +196,8 @@ typedef struct
 
 } SubField;
 
+#define SUBFIELD_INIT { BUFFER_INIT, 0 };
+
 MAGNA_API SubField* MAGNA_CALL subfield_clone     (SubField *target, const SubField *source);
 MAGNA_API SubField* MAGNA_CALL subfield_decode    (SubField *subfield, Span span);
 MAGNA_API am_bool   MAGNA_CALL subfield_empty     (const SubField *subfield);
@@ -210,8 +212,8 @@ MAGNA_API am_bool   MAGNA_CALL subfield_verify    (const SubField *subfield);
 typedef struct
 {
     Buffer value;
-    am_uint32 tag;
     Array subfields;
+    am_uint32 tag;
 
 } MarcField;
 
@@ -236,11 +238,12 @@ MAGNA_API am_bool    MAGNA_CALL field_verify                   (const MarcField 
 
 typedef struct
 {
+    Array fields;
+    Buffer database;
+    void *data;
     am_mfn mfn;
     am_flag status;
     am_int32 version;
-    Buffer database;
-    Array fields;
 
 } MarcRecord;
 

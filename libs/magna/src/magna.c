@@ -15,6 +15,20 @@ MAGNA_API am_int32 magna_get_version (void)
 }
 
 /**
+ * Требуем библиотеку не ниже указанной версии
+ *
+ * @param version Минимально допустимая версия.
+ * @return Требование выполнено?
+ */
+MAGNA_API am_bool MAGNA_CALL magna_require_version
+    (
+        am_int32 version
+    )
+{
+    return MAGNA_VERSION >= version;
+}
+
+/**
  * Запущено на Windows?
  *
  * @return Да или нет.

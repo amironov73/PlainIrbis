@@ -16,7 +16,7 @@ int main (int argc, char **argv)
     (void) argc;
     (void) argv;
 
-    printf ("Library version: %d\n", magna_version());
+    printf ("Library version: %d\n", magna_get_version());
     connection_init (&connection);
     buffer_from_text (&connection.host, "localhost");
     connection.port = 6666;

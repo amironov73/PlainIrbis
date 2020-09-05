@@ -18,6 +18,7 @@ set(CFiles
     src/beep.c
     src/buffer.c
     src/chunked.c
+    src/date.c
     src/delphi.c
     src/encoding.c
     src/error.c
@@ -33,6 +34,7 @@ set(CFiles
     src/span.c
     src/string.c
     src/tcp4.c
+    src/thread.c
 )
 
 add_library(${PROJECT_NAME}

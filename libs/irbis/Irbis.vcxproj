@@ -27,6 +27,7 @@
     <ClCompile Include="src\guard.c" />
     <ClCompile Include="src\ini.c" />
     <ClCompile Include="src\isbn.c" />
+    <ClCompile Include="src\iso2709.c" />
     <ClCompile Include="src\menu.c" />
     <ClCompile Include="src\query.c" />
     <ClCompile Include="src\record.c" />
