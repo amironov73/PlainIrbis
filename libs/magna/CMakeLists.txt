@@ -24,6 +24,7 @@ set(CFiles
     src/error.c
     src/fastbuf.c
     src/file.c
+    src/intarray.c
     src/io.c
     src/keyboard.c
     src/magna.c

@@ -29,6 +29,7 @@
     <ClCompile Include="src\error.c" />
     <ClCompile Include="src\fastbuf.c" />
     <ClCompile Include="src\file.c" />
+    <ClCompile Include="src\intarray.c" />
     <ClCompile Include="src\io.c" />
     <ClCompile Include="src\keyboard.c" />
     <ClCompile Include="src\magna.c" />

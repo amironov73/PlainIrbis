@@ -295,11 +295,13 @@ typedef void  (*Liberator) (void*);
 
 /*=========================================================*/
 
+/* Массив указателей на объекты */
+
 typedef struct MagnaArray
 {
     void **ptr;
-    size_t len;
-    size_t capacity;
+    am_size_t len;
+    am_size_t capacity;
 
     Cloner cloner;
     Liberator liberator;
@@ -309,8 +311,8 @@ typedef struct MagnaArray
 #define ARRAY_INIT { NULL, 0, 0, NULL, NULL }
 
 MAGNA_API am_bool MAGNA_CALL array_clone      (Array *target, const Array *source);
-MAGNA_API am_bool MAGNA_CALL array_copy       (Array *target, const Array *source);
 MAGNA_API am_bool MAGNA_CALL array_concat     (Array *target, const Array *source);
+MAGNA_API am_bool MAGNA_CALL array_copy       (Array *target, const Array *source);
 MAGNA_API am_bool MAGNA_CALL array_create     (Array *array, am_size_t capacity);
 MAGNA_API void    MAGNA_CALL array_free       (Array *array);
 MAGNA_API void*   MAGNA_CALL array_get        (const Array *array, am_size_t index);
@@ -321,6 +323,35 @@ MAGNA_API am_bool MAGNA_CALL array_push_back  (Array *array,  void *item);
 MAGNA_API am_bool MAGNA_CALL array_push_front (Array *array,  void *item);
 MAGNA_API void    MAGNA_CALL array_set        (Array *array, am_size_t index, void *item);
 MAGNA_API void    MAGNA_CALL array_truncate   (Array *array, am_size_t newSize);
+
+/*=========================================================*/
+
+/* Массив 32-битных целых */
+
+typedef struct
+{
+    am_int32 *ptr;
+    am_size_t len;
+    am_size_t capacity;
+
+} Int32Array;
+
+#define INT32_ARRAY_INIT { NULL, 0, 0 }
+
+MAGNA_API am_bool  MAGNA_CALL int32_array_clone      (Int32Array *target, const Int32Array *source);
+MAGNA_API am_bool  MAGNA_CALL int32_array_concat     (Int32Array *target, const Int32Array *source);
+MAGNA_API am_bool  MAGNA_CALL int32_array_copy       (Int32Array *target, const Int32Array *source);
+MAGNA_API am_bool  MAGNA_CALL int32_array_create     (Int32Array *array, am_size_t capacity);
+MAGNA_API void     MAGNA_CALL int32_array_free       (Int32Array *array);
+MAGNA_API am_int32 MAGNA_CALL int32_array_get        (const Int32Array *array, am_size_t index);
+MAGNA_API am_bool  MAGNA_CALL int32_array_grow       (Int32Array *array, am_size_t newSize);
+MAGNA_API am_bool  MAGNA_CALL int32_array_shrink     (Int32Array *array);
+MAGNA_API am_int32 MAGNA_CALL int32_array_pop_back   (Int32Array *array);
+MAGNA_API am_int32 MAGNA_CALL int32_array_pop_front  (Int32Array *array);
+MAGNA_API am_bool  MAGNA_CALL int32_array_push_back  (Int32Array *array, am_int32 value);
+MAGNA_API am_bool  MAGNA_CALL int32_array_push_front (Int32Array *array, am_int32 value);
+MAGNA_API void     MAGNA_CALL int32_array_set        (Int32Array *array, am_size_t index, am_int32 value);
+MAGNA_API void     MAGNA_CALL int32_array_truncate   (Int32Array *array, am_size_t newSize);
 
 /*=========================================================*/
 

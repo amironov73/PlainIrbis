@@ -13,8 +13,14 @@
 #pragma warning(push)
 #pragma warning(disable: 4255)
 #pragma warning(disable: 4820)
-#pragma warning(disable: 5031)
+
+#if _MSC_VER >= 1910
+
+/* MSVS 2017 */
 #pragma warning(disable: 5045)
+#pragma warning(disable: 5031)
+
+#endif
 
 #endif
 

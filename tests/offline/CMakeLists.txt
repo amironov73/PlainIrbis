@@ -10,6 +10,7 @@ set(CFiles
     src/array.c
     src/buffer.c
     src/ean.c
+    src/intarray.c
     src/main.c
     src/path.c
     src/span.c
