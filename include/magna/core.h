@@ -220,6 +220,8 @@ MAGNA_API am_bool             magna_on_windows      (void);
 
 /* Опережающее объявление */
 struct MagnaArray;
+struct MagnaSpanArray;
+struct MagnaBuffer;
 
 /*=========================================================*/
 
@@ -265,28 +267,30 @@ typedef struct
 
 #define SPAN_INIT { NULL, 0 }
 
-MAGNA_API int                MAGNA_CALL span_compare          (Span first, Span second);
-MAGNA_API am_bool            MAGNA_CALL span_ends_with        (Span span, Span suffix);
-MAGNA_API Span               MAGNA_CALL span_fill             (Span span, am_byte value);
-MAGNA_API am_byte*           MAGNA_CALL span_find_byte        (Span span, am_byte value);
-MAGNA_API Span               MAGNA_CALL span_from_text        (const char *str);
-MAGNA_API Span               MAGNA_CALL span_init             (am_byte *ptr, am_size_t len);
-MAGNA_API am_bool            MAGNA_CALL span_is_empty         (Span span);
-MAGNA_API Span               MAGNA_CALL span_slice            (Span span, am_ssize_t start, am_ssize_t length);
-MAGNA_API struct MagnaArray* MAGNA_CALL span_split_by_char    (Span span, struct MagnaArray *array, am_byte value);
-MAGNA_API struct MagnaArray* MAGNA_CALL span_split_by_chars   (Span span, struct MagnaArray *array, const am_byte *values, am_size_t valueCount);
-MAGNA_API am_size_t          MAGNA_CALL span_split_n_by_char  (Span span, Span *array, size_t arraySize, am_byte value);
-MAGNA_API am_size_t          MAGNA_CALL span_split_n_by_chars (Span span, Span *array, size_t arraySize, am_byte *values, am_size_t valueCount);
-MAGNA_API am_bool            MAGNA_CALL span_starts_with      (Span span, Span prefix);
-MAGNA_API Span               MAGNA_CALL span_trim_start       (Span span);
-MAGNA_API Span               MAGNA_CALL span_trim_end         (Span span);
-MAGNA_API Span               MAGNA_CALL span_trim             (Span span);
-MAGNA_API char*              MAGNA_CALL span_to_string        (Span span);
-MAGNA_API am_uint32          MAGNA_CALL span_to_uint_32       (Span span);
-MAGNA_API am_uint64          MAGNA_CALL span_to_uint_64       (Span span);
-MAGNA_API am_byte*           MAGNA_CALL span_to_vector        (Span span);
-MAGNA_API Span               MAGNA_CALL span_toupper          (Span span);
-MAGNA_API Span               MAGNA_CALL span_tolower          (Span span);
+MAGNA_API int                    MAGNA_CALL span_compare          (Span first, Span second);
+MAGNA_API am_bool                MAGNA_CALL span_ends_with        (Span span, Span suffix);
+MAGNA_API Span                   MAGNA_CALL span_fill             (Span span, am_byte value);
+MAGNA_API am_byte*               MAGNA_CALL span_find_byte        (Span span, am_byte value);
+MAGNA_API Span                   MAGNA_CALL span_from_text        (const char *str);
+MAGNA_API Span                   MAGNA_CALL span_init             (const am_byte *ptr, am_size_t len);
+MAGNA_API am_ssize_t             MAGNA_CALL span_index_of         (Span span, am_byte value);
+MAGNA_API am_bool                MAGNA_CALL span_is_empty         (Span span);
+MAGNA_API am_ssize_t             MAGNA_CALL span_last_index_of    (Span span, am_byte value);
+MAGNA_API Span                   MAGNA_CALL span_slice            (Span span, am_ssize_t start, am_ssize_t length);
+MAGNA_API struct MagnaSpanArray* MAGNA_CALL span_split_by_char    (Span span, struct MagnaSpanArray *array, am_byte value);
+MAGNA_API struct MagnaSpanArray* MAGNA_CALL span_split_by_chars   (Span span, struct MagnaSpanArray *array, const am_byte *values, am_size_t valueCount);
+MAGNA_API am_size_t              MAGNA_CALL span_split_n_by_char  (Span span, Span *array, am_size_t arraySize, am_byte value);
+MAGNA_API am_size_t              MAGNA_CALL span_split_n_by_chars (Span span, Span *array, am_size_t arraySize, am_byte *values, am_size_t valueCount);
+MAGNA_API am_bool                MAGNA_CALL span_starts_with      (Span span, Span prefix);
+MAGNA_API Span                   MAGNA_CALL span_trim_start       (Span span);
+MAGNA_API Span                   MAGNA_CALL span_trim_end         (Span span);
+MAGNA_API Span                   MAGNA_CALL span_trim             (Span span);
+MAGNA_API char*                  MAGNA_CALL span_to_string        (Span span);
+MAGNA_API am_uint32              MAGNA_CALL span_to_uint_32       (Span span);
+MAGNA_API am_uint64              MAGNA_CALL span_to_uint_64       (Span span);
+MAGNA_API am_byte*               MAGNA_CALL span_to_vector        (Span span);
+MAGNA_API Span                   MAGNA_CALL span_toupper          (Span span);
+MAGNA_API Span                   MAGNA_CALL span_tolower          (Span span);
 
 /*=========================================================*/
 
@@ -326,7 +330,7 @@ MAGNA_API void    MAGNA_CALL array_truncate   (Array *array, am_size_t newSize);
 
 /*=========================================================*/
 
-/* Массив 32-битных целых */
+/* Динамический ассив 32-битных целых */
 
 typedef struct
 {
@@ -351,23 +355,44 @@ MAGNA_API am_int32 MAGNA_CALL int32_array_pop_front  (Int32Array *array);
 MAGNA_API am_bool  MAGNA_CALL int32_array_push_back  (Int32Array *array, am_int32 value);
 MAGNA_API am_bool  MAGNA_CALL int32_array_push_front (Int32Array *array, am_int32 value);
 MAGNA_API void     MAGNA_CALL int32_array_set        (Int32Array *array, am_size_t index, am_int32 value);
+MAGNA_API am_bool  MAGNA_CALL int32_array_to_text    (const Int32Array *array, struct MagnaBuffer *buffer, const am_byte *delimiter);
 MAGNA_API void     MAGNA_CALL int32_array_truncate   (Int32Array *array, am_size_t newSize);
 
 /*=========================================================*/
 
-/* Массив MFN */
+/* Динамический массив фрагментов */
 
-typedef struct
+typedef struct MagnaSpanArray
 {
-    am_mfn *ptr;
+    Span *ptr;
     am_size_t len;
     am_size_t capacity;
-} MfnList;
+
+} SpanArray;
+
+#define SPAN_ARRAY_INIT { NULL, 0, 0 }
+
+MAGNA_API am_bool MAGNA_CALL span_array_clone      (SpanArray *target, const SpanArray *source);
+MAGNA_API am_bool MAGNA_CALL span_array_copy       (SpanArray *target, const SpanArray *source);
+MAGNA_API am_bool MAGNA_CALL span_array_concat     (SpanArray *target, const SpanArray *source);
+MAGNA_API am_bool MAGNA_CALL span_array_create     (SpanArray *array, am_size_t capacity);
+MAGNA_API void    MAGNA_CALL span_array_free       (SpanArray *array);
+MAGNA_API am_bool MAGNA_CALL span_array_from_text  (SpanArray *array, const char **text, am_size_t count);
+MAGNA_API Span    MAGNA_CALL span_array_get        (const SpanArray *array, am_size_t index);
+MAGNA_API am_bool MAGNA_CALL span_array_grow       (SpanArray *array, am_size_t newSize);
+MAGNA_API Span    MAGNA_CALL span_array_pop_back   (SpanArray *array);
+MAGNA_API Span    MAGNA_CALL span_array_pop_front  (SpanArray *array);
+MAGNA_API am_bool MAGNA_CALL span_array_push_back  (SpanArray *array, Span value);
+MAGNA_API am_bool MAGNA_CALL span_array_push_front (SpanArray *array, Span value);
+MAGNA_API void    MAGNA_CALL span_array_set        (SpanArray *array, am_size_t index, Span value);
+MAGNA_API am_bool MAGNA_CALL span_array_shrink     (SpanArray *array);
+MAGNA_API am_bool MAGNA_CALL span_array_to_text    (const SpanArray *array, struct MagnaBuffer *buffer, const am_byte *delimiter);
+MAGNA_API void    MAGNA_CALL span_array_truncate   (SpanArray *array, am_size_t newSize);
 
 /*=========================================================*/
 
 /* Буфер - замена строки */
-typedef struct
+typedef struct MagnaBuffer
 {
     am_byte *ptr;
     am_size_t position;

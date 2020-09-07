@@ -14,6 +14,7 @@ set(CFiles
     src/main.c
     src/path.c
     src/span.c
+    src/spanarry.c
 )
 
 set(HeaderFiles

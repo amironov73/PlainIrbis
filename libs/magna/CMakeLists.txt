@@ -33,6 +33,7 @@ set(CFiles
     src/path.c
     src/screen.c
     src/span.c
+    src/spanarry.c
     src/string.c
     src/tcp4.c
     src/thread.c

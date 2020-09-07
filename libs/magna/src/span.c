@@ -33,11 +33,11 @@
  */
 MAGNA_API Span MAGNA_CALL span_init
     (
-        am_byte *ptr,
+        const am_byte *ptr,
         am_size_t len
     )
 {
-    Span result = { ptr, len };
+    Span result = { (am_byte*) ptr, len };
 
     return result;
 }
@@ -76,8 +76,6 @@ MAGNA_API Span MAGNA_CALL span_trim_start
 {
     Span result = span;
 
-    assert (span.ptr != NULL);
-
     while (result.len != 0) {
         if (!isspace (*result.ptr)) {
             break;
@@ -101,8 +99,6 @@ MAGNA_API Span MAGNA_CALL span_trim_end
     )
 {
     Span result = span;
-
-    assert (span.ptr != NULL);
 
     while (result.len != 0) {
         if (!isspace (result.ptr [result.len - 1])) {
@@ -247,9 +243,10 @@ MAGNA_API am_byte* MAGNA_CALL span_find_byte
     am_size_t len = span.len;
 
     while (len--) {
-        if (*ptr++ == value) {
+        if (*ptr == value) {
             return ptr;
         }
+        ++ptr;
     }
 
     return NULL;
@@ -344,6 +341,10 @@ MAGNA_API Span MAGNA_CALL span_slice
 
     if (length == -1) {
         length = result.len - start;
+    }
+
+    if (length + start > span.len) {
+        length = span.len - start;
     }
 
     if (length < 0) {
@@ -476,10 +477,10 @@ MAGNA_API int MAGNA_CALL span_compare
  * @param value
  * @return
  */
-MAGNA_API struct MagnaArray* MAGNA_CALL span_split_by_char
+MAGNA_API struct MagnaSpanArray* MAGNA_CALL span_split_by_char
     (
         Span span,
-        struct MagnaArray *array,
+        struct MagnaSpanArray *array,
         am_byte value
     )
 {
@@ -497,10 +498,10 @@ MAGNA_API struct MagnaArray* MAGNA_CALL span_split_by_char
  * @param valueCount
  * @return
  */
-MAGNA_API struct MagnaArray* MAGNA_CALL span_split_by_chars
+MAGNA_API struct MagnaSpanArray* MAGNA_CALL span_split_by_chars
     (
         Span span,
-        struct MagnaArray *array,
+        struct MagnaSpanArray *array,
         const am_byte *values,
         am_size_t valueCount
     )
@@ -509,6 +510,33 @@ MAGNA_API struct MagnaArray* MAGNA_CALL span_split_by_chars
     assert (values != NULL);
 
     return array;
+}
+
+static am_byte* find_one (am_byte *from, am_byte *to, am_byte value)
+{
+    am_byte *ptr;
+
+    for (ptr = from; ptr < to; ++ptr) {
+        if (*ptr == value) {
+            return ptr;
+        }
+    }
+
+    return NULL;
+}
+
+static am_byte* find_many (am_byte *from, am_byte *to, am_byte *values, am_size_t valueCount)
+{
+    am_byte *ptr1, *ptr2 = values + valueCount, *ptr3;
+
+    for (ptr1 = from; ptr1 < to; ++ptr1) {
+        ptr3 = find_one (values, ptr2, *ptr1);
+        if (ptr3) {
+            return ptr1;
+        }
+    }
+
+    return NULL;
 }
 
 /**
@@ -524,13 +552,42 @@ MAGNA_API am_size_t MAGNA_CALL span_split_n_by_char
     (
         Span span,
         Span *array,
-        size_t arraySize,
+        am_size_t arraySize,
         am_byte value
     )
 {
+    am_size_t count;
+    am_byte *ptr = span.ptr, *end = ptr + span.len, *found;
+    Span *item;
+
     assert (array != NULL);
 
-    return 0;
+    for (count = 0; count < arraySize - 1; ) {
+        found = find_one (ptr, end, value);
+        if (!found) {
+            break;
+        }
+
+        if (found == ptr) {
+            ++ptr;
+            continue;
+        }
+
+        item = array + count;
+        item->ptr = ptr;
+        item->len = found - ptr;
+        ptr = found + 1;
+        ++count;
+    }
+
+    if (ptr != end) {
+        item = array + count;
+        item->ptr = ptr;
+        item->len = end - ptr;
+        ++count;
+    }
+
+    return count;
 }
 
 /**
@@ -552,9 +609,38 @@ MAGNA_API am_size_t MAGNA_CALL span_split_n_by_chars
         am_size_t valueCount
     )
 {
+    am_size_t count;
+    am_byte *ptr = span.ptr, *end = ptr + span.len, *found;
+    Span *item;
+
     assert (array != NULL);
 
-    return 0;
+    for (count = 0; count < arraySize - 1; ) {
+        found = find_many (ptr, end, values, valueCount);
+        if (!found) {
+            break;
+        }
+
+        if (found == ptr) {
+            ++ptr;
+            continue;
+        }
+
+        item = array + count;
+        item->ptr = ptr;
+        item->len = found - ptr;
+        ptr = found + 1;
+        ++count;
+    }
+
+    if (ptr != end) {
+        item = array + count;
+        item->ptr = ptr;
+        item->len = end - ptr;
+        ++count;
+    }
+
+    return count;
 }
 
 /*=========================================================*/

@@ -18,13 +18,13 @@
 /*=========================================================*/
 
 /**
- * \file intarray.c
+ * \file spanarra.c
  *
- * Простой динамический массив 32-битных чисел (например,
- * для MFN).
+ * Простой динамический массив фрагметов (например,
+ * для разбиения строки).
  *
  * Владеет собственной памятью. Для освобождения
- * ресурсов используйте `int32_array_free`.
+ * ресурсов используйте `span_array_free`.
  */
 
 /*=========================================================*/
@@ -36,22 +36,22 @@
  * @param source Массив-источник.
  * @return Признак успешности завершения операции.
  */
-MAGNA_API am_bool MAGNA_CALL int32_array_clone
+MAGNA_API am_bool MAGNA_CALL span_array_clone
     (
-        Int32Array *target,
-        const Int32Array *source
+        SpanArray *target,
+        const SpanArray *source
     )
 {
     assert (target != NULL);
     assert (source != NULL);
 
     if (source->len == 0) {
-        memset (target, 0, sizeof (Int32Array));
+        memset (target, 0, sizeof (SpanArray));
         return AM_TRUE;
     }
 
-    return int32_array_create (target, source->len)
-        && int32_array_copy (target, source);
+    return span_array_create (target, source->len)
+           && span_array_copy (target, source);
 }
 
 /**
@@ -61,18 +61,18 @@ MAGNA_API am_bool MAGNA_CALL int32_array_clone
  * @param source Массив-источник.
  * @return Признак успешности завершения операции.
  */
-MAGNA_API am_bool MAGNA_CALL int32_array_copy
+MAGNA_API am_bool MAGNA_CALL span_array_copy
     (
-        Int32Array *target,
-        const Int32Array *source
+        SpanArray *target,
+        const SpanArray *source
     )
 {
     assert (target != NULL);
     assert (source != NULL);
 
-    int32_array_truncate (target, 0);
+    span_array_truncate (target, 0);
 
-    return int32_array_concat (target, source);
+    return span_array_concat (target, source);
 }
 
 /**
@@ -82,20 +82,20 @@ MAGNA_API am_bool MAGNA_CALL int32_array_copy
  * @param source Массив-источник.
  * @return Признак успешности завершения операции.
  */
-MAGNA_API am_bool MAGNA_CALL int32_array_concat
+MAGNA_API am_bool MAGNA_CALL span_array_concat
     (
-        Int32Array *target,
-        const Int32Array *source
+        SpanArray *target,
+        const SpanArray *source
     )
 {
     assert (target != NULL);
     assert (source != NULL);
 
-    if (!int32_array_grow (target, target->len + source->len)) {
+    if (!span_array_grow (target, target->len + source->len)) {
         return AM_FALSE;
     }
 
-    memcpy (target->ptr + target->len, source->ptr, source->len * sizeof (am_int32));
+    memcpy (target->ptr + target->len, source->ptr, source->len * sizeof (Span));
     target->len += source->len;
 
     return AM_TRUE;
@@ -108,9 +108,9 @@ MAGNA_API am_bool MAGNA_CALL int32_array_concat
  * @param capacity Требуемая емкость массива (больше нуля).
  * @return Признак успешности завершения операции.
  */
-MAGNA_API am_bool MAGNA_CALL int32_array_create
+MAGNA_API am_bool MAGNA_CALL span_array_create
     (
-        Int32Array *array,
+        SpanArray *array,
         am_size_t capacity
     )
 {
@@ -119,7 +119,7 @@ MAGNA_API am_bool MAGNA_CALL int32_array_create
 
     array->len = 0;
     array->capacity = capacity;
-    array->ptr = (am_int32*) malloc (capacity * sizeof (am_int32));
+    array->ptr = (Span*) malloc (capacity * sizeof (Span));
     if (array->ptr == NULL) {
         return AM_FALSE;
     }
@@ -132,9 +132,9 @@ MAGNA_API am_bool MAGNA_CALL int32_array_create
  *
  * @param array Массив, подлежащий освобождению.
  */
-MAGNA_API void MAGNA_CALL int32_array_free
+MAGNA_API void MAGNA_CALL span_array_free
     (
-        Int32Array *array
+        SpanArray *array
     )
 {
     assert (array != NULL);
@@ -154,9 +154,9 @@ MAGNA_API void MAGNA_CALL int32_array_free
  * @param index Индекс.
  * @return Элемент массива.
  */
-MAGNA_API am_int32 MAGNA_CALL int32_array_get
+MAGNA_API Span MAGNA_CALL span_array_get
     (
-        const Int32Array *array,
+        const SpanArray *array,
         am_size_t index
     )
 {
@@ -175,14 +175,14 @@ MAGNA_API am_int32 MAGNA_CALL int32_array_get
  * @param newSize Требуемая емкость массива.
  * @return Признак успешности завершения операции.
  */
-MAGNA_API am_bool MAGNA_CALL int32_array_grow
+MAGNA_API am_bool MAGNA_CALL span_array_grow
     (
-        Int32Array *array,
+        SpanArray *array,
         am_size_t newSize
     )
 {
     am_size_t size;
-    am_int32 *newPtr;
+    Span *newPtr;
 
     assert (array != NULL);
     assert (newSize > 0);
@@ -196,7 +196,7 @@ MAGNA_API am_bool MAGNA_CALL int32_array_grow
         }
         newSize = size;
 
-        newPtr = malloc (newSize * sizeof (am_int32));
+        newPtr = malloc (newSize * sizeof(am_int32));
         if (newPtr == NULL) {
             return AM_FALSE;
         }
@@ -224,12 +224,12 @@ MAGNA_API am_bool MAGNA_CALL int32_array_grow
  * @param array Массив.
  * @return Признак успешности завершения операции.
  */
-MAGNA_API am_bool MAGNA_CALL int32_array_shrink
+MAGNA_API am_bool MAGNA_CALL span_array_shrink
     (
-        Int32Array *array
+        SpanArray *array
     )
 {
-    am_int32 *newPtr;
+    Span *newPtr;
     am_size_t newSize;
 
     assert (array != NULL);
@@ -245,8 +245,8 @@ MAGNA_API am_bool MAGNA_CALL int32_array_shrink
             array->capacity = 0;
         }
         else {
-            newSize = array->len * sizeof (am_int32);
-            newPtr = (am_int32 *) malloc (newSize);
+            newSize = array->len * sizeof (Span);
+            newPtr = (Span *) malloc (newSize);
             if (newPtr == NULL) {
                 return AM_FALSE;
             }
@@ -270,12 +270,12 @@ MAGNA_API am_bool MAGNA_CALL int32_array_shrink
  * @return Извлеченный элемент.
  * @warning На пустом массиве приводит к неопределенному поведению.
  */
-MAGNA_API am_int32 MAGNA_CALL int32_array_pop_back
+MAGNA_API Span MAGNA_CALL span_array_pop_back
     (
-        Int32Array *array
+        SpanArray *array
     )
 {
-    am_int32 result;
+    Span result;
 
     assert (array != NULL);
     assert (array->len != 0);
@@ -296,19 +296,19 @@ MAGNA_API am_int32 MAGNA_CALL int32_array_pop_back
  * @return Извлеченный элемент.
  * @warning На пустом массиве приводит к неопределенному поведени.
  */
-MAGNA_API am_int32 MAGNA_CALL int32_array_pop_front
+MAGNA_API Span MAGNA_CALL span_array_pop_front
     (
-        Int32Array *array
+        SpanArray *array
     )
 {
-    am_int32 result;
+    Span result;
 
     assert (array != NULL);
     assert (array->len != 0);
 
     result = array->ptr [0];
     --array->len;
-    memmove (array->ptr, array->ptr + 1, array->len * sizeof (am_int32));
+    memmove (array->ptr, array->ptr + 1, array->len * sizeof (Span));
 
     return result;
 }
@@ -321,15 +321,15 @@ MAGNA_API am_int32 MAGNA_CALL int32_array_pop_front
  * @param value Помещаемый элемент.
  * @return Признак успешности завершения операции.
  */
-MAGNA_API am_bool MAGNA_CALL int32_array_push_back
+MAGNA_API am_bool MAGNA_CALL span_array_push_back
     (
-        Int32Array *array,
-        am_int32 value
+        SpanArray *array,
+        Span value
     )
 {
     assert (array != NULL);
 
-    if (!int32_array_grow (array, array->len + 1)) {
+    if (!span_array_grow (array, array->len + 1)) {
         return AM_FALSE;
     }
 
@@ -347,19 +347,19 @@ MAGNA_API am_bool MAGNA_CALL int32_array_push_back
  * @param value ПОмещаемый элемент.
  * @return Признак успешности завершения операции.
  */
-MAGNA_API am_bool MAGNA_CALL int32_array_push_front
+MAGNA_API am_bool MAGNA_CALL span_array_push_front
     (
-        Int32Array *array,
-        am_int32 value
+        SpanArray *array,
+        Span value
     )
 {
     assert (array != NULL);
 
-    if (!int32_array_grow (array, array->len + 1)) {
+    if (!span_array_grow (array, array->len + 1)) {
         return AM_FALSE;
     }
 
-    memmove (array->ptr + 1, array->ptr, array->len * sizeof (am_int32));
+    memmove (array->ptr + 1, array->ptr, array->len * sizeof (Span));
     array->ptr [0] = value;
     ++array->len;
 
@@ -373,11 +373,11 @@ MAGNA_API am_bool MAGNA_CALL int32_array_push_front
  * @param index Индекс.
  * @param value Новое значение для элемента массива.
  */
-MAGNA_API void MAGNA_CALL int32_array_set
+MAGNA_API void MAGNA_CALL span_array_set
     (
-        Int32Array *array,
+        SpanArray *array,
         am_size_t index,
-        am_int32 value
+        Span value
     )
 {
     assert (array != NULL);
@@ -393,9 +393,9 @@ MAGNA_API void MAGNA_CALL int32_array_set
  * @param array Массив.
  * @param newSize Новая длина массива.
  */
-MAGNA_API void MAGNA_CALL int32_array_truncate
+MAGNA_API void MAGNA_CALL span_array_truncate
     (
-        Int32Array *array,
+        SpanArray *array,
         am_size_t newSize
     )
 {
@@ -414,22 +414,22 @@ MAGNA_API void MAGNA_CALL int32_array_truncate
  * @param delimiter Разделитель между элементами массива (может быть NULL).
  * @return Признак успешности завершения операции.
  */
-MAGNA_API am_bool MAGNA_CALL int32_array_to_text
+MAGNA_API am_bool MAGNA_CALL span_array_to_text
     (
-        const Int32Array *array,
+        const SpanArray *array,
         struct MagnaBuffer *buffer,
         const am_byte *delimiter
     )
 {
     am_size_t index;
-    am_int32 *item;
+    Span *span;
 
     assert (array != NULL);
     assert (buffer != NULL);
 
-    item = array->ptr;
-    for (index = 0; index < array->len; ++index, ++item) {
-        if (!buffer_put_uint_32(buffer, *item)) {
+    span = array->ptr;
+    for (index = 0; index < array->len; ++index, ++span) {
+        if (!buffer_write (buffer, span->ptr, span->len)) {
             return AM_FALSE;
         }
 
@@ -438,6 +438,38 @@ MAGNA_API am_bool MAGNA_CALL int32_array_to_text
                 return AM_TRUE;
             }
         }
+    }
+
+    return AM_TRUE;
+}
+
+/**
+ * Формирование массива из указателей на строки.
+ *
+ * @param array Неинициализированный массив.
+ * @param text Массив указателей на строки.
+ * @param count Количество указателей.
+ * @return Признак успешности завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL span_array_from_text
+    (
+        SpanArray *array,
+        const char **text,
+        am_size_t count
+    )
+{
+    am_size_t index;
+    Span *span;
+
+    assert (array != NULL);
+
+    if (!span_array_create (array, count)) {
+        return AM_FALSE;
+    }
+
+    span = array->ptr;
+    for (index = 0; index < count; ++index, ++span) {
+        *span = span_from_text (text [index]);
     }
 
     return AM_TRUE;

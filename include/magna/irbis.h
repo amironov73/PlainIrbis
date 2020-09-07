@@ -415,7 +415,7 @@ typedef struct
 {
     Buffer database;
     Buffer fileName;
-    MfnList mfnList;
+    Int32Array mfnList;
     Buffer searchExpression;
     Buffer sequentialSearch;
     Array statements;
