@@ -9,6 +9,8 @@ project(offline C)
 set(CFiles
     src/array.c
     src/buffer.c
+    src/cp1251.c
+    src/cp866.c
     src/ean.c
     src/intarray.c
     src/main.c

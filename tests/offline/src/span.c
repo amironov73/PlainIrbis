@@ -162,7 +162,7 @@ TESTER(span_to_uint_64_2)
 
 TESTER(span_toupper_1)
 {
-    char *hello = strdup ("Hello");
+    char *hello = str_dup ("Hello");
     Span span = span_from_text (hello);
     span_toupper (span);
 
@@ -173,7 +173,7 @@ TESTER(span_toupper_1)
 
 TESTER(span_tolower_1)
 {
-    char *hello = strdup ("Hello");
+    char *hello = str_dup ("Hello");
     Span span = span_from_text (hello);
     span_tolower (span);
 
@@ -211,7 +211,7 @@ TESTER(span_find_byte_1)
 
 TESTER(span_fill_1)
 {
-    char *hello = strdup ("Hello");
+    char *hello = str_dup ("Hello");
     Span span = span_from_text (hello);
     span_fill (span, '0');
 

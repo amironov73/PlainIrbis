@@ -544,6 +544,7 @@ MAGNA_API int            MAGNA_CALL nav_read_no_crlf     (TextNavigator *nav);
 MAGNA_API Span           MAGNA_CALL nav_read_string      (TextNavigator *nav, am_size_t length);
 MAGNA_API Span           MAGNA_CALL nav_read_to          (TextNavigator *nav, am_byte stopChar);
 MAGNA_API Span           MAGNA_CALL nav_read_until       (TextNavigator *nav, am_byte stopChar);
+MAGNA_API int            MAGNA_CALL nav_read_utf8        (TextNavigator *nav);
 MAGNA_API Span           MAGNA_CALL nav_read_while       (TextNavigator *nav, am_byte goodChar);
 MAGNA_API Span           MAGNA_CALL nav_read_word        (TextNavigator *nav);
 MAGNA_API Span           MAGNA_CALL nav_recent           (const TextNavigator *nav, am_ssize_t length);
@@ -595,12 +596,37 @@ MAGNA_API am_bool MAGNA_CALL path_set_current_directory (const Buffer *path);
 MAGNA_API am_uint32 MAGNA_CALL fastParse32 (const am_byte *text, am_size_t length);
 MAGNA_API am_bool   MAGNA_CALL same_char   (int first, int second);
 MAGNA_API am_bool   MAGNA_CALL same_text   (const char *first, const char *second);
+MAGNA_API char*     MAGNA_CALL str_dup     (const char *text);
 
 /*=========================================================*/
 
 /* Работа с кодировками */
 
-MAGNA_API am_size_t MAGNA_CALL utf8_code_points (const am_byte *data, am_size_t dataLength);
+typedef struct
+{
+    const char *name;
+    unsigned (MAGNA_CALL *char_to_unicode) (am_byte);
+    am_byte (MAGNA_CALL *unicode_to_char) (unsigned);
+
+} Encoding;
+
+extern Encoding cp1251_encoding, cp866_encoding;
+
+MAGNA_API am_bool    MAGNA_CALL buffer_putc_utf8 (Buffer *buffer, unsigned chr);
+MAGNA_API am_size_t  MAGNA_CALL utf8_code_points (const am_byte *data, am_size_t dataLength);
+MAGNA_API am_ssize_t MAGNA_CALL search_for_unicode (am_wchar *array, am_ssize_t left, am_ssize_t right, am_wchar value);
+
+MAGNA_API unsigned MAGNA_CALL cp1251_char_to_unicode  (am_byte chr);
+MAGNA_API am_bool  MAGNA_CALL cp1251_char_to_utf8     (Buffer *buffer, am_byte chr);
+MAGNA_API am_bool  MAGNA_CALL cp1251_buffer_to_utf8   (Buffer *target, const Buffer *source);
+MAGNA_API am_byte  MAGNA_CALL cp1251_unicode_to_char  (unsigned uchr);
+MAGNA_API am_bool  MAGNA_CALL cp1251_buffer_from_utf8 (Buffer *target, const Buffer *source);
+
+MAGNA_API unsigned MAGNA_CALL cp866_char_to_unicode  (am_byte chr);
+MAGNA_API am_byte  MAGNA_CALL cp866_unicode_to_char  (unsigned uchr);
+MAGNA_API am_bool  MAGNA_CALL cp866_char_to_utf8     (Buffer *buffer, am_byte chr);
+MAGNA_API am_bool  MAGNA_CALL cp866_buffer_to_utf8   (Buffer *target, const Buffer *source);
+MAGNA_API am_bool  MAGNA_CALL cp866_buffer_from_utf8 (Buffer *target, const Buffer *source);
 
 /*=========================================================*/
 

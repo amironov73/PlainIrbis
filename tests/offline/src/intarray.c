@@ -239,7 +239,7 @@ TESTER(int32_array_truncate_1)
 {
     Int32Array a1;
     am_int32 c1 = 1, c2 = 2;
-    am_int32 g1, g2;
+    am_int32 g1;
 
     int32_array_create (&a1, 10);
     CHECK (a1.len == 0);
@@ -282,7 +282,6 @@ TESTER(int32_array_grow_3)
 {
     Int32Array a1;
     am_int32 c1 = 1, c2 = 2;
-    am_int32 g1, g2;
 
     int32_array_create (&a1, 10);
     CHECK (a1.capacity == 10);

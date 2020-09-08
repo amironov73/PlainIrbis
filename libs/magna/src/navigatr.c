@@ -991,6 +991,22 @@ MAGNA_API void MAGNA_CALL nav_skip_punctuation
     }
 }
 
+/**
+ * Считывание одного символа в кодировке UTF-8.
+ *
+ * @param nav
+ * @return
+ */
+MAGNA_API int MAGNA_CALL nav_read_utf8
+    (
+        TextNavigator *nav
+    )
+{
+    assert (nav != NULL);
+
+    return -1;
+}
+
 /*=========================================================*/
 
 #ifdef _MSC_VER

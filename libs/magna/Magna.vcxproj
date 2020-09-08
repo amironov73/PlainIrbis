@@ -23,6 +23,8 @@
     <ClCompile Include="src\beep.c" />
     <ClCompile Include="src\buffer.c" />
     <ClCompile Include="src\chunked.c" />
+    <ClCompile Include="src\cp1251.c" />
+    <ClCompile Include="src\cp866.c" />
     <ClCompile Include="src\date.c" />
     <ClCompile Include="src\delphi.c" />
     <ClCompile Include="src\encoding.c" />
@@ -42,6 +44,7 @@
     <ClCompile Include="src\string.c" />
     <ClCompile Include="src\tcp4.c" />
     <ClCompile Include="src\thread.c" />
+    <ClCompile Include="src\utf8.c" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

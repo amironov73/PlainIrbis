@@ -171,6 +171,29 @@ MAGNA_API am_uint32 MAGNA_CALL fastParse32
     return result;
 }
 
+/**
+ * Копия строки в куче. Освобождать должен вызывающий.
+ *
+ * @param text
+ * @return
+ */
+MAGNA_API char* MAGNA_CALL str_dup
+    (
+        const char *text
+    )
+{
+    am_size_t size;
+    char *result;
+
+    assert (text != NULL);
+
+    size = strlen (text) + 1;
+    result = malloc (size);
+    memcpy (result, text, size);
+
+    return result;
+}
+
 /*=========================================================*/
 
 #ifdef _MSC_VER
