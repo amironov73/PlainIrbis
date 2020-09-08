@@ -352,7 +352,7 @@ MAGNA_API Span MAGNA_CALL span_slice
     }
 
     result.ptr += start;
-    result.len = length;
+    result.len = (am_size_t) length;
 
     return result;
 }
@@ -512,9 +512,9 @@ MAGNA_API struct MagnaSpanArray* MAGNA_CALL span_split_by_chars
     return array;
 }
 
-static am_byte* find_one (am_byte *from, am_byte *to, am_byte value)
+static const am_byte* find_one (const am_byte *from, const am_byte *to, am_byte value)
 {
-    am_byte *ptr;
+    const am_byte *ptr;
 
     for (ptr = from; ptr < to; ++ptr) {
         if (*ptr == value) {
@@ -525,9 +525,9 @@ static am_byte* find_one (am_byte *from, am_byte *to, am_byte value)
     return NULL;
 }
 
-static am_byte* find_many (am_byte *from, am_byte *to, am_byte *values, am_size_t valueCount)
+static const am_byte* find_many (const am_byte *from, const am_byte *to, const am_byte *values, am_size_t valueCount)
 {
-    am_byte *ptr1, *ptr2 = values + valueCount, *ptr3;
+    const am_byte *ptr1, *ptr2 = values + valueCount, *ptr3;
 
     for (ptr1 = from; ptr1 < to; ++ptr1) {
         ptr3 = find_one (values, ptr2, *ptr1);
@@ -557,7 +557,7 @@ MAGNA_API am_size_t MAGNA_CALL span_split_n_by_char
     )
 {
     am_size_t count;
-    am_byte *ptr = span.ptr, *end = ptr + span.len, *found;
+    const am_byte *ptr = span.ptr, *end = ptr + span.len, *found;
     Span *item;
 
     assert (array != NULL);
@@ -574,7 +574,7 @@ MAGNA_API am_size_t MAGNA_CALL span_split_n_by_char
         }
 
         item = array + count;
-        item->ptr = ptr;
+        item->ptr = (am_byte*) ptr;
         item->len = found - ptr;
         ptr = found + 1;
         ++count;
@@ -582,7 +582,7 @@ MAGNA_API am_size_t MAGNA_CALL span_split_n_by_char
 
     if (ptr != end) {
         item = array + count;
-        item->ptr = ptr;
+        item->ptr = (am_byte*) ptr;
         item->len = end - ptr;
         ++count;
     }
@@ -604,13 +604,13 @@ MAGNA_API am_size_t MAGNA_CALL span_split_n_by_chars
     (
         Span span,
         Span *array,
-        size_t arraySize,
-        am_byte *values,
+        am_size_t arraySize,
+        const am_byte *values,
         am_size_t valueCount
     )
 {
     am_size_t count;
-    am_byte *ptr = span.ptr, *end = ptr + span.len, *found;
+    const am_byte *ptr = span.ptr, *end = ptr + span.len, *found;
     Span *item;
 
     assert (array != NULL);
@@ -627,7 +627,7 @@ MAGNA_API am_size_t MAGNA_CALL span_split_n_by_chars
         }
 
         item = array + count;
-        item->ptr = ptr;
+        item->ptr = (am_byte*) ptr;
         item->len = found - ptr;
         ptr = found + 1;
         ++count;
@@ -635,7 +635,7 @@ MAGNA_API am_size_t MAGNA_CALL span_split_n_by_chars
 
     if (ptr != end) {
         item = array + count;
-        item->ptr = ptr;
+        item->ptr = (am_byte*) ptr;
         item->len = end - ptr;
         ++count;
     }
