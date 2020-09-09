@@ -29,6 +29,7 @@ set(CFiles
     src/intarray.c
     src/io.c
     src/keyboard.c
+    src/koi8r.c
     src/magna.c
     src/memory.c
     src/navigatr.c

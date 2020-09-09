@@ -610,7 +610,11 @@ typedef struct
 
 } Encoding;
 
-extern Encoding cp1251_encoding, cp866_encoding;
+extern Encoding cp1251_encoding, cp866_encoding, koi8r_encoding;
+
+MAGNA_API am_bool   MAGNA_CALL encoding_register (const Encoding *encoding);
+MAGNA_API Encoding* MAGNA_CALL encoding_get      (const char *name);
+MAGNA_API Encoding*            encoding_ansi     ();
 
 MAGNA_API am_bool    MAGNA_CALL buffer_putc_utf8 (Buffer *buffer, unsigned chr);
 MAGNA_API am_size_t  MAGNA_CALL utf8_code_points (const am_byte *data, am_size_t dataLength);
@@ -627,6 +631,12 @@ MAGNA_API am_byte  MAGNA_CALL cp866_unicode_to_char  (unsigned uchr);
 MAGNA_API am_bool  MAGNA_CALL cp866_char_to_utf8     (Buffer *buffer, am_byte chr);
 MAGNA_API am_bool  MAGNA_CALL cp866_buffer_to_utf8   (Buffer *target, const Buffer *source);
 MAGNA_API am_bool  MAGNA_CALL cp866_buffer_from_utf8 (Buffer *target, const Buffer *source);
+
+MAGNA_API unsigned MAGNA_CALL koi8r_char_to_unicode  (am_byte chr);
+MAGNA_API am_byte  MAGNA_CALL koi8r_unicode_to_char  (unsigned uchr);
+MAGNA_API am_bool  MAGNA_CALL koi8r_char_to_utf8     (Buffer *buffer, am_byte chr);
+MAGNA_API am_bool  MAGNA_CALL koi8r_buffer_to_utf8   (Buffer *target, const Buffer *source);
+MAGNA_API am_bool  MAGNA_CALL koi8r_buffer_from_utf8 (Buffer *target, const Buffer *source);
 
 /*=========================================================*/
 

@@ -37,6 +37,84 @@ Encoding cp866_encoding = {
     cp866_unicode_to_char
 };
 
+Encoding koi8r_encoding = {
+    "KOI-8r",
+    koi8r_char_to_unicode,
+    koi8r_unicode_to_char
+};
+
+static Encoding* _builtin_encodings[] = { &cp1251_encoding, &cp866_encoding, &koi8r_encoding };
+
+static Array _registered_encodings = ARRAY_INIT;
+
+static void _register_builtin_encodings()
+{
+    am_size_t index, count;
+
+    if (_registered_encodings.ptr == NULL) {
+        count = sizeof (_builtin_encodings) / sizeof (_builtin_encodings[0]);
+        array_create (&_registered_encodings, count);
+        for (index = 0; index < count; ++index) {
+            array_push_back (&_registered_encodings, _builtin_encodings[index]);
+        }
+    }
+}
+
+/**
+ * Регистрация кодировки.
+ *
+ * @param encoding Кодировка.
+ * @return Признак успешности завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL encoding_register
+    (
+        const Encoding *encoding
+    )
+{
+    assert (encoding != NULL);
+
+    _register_builtin_encodings();
+
+    /* TODO: проверять наличие среди уже зарегистрированных */
+    return array_push_back (&_registered_encodings, (void*) encoding);
+}
+
+/**
+ * Поиск кодировки по имени.
+ *
+ * @param name Имя кодировки.
+ * @return Указатель на найденную кодировку либо `NULL`.
+ */
+MAGNA_API Encoding* MAGNA_CALL encoding_get
+    (
+        const char *name
+    )
+{
+    am_size_t index;
+    Encoding *encoding;
+
+    assert (name != NULL);
+
+    for (index = 0; index < _registered_encodings.len; ++index) {
+        encoding = (Encoding*) array_get (&_registered_encodings, index);
+        if (!strcmpi (encoding->name, name)) {
+            return encoding;
+        }
+    }
+
+    return NULL;
+}
+
+/**
+ * Встроенная кодировка ANSI.
+ *
+ * @return
+ */
+MAGNA_API Encoding* encoding_ansi()
+{
+    return &cp1251_encoding;
+}
+
 /**
  * Поиск широкого символа в таблице перекодировки в узкий.
  * Таблица перекодировки должна быть отсортированной!

@@ -13,6 +13,7 @@ set(CFiles
     src/cp866.c
     src/ean.c
     src/intarray.c
+    src/koi8r.c
     src/main.c
     src/path.c
     src/span.c
