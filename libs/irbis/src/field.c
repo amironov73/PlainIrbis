@@ -135,19 +135,23 @@ MAGNA_API MarcField* MAGNA_CALL field_init
 
 MAGNA_API MarcField* MAGNA_CALL field_insert_at
     (
-            MarcField *field,
-            am_size_t index,
-            const SubField *subfield
+        MarcField *field,
+        am_size_t index,
+        const SubField *subfield
     )
 {
     assert (field != NULL);
     assert (subfield != NULL);
+
+    /* TODO: implement */
+
+    return NULL;
 }
 
 MAGNA_API MarcField* MAGNA_CALL field_remove_at
     (
-            MarcField *field,
-            am_size_t index
+        MarcField *field,
+        am_size_t index
     )
 {
     assert (field != NULL);

@@ -280,7 +280,7 @@ MAGNA_API Span                   MAGNA_CALL span_slice            (Span span, am
 MAGNA_API struct MagnaSpanArray* MAGNA_CALL span_split_by_char    (Span span, struct MagnaSpanArray *array, am_byte value);
 MAGNA_API struct MagnaSpanArray* MAGNA_CALL span_split_by_chars   (Span span, struct MagnaSpanArray *array, const am_byte *values, am_size_t valueCount);
 MAGNA_API am_size_t              MAGNA_CALL span_split_n_by_char  (Span span, Span *array, am_size_t arraySize, am_byte value);
-MAGNA_API am_size_t              MAGNA_CALL span_split_n_by_chars (Span span, Span *array, am_size_t arraySize, am_byte *values, am_size_t valueCount);
+MAGNA_API am_size_t              MAGNA_CALL span_split_n_by_chars (Span span, Span *array, am_size_t arraySize, const am_byte *values, am_size_t valueCount);
 MAGNA_API am_bool                MAGNA_CALL span_starts_with      (Span span, Span prefix);
 MAGNA_API Span                   MAGNA_CALL span_trim_start       (Span span);
 MAGNA_API Span                   MAGNA_CALL span_trim_end         (Span span);

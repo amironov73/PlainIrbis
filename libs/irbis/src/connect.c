@@ -51,6 +51,8 @@ MAGNA_API am_bool MAGNA_CALL connection_init
     buffer_assign_text (&connection->host, "IBIS");
     connection->port = 6666;
     connection->workstation = CATALOGER;
+
+    return AM_FALSE;
 }
 
 /*=========================================================*/
