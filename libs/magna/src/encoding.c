@@ -97,7 +97,7 @@ MAGNA_API Encoding* MAGNA_CALL encoding_get
 
     for (index = 0; index < _registered_encodings.len; ++index) {
         encoding = (Encoding*) array_get (&_registered_encodings, index);
-        if (!strcmpi (encoding->name, name)) {
+        if (same_text(encoding->name, name)) {
             return encoding;
         }
     }
