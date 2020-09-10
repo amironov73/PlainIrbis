@@ -18,6 +18,12 @@
     #include <malloc.h>
     #define alloca _alloca
 
+#elif defined(MAGNA_MSDOS)
+
+    /* TODO: implement properly */
+
+    #define alloca malloc
+
 #else
 
     #if defined(__MINGW32__) || defined(__MINGW64__)

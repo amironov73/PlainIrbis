@@ -17,6 +17,19 @@
 
 #include <windows.h>
 
+#elif defined(MAGNA_MSDOS)
+
+#include <stdio.h>
+#include <fcntl.h>
+#include <io.h>
+
+typdef unsigned mode_t;
+
+#define S_IRUSR 0
+#define S_IWUSR 0
+#define S_IRGRP 0
+#define S_IWGRP 0
+
 #else
 
 #include <unistd.h>

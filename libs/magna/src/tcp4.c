@@ -21,6 +21,10 @@
 
 static WSADATA wsaData;
 
+#elif defined(MAGNA_MSDOS)
+
+/* TODO: implement */
+
 #else
 
 #include <sys/socket.h>
@@ -86,6 +90,16 @@ MAGNA_API am_int32 MAGNA_CALL tcp4_connect
         am_uint16 port
     )
 {
+#ifdef MAGNA_MSDOS
+
+    /* TODO: implement */
+    (void) hostname;
+    (void) port;
+
+    return -1;
+
+#else
+
     am_int32 result;
     struct sockaddr_in destinationAddress;
     unsigned long inaddr;
@@ -133,6 +147,8 @@ MAGNA_API am_int32 MAGNA_CALL tcp4_connect
     }
 
     return result;
+
+#endif
 }
 
 /**

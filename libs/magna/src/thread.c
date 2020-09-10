@@ -17,6 +17,10 @@
 
 #include <windows.h>
 
+#elif defined(MAGNA_MSDOS)
+
+/* TODO: implement */
+
 #else
 
 #include <unistd.h>
@@ -48,7 +52,34 @@ MAGNA_API am_handle MAGNA_CALL thread_create
         void *start
     )
 {
+#ifdef MAGNA_WINDOWS
+
+    LPSECURITY_ATTRIBUTES securityAttributes = NULL;
+    SIZE_T stackSize = 0; /* use defaults */
+    DWORD creationFlags = 0;
+    DWORD threadId;
+
+    HANDLE result = CreateThread
+        (
+            securityAttributes,
+            stackSize,
+            (LPTHREAD_START_ROUTINE) start,
+            NULL,
+            creationFlags,
+            &threadId
+        );
+
+    return result;
+
+#elif defined(MAGNA_MSDOS)
+
+    return -1;
+
+#else
+
     return AM_BAD_HANDLE;
+
+#endif
 }
 
 /**
@@ -65,6 +96,12 @@ MAGNA_API am_bool MAGNA_CALL thread_join
     )
 {
     assert (handle != AM_BAD_HANDLE);
+
+#ifdef MAGNA_WINDOWS
+
+    WaitForSingleObject (handle, timeout);
+
+#endif
 
     return AM_FALSE;
 }

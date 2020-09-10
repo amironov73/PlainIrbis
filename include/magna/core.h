@@ -14,9 +14,19 @@
 
         #define MAGNA_WINDOWS
 
+    #elif defined(__MSDOS__)
+
+        #define MAGNA_MSDOS
+
     #else
 
         #define MAGNA_UNIX
+
+        #if defined(__linux__)
+
+            #define MAGNA_LINUX
+
+        #endif
 
         #if defined(__FreeBSD__)
 
@@ -30,7 +40,9 @@
 
         #endif
 
-        #if defined(__APPLE__) || defined(__APPLE_CC__) || defined (__OSX__)
+        #if defined(__APPLE__) || defined(__apple__) || defined(__APPLE_CC__) || defined (__OSX__)
+
+            /* DARWIN -- OSX and iOS */
 
             #define MAGNA_APPLE
 
@@ -118,9 +130,15 @@
 
 #if !defined(MAGNA_64BIT) && !defined(MAGNA_32BIT) && !defined(MAGNA_16BIT)
 
-    #if defined(_WIN64) || defined(__x86_64__) || defined(__aarch64__) || defined(__powerpc64__)
+    #if defined(_WIN64) || defined(__x86_64__) || defined(__aarch64__) || defined(__powerpc64__) || defined(__LP64__)
 
         #define MAGNA_64BIT
+
+    #elif defined(__TURBOC__)
+
+        /* TODO: implement properly */
+
+        #define MAGNA_16BIT
 
     #else
 
@@ -133,6 +151,60 @@
 /* Sanity check */
 #if !defined(MAGNA_64BIT) && !defined(MAGNA_32BIT) && !defined(MAGNA_16BIT)
 #error Unsupported architecture
+#endif
+
+/*=========================================================*/
+
+/* https://ru.wikipedia.org/wiki/Restrict
+
+  restrict — ключевое слово в языке программирования C,
+  введённое стандартом C99 и используемое в объявлениях
+  указателей.
+
+    char * restrict p1;
+    int ** restrict p2;
+    float * restrict p3, * restrict p4;
+
+  Ключевое слово restrict позволяет программисту сообщить компилятору,
+  что объявляемый указатель указывает на блок памяти, на который
+  не указывает никакой другой указатель. Гарантию того, что на один
+  блок памяти не будет указывать более одного указателя, даёт
+  программист. При этом оптимизирующий компилятор может генерировать
+  более эффективный код.
+
+  Использование ключевого слова restrict при объявлении других
+  объектов (не указателей) не определено стандартом.
+
+  При использовании ключевого слова restrict программа, написанная
+  на «умном» C, может сравниться по скорости с программой, написанной
+  на «глупом» Fortran.
+
+  В языке C++ нет ключевого слова restrict (не описано в стандарте),
+  но разработчики разных компиляторов C++ добавили аналогичные
+  по назначению ключевые слова, например:
+
+  __restrict и __restrict__ у GNU Compiler Collection[2];
+  __restrict и __declspec(restrict) у Visual C++;
+  __restrict__ у Clang.
+
+ */
+
+#if __STDC_VERSION__ >= 199901L
+
+#define MAGNA_RESTRICT restrict
+
+#elif defined(_MSC_VER)
+
+#define MAGNA_RESTRICT __declspec(restrict)
+
+#elif defined(__GNUC__)
+
+#define MAGNA_RESTRICT __restrict__
+
+#else
+
+#define MAGNA_RESTRICT
+
 #endif
 
 /*=========================================================*/
@@ -588,6 +660,7 @@ MAGNA_API am_bool    MAGNA_CALL file_write_text   (am_handle handle, const char 
 MAGNA_API am_bool MAGNA_CALL path_get_current_directory (Buffer *path);
 MAGNA_API Span    MAGNA_CALL path_get_extension         (const Buffer *path);
 MAGNA_API am_bool MAGNA_CALL path_set_current_directory (const Buffer *path);
+MAGNA_API am_bool MAGNA_CALL path_to_executable         (Buffer *buffer);
 
 /*=========================================================*/
 
@@ -614,7 +687,7 @@ extern Encoding cp1251_encoding, cp866_encoding, koi8r_encoding;
 
 MAGNA_API am_bool   MAGNA_CALL encoding_register (const Encoding *encoding);
 MAGNA_API Encoding* MAGNA_CALL encoding_get      (const char *name);
-MAGNA_API Encoding*            encoding_ansi     ();
+MAGNA_API Encoding*            encoding_ansi     (void);
 
 MAGNA_API am_bool    MAGNA_CALL buffer_putc_utf8 (Buffer *buffer, unsigned chr);
 MAGNA_API am_size_t  MAGNA_CALL utf8_code_points (const am_byte *data, am_size_t dataLength);

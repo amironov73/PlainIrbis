@@ -7,6 +7,16 @@ TESTER(path_get_current_directory_1)
 {
     Buffer buffer = BUFFER_INIT;
     am_bool rc = path_get_current_directory (&buffer);
+
+    CHECK (rc);
+    CHECK (buffer.position != 0);
+}
+
+TESTER(path_to_executable_1)
+{
+    Buffer buffer = BUFFER_INIT;
+    am_bool rc = path_to_executable (&buffer);
+
     CHECK (rc);
     CHECK (buffer.position != 0);
 }

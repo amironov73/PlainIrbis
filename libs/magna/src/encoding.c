@@ -110,7 +110,7 @@ MAGNA_API Encoding* MAGNA_CALL encoding_get
  *
  * @return
  */
-MAGNA_API Encoding* encoding_ansi()
+MAGNA_API Encoding* encoding_ansi (void)
 {
     return &cp1251_encoding;
 }

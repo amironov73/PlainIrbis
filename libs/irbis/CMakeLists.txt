@@ -19,6 +19,7 @@ set(CFiles
     src/ean.c
     src/error.c
     src/field.c
+    src/format.c
     src/guard.c
     src/ini.c
     src/isbn.c

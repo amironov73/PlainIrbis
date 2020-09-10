@@ -13,11 +13,17 @@
 
 /*=========================================================*/
 
-#ifdef MAGNA_WINDOWS
+#if defined(MAGNA_WINDOWS)
 
 #include <windows.h>
 
+#elif defined(MAGNA_MSDOS)
+
+#include <dos.h>
+
 #else
+
+/* variouse UNIXes */
 
 #include <unistd.h>
 #include <sys/stat.h>

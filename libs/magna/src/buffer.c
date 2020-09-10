@@ -30,14 +30,20 @@
 
 MAGNA_API am_size_t MAGNA_CALL buffer_calculate_size
     (
-            am_size_t newSize
+        am_size_t newSize
     )
 {
+    am_size_t result = 8;
+
     if (newSize < 8) {
         newSize = 8;
     }
 
-    return newSize * 2;
+    while (result <= newSize) {
+        result *= 2;
+    }
+
+    return result;
 }
 
 /**
@@ -269,10 +275,12 @@ MAGNA_API am_bool MAGNA_CALL buffer_puts
         const char *str
     )
 {
+    am_size_t delta;
+
     assert (buffer != NULL);
     assert (str != NULL);
 
-    size_t delta = strlen (str);
+    delta = strlen (str);
     if (!buffer_grow (buffer, buffer->position + delta)) {
         return AM_FALSE;
     }
