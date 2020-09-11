@@ -43,6 +43,11 @@
 #include <fcntl.h>
 #include <io.h>
 
+#elif defined(MAGNA_APPLE)
+
+#include <mach-o/dyld.h>
+#include <unistd.h>
+
 #else
 
 #include <unistd.h>
@@ -79,7 +84,7 @@ MAGNA_API am_bool MAGNA_CALL path_get_current_directory
 
 #ifdef MAGNA_WINDOWS
 
-    if (!GetCurrentDirectoryA (FILENAME_MAX, temporary)) {
+    if (!GetCurrentDirectoryA (sizeof (temporary), temporary)) {
         return AM_FALSE;
     }
 
@@ -91,9 +96,7 @@ MAGNA_API am_bool MAGNA_CALL path_get_current_directory
 
 #endif
 
-    buffer_assign_text (path, temporary);
-
-    return AM_TRUE;
+    return buffer_assign_text (path, temporary);
 }
 
 /**
@@ -216,6 +219,19 @@ MAGNA_API am_bool MAGNA_CALL path_to_executable
     }
 
     return buffer_puts (buffer, temp);
+
+#elif defined(MAGNA_APPLE)
+
+    char path[1024];
+    uint32_t size = sizeof (path);
+
+    assert (buffer != NULL);
+
+    if (_NSGetExecutablePath(path, &size) != 0) {
+        return AM_FALSE;
+    }
+
+    return buffer_puts (buffer, path);
 
 #else
 
