@@ -22,6 +22,7 @@ set(CFiles
     src/cp866.c
     src/date.c
     src/delphi.c
+    src/dump.c
     src/encoding.c
     src/error.c
     src/fastbuf.c
@@ -33,8 +34,11 @@ set(CFiles
     src/magna.c
     src/memory.c
     src/navigatr.c
+    src/number.c
     src/path.c
+    src/retry.c
     src/screen.c
+    src/sleep.c
     src/span.c
     src/spanarry.c
     src/string.c

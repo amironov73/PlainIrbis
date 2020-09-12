@@ -189,7 +189,7 @@
 
  */
 
-#if __STDC_VERSION__ >= 199901L
+#if defined (__STDC_VERSION) && __STDC_VERSION__ >= 199901L
 
 #define MAGNA_RESTRICT restrict
 
@@ -415,6 +415,7 @@ typedef struct
 #define INT32_ARRAY_INIT { NULL, 0, 0 }
 
 MAGNA_API am_bool  MAGNA_CALL int32_array_clone      (Int32Array *target, const Int32Array *source);
+MAGNA_API am_bool  MAGNA_CALL int32_array_compress   (const Int32Array *array, struct MagnaBuffer *buffer);
 MAGNA_API am_bool  MAGNA_CALL int32_array_concat     (Int32Array *target, const Int32Array *source);
 MAGNA_API am_bool  MAGNA_CALL int32_array_copy       (Int32Array *target, const Int32Array *source);
 MAGNA_API am_bool  MAGNA_CALL int32_array_create     (Int32Array *array, am_size_t capacity);
@@ -629,6 +630,23 @@ MAGNA_API Span           MAGNA_CALL nav_slice            (const TextNavigator *n
 
 /*=========================================================*/
 
+/* Текст, содержащий фрагменты с числами */
+
+typedef struct {
+    Buffer prefix;
+    am_int64 value;
+    int length;
+    am_bool haveValue;
+
+} NumberTextChunk;
+
+typedef struct {
+    Array  chunks;
+
+} NumberText;
+
+/*=========================================================*/
+
 /* Работа с файлами */
 
 MAGNA_API am_bool    MAGNA_CALL file_close        (am_handle handle);
@@ -666,10 +684,14 @@ MAGNA_API am_bool MAGNA_CALL path_to_executable         (Buffer *buffer);
 
 /* Работа со строками */
 
-MAGNA_API am_uint32 MAGNA_CALL fastParse32 (const am_byte *text, am_size_t length);
-MAGNA_API am_bool   MAGNA_CALL same_char   (int first, int second);
-MAGNA_API am_bool   MAGNA_CALL same_text   (const char *first, const char *second);
-MAGNA_API char*     MAGNA_CALL str_dup     (const char *text);
+MAGNA_API am_uint32   MAGNA_CALL fastParse32      (const am_byte *text, am_size_t length);
+MAGNA_API am_bool     MAGNA_CALL same_char        (int first, int second);
+MAGNA_API am_bool     MAGNA_CALL same_text        (const char *first, const char *second);
+MAGNA_API char*       MAGNA_CALL str_dup          (const char *text);
+MAGNA_API am_bool     MAGNA_CALL char_one_of      (am_byte one, const am_byte *many);
+MAGNA_API am_bool                str_one_of       (const char *one, ...);
+MAGNA_API int         MAGNA_CALL str_safe_compare (const char *first, const char *second);
+MAGNA_API const char* MAGNA_CALL str_to_visible   (const char *text);
 
 /*=========================================================*/
 
@@ -734,6 +756,27 @@ MAGNA_API am_bool  MAGNA_CALL date_today   (struct tm *date);
 
 /*=========================================================*/
 
+/* Настойчивое исполнение */
+
+typedef struct MagnaRetryManager RetryManager;
+
+typedef void* (MAGNA_CALL *Action) (void *data);
+typedef am_bool (MAGNA_CALL *Handler) (RetryManager *manager);
+
+struct MagnaRetryManager
+{
+    Handler onError;
+    Handler onSuccess;
+    unsigned sleepInterval;
+    unsigned retryLimit;
+    void *data;
+};
+
+MAGNA_API void  MAGNA_CALL retry_init   (RetryManager *manager);
+MAGNA_API void* MAGNA_CALL retry_action (RetryManager *manager, Action action, void *data);
+
+/*=========================================================*/
+
 /* Работа с потоками */
 
 MAGNA_API am_handle MAGNA_CALL thread_create (void *start);
@@ -741,7 +784,10 @@ MAGNA_API am_bool   MAGNA_CALL thread_join   (am_handle handle, am_int32 timeout
 
 /*=========================================================*/
 
+/* Прочие функции */
+
 MAGNA_API void beep (void);
+MAGNA_API void MAGNA_CALL magna_sleep (unsigned interval);
 
 #ifdef MAGNA_WINDOWS
 

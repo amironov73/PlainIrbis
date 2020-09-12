@@ -443,6 +443,88 @@ MAGNA_API am_bool MAGNA_CALL int32_array_to_text
     return AM_TRUE;
 }
 
+static am_bool format_range
+    (
+        struct MagnaBuffer *buffer,
+        am_uint32 first,
+        am_uint32 last
+    )
+{
+    if (first == last) {
+        return buffer_put_uint_32 (buffer, first);
+    }
+
+    if (first == last - 1) {
+        return buffer_put_uint_32 (buffer, first)
+            && buffer_puts (buffer, ", ")
+            && buffer_put_uint_32 (buffer, last);
+    }
+
+    return buffer_put_uint_32 (buffer, first)
+        && buffer_putc (buffer, '-')
+        && buffer_put_uint_32 (buffer, last);
+}
+
+MAGNA_API am_bool MAGNA_CALL int32_array_compress
+    (
+        const Int32Array *array,
+        struct MagnaBuffer *buffer
+    )
+{
+    am_bool first = AM_TRUE;
+    am_uint32 previous, last, current;
+    am_size_t index;
+
+    assert (array != NULL);
+    assert (buffer != NULL);
+
+    if (array->len == 0) {
+        return AM_TRUE;
+    }
+
+    last = previous = array->ptr[0];
+    for (index = 1; index < array->len; ++index) {
+        current = array->ptr[index];
+        if (current != last + 1) {
+            if (!first) {
+                if (!buffer_puts (buffer, ", ")) {
+                    return AM_FALSE;
+                }
+            }
+
+            if (!format_range (buffer, previous, last)) {
+                return AM_FALSE;
+            }
+
+            previous = current;
+
+            first = AM_FALSE;
+        }
+
+        last = current;
+    }
+
+    if (!first) {
+        if (!buffer_puts (buffer, ", ")) {
+            return AM_FALSE;
+        }
+    }
+
+    return format_range (buffer, previous, last);
+}
+
+MAGNA_API am_bool MAGNA_CALL int32_array_parse
+    (
+        Int32Array *array,
+        TextNavigator *nav
+    )
+{
+    assert (array != NULL);
+    assert (nav != NULL);
+
+    return AM_FALSE;
+}
+
 /*=========================================================*/
 
 #include "warnpop.h"

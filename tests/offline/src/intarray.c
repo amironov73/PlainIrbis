@@ -292,3 +292,24 @@ TESTER(int32_array_grow_3)
     CHECK (a1.len == 2);
     int32_array_free (&a1);
 }
+
+TESTER(int32_array_compress_1)
+{
+    am_int32 data[] = { 1, 2, 3, 6, 7 };
+    Int32Array array;
+    Buffer buffer = BUFFER_INIT;
+    am_bool rc;
+    const am_byte *text;
+
+    array.ptr = data;
+    array.len = sizeof (data) / sizeof (data[0]);
+    array.capacity = array.len;
+    rc = int32_array_compress (&array, &buffer);
+
+    CHECK (rc);
+
+    text = buffer_to_text (&buffer);
+
+    CHECK (text != NULL);
+    CHECK (strcmp (text, "1-3, 6, 7") == 0);
+}

@@ -14,6 +14,7 @@
 
 #include <assert.h>
 #include <ctype.h>
+#include <stdarg.h>
 
 /*=========================================================*/
 
@@ -192,6 +193,112 @@ MAGNA_API char* MAGNA_CALL str_dup
     memcpy (result, text, size);
 
     return result;
+}
+
+/**
+ * Является ли символ одним из перечисленных.
+ *
+ * @param one Проверяемый символ.
+ * @param many Перечисленные символы.
+ * @return
+ */
+MAGNA_API am_bool MAGNA_CALL char_one_of
+    (
+        am_byte one,
+        const am_byte *many
+    )
+{
+    assert (many != NULL);
+
+    while (*many) {
+        if (same_char (one, *many)) {
+            return AM_TRUE;
+        }
+
+        ++many;
+    }
+
+    return AM_FALSE;
+}
+
+MAGNA_API am_bool str_one_of
+    (
+        const char *one,
+        ...
+    )
+{
+    am_bool result = AM_FALSE;
+    const char *ptr;
+    va_list args;
+
+    assert (one != NULL);
+
+    va_start (args, one);
+
+    while ((ptr = va_arg (args, const char*)) != NULL) {
+        if (same_text (one, ptr)) {
+            return AM_TRUE;
+        }
+    }
+
+    va_end (args);
+
+    return result;
+}
+
+MAGNA_API int MAGNA_CALL str_safe_compare
+    (
+        const char *first,
+        const char *second
+    )
+{
+    if (first == NULL) {
+        if (second == NULL) {
+            return AM_TRUE;
+        }
+
+        return -1;
+    }
+
+    if (second == NULL) {
+        return 1;
+    }
+
+    return strcmp (first, second);
+}
+
+/**
+ * Превращает строку в видимую.
+ *
+ * @param text Строка.
+ * @return Видимая строка, например, "null".
+ */
+MAGNA_API const char* MAGNA_CALL str_to_visible
+    (
+        const char *text
+    )
+{
+    const char *ptr;
+
+    if (text == NULL) {
+        return "(null)";
+    }
+
+    if (*text == 0) {
+        return "(empty)";
+    }
+
+    for (ptr = text; *ptr; ++ptr) {
+        if (*ptr > ' ') {
+            break;
+        }
+    }
+
+    if (*ptr == 0) {
+        return "(blank)";
+    }
+
+    return text;
 }
 
 /*=========================================================*/

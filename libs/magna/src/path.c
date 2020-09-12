@@ -183,6 +183,122 @@ MAGNA_API Span MAGNA_CALL path_get_extension
 }
 
 /**
+ * Получение имени файла (с расширением, если есть).
+ *
+ * @param path Путь к файлу (возможно, неполный).
+ * @return Имя файла (возможно, пустое).
+ */
+MAGNA_API Span MAGNA_CALL path_get_filename
+    (
+        const Buffer *path
+    )
+{
+    Span result;
+    char c;
+
+    assert (path != NULL);
+
+    if (path->position <= 2) {
+        result.ptr = path->ptr;
+        result.len = 0;
+        return result;
+    }
+
+    result.ptr = path->ptr + path->position - 1;
+    result.len = 0;
+
+    while (result.ptr >= path->ptr) {
+        c = *result.ptr;
+        if (c == '/' || c == '\\') {
+            ++result.ptr;
+            --result.len;
+            break;
+        }
+
+        --result.ptr;
+        ++result.len;
+    }
+
+    return result;
+}
+
+/**
+ * Получение директории для указанного пути.
+ *
+ * @param path Путь (возможно, неполный).
+ * @return Директория (возможно, пустой фрагмент).
+ */
+MAGNA_API Span MAGNA_CALL path_get_directory
+    (
+        const Buffer *path
+    )
+{
+    Span result;
+    char c;
+
+    assert (path != NULL);
+
+    if (path->position <= 2) {
+        result.ptr = path->ptr;
+        result.len = 0;
+        return result;
+    }
+
+    result.ptr = path->ptr + path->position - 1;
+    result.len = 0;
+
+    /* TODO: implement */
+
+    return result;
+}
+
+/**
+ * Превращает неправильные слэши в правильные.
+ *
+ * @param path Путь (возможно, пустой).
+ * @return Обработанный путь.
+ */
+MAGNA_API Buffer* MAGNA_CALL path_convert_slashes
+    (
+        Buffer *path
+    )
+{
+    am_byte *ptr, *end;
+
+    assert (path != NULL);
+
+    for (ptr = path->ptr, end = ptr + path->position; ptr < end; ++ptr) {
+
+#if defined(MAGNA_WINDOWS) || defined(MAGNA_MSDOS)
+
+        if (*ptr == '/') {
+            *ptr = '\\';
+        }
+
+#else
+
+        if (*ptr == '\\') {
+            *ptr = '/';
+        }
+
+#endif
+    }
+
+    return path;
+}
+
+MAGNA_API am_bool path_combine
+    (
+        Buffer *result,
+        ...
+    )
+{
+    assert (result != NULL);
+
+    return AM_FALSE;
+}
+
+/**
  * Путь к исполняемому файлу.
  *
  * @param buffer Проинициализированный буфер.
@@ -208,13 +324,74 @@ MAGNA_API am_bool MAGNA_CALL path_to_executable
 
 #elif defined(MAGNA_LINUX)
 
-    char temp [PATH_MAX];
+    char temp [PATH_MAX], temp2[30], *ptr;
+    pid_t pid;
 
     assert (buffer != NULL);
 
     /* readlink does not null terminate! */
     memset (temp, 0, sizeof (temp));
     if (readlink ("/proc/self/exe", temp, PATH_MAX) == -1) {
+        /* Может, procfs есть, но нет /proc/self */
+        pid = getpid();
+        sprintf (temp2, "/proc/%ld/exe", (long) pid);
+        if (readlink (temp2, temp, PATH_MAX) == -1) {
+
+            /* When Bash invokes an external command,
+              the variable ‘$_’ is set to the full pathname
+              of the command and passed to that command
+              in its environment.*/
+
+            ptr = getenv("_");
+            if (!ptr) {
+                return AM_FALSE;
+            }
+
+            strcpy (temp, ptr);
+        }
+    }
+
+    return buffer_puts (buffer, temp);
+
+#elif defined(MAGNA_SOLARIS)
+
+    /* See https://docs.oracle.com/cd/E19253-01/816-5168/6mbb3hrb1/index.html */
+
+    const char *path = getexecname();
+
+    assert (buffer != NULL);
+
+    /* readlink("/proc/self/path/a.out", buf, bufsize); */
+
+    if (path == NULL) {
+        return AM_FALSE;
+    }
+
+    return buffer_puts (buffer, path);
+
+#elif defined(MAGNA_FREEBSD)
+
+    char temp [PATH_MAX];
+
+    assert (buffer != NULL);
+
+    /* readlink does not null terminate! */
+    memset (temp, 0, sizeof (temp));
+    if (readlink ("/proc/curproc/file", temp, PATH_MAX) == -1) {
+        return AM_FALSE;
+    }
+
+    return buffer_puts (buffer, temp);
+
+#elif defined(MAGNA_NETBSD)
+
+    char temp [PATH_MAX];
+
+    assert (buffer != NULL);
+
+    /* readlink does not null terminate! */
+    memset (temp, 0, sizeof (temp));
+    if (readlink ("/proc/curproc/exe", temp, PATH_MAX) == -1) {
         return AM_FALSE;
     }
 
@@ -227,7 +404,7 @@ MAGNA_API am_bool MAGNA_CALL path_to_executable
 
     assert (buffer != NULL);
 
-    if (_NSGetExecutablePath(path, &size) != 0) {
+    if (_NSGetExecutablePath (path, &size) != 0) {
         return AM_FALSE;
     }
 
