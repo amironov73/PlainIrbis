@@ -25,6 +25,11 @@
 
 /*=========================================================*/
 
+/**
+ * Инициализация чанка.
+ *
+ * @param chunk Указатель на неинициализированный чанк.
+ */
 MAGNA_API void MAGNA_CALL ntc_init
     (
         NumberTextChunk *chunk
@@ -34,11 +39,7 @@ MAGNA_API void MAGNA_CALL ntc_init
 
     assert (chunk != NULL);
 
-    prefix = &chunk->prefix;
-    prefix->ptr = NULL;
-    prefix->position = 0;
-    prefix->capacity = 0;
-
+    (void) buffer_init (&chunk->prefix);
     chunk->value = 0;
     chunk->length = 0;
     chunk->haveValue = 0;

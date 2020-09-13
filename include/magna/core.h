@@ -291,13 +291,17 @@ MAGNA_API am_bool             magna_on_windows      (void);
 /*=========================================================*/
 
 /* Опережающее объявление */
-struct MagnaArray;
-struct MagnaSpanArray;
-struct MagnaBuffer;
+
+typedef struct MagnaArray       Array;
+typedef struct MagnaSpanArray   SpanArray;
+typedef struct MagnaBuffer      Buffer;
+typedef struct MagnaStream      Stream;
+typedef struct MagnaMemoryChunk MemoryChunk;
 
 /*=========================================================*/
 
 /* Работа с ошибками */
+
 MAGNA_API void display_error (void);
 MAGNA_API void print_error   (void);
 
@@ -373,7 +377,7 @@ typedef void  (*Liberator) (void*);
 
 /* Массив указателей на объекты */
 
-typedef struct MagnaArray
+struct MagnaArray
 {
     void **ptr;
     am_size_t len;
@@ -382,7 +386,7 @@ typedef struct MagnaArray
     Cloner cloner;
     Liberator liberator;
 
-} Array;
+};
 
 #define ARRAY_INIT { NULL, 0, 0, NULL, NULL }
 
@@ -435,13 +439,13 @@ MAGNA_API void     MAGNA_CALL int32_array_truncate   (Int32Array *array, am_size
 
 /* Динамический массив фрагментов */
 
-typedef struct MagnaSpanArray
+struct MagnaSpanArray
 {
     Span *ptr;
     am_size_t len;
     am_size_t capacity;
 
-} SpanArray;
+};
 
 #define SPAN_ARRAY_INIT { NULL, 0, 0 }
 
@@ -465,13 +469,14 @@ MAGNA_API void    MAGNA_CALL span_array_truncate   (SpanArray *array, am_size_t 
 /*=========================================================*/
 
 /* Буфер - замена строки */
-typedef struct MagnaBuffer
+
+struct MagnaBuffer
 {
     am_byte *ptr;
     am_size_t position;
     am_size_t capacity;
 
-} Buffer;
+};
 
 #define BUFFER_INIT { NULL, 0, 0 }
 
@@ -491,6 +496,7 @@ MAGNA_API void           MAGNA_CALL buffer_free           (Buffer *buffer);
 MAGNA_API Buffer*        MAGNA_CALL buffer_from_span      (Buffer *buffer, Span span);
 MAGNA_API Buffer*        MAGNA_CALL buffer_from_text      (Buffer *buffer, const char *text);
 MAGNA_API am_bool        MAGNA_CALL buffer_grow           (Buffer *buffer, am_size_t newSize);
+MAGNA_API Buffer*        MAGNA_CALL buffer_init           (Buffer *buffer);
 MAGNA_API am_bool        MAGNA_CALL buffer_new_line       (Buffer *buffer);
 MAGNA_API Buffer*        MAGNA_CALL buffer_null           (Buffer *buffer);
 MAGNA_API am_bool        MAGNA_CALL buffer_put_uint_32    (Buffer *buffer, am_uint32 value);
@@ -508,12 +514,12 @@ MAGNA_API am_bool        MAGNA_CALL buffer_write          (Buffer *target, const
 
 /* Блок памяти */
 
-typedef struct MagnaMemoryChunk
+struct MagnaMemoryChunk
 {
     am_byte *data;
-    struct MagnaMemoryChunk *next;
+    MemoryChunk *next;
 
-} MemoryChunk;
+};
 
 /* Буфер, состоящий из блоков */
 
@@ -554,6 +560,7 @@ typedef struct
     am_size_t capacity;
     am_size_t size;
     am_size_t static_capacity;
+
 } FastBuffer;
 
 MAGNA_API FastBuffer*   MAGNA_CALL fastbuf_clear     (FastBuffer *buffer);
@@ -644,6 +651,43 @@ typedef struct {
     Array  chunks;
 
 } NumberText;
+
+/*=========================================================*/
+
+/* Простая абстракция потока */
+
+typedef am_ssize_t (MAGNA_CALL *ReadFunction)  (Stream*, am_byte*, am_size_t);
+typedef am_ssize_t (MAGNA_CALL *WriteFunction) (Stream*, const am_byte*, am_size_t);
+typedef am_ssize_t (MAGNA_CALL *SeekFunction)  (Stream*, am_size_t);
+typedef am_ssize_t (MAGNA_CALL *TellFunction)  (Stream*);
+typedef am_bool    (MAGNA_CALL *CloseFunction) (Stream*);
+
+struct MagnaStream
+{
+    ReadFunction  readFunction;
+    WriteFunction writeFunction;
+    SeekFunction  seekFunction;
+    TellFunction  tellFunction;
+    CloseFunction closeFunction;
+    void *data;
+};
+
+MAGNA_API am_bool    MAGNA_CALL stream_close (Stream *stream);
+MAGNA_API am_bool    MAGNA_CALL stream_copy  (Stream *target, Stream *source);
+MAGNA_API am_bool    MAGNA_CALL stream_init  (Stream *stream);
+MAGNA_API am_ssize_t MAGNA_CALL stream_read  (Stream *stream, am_byte *buffer, am_size_t length);
+MAGNA_API am_ssize_t MAGNA_CALL stream_seek  (Stream *stream, am_size_t position);
+MAGNA_API am_ssize_t MAGNA_CALL stream_tell  (Stream *stream);
+MAGNA_API am_byte    MAGNA_CALL stream_write (Stream *stream, const am_byte *buffer, am_size_t length);
+
+MAGNA_API am_bool    MAGNA_CALL null_stream_open       (Stream *stream);
+MAGNA_API am_bool    MAGNA_CALL memory_stream_create   (Stream *stream);
+MAGNA_API am_bool    MAGNA_CALL memory_stream_open     (Stream *stream, am_byte *data, am_size_t length);
+MAGNA_API Span       MAGNA_CALL memory_stream_to_span  (const Stream *stream);
+MAGNA_API am_byte*   MAGNA_CALL memory_stream_to_text  (Stream *stream);
+MAGNA_API am_bool    MAGNA_CALL file_stream_create     (Stream *stream, const char *filename);
+MAGNA_API am_bool    MAGNA_CALL file_stream_open_read  (Stream *stream, const char *filename);
+MAGNA_API am_bool    MAGNA_CALL file_stream_open_write (Stream *stream, const char *filename);
 
 /*=========================================================*/
 

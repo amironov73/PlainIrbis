@@ -28,6 +28,32 @@
 
 /*=========================================================*/
 
+/**
+ * Инициализация буфера нулями.
+ *
+ * @param buffer Указатель на неинициализированный буфер.
+ * @return Инициализированный пустой буфер.
+ */
+MAGNA_API Buffer* MAGNA_CALL buffer_init
+    (
+        Buffer *buffer
+    )
+{
+    assert (buffer != NULL);
+
+    buffer->ptr = NULL;
+    buffer->position = 0;
+    buffer->capacity = 0;
+
+    return buffer;
+}
+
+/**
+ * Вычисление наиболее выгодного размера буфера.
+ *
+ * @param newSize Предполагаемый размер.
+ * @return Вычисленный размер.
+ */
 MAGNA_API am_size_t MAGNA_CALL buffer_calculate_size
     (
         am_size_t newSize

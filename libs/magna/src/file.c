@@ -66,7 +66,7 @@ MAGNA_API am_handle MAGNA_CALL file_create
 
 #ifdef MAGNA_WINDOWS
 
-    DWORD desiredAccess = GENERIC_READ | GENERIC_WRITE;
+    DWORD desiredAccess = GENERIC_READ | GENERIC_WRITE; /* NOLINT(hicpp-signed-bitwise) */
     DWORD shareMode = 0;
     LPSECURITY_ATTRIBUTES securityAttributes = NULL;
     DWORD creationDisposition = CREATE_ALWAYS;
@@ -179,7 +179,7 @@ MAGNA_API am_handle MAGNA_CALL file_open_write
 
 #ifdef MAGNA_WINDOWS
 
-    DWORD desiredAccess = GENERIC_READ | GENERIC_WRITE;
+    DWORD desiredAccess = GENERIC_READ | GENERIC_WRITE; /* NOLINT(hicpp-signed-bitwise) */
     DWORD shareMode = 0;
     LPSECURITY_ATTRIBUTES securityAttributes = NULL;
     DWORD creationDisposition = OPEN_EXISTING;
@@ -225,17 +225,19 @@ MAGNA_API am_bool MAGNA_CALL file_close
         am_handle handle
     )
 {
-    am_bool result;
-
     assert (handle != AM_BAD_HANDLE);
 
 #ifdef MAGNA_WINDOWS
 
+    CloseHandle (handle);
+
 #else
+
+    close (handle);
 
 #endif
 
-    return AM_FALSE;
+    return AM_TRUE;
 }
 
 /**
@@ -596,6 +598,163 @@ MAGNA_API am_bool MAGNA_CALL file_write_text
         );
 
     return result;
+}
+
+/*=========================================================*/
+
+/* Файловый поток */
+
+MAGNA_API am_ssize_t MAGNA_CALL file_read_function
+    (
+        Stream *stream,
+        am_byte *buffer,
+        am_size_t length
+    )
+{
+    am_handle handle;
+
+    assert (stream != NULL);
+
+    handle = (am_handle) stream->data;
+    assert (handle != AM_BAD_HANDLE);
+
+    return file_read (handle, buffer, length);
+}
+
+MAGNA_API am_ssize_t MAGNA_CALL file_write_function
+    (
+        Stream *stream,
+        const am_byte *buffer,
+        am_size_t length
+    )
+{
+    am_handle handle;
+
+    assert (stream != NULL);
+
+    handle = (am_handle) stream->data;
+    assert (handle != AM_BAD_HANDLE);
+
+    return file_write (handle, buffer, length) ? length : -1;
+}
+
+MAGNA_API am_ssize_t MAGNA_CALL file_seek_function
+    (
+        Stream *stream,
+        am_size_t position
+    )
+{
+    am_handle handle;
+
+    assert (stream != NULL);
+
+    handle = (am_handle) stream->data;
+    assert (handle != AM_BAD_HANDLE);
+
+    return file_seek (handle, position) ? (am_ssize_t) position : -1;
+}
+
+MAGNA_API am_ssize_t MAGNA_CALL file_tell_function
+    (
+        Stream *stream
+    )
+{
+    am_handle handle;
+
+    assert (stream != NULL);
+
+    handle = (am_handle) stream->data;
+    assert (handle != AM_BAD_HANDLE);
+
+    return (am_ssize_t) file_tell (handle);
+}
+
+MAGNA_API am_bool MAGNA_CALL file_close_function
+    (
+        Stream *stream
+    )
+{
+    am_handle handle;
+
+    assert (stream != NULL);
+
+    handle = (am_handle) stream->data;
+    if (handle != AM_BAD_HANDLE) {
+        file_close (handle);
+        stream->data = (void*) AM_BAD_HANDLE;
+    }
+
+    return AM_TRUE;
+}
+
+static am_bool initialize
+    (
+        Stream *stream,
+        am_handle handle
+    )
+{
+    if (handle == AM_BAD_HANDLE) {
+        return AM_FALSE;
+    }
+
+    if (!stream_init (stream)) {
+        file_close (handle);
+        return AM_FALSE;
+    }
+
+    stream->data = (void*) handle;
+    stream->readFunction  = file_read_function;
+    stream->writeFunction = file_write_function;
+    stream->seekFunction  = file_seek_function;
+    stream->tellFunction  = file_tell_function;
+    stream->closeFunction = file_close_function;
+
+    return AM_TRUE;
+}
+
+MAGNA_API am_bool MAGNA_CALL file_stream_create
+    (
+        Stream *stream,
+        const char *filename
+    )
+{
+    assert (stream != NULL);
+
+    if (!initialize (stream, file_create (filename))) {
+        return AM_FALSE;
+    }
+
+    return AM_TRUE;
+}
+
+MAGNA_API am_bool MAGNA_CALL file_stream_open_read
+    (
+        Stream *stream,
+        const char *filename
+    )
+{
+    assert (stream != NULL);
+
+    if (!initialize (stream, file_open_read (filename))) {
+        return AM_FALSE;
+    }
+
+    return AM_TRUE;
+}
+
+MAGNA_API am_bool MAGNA_CALL file_stream_open_write
+    (
+        Stream *stream,
+        const char *filename
+    )
+{
+    assert (stream != NULL);
+
+    if (!initialize (stream, file_open_write (filename))) {
+        return AM_FALSE;
+    }
+
+    return AM_TRUE;
 }
 
 /*=========================================================*/

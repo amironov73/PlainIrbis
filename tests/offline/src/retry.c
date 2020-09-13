@@ -3,7 +3,7 @@
 
 #include "magna/tester.h"
 
-static void* canary_action (void *data)
+static void* MAGNA_CALL canary_action (void *data)
 {
     int *ptr = (int *) data;
 

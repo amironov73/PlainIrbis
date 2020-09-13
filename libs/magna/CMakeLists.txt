@@ -41,6 +41,7 @@ set(CFiles
     src/sleep.c
     src/span.c
     src/spanarry.c
+    src/stream.c
     src/string.c
     src/tcp4.c
     src/thread.c

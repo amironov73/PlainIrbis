@@ -46,6 +46,7 @@
     <ClCompile Include="src\sleep.c" />
     <ClCompile Include="src\span.c" />
     <ClCompile Include="src\spanarry.c" />
+    <ClCompile Include="src\stream.c" />
     <ClCompile Include="src\string.c" />
     <ClCompile Include="src\tcp4.c" />
     <ClCompile Include="src\thread.c" />
