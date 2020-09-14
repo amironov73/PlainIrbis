@@ -24,6 +24,7 @@ set(CFiles
     src/delphi.c
     src/dump.c
     src/encoding.c
+    src/enumertr.c
     src/error.c
     src/fastbuf.c
     src/file.c

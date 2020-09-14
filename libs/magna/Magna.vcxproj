@@ -29,6 +29,7 @@
     <ClCompile Include="src\delphi.c" />
     <ClCompile Include="src\dump.c" />
     <ClCompile Include="src\encoding.c" />
+    <ClCompile Include="src\enumertr.c" />
     <ClCompile Include="src\error.c" />
     <ClCompile Include="src\fastbuf.c" />
     <ClCompile Include="src\file.c" />

@@ -12,6 +12,7 @@ set(CFiles
     src/cp1251.c
     src/cp866.c
     src/ean.c
+    src/enumertr.c
     src/intarray.c
     src/koi8r.c
     src/main.c

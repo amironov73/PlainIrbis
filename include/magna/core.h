@@ -298,6 +298,7 @@ typedef struct MagnaSpanArray   SpanArray;
 typedef struct MagnaBuffer      Buffer;
 typedef struct MagnaStream      Stream;
 typedef struct MagnaMemoryChunk MemoryChunk;
+typedef struct MangaEnumerator  Enumerator;
 
 /*=========================================================*/
 
@@ -750,6 +751,24 @@ MAGNA_API am_bool     MAGNA_CALL char_one_of      (am_byte one, const am_byte *m
 MAGNA_API am_bool                str_one_of       (const char *one, ...);
 MAGNA_API int         MAGNA_CALL str_safe_compare (const char *first, const char *second);
 MAGNA_API const char* MAGNA_CALL str_to_visible   (const char *text);
+
+/*=========================================================*/
+
+/* Перечисление элементов */
+
+typedef void    (MAGNA_CALL *EnumerationCleanup) (Enumerator*);
+typedef void*   (MAGNA_CALL *EnumerationNext)    (Enumerator*);
+typedef am_bool (MAGNA_CALL *EnumerationAction)  (Enumerator*, void*);
+
+struct MangaEnumerator
+{
+    EnumerationCleanup cleanup;
+    EnumerationNext next;
+    void *data;
+};
+
+MAGNA_API am_bool MAGNA_CALL enum_for_all (Enumerator *enumerator, EnumerationAction action);
+MAGNA_API void*   MAGNA_CALL enum_next    (Enumerator *enumerator);
 
 /*=========================================================*/
 
