@@ -20,7 +20,6 @@
 #elif defined(MAGNA_MSDOS)
 
 #include <stdio.h>
-#include <fcntl.h>
 #include <io.h>
 
 typdef unsigned mode_t;
@@ -33,12 +32,21 @@ typdef unsigned mode_t;
 #else
 
 #include <unistd.h>
-#include <sys/stat.h>
-#include <fcntl.h>
+#include <sys/types.h>
 
 #endif
 
 #include <assert.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
+#ifndef S_IFDIR
+#define	S_IFDIR	0040000	/* Directory.  */
+#endif
+
+#ifndef S_IFREG
+#define	S_IFREG	0100000	/* Regular file.  */
+#endif
 
 /*=========================================================*/
 
@@ -49,6 +57,22 @@ typdef unsigned mode_t;
  */
 
 /*=========================================================*/
+
+MAGNA_API am_bool is_good_handle
+    (
+        am_handle handle
+    )
+{
+#ifdef MAGNA_WINDOWS
+
+    return (handle.ptr != INVALID_HANDLE_VALUE);
+
+#else
+
+    return (handle.handle != -1);
+
+#endif
+}
 
 /**
  * Создание файла с указанным именем.
@@ -75,7 +99,7 @@ MAGNA_API am_handle MAGNA_CALL file_create
 
     assert (fileName != NULL);
 
-    result = CreateFileA
+    result.ptr = CreateFileA
         (
             fileName,
             desiredAccess,
@@ -99,7 +123,7 @@ MAGNA_API am_handle MAGNA_CALL file_create
 
 #else
 
-    result = open64 (fileName, flags, mode);
+    result.handle = open64 (fileName, flags, mode);
 
 #endif
 
@@ -132,7 +156,7 @@ MAGNA_API am_handle MAGNA_CALL file_open_read
 
     assert (fileName != NULL);
 
-    result = CreateFileA
+    result.ptr = CreateFileA
         (
             fileName,
             desiredAccess,
@@ -155,7 +179,7 @@ MAGNA_API am_handle MAGNA_CALL file_open_read
 
 #else
 
-    result = open64 (fileName, flags);
+    result.handle = open64 (fileName, flags);
 
 #endif
 
@@ -188,7 +212,7 @@ MAGNA_API am_handle MAGNA_CALL file_open_write
 
     assert (fileName != NULL);
 
-    result = CreateFileA
+    result.ptr = CreateFileA
         (
             fileName,
             desiredAccess,
@@ -211,7 +235,7 @@ MAGNA_API am_handle MAGNA_CALL file_open_write
 
 #else
 
-    result = open64 (fileName, flags);
+    result.handle = open64 (fileName, flags);
 
 #endif
 
@@ -225,15 +249,15 @@ MAGNA_API am_bool MAGNA_CALL file_close
         am_handle handle
     )
 {
-    assert (handle != AM_BAD_HANDLE);
+    assert (is_good_handle (handle));
 
 #ifdef MAGNA_WINDOWS
 
-    CloseHandle (handle);
+    CloseHandle (handle.ptr);
 
 #else
 
-    close (handle);
+    close (handle.handle);
 
 #endif
 
@@ -251,7 +275,9 @@ MAGNA_API am_bool MAGNA_CALL file_eof
         am_handle handle
     )
 {
-    assert (handle != AM_BAD_HANDLE);
+    assert (is_good_handle (handle));
+
+    /* TODO: implement */
 
     return AM_FALSE;
 }
@@ -278,12 +304,12 @@ MAGNA_API am_ssize_t MAGNA_CALL file_read
     DWORD numberOfBytesRead;
     BOOL rc;
 
-    assert (handle != AM_BAD_HANDLE);
+    assert (is_good_handle (handle));
     assert (buffer != NULL);
 
     rc = ReadFile
         (
-            handle,
+            handle.ptr,
             buffer,
             size,
             &numberOfBytesRead,
@@ -294,10 +320,10 @@ MAGNA_API am_ssize_t MAGNA_CALL file_read
 
 #else
 
-    assert (handle != AM_BAD_HANDLE);
+    assert (is_good_handle (handle));
     assert (buffer != NULL);
 
-    result = read (handle, buffer, size);
+    result = read (handle.handle, buffer, size);
 
 #endif
 
@@ -318,7 +344,7 @@ MAGNA_API int MAGNA_CALL file_read_byte
     am_byte result;
     am_ssize_t rc;
 
-    assert (handle != AM_BAD_HANDLE);
+    assert (is_good_handle (handle));
 
     rc = file_read (handle, &result, 1);
 
@@ -326,22 +352,56 @@ MAGNA_API int MAGNA_CALL file_read_byte
 }
 
 /**
- * Считывание всего остатка файла в оперативную память.
+ * Считывание всего файла в оперативную память.
  *
- * @param handle Файловый дескриптор.
+ * @param fileName Имя файла.
  * @param buffer Буфер, в который должен быть помещен результат.
- * @return Количество прочитанных байт либо отрицательное значение.
+ * @return Признак успешности завершения операции.
  */
-MAGNA_API am_ssize_t MAGNA_CALL file_read_all
+MAGNA_API am_bool MAGNA_CALL file_read_all
     (
-        am_handle handle,
+        const char *fileName,
         Buffer *buffer
     )
 {
-    assert (handle != AM_BAD_HANDLE);
+    am_handle handle;
+    am_size_t rc, totalLength;
+    am_byte temp [1024];
+
+    assert (fileName != NULL);
     assert (buffer != NULL);
 
-    return -1;
+    handle = file_open_read (fileName);
+    if (!is_good_handle (handle)) {
+        return AM_FALSE;
+    }
+
+    totalLength = file_size (handle);
+    if (!buffer_grow (buffer, totalLength)) {
+        file_close (handle);
+        return AM_FALSE;
+    }
+
+    while (AM_TRUE) {
+        rc = file_read (handle, temp, sizeof (temp));
+        if (rc < 0) {
+            file_close (handle);
+            return AM_FALSE;
+        }
+
+        if (rc == 0) {
+            break;
+        }
+
+        if (!buffer_write (buffer, temp, rc)) {
+            file_close (handle);
+            return AM_FALSE;
+        }
+    }
+
+    file_close (handle);
+
+    return AM_TRUE;
 }
 
 MAGNA_API am_uint32 MAGNA_CALL file_read_int_32
@@ -349,7 +409,9 @@ MAGNA_API am_uint32 MAGNA_CALL file_read_int_32
         am_handle handle
     )
 {
-    assert (handle != AM_BAD_HANDLE);
+    assert (is_good_handle (handle));
+
+    /* TODO: implement */
 
     return 0;
 }
@@ -359,7 +421,9 @@ MAGNA_API am_uint64 MAGNA_CALL file_read_int_64
         am_handle handle
     )
 {
-    assert (handle != AM_BAD_HANDLE);
+    assert (is_good_handle (handle));
+
+    /* TODO: implement */
 
     return 0;
 }
@@ -381,7 +445,7 @@ MAGNA_API am_bool MAGNA_CALL file_read_line
 {
     int c;
 
-    assert (handle != AM_BAD_HANDLE);
+    assert (is_good_handle (handle));
     assert (buffer != NULL);
 
     while (AM_TRUE) {
@@ -417,7 +481,7 @@ MAGNA_API am_int64 MAGNA_CALL file_tell
         am_handle handle
     )
 {
-    assert (handle != AM_BAD_HANDLE);
+    assert (is_good_handle (handle));
 
     return 0;
 }
@@ -427,7 +491,7 @@ MAGNA_API am_uint64 MAGNA_CALL file_size
         am_handle handle
     )
 {
-    assert (handle != AM_BAD_HANDLE);
+    assert (is_good_handle (handle));
 
     return 0;
 }
@@ -438,7 +502,7 @@ MAGNA_API am_bool MAGNA_CALL file_seek
         am_int64 offset
     )
 {
-    assert (handle != AM_BAD_HANDLE);
+    assert (is_good_handle (handle));
 
     return AM_FALSE;
 }
@@ -458,7 +522,7 @@ MAGNA_API am_bool MAGNA_CALL file_write
         am_size_t size
     )
 {
-    assert (handle != AM_BAD_HANDLE);
+    assert (is_good_handle (handle));
     assert (data != NULL);
 
     return AM_FALSE;
@@ -477,7 +541,7 @@ MAGNA_API am_bool MAGNA_CALL file_write_byte
         am_byte value
     )
 {
-    assert (handle != AM_BAD_HANDLE);
+    assert (is_good_handle (handle));
 
     return AM_FALSE;
 }
@@ -495,7 +559,7 @@ MAGNA_API am_bool MAGNA_CALL file_write_int_32
         am_uint32 value
     )
 {
-    assert (handle != AM_BAD_HANDLE);
+    assert (is_good_handle (handle));
 
     return AM_FALSE;
 }
@@ -513,7 +577,7 @@ MAGNA_API am_bool MAGNA_CALL file_write_int_64
         am_uint64 value
     )
 {
-    assert (handle != AM_BAD_HANDLE);
+    assert (is_good_handle (handle));
 
     return AM_FALSE;
 }
@@ -533,7 +597,7 @@ MAGNA_API am_bool MAGNA_CALL file_write_buffer
 {
     am_bool result;
 
-    assert (handle != AM_BAD_HANDLE);
+    assert (is_good_handle (handle));
     assert (buffer != NULL);
 
     result = file_write
@@ -561,7 +625,7 @@ MAGNA_API am_bool MAGNA_CALL file_write_span
 {
     am_bool result;
 
-    assert (handle != AM_BAD_HANDLE);
+    assert (is_good_handle (handle));
 
     result = file_write
         (
@@ -588,7 +652,7 @@ MAGNA_API am_bool MAGNA_CALL file_write_text
 {
     am_bool result;
 
-    assert (handle != AM_BAD_HANDLE);
+    assert (is_good_handle (handle));
 
     result = file_write
         (
@@ -598,6 +662,180 @@ MAGNA_API am_bool MAGNA_CALL file_write_text
         );
 
     return result;
+}
+
+/**
+ * Проверяет, существует ли указанный файл.
+ *
+ * @param filename Имя файла в нативной кодировке.
+ * @return Результат проверки.
+ */
+MAGNA_API am_bool MAGNA_CALL file_exist
+    (
+        const char *filename
+    )
+{
+#ifdef MAGNA_WINDOWS
+
+    DWORD rc;
+
+    assert (filename != NULL);
+
+    rc = GetFileAttributes (filename);
+    if (rc == INVALID_FILE_ATTRIBUTES) {
+        return AM_FALSE;
+    }
+
+    return (rc & FILE_ATTRIBUTE_DIRECTORY) == 0;
+
+#elif defined(MAGNA_UNIX)
+
+    struct stat info;
+
+    assert (filename != NULL);
+
+    mem_clear (&info, sizeof (info));
+    if (stat (filename, &info)) {
+        return AM_FALSE;
+    }
+
+    return (info.st_mode & S_IFREG != 0);
+
+#else
+
+    return 0;
+
+#endif
+}
+
+/**
+ * Удаление файла с указанным именем.
+ *
+ * @param filename Имя файла в нативной кодировке.
+ * @return Признак успешности завершения операции.
+ * Если файла не существует, считается, что функция отработала успешно.
+ */
+MAGNA_API am_bool MAGNA_CALL file_delete
+    (
+        const char *filename
+    )
+{
+    if (!file_exist (filename)) {
+        return AM_TRUE;
+    }
+
+#ifdef MAGNA_WINDOWS
+
+    return DeleteFileA (filename);
+
+#elif defined(MAGNA_UNIX)
+
+    return remove (filename) >= 0;
+
+#else
+
+    return AM_FALSE;
+
+#endif
+}
+
+/**
+ * Проверяет, существует ли указанная директория.
+ *
+ * @param filename Имя директории в нативной кодировке.
+ * @return Результат проверки.
+ */
+MAGNA_API am_bool MAGNA_CALL directory_exist
+    (
+        const char *dirname
+    )
+{
+#ifdef MAGNA_WINDOWS
+
+    DWORD rc;
+
+    assert (dirname != NULL);
+
+    rc = GetFileAttributes (dirname);
+    if (rc == INVALID_FILE_ATTRIBUTES) {
+        return AM_FALSE;
+    }
+
+    return (rc & FILE_ATTRIBUTE_DIRECTORY) != 0;
+
+#elif defined(MAGNA_UNIX)
+
+    struct stat info;
+
+    assert (dirname != NULL);
+
+    mem_clear (&info, sizeof (info));
+    if (stat (dirname, &info)) {
+        return AM_FALSE;
+    }
+
+    return (info.st_mode & S_IFDIR != 0);
+
+#else
+
+    return 0;
+
+#endif
+}
+
+MAGNA_API am_bool MAGNA_CALL directory_create
+    (
+        const char *dirname,
+        am_bool createNew
+    )
+{
+    if (directory_exist (dirname)) {
+        return !createNew;
+    }
+
+#ifdef MAGNA_WINDOWS
+
+    assert (dirname != NULL);
+
+    return CreateDirectoryA (dirname, NULL);
+
+#elif defined(MAGNA_UNIX)
+
+    assert (dirname != NULL);
+
+    return mkdir (dirname, 0755) >= 0;
+
+#else
+
+    return AM_FALSE;
+
+#endif
+}
+
+MAGNA_API am_bool MAGNA_CALL directory_delete
+    (
+        const char *dirname
+    )
+{
+    if (!directory_exist (dirname)) {
+        return AM_TRUE;
+    }
+
+#ifdef MAGNA_WINDOWS
+
+    assert (dirname != NULL);
+
+    return RemoveDirectoryA (dirname);
+
+#elif defined (MAGNA_UNIX)
+
+    return rmdir (dirname) >= 0;
+
+#else
+
+    return AM_FALSE;
+
+#endif
 }
 
 /*=========================================================*/
@@ -615,8 +853,8 @@ MAGNA_API am_ssize_t MAGNA_CALL file_read_function
 
     assert (stream != NULL);
 
-    handle = (am_handle) stream->data;
-    assert (handle != AM_BAD_HANDLE);
+    handle = *(am_handle*) &stream->data;
+    assert (is_good_handle (handle));
 
     return file_read (handle, buffer, length);
 }
@@ -632,8 +870,8 @@ MAGNA_API am_ssize_t MAGNA_CALL file_write_function
 
     assert (stream != NULL);
 
-    handle = (am_handle) stream->data;
-    assert (handle != AM_BAD_HANDLE);
+    handle = *(am_handle*) &stream->data;
+    assert (is_good_handle (handle));
 
     return file_write (handle, buffer, length) ? length : -1;
 }
@@ -648,8 +886,8 @@ MAGNA_API am_ssize_t MAGNA_CALL file_seek_function
 
     assert (stream != NULL);
 
-    handle = (am_handle) stream->data;
-    assert (handle != AM_BAD_HANDLE);
+    handle = *(am_handle*) &stream->data;
+    assert (is_good_handle (handle));
 
     return file_seek (handle, position) ? (am_ssize_t) position : -1;
 }
@@ -663,8 +901,8 @@ MAGNA_API am_ssize_t MAGNA_CALL file_tell_function
 
     assert (stream != NULL);
 
-    handle = (am_handle) stream->data;
-    assert (handle != AM_BAD_HANDLE);
+    handle = *(am_handle*) &stream->data;
+    assert (is_good_handle (handle));
 
     return (am_ssize_t) file_tell (handle);
 }
@@ -678,10 +916,15 @@ MAGNA_API am_bool MAGNA_CALL file_close_function
 
     assert (stream != NULL);
 
-    handle = (am_handle) stream->data;
-    if (handle != AM_BAD_HANDLE) {
+    handle = *(am_handle*) &stream->data;
+    if (is_good_handle (handle)) {
         file_close (handle);
-        stream->data = (void*) AM_BAD_HANDLE;
+#ifdef MAGNA_WINDOWS
+        handle.ptr = AM_BAD_HANDLE;
+#else
+        handle.handle = AM_BAD_HANDLE;
+#endif
+        stream->data = *(void**) &handle;
     }
 
     return AM_TRUE;
@@ -693,7 +936,7 @@ static am_bool initialize
         am_handle handle
     )
 {
-    if (handle == AM_BAD_HANDLE) {
+    if (!is_good_handle (handle)) {
         return AM_FALSE;
     }
 
@@ -702,7 +945,7 @@ static am_bool initialize
         return AM_FALSE;
     }
 
-    stream->data = (void*) handle;
+    stream->data = handle.ptr;
     stream->readFunction  = file_read_function;
     stream->writeFunction = file_write_function;
     stream->seekFunction  = file_seek_function;

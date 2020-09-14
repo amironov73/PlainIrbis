@@ -34,6 +34,7 @@ set(CFiles
     src/tree.c
     src/upc.c
     src/version.c
+    src/xrf.c
 )
 
 add_library(${PROJECT_NAME}

@@ -99,7 +99,7 @@ MAGNA_API am_bool MAGNA_CALL iso_read_record
         MarcRecord *record
     )
 {
-    assert (handle != AM_BAD_HANDLE);
+    assert (is_good_handle (handle));
     assert (record != NULL);
 
     return AM_FALSE;
@@ -118,7 +118,7 @@ MAGNA_API am_bool MAGNA_CALL iso_write_record
         const MarcRecord *record
     )
 {
-    assert (handle != AM_BAD_HANDLE);
+    assert (is_good_handle (handle));
     assert (record != NULL);
 
     return AM_FALSE;

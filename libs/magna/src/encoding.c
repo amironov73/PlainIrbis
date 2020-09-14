@@ -72,10 +72,14 @@ MAGNA_API am_bool MAGNA_CALL encoding_register
     )
 {
     assert (encoding != NULL);
+    assert (encoding->name != NULL);
 
     _register_builtin_encodings();
 
-    /* TODO: проверять наличие среди уже зарегистрированных */
+    if (encoding_get (encoding->name) != NULL) {
+        return AM_TRUE;
+    }
+
     return array_push_back (&_registered_encodings, (void*) encoding);
 }
 

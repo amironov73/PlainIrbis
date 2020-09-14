@@ -235,7 +235,7 @@ MAGNA_API am_bool MAGNA_CALL isbn_check_control_digit
     for (i = j = 0; i < isbn.len; ++i) {
         c = isbn.ptr[i];
         if (c >= '0' && c <= '9') {
-            result += (c - '0') * (10 - j);
+            result += (unsigned) ((c - '0') * (10 - j));
             ++j;
         }
         else if (c == 'X' || c == 'x') {

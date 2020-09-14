@@ -139,6 +139,63 @@ MAGNA_API am_bool MAGNA_CALL path_set_current_directory
 }
 
 /**
+ * Получение пути директории для временных файлов.
+ *
+ * @param path Буфер для размещения результата.
+ * @return Признак успешности завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL path_get_temporary_directory
+    (
+        Buffer *path
+    )
+{
+#ifdef MAGNA_WINDOWS
+
+    char buffer [FILENAME_MAX];
+
+    assert (path != NULL);
+
+    mem_clear (buffer, sizeof (buffer));
+    if (!GetTempPathA(FILENAME_MAX, buffer)) {
+        return AM_FALSE;
+    }
+
+    return buffer_puts (path, buffer);
+
+
+#elif defined (MAGNA_UNIX)
+
+    const char *result;
+
+    assert (path != NULL);
+
+    result = getenv("TMPDIR");
+    if (!result) {
+        result = getenv("TEMPDIR");
+    }
+    if (!result) {
+        result = getenv("TMP");
+    }
+    if (!result) {
+        result = getenv("TEMP");
+    }
+    if (!result) {
+        /* The Filesystem Hierarchy Standard version 3.0 says:
+           The /tmp directory must be made available for programs
+           that require temporary files. */
+        result = "/tmp";
+    }
+
+    return buffer_puts (path, result);
+
+#else
+
+    return AM_FALSE;
+
+#endif
+}
+
+/**
  * Получение расширения для файла.
  *
  * @param path Путь к файлу (возможно, не полный).
@@ -304,7 +361,7 @@ MAGNA_API am_bool path_combine
  * @param buffer Проинициализированный буфер.
  * @return Признак успешности завершения операции.
  */
-MAGNA_API am_bool MAGNA_CALL path_to_executable
+MAGNA_API am_bool MAGNA_CALL path_get_executable
     (
         Buffer *buffer
     )

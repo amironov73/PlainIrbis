@@ -15,6 +15,7 @@ set(CFiles
     src/intarray.c
     src/koi8r.c
     src/main.c
+    src/memory.c
     src/path.c
     src/retry.c
     src/span.c
