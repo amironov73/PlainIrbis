@@ -45,7 +45,6 @@ MAGNA_API am_bool MAGNA_CALL buffer_putc_utf8
     }
 
     if (chr < (1u << 11u)) {
-
         return buffer_putc (buffer, (chr >> 6u) | 0xC0u)
             && buffer_putc (buffer, (chr & 0x3Fu) | 0x80u);
     }

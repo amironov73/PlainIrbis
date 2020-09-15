@@ -686,7 +686,7 @@ MAGNA_API am_bool MAGNA_CALL file_exist
         return AM_FALSE;
     }
 
-    return (rc & FILE_ATTRIBUTE_DIRECTORY) == 0;
+    return (rc & (DWORD) FILE_ATTRIBUTE_DIRECTORY) == 0u;
 
 #elif defined(MAGNA_UNIX)
 
@@ -761,7 +761,7 @@ MAGNA_API am_bool MAGNA_CALL directory_exist
         return AM_FALSE;
     }
 
-    return (rc & FILE_ATTRIBUTE_DIRECTORY) != 0;
+    return (rc & (DWORD) FILE_ATTRIBUTE_DIRECTORY) != 0u;
 
 #elif defined(MAGNA_UNIX)
 
@@ -834,6 +834,72 @@ MAGNA_API am_bool MAGNA_CALL directory_delete
 #else
 
     return AM_FALSE;
+
+#endif
+}
+
+/**
+ * Простое копирование файла.
+ *
+ * @param targetName
+ * @param sourceName
+ * @return
+ */
+MAGNA_API am_bool MAGNA_CALL file_copy
+    (
+        const char *targetName,
+        const char *sourceName
+    )
+{
+#ifdef MAGNA_WINDOWS
+
+    return CopyFileA (sourceName, targetName, AM_FALSE);
+
+#else
+
+    am_handle targetHandle, sourceHandle;
+    am_byte buffer [1024];
+    am_size_t rc;
+
+    assert (targetName != NULL);
+    assert (sourceName != NULL);
+
+    sourceHandle = file_create (sourceName);
+    if (!is_good_handle (sourceHandle)) {
+        return AM_FALSE;
+    }
+
+    targetHandle = file_create (targetName);
+    if (!is_good_handle (targetHandle)) {
+        file_close (sourceHandle);
+        return AM_FALSE;
+    }
+
+    while (AM_TRUE) {
+        rc = file_read (sourceHandle, buffer, sizeof (buffer));
+        if (rc < 0) {
+            file_close (sourceHandle);
+            file_close (targetHandle);
+            file_delete (targetName);
+            return AM_FALSE;
+        }
+
+        if (rc == 0) {
+            break;
+        }
+
+        if (!file_write (targetHandle, buffer, rc)) {
+            file_close (sourceHandle);
+            file_close (targetHandle);
+            file_delete (targetName);
+            return AM_FALSE;
+        }
+    }
+
+    file_close (sourceHandle);
+    file_close (targetHandle);
+
+    return AM_TRUE;
 
 #endif
 }

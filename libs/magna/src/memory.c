@@ -117,7 +117,7 @@ MAGNA_API void MAGNA_CALL mem_clear
 MAGNA_API void MAGNA_CALL mem_copy
     (
         void *destination,
-        void *source,
+        const void *source,
         am_size_t size
     )
 {

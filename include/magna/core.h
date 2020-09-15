@@ -314,7 +314,7 @@ MAGNA_API void print_error   (void);
 MAGNA_API void*     MAGNA_CALL mem_alloc           (am_size_t size);
 MAGNA_API void*     MAGNA_CALL mem_alloc_ex        (am_size_t size);
 MAGNA_API void      MAGNA_CALL mem_clear           (void *ptr, am_size_t size);
-MAGNA_API void      MAGNA_CALL mem_copy            (void *destination, void *source, am_size_t size);
+MAGNA_API void      MAGNA_CALL mem_copy            (void *destination, const void *source, am_size_t size);
 MAGNA_API void      MAGNA_CALL mem_free            (void *ptr);
 MAGNA_API am_uint64            mem_avail_physical  (void);
 MAGNA_API am_uint64            mem_avail_virtual   (void);
@@ -536,24 +536,29 @@ typedef struct
 
 } ChunkedBuffer;
 
-MAGNA_API Buffer*          MAGNA_CALL chunked_all            (const ChunkedBuffer *chunked, Buffer *buffer);
+MAGNA_API am_ssize_t       MAGNA_CALL chunked_all            (const ChunkedBuffer *chunked, Buffer *buffer);
+MAGNA_API am_byte*         MAGNA_CALL chunked_at             (const ChunkedBuffer *chunked, am_size_t offset);
 MAGNA_API am_size_t        MAGNA_CALL chunked_capacity       (const ChunkedBuffer *chunked);
+MAGNA_API am_bool          MAGNA_CALL chunked_empty          (const ChunkedBuffer *chunked);
 MAGNA_API am_bool          MAGNA_CALL chunked_eof            (const ChunkedBuffer *chunked);
 MAGNA_API void             MAGNA_CALL chunked_free           (ChunkedBuffer *chunked);
 MAGNA_API am_bool          MAGNA_CALL chunked_grow           (ChunkedBuffer *chunked, am_size_t newSize);
 MAGNA_API ChunkedBuffer*   MAGNA_CALL chunked_init           (ChunkedBuffer *chunked, am_size_t chunkSize);
-MAGNA_API int              MAGNA_CALL chunked_peek           (const ChunkedBuffer *chunked);
+MAGNA_API int              MAGNA_CALL chunked_peek           (ChunkedBuffer *chunked);
 MAGNA_API am_size_t        MAGNA_CALL chunked_position       (const ChunkedBuffer *chunked);
 MAGNA_API int              MAGNA_CALL chunked_read_byte      (ChunkedBuffer *chunked);
-MAGNA_API am_size_t        MAGNA_CALL chunked_read           (ChunkedBuffer *chunked, Buffer *buffer, am_size_t count);
-MAGNA_API am_size_t        MAGNA_CALL chunked_read_line      (ChunkedBuffer *chunked, Buffer *buffer);
-MAGNA_API am_size_t        MAGNA_CALL chunked_read_remaining (ChunkedBuffer *chunked, Buffer *buffer);
+MAGNA_API am_ssize_t       MAGNA_CALL chunked_read           (ChunkedBuffer *chunked, Buffer *buffer, am_size_t count);
+MAGNA_API am_ssize_t       MAGNA_CALL chunked_read_line      (ChunkedBuffer *chunked, Buffer *buffer);
+MAGNA_API am_ssize_t       MAGNA_CALL chunked_read_raw       (ChunkedBuffer *chunked, am_byte *buffer, am_size_t count);
+MAGNA_API am_ssize_t       MAGNA_CALL chunked_read_remaining (const ChunkedBuffer *chunked, Buffer *buffer);
+MAGNA_API int              MAGNA_CALL chunked_read_utf8      (ChunkedBuffer *chunked);
 MAGNA_API am_size_t        MAGNA_CALL chunked_remaining_size (const ChunkedBuffer *chunked);
 MAGNA_API ChunkedBuffer*   MAGNA_CALL chunked_rewind         (ChunkedBuffer *chunked);
 MAGNA_API am_size_t        MAGNA_CALL chunked_size           (const ChunkedBuffer *chunked);
-MAGNA_API am_bool          MAGNA_CALL chunked_write          (ChunkedBuffer *chunked, am_byte *data, am_size_t dataSize);
+MAGNA_API am_bool          MAGNA_CALL chunked_write          (ChunkedBuffer *chunked, const am_byte *data, am_size_t dataSize);
 MAGNA_API am_bool          MAGNA_CALL chunked_write_byte     (ChunkedBuffer *chunked, am_byte value);
 MAGNA_API am_bool          MAGNA_CALL chunked_write_text     (ChunkedBuffer *chunked, const char *text);
+MAGNA_API am_bool          MAGNA_CALL chunked_write_utf8     (ChunkedBuffer *chunked, unsigned chr);
 
 /*=========================================================*/
 
@@ -700,6 +705,7 @@ MAGNA_API am_bool    MAGNA_CALL file_stream_open_write (Stream *stream, const ch
 /* Работа с файлами */
 
 MAGNA_API am_bool    MAGNA_CALL file_close        (am_handle handle);
+MAGNA_API am_bool    MAGNA_CALL file_copy         (const char *targetName, const char *sourceName);
 MAGNA_API am_handle  MAGNA_CALL file_create       (const char *fileName);
 MAGNA_API am_bool    MAGNA_CALL file_delete       (const char *filename);
 MAGNA_API am_bool    MAGNA_CALL file_eof          (am_handle handle);
