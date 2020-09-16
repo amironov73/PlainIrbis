@@ -233,6 +233,19 @@ TESTER(span_index_of_1)
     CHECK (found == 4);
 }
 
+TESTER(span_last_index_of_1)
+{
+    const char *text = "123456789";
+    Span span = span_from_text (text);
+    am_ssize_t found = span_last_index_of (span, '?');
+
+    CHECK (found < 0);
+
+    found = span_last_index_of (span, '5');
+
+    CHECK (found == 4);
+}
+
 TESTER(span_slice_1)
 {
     Span span1 = SPAN_INIT;
@@ -300,6 +313,197 @@ TESTER(span_compare_2)
     Span span2 = span_from_text (text2);
 
     CHECK (span_compare (span1, span2) < 0);
+}
+
+TESTER(span_compare_3)
+{
+    const char *text1 = "123456789";
+    Span span1 = span_from_text (text1);
+    Span span2 = span_from_text (text1);
+
+    CHECK (span_compare (span1, span2) == 0);
+}
+
+TESTER(span_compare_4)
+{
+    const char *text1 = "1234", *text2 = "123456789";
+    Span span1 = span_from_text (text1);
+    Span span2 = span_from_text (text2);
+
+    CHECK (span_compare (span1, span2) < 0);
+}
+
+TESTER(span_compare_5)
+{
+    const char *text1 = "123456789", *text2 = "1234";
+    Span span1 = span_from_text (text1);
+    Span span2 = span_from_text (text2);
+
+    CHECK (span_compare (span1, span2) > 0);
+}
+
+TESTER(span_split_by_char_1)
+{
+    Span span = SPAN_INIT;
+    SpanArray parts = SPAN_ARRAY_INIT;
+    am_bool rc = span_split_by_char (span, &parts, '?');
+
+    CHECK (rc);
+    CHECK (parts.len == 0);
+
+    span_array_free (&parts);
+}
+
+TESTER(span_split_by_char_2)
+{
+    const char *text = "123456789";
+    Span span = span_from_text (text);
+    SpanArray parts = SPAN_ARRAY_INIT;
+    am_bool rc = span_split_by_char (span, &parts, '?');
+
+    CHECK (rc);
+    CHECK (parts.len == 1);
+    CHECK (parts.ptr[0].ptr == text);
+    CHECK (parts.ptr[0].len == 9);
+
+    span_array_free (&parts);
+}
+
+TESTER(span_split_by_char_3)
+{
+    const char *text = "123456789";
+    Span span = span_from_text (text);
+    SpanArray parts = SPAN_ARRAY_INIT;
+    am_bool rc = span_split_by_char (span, &parts, '5');
+
+    CHECK (rc);
+    CHECK (parts.len == 2);
+    CHECK (parts.ptr[0].ptr == text);
+    CHECK (parts.ptr[0].len == 4);
+    CHECK (parts.ptr[1].ptr == text + 5);
+    CHECK (parts.ptr[1].len == 4);
+
+    span_array_free (&parts);
+}
+
+TESTER(span_split_by_char_4)
+{
+    const char *text = "123,567,9";
+    Span span = span_from_text (text);
+    SpanArray parts = SPAN_ARRAY_INIT;
+    am_bool rc = span_split_by_char (span, &parts, ',');
+
+    CHECK (rc);
+    CHECK (parts.len == 3);
+    CHECK (parts.ptr[0].ptr == text);
+    CHECK (parts.ptr[0].len == 3);
+    CHECK (parts.ptr[1].ptr == text + 4);
+    CHECK (parts.ptr[1].len == 3);
+    CHECK (parts.ptr[2].ptr == text + 8);
+    CHECK (parts.ptr[2].len == 1);
+
+    span_array_free (&parts);
+}
+
+TESTER(span_split_by_char_5)
+{
+    const char *text = ",123,,567,9";
+    Span span = span_from_text (text);
+    SpanArray parts = SPAN_ARRAY_INIT;
+    am_bool rc = span_split_by_char (span, &parts, ',');
+
+    CHECK (rc);
+    CHECK (parts.len == 3);
+    CHECK (parts.ptr[0].ptr == text + 1);
+    CHECK (parts.ptr[0].len == 3);
+    CHECK (parts.ptr[1].ptr == text + 6);
+    CHECK (parts.ptr[1].len == 3);
+    CHECK (parts.ptr[2].ptr == text + 10);
+    CHECK (parts.ptr[2].len == 1);
+
+    span_array_free (&parts);
+}
+
+TESTER(span_split_by_chars_1)
+{
+    Span span = SPAN_INIT;
+    SpanArray parts = SPAN_ARRAY_INIT;
+    am_bool rc = span_split_by_chars (span, &parts, "!?", 2);
+
+    CHECK (rc);
+    CHECK (parts.len == 0);
+
+    span_array_free (&parts);
+}
+
+TESTER(span_split_by_chars_2)
+{
+    const char *text = "123456789";
+    Span span = span_from_text (text);
+    SpanArray parts = SPAN_ARRAY_INIT;
+    am_bool rc = span_split_by_chars (span, &parts, "!?", 2);
+
+    CHECK (rc);
+    CHECK (parts.len == 1);
+    CHECK (parts.ptr[0].ptr == text);
+    CHECK (parts.ptr[0].len == 9);
+
+    span_array_free (&parts);
+}
+
+TESTER(span_split_by_chars_3)
+{
+    const char *text = "123456789";
+    Span span = span_from_text (text);
+    SpanArray parts = SPAN_ARRAY_INIT;
+    am_bool rc = span_split_by_chars (span, &parts, "5?", 2);
+
+    CHECK (rc);
+    CHECK (parts.len == 2);
+    CHECK (parts.ptr[0].ptr == text);
+    CHECK (parts.ptr[0].len == 4);
+    CHECK (parts.ptr[1].ptr == text + 5);
+    CHECK (parts.ptr[1].len == 4);
+
+    span_array_free (&parts);
+}
+
+TESTER(span_split_by_chars_4)
+{
+    const char *text = "123.567,9";
+    Span span = span_from_text (text);
+    SpanArray parts = SPAN_ARRAY_INIT;
+    am_bool rc = span_split_by_chars (span, &parts,",.", 2);
+
+    CHECK (rc);
+    CHECK (parts.len == 3);
+    CHECK (parts.ptr[0].ptr == text);
+    CHECK (parts.ptr[0].len == 3);
+    CHECK (parts.ptr[1].ptr == text + 4);
+    CHECK (parts.ptr[1].len == 3);
+    CHECK (parts.ptr[2].ptr == text + 8);
+    CHECK (parts.ptr[2].len == 1);
+
+    span_array_free (&parts);
+}
+
+TESTER(span_split_by_chars_5)
+{
+    const char *text = ",123,.567.9";
+    Span span = span_from_text (text);
+    SpanArray parts = SPAN_ARRAY_INIT;
+    am_bool rc = span_split_by_chars (span, &parts, ",.", 2);
+
+    CHECK (rc);
+    CHECK (parts.len == 3);
+    CHECK (parts.ptr[0].ptr == text + 1);
+    CHECK (parts.ptr[0].len == 3);
+    CHECK (parts.ptr[1].ptr == text + 6);
+    CHECK (parts.ptr[1].len == 3);
+    CHECK (parts.ptr[2].ptr == text + 10);
+    CHECK (parts.ptr[2].len == 1);
+
+    span_array_free (&parts);
 }
 
 TESTER(span_split_n_by_char_1)
@@ -371,7 +575,7 @@ TESTER(span_split_n_by_chars_1)
 {
     Span span = SPAN_INIT;
     Span parts [2];
-    am_size_t count = span_split_n_by_char (span, parts, 2, '?');
+    am_size_t count = span_split_n_by_chars (span, parts, 2, "!?", 2);
 
     CHECK (count == 0);
 }
@@ -431,4 +635,53 @@ TESTER(span_split_n_by_chars_5)
     CHECK (parts[2].ptr == text + 10);
     CHECK (parts[2].len == 1);
 }
+
+TESTER(span_starts_with_1)
+{
+    Span span1 = SPAN_INIT;
+    Span span2 = span_from_text ("Hello");
+
+    CHECK (!span_starts_with (span1, span2));
+}
+
+TESTER(span_starts_with_2)
+{
+    Span span1 = span_from_text ("Hello, world!");
+    Span span2 = span_from_text ("Hello");
+
+    CHECK (span_starts_with (span1, span2));
+}
+
+TESTER(span_starts_with_3)
+{
+    Span span1 = span_from_text ("HellO, world!");
+    Span span2 = span_from_text ("Hello");
+
+    CHECK (!span_starts_with (span1, span2));
+}
+
+TESTER(span_ends_with_1)
+{
+    Span span1 = SPAN_INIT;
+    Span span2 = span_from_text ("world!");
+
+    CHECK (!span_ends_with (span1, span2));
+}
+
+TESTER(span_ends_with_2)
+{
+    Span span1 = span_from_text ("Hello, world!");
+    Span span2 = span_from_text ("world!");
+
+    CHECK (span_ends_with (span1, span2));
+}
+
+TESTER(span_ends_with_3)
+{
+    Span span1 = span_from_text ("Hello, World!");
+    Span span2 = span_from_text ("world!");
+
+    CHECK (!span_ends_with (span1, span2));
+}
+
 

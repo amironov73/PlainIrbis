@@ -278,6 +278,8 @@ MAGNA_API am_ssize_t MAGNA_CALL memory_read_function
     buffer = (Buffer *) stream->data;
     assert (buffer != NULL);
 
+    /* TODO: implement */
+
     return 0;
 }
 

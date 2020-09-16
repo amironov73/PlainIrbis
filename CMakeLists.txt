@@ -9,10 +9,9 @@ cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 project(PlainIrbis)
 
 set(CMAKE_C_STANDARD 90)
-set(CMAKE_C_EXTENSIONS OFF)
 
 if(MSVC)
-    add_compile_options(/UTF-8 /permissive- /Wall)
+    add_compile_options(/UTF-8 /Wall)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 endif()
 

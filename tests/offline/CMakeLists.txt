@@ -18,6 +18,7 @@ set(CFiles
     src/koi8r.c
     src/main.c
     src/memory.c
+    src/navigatr.c
     src/path.c
     src/retry.c
     src/span.c

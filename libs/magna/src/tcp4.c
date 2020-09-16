@@ -264,6 +264,101 @@ MAGNA_API am_ssize_t MAGNA_CALL tcp4_receive_all
 
 /*=========================================================*/
 
+/* Сетевой поток (TCP) */
+
+MAGNA_API am_ssize_t MAGNA_CALL tcp4_read_function
+    (
+        Stream *stream,
+        am_byte *data,
+        am_size_t length
+    )
+{
+    am_int32 handle;
+
+    assert (stream != NULL);
+    assert (data != NULL);
+
+    handle = *(am_int32*) &stream->data;
+    assert (handle != -1);
+
+    return recv (handle, data, length, 0);
+}
+
+MAGNA_API am_ssize_t MAGNA_CALL tcp4_write_function
+    (
+        Stream *stream,
+        const am_byte *data,
+        am_size_t length
+    )
+{
+    am_int32 handle;
+
+    assert (stream != NULL);
+    assert (data != NULL);
+
+    handle = *(am_int32*) &stream->data;
+    assert (handle != -1);
+
+    return send (handle, data, length, 0);
+}
+
+
+MAGNA_API am_bool MAGNA_CALL tcp4_close_function
+    (
+        Stream *stream
+    )
+{
+    am_int32 handle;
+
+    assert (stream != NULL);
+
+    handle = *(am_int32*) &stream->data;
+    if (handle != -1) {
+        closesocket (handle);
+        stream->data = NULL;
+    }
+
+    return AM_TRUE;
+}
+
+/**
+ * Предполагается, что память будут записывать.
+ *
+ * @param stream
+ * @param hostname
+ * @param port
+ * @return
+ */
+MAGNA_API am_bool MAGNA_CALL tcp4_stream_create
+    (
+        Stream *stream,
+        const char *hostname,
+        am_uint16 port
+    )
+{
+    am_int32 handle;
+
+    assert (stream != NULL);
+
+    if (!stream_init (stream)) {
+        return AM_FALSE;
+    }
+
+    handle = tcp4_connect (hostname, port);
+    if (handle == -1) {
+        return AM_FALSE;
+    }
+
+    stream->data = *(void**) &handle;
+    stream->readFunction  = tcp4_read_function;
+    stream->writeFunction = tcp4_write_function;
+    stream->closeFunction = tcp4_close_function;
+
+    return AM_TRUE;
+}
+
+/*=========================================================*/
+
 #include "warnpop.h"
 
 /*=========================================================*/

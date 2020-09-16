@@ -196,14 +196,14 @@ MAGNA_API am_bool MAGNA_CALL span_array_grow
         }
         newSize = size;
 
-        newPtr = malloc (newSize * sizeof(am_int32));
+        newPtr = malloc (newSize * sizeof(Span));
         if (newPtr == NULL) {
             return AM_FALSE;
         }
 
         if (array->len) {
             assert (array->ptr != NULL);
-            memcpy (newPtr, array->ptr, array->len * sizeof(am_int32));
+            memcpy (newPtr, array->ptr, array->len * sizeof(Span));
         }
 
         if (array->ptr) {

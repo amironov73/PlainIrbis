@@ -36,15 +36,15 @@
  */
 MAGNA_API TextNavigator* MAGNA_CALL nav_init
     (
-            TextNavigator* nav,
-            const am_byte *data,
-            am_size_t dataSize
+        TextNavigator* nav,
+        const am_byte *data,
+        am_size_t dataSize
     )
 {
-    assert (data != NULL);
+    assert (nav != NULL);
     assert (data != NULL);
 
-    memset (nav, 0, sizeof (TextNavigator));
+    mem_clear (nav, sizeof (TextNavigator));
     nav->data = data;
     nav->length = dataSize;
     nav->position = 0;
@@ -168,8 +168,8 @@ MAGNA_API am_bool MAGNA_CALL nav_eot
  */
 MAGNA_API int MAGNA_CALL nav_at
     (
-            const TextNavigator *nav,
-            am_size_t position
+        const TextNavigator *nav,
+        am_size_t position
     )
 {
     assert (nav != NULL);
@@ -220,8 +220,8 @@ MAGNA_API int MAGNA_CALL nav_back
  */
 MAGNA_API int MAGNA_CALL nav_look_ahead
     (
-            const TextNavigator *nav,
-            am_size_t distance
+        const TextNavigator *nav,
+        am_size_t distance
     )
 {
     am_size_t newPos;
@@ -242,8 +242,8 @@ MAGNA_API int MAGNA_CALL nav_look_ahead
  */
 MAGNA_API int MAGNA_CALL nav_look_behind
     (
-            const TextNavigator *nav,
-            am_size_t distance
+        const TextNavigator *nav,
+        am_size_t distance
     )
 {
     am_size_t newPos;
@@ -342,6 +342,7 @@ MAGNA_API int MAGNA_CALL nav_read
     else {
         ++nav->column;
     }
+    ++nav->position;
 
     return result;
 }

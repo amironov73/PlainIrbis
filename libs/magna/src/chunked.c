@@ -977,6 +977,168 @@ MAGNA_API am_bool MAGNA_CALL chunked_write_text
     return chunked_write (chunked, (const am_byte*) text, strlen (text));
 }
 
+/**
+ * Добавление перевода на новую строку.
+ *
+ * @param chunked Указатель на буфер.
+ * @return Признак успешности завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL chunked_new_line
+    (
+        ChunkedBuffer *chunked
+    )
+{
+    assert (chunked != NULL);
+
+    return chunked_write_byte (chunked, '\n');
+}
+
+/**
+ * Преобразование данных из кодировки UTF-8 в ANSI.
+ *
+ * @param target Инициализированный буфер назначения.
+ * @param source Буфер с исходными данными.
+ * @return Признак успешности завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL chunked_utf8_to_ansi
+    (
+        ChunkedBuffer *target,
+        const Buffer *source
+    )
+{
+    am_size_t delta;
+
+    assert (target != NULL);
+    assert (source != NULL);
+
+    delta = utf8_code_points (source->ptr, source->position);
+    if (!chunked_grow (target, delta)) {
+        return AM_FALSE;
+    }
+
+    /* TODO: сделать собственно преобразование */
+
+    return AM_FALSE;
+}
+
+/**
+ * Преобразование данных из кодировки ANSI  в UTF-8.
+ *
+ * @param target Инициализированный буфер назначения.
+ * @param source Буфер с исходными данными.
+ * @return Признак успешности завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL chunked_ansi_to_utf8
+    (
+        ChunkedBuffer *target,
+        const Buffer *source
+    )
+{
+    assert (target != NULL);
+    assert (source != NULL);
+
+    if (!chunked_grow (target, source->position)) {
+        return AM_FALSE;
+    }
+
+    /* TODO: собственно преобразование */
+
+    return AM_FALSE;
+}
+
+
+/*=========================================================*/
+
+/* Stream-обертка */
+
+MAGNA_API am_ssize_t MAGNA_CALL chunked_read_function
+    (
+        Stream *stream,
+        am_byte *data,
+        am_size_t length
+    )
+{
+    ChunkedBuffer *buffer;
+
+    assert (stream != NULL);
+
+    buffer = (ChunkedBuffer *) stream->data;
+    assert (buffer != NULL);
+
+    return chunked_read_raw (buffer, data, length);
+}
+
+MAGNA_API am_ssize_t MAGNA_CALL chunked_write_function
+    (
+        Stream *stream,
+        const am_byte *data,
+        am_size_t length
+    )
+{
+    ChunkedBuffer *buffer;
+
+    assert (stream != NULL);
+
+    buffer = (ChunkedBuffer *) stream->data;
+    assert (buffer != NULL);
+
+    return chunked_write (buffer, data, length) ? length : 0;
+}
+
+MAGNA_API am_bool MAGNA_CALL chunked_close_function
+    (
+        Stream *stream
+    )
+{
+    Buffer *buffer;
+
+    assert (stream != NULL);
+
+    buffer = (Buffer *) stream->data;
+    if (buffer != NULL) {
+        buffer_free (buffer);
+        stream->data = NULL;
+    }
+
+    return AM_TRUE;
+}
+
+/**
+ * Предполагается, что память будут записывать.
+ *
+ * @param stream
+ * @param chunkSize
+ * @return
+ */
+MAGNA_API am_bool MAGNA_CALL chunked_stream_create
+    (
+        Stream *stream,
+        am_size_t chunkSize
+    )
+{
+    ChunkedBuffer *chunked;
+
+    assert (stream != NULL);
+
+    if (!stream_init (stream)) {
+        return AM_FALSE;
+    }
+
+    chunked = (ChunkedBuffer*) calloc (1, sizeof (ChunkedBuffer));
+    if (chunked == NULL) {
+        return AM_FALSE;
+    }
+
+    chunked_init (chunked, chunkSize);
+
+    stream->data = (void*) chunked;
+    stream->readFunction  = chunked_read_function;
+    stream->writeFunction = chunked_write_function;
+    stream->closeFunction = chunked_close_function;
+
+    return AM_TRUE;
+}
+
 /*=========================================================*/
 
 #include "warnpop.h"

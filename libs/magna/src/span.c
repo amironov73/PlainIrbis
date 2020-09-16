@@ -5,10 +5,7 @@
 
 /*=========================================================*/
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable: 5045)
-#endif
+#include "warnpush.h"
 
 /*=========================================================*/
 
@@ -24,12 +21,14 @@
  *
  */
 
+/*=========================================================*/
+
 /**
  * Простая инициализация.
  *
- * @param ptr
- * @param len
- * @return
+ * @param ptr Указатель на начало.
+ * @param len Длина участка памяти.
+ * @return Инициализированный спан.
  */
 MAGNA_API Span MAGNA_CALL span_init
     (
@@ -43,10 +42,10 @@ MAGNA_API Span MAGNA_CALL span_init
 }
 
 /**
- * Инициализация строкой.
+ * Инициализация строкой, завершающейся нулём.
  *
- * @param str
- * @return
+ * @param str Указатель на начало строки.
+ * @return Инициализированный спан. Завершающий нуль не включается.
  */
 MAGNA_API Span MAGNA_CALL span_from_text
     (
@@ -66,8 +65,8 @@ MAGNA_API Span MAGNA_CALL span_from_text
 /**
  * Удаление пробельных символов из начала спана.
  *
- * @param span
- * @return
+ * @param span Спан.
+ * @return Тот же спан, возможно, укороченный.
  */
 MAGNA_API Span MAGNA_CALL span_trim_start
     (
@@ -90,8 +89,8 @@ MAGNA_API Span MAGNA_CALL span_trim_start
 /**
  * Удаление пробельных символов из конца спана.
  *
- * @param span
- * @return
+ * @param span Спан.
+ * @return Тот же спан, возможно, укороченный.
  */
 MAGNA_API Span MAGNA_CALL span_trim_end
     (
@@ -112,8 +111,9 @@ MAGNA_API Span MAGNA_CALL span_trim_end
 
 /**
  * Удаление пробельных символов из начала и конца спана.
- * @param span
- * @return
+ *
+ * @param span Спан.
+ * @return Тот же спан, возможно, укороченный.
  */
 MAGNA_API Span MAGNA_CALL span_trim
     (
@@ -129,8 +129,8 @@ MAGNA_API Span MAGNA_CALL span_trim
 /**
  * Преобразование спана в целое число без знака.
  *
- * @param span
- * @return
+ * @param span Спан.
+ * @return Результат разбора. Мусор на входе -- мусор на выходе!
  */
 MAGNA_API am_uint32 MAGNA_CALL span_to_uint_32
     (
@@ -151,8 +151,8 @@ MAGNA_API am_uint32 MAGNA_CALL span_to_uint_32
 /**
  * Преобразование спана в целое число без знака.
  *
- * @param span
- * @return
+ * @param span Спан.
+ * @return Результат разбора. Мусор на входе -- мусор на выходе!
  */
 MAGNA_API am_uint64 MAGNA_CALL span_to_uint_64
     (
@@ -171,9 +171,10 @@ MAGNA_API am_uint64 MAGNA_CALL span_to_uint_64
 }
 
 /**
- * Перевод спана в верхний регистр.
+ * Перевод спана в верхний регистр (в нативной кодировке).
  *
- * @param span
+ * @param span Спан.
+ * @return Тот же спан.
  */
 MAGNA_API Span MAGNA_CALL span_toupper
     (
@@ -192,9 +193,10 @@ MAGNA_API Span MAGNA_CALL span_toupper
 }
 
 /**
- * Перевод спана в нижний регистр.
+ * Перевод спана в нижний регистр (в нативной кодировке).
  *
- * @param span
+ * @param span Спан.
+ * @return Тот же спан.
  */
 MAGNA_API Span MAGNA_CALL span_tolower
     (
@@ -215,8 +217,8 @@ MAGNA_API Span MAGNA_CALL span_tolower
 /**
  * Спан пустой?
  *
- * @param span
- * @return
+ * @param span Проверяемый спан.
+ * @return Результат проверки.
  */
 MAGNA_API am_bool MAGNA_CALL span_is_empty
     (
@@ -229,9 +231,9 @@ MAGNA_API am_bool MAGNA_CALL span_is_empty
 /**
  * Содержит ли спан указанный элемент?
  *
- * @param span
- * @param value
- * @return
+ * @param span Спан.
+ * @param value Искомый элемент.
+ * @return Указатель на найденный байт либо `NULL`.
  */
 MAGNA_API am_byte* MAGNA_CALL span_find_byte
     (
@@ -255,8 +257,9 @@ MAGNA_API am_byte* MAGNA_CALL span_find_byte
 /**
  * Заполнение спана указанным значением.
  *
- * @param span
- * @param value
+ * @param span Спан.
+ * @param value Значение-заполнитель.
+ * @return Тот же спан.
  */
 MAGNA_API Span MAGNA_CALL span_fill
     (
@@ -277,9 +280,9 @@ MAGNA_API Span MAGNA_CALL span_fill
 /**
  * Поиск указанного значения в спане с начала.
  *
- * @param span
- * @param value
- * @return
+ * @param span Спан.
+ * @param value Искомое значение.
+ * @return Найденный индекс либо -1.
  */
 MAGNA_API am_ssize_t MAGNA_CALL span_index_of
     (
@@ -301,9 +304,9 @@ MAGNA_API am_ssize_t MAGNA_CALL span_index_of
 /**
  * Поиск указанного значения в спане с конца.
  *
- * @param span
- * @param value
- * @return
+ * @param span Спан.
+ * @param value Искомое значение.
+ * @return Найденный индекс либо -1.
  */
 MAGNA_API am_ssize_t MAGNA_CALL span_last_index_of
     (
@@ -325,10 +328,10 @@ MAGNA_API am_ssize_t MAGNA_CALL span_last_index_of
 /**
  * Срез спана.
  *
- * @param span
- * @param start
- * @param length
- * @return
+ * @param span Спан.
+ * @param start Смещение от начала.
+ * @param length Длина среза.
+ * @return Обрезанный спан.
  */
 MAGNA_API Span MAGNA_CALL span_slice
     (
@@ -360,8 +363,8 @@ MAGNA_API Span MAGNA_CALL span_slice
 /**
  * Преобразование спана в строку.
  *
- * @param span
- * @return
+ * @param span Спан для преобразования.
+ * @return Размещенная в куче копия строки.
  */
 MAGNA_API char* MAGNA_CALL span_to_string
     (
@@ -374,7 +377,7 @@ MAGNA_API char* MAGNA_CALL span_to_string
     }
 
     if (span.len != 0 && span.ptr != NULL) {
-        memcpy (result, span.ptr, span.len);
+        mem_copy (result, span.ptr, span.len);
     }
     result [span.len] = 0;
 
@@ -384,8 +387,8 @@ MAGNA_API char* MAGNA_CALL span_to_string
 /**
  * Преобразование спана в вектор байтов.
  *
- * @param span
- * @return
+ * @param span Спан для преобразования.
+ * @return Размещенный в куче вектор байтов (копия).
  */
 MAGNA_API am_byte* MAGNA_CALL span_to_vector
     (
@@ -395,7 +398,7 @@ MAGNA_API am_byte* MAGNA_CALL span_to_vector
     am_byte *result = mem_alloc (span.len);
 
     if (span.len != 0 && span.ptr != NULL) {
-        memcpy (result, span.ptr, span.len);
+        mem_copy (result, span.ptr, span.len);
     }
 
     return result;
@@ -404,9 +407,9 @@ MAGNA_API am_byte* MAGNA_CALL span_to_vector
 /**
  * Совпадает ли начало спана с другим спаном?
  *
- * @param span
- * @param prefix
- * @return
+ * @param span Проверяемый спан.
+ * @param prefix Предполагаемый префикс.
+ * @return Результат проверки.
  */
 MAGNA_API am_bool MAGNA_CALL span_starts_with
     (
@@ -414,15 +417,27 @@ MAGNA_API am_bool MAGNA_CALL span_starts_with
         Span prefix
     )
 {
-    return 0;
+    am_bool result = prefix.len <= span.len;
+    am_size_t i;
+
+    if (result) {
+        for (i = 0; i < prefix.len; ++i) {
+            if (span.ptr[i] != prefix.ptr[i]) {
+                result = AM_FALSE;
+                break;
+            }
+        }
+    }
+
+    return result;
 }
 
 /**
  * Совпадает ли конец спана с другим спаном?
  *
- * @param span
- * @param suffix
- * @return
+ * @param span Проверяемый спан.
+ * @param suffix Предполагаемый суффикс.
+ * @return Результат проверки.
  */
 MAGNA_API am_bool MAGNA_CALL span_ends_with
     (
@@ -430,15 +445,28 @@ MAGNA_API am_bool MAGNA_CALL span_ends_with
         Span suffix
     )
 {
-    return 0;
+    am_bool result = suffix.len <= span.len;
+    am_size_t i;
+
+    if (result) {
+        for (i = 0; i < suffix.len; ++i) {
+            if (span.ptr[span.len - i - 1] != suffix.ptr [suffix.len - i - 1]) {
+                result = AM_FALSE;
+                break;
+            }
+        }
+    }
+
+    return result;
 }
 
 /**
  * Побайтовое сравнение двух спанов.
  *
- * @param first
- * @param second
- * @return
+ * @param first Первый спан.
+ * @param second Второй спан.
+ * @return Результат сравнения: < 0, если первый спан меньше,
+ * > 0, если первый спан больше и = 0, если содержимое спанов совпадает.
  */
 MAGNA_API int MAGNA_CALL span_compare
     (
@@ -472,47 +500,129 @@ MAGNA_API int MAGNA_CALL span_compare
 /**
  * Разбиение по указанному символу.
  *
- * @param span
- * @param array
- * @param value
- * @return
+ * @param span Спан для разбиения.
+ * @param array Инициализированный динамический массив для помещения результата.
+ * @param value Символ-разделитель.
+ * @return Признак успешности завершения операции.
  */
-MAGNA_API struct MagnaSpanArray* MAGNA_CALL span_split_by_char
+MAGNA_API am_bool MAGNA_CALL span_split_by_char
     (
         Span span,
-        struct MagnaSpanArray *array,
+        SpanArray *array,
         am_byte value
     )
 {
+    am_size_t left, right;
+    am_bool found;
+    Span item;
+
     assert (array != NULL);
 
-    return array;
+    left = 0;
+    while (left < span.len) {
+        found = AM_FALSE;
+        for (right = left; right < span.len; ++right) {
+            if (span.ptr[right] == value) {
+                if (left != right) {
+                    item.ptr = span.ptr + left;
+                    item.len = right - left;
+                    if (!span_array_push_back (array, item)) {
+                        return AM_FALSE;
+                    }
+                }
+
+                found = AM_TRUE;
+                break;
+            }
+        }
+
+        if (!found) {
+            item.ptr = span.ptr + left;
+            item.len = span.len - left;
+            if (!span_array_push_back (array, item)) {
+                return AM_FALSE;
+            }
+
+            break;
+        }
+
+        left = right + 1;
+    }
+
+    return AM_TRUE;
 }
 
 /**
  * Разбиение по указанным символам.
  *
- * @param span
- * @param array
- * @param values
- * @param valueCount
- * @return
+ * @param span Спан для разбиения.
+ * @param array Инициализированный динамический массив для помещения результата.
+ * @param values Указатель на символы-разделители.
+ * @param valueCount Количество символов-разделителей.
+ * @return Признак успешности завершения операции.
  */
-MAGNA_API struct MagnaSpanArray* MAGNA_CALL span_split_by_chars
+MAGNA_API am_bool MAGNA_CALL span_split_by_chars
     (
         Span span,
-        struct MagnaSpanArray *array,
+        SpanArray *array,
         const am_byte *values,
         am_size_t valueCount
     )
 {
+    am_size_t left, right, i;
+    Span item;
+    am_byte c;
+    am_bool found;
+
     assert (array != NULL);
     assert (values != NULL);
 
-    return array;
+    left = 0;
+    while (left < span.len) {
+        for (right = left; right < span.len; ++right) {
+            c = span.ptr[right];
+            found = AM_FALSE;
+            for (i = 0; i < valueCount; ++i) {
+                if (c == values[i]) {
+                    found = AM_TRUE;
+                    break;
+                }
+            }
+
+            if (found) {
+                if (left != right) {
+                    item.ptr = span.ptr + left;
+                    item.len = right - left;
+                    if (!span_array_push_back (array, item)) {
+                        return AM_FALSE;
+                    }
+                }
+                break;
+            }
+        }
+
+        if (!found) {
+            item.ptr = span.ptr + left;
+            item.len = span.len - left;
+            if (!span_array_push_back (array, item)) {
+                return AM_FALSE;
+            }
+
+            break;
+        }
+
+        left = right + 1;
+    }
+
+    return AM_TRUE;
 }
 
-static const am_byte* find_one (const am_byte *from, const am_byte *to, am_byte value)
+static const am_byte* find_one
+    (
+        const am_byte *from,
+        const am_byte *to,
+        am_byte value
+    )
 {
     const am_byte *ptr;
 
@@ -525,7 +635,13 @@ static const am_byte* find_one (const am_byte *from, const am_byte *to, am_byte 
     return NULL;
 }
 
-static const am_byte* find_many (const am_byte *from, const am_byte *to, const am_byte *values, am_size_t valueCount)
+static const am_byte* find_many
+    (
+        const am_byte *from,
+        const am_byte *to,
+        const am_byte *values,
+        am_size_t valueCount
+    )
 {
     const am_byte *ptr1, *ptr2 = values + valueCount, *ptr3;
 
@@ -542,11 +658,11 @@ static const am_byte* find_many (const am_byte *from, const am_byte *to, const a
 /**
  * Разбиение по указанному символу.
  *
- * @param span
- * @param array
- * @param arraySize
- * @param value
- * @return
+ * @param span Спан для разбиения.
+ * @param array Статический массив для размещения результатов.
+ * @param arraySize Размер статического массива в элементах.
+ * @param value Символ-разделитель.
+ * @return Количество получившихся фрагметов.
  */
 MAGNA_API am_size_t MAGNA_CALL span_split_n_by_char
     (
@@ -593,12 +709,12 @@ MAGNA_API am_size_t MAGNA_CALL span_split_n_by_char
 /**
  * Разбиение по указанным символам.
  *
- * @param span
- * @param array
- * @param arraySize
- * @param values
- * @param valueCount
- * @return
+ * @param span Спан для разбиения.
+ * @param array Статический массив для размещения результата.
+ * @param arraySize Размер статического массива в элементах.
+ * @param values Символы-разделители.
+ * @param valueCount Количество символов-разделителей.
+ * @return Количество получившихся фрагментов.
  */
 MAGNA_API am_size_t MAGNA_CALL span_split_n_by_chars
     (
@@ -645,8 +761,6 @@ MAGNA_API am_size_t MAGNA_CALL span_split_n_by_chars
 
 /*=========================================================*/
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
+#include "warnpop.h"
 
 /*=========================================================*/

@@ -60,7 +60,7 @@ MAGNA_API am_handle MAGNA_CALL thread_create
     DWORD threadId;
     am_handle result;
 
-    result.ptr = CreateThread
+    result.pointer = CreateThread
         (
             securityAttributes,
             stackSize,
@@ -80,7 +80,7 @@ MAGNA_API am_handle MAGNA_CALL thread_create
 
     am_handle result;
 
-    result.handle = AM_BAD_HANDLE;
+    result.value = AM_BAD_HANDLE;
 
     return result;
 
@@ -100,11 +100,11 @@ MAGNA_API am_bool MAGNA_CALL thread_join
         am_int32 timeout
     )
 {
-    assert (is_good_handle (handle));
+    assert (handle_is_good(handle));
 
 #ifdef MAGNA_WINDOWS
 
-    WaitForSingleObject (handle.ptr, timeout);
+    WaitForSingleObject (handle.pointer, timeout);
 
 #endif
 
