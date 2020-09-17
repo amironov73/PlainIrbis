@@ -218,7 +218,7 @@
 #endif
 
 #ifdef __GNUC__
-#define MAGNA_INLINE inline
+#define MAGNA_INLINE __attribute__ ((gnu_inline)) inline
 #endif
 
 #endif

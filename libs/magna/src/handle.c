@@ -37,7 +37,7 @@
  * @param handle Проверяемый дескриптор.
  * @return Результат проверки.
  */
-MAGNA_API am_bool MAGNA_CALL handle_is_good
+MAGNA_API MAGNA_INLINE am_bool MAGNA_CALL handle_is_good
     (
         am_handle handle
     )
@@ -59,7 +59,7 @@ MAGNA_API am_bool MAGNA_CALL handle_is_good
  * @param value Целочисленный индекс.
  * @return Сконструированный дескриптор.
  */
-MAGNA_API am_handle MAGNA_CALL handle_from_value
+MAGNA_API MAGNA_INLINE am_handle MAGNA_CALL handle_from_value
     (
         int value
     )
@@ -77,7 +77,7 @@ MAGNA_API am_handle MAGNA_CALL handle_from_value
  * @param pointer Указатель.
  * @return Сконструированный дескриптор.
  */
-MAGNA_API am_handle MAGNA_CALL handle_from_pointer
+MAGNA_API MAGNA_INLINE am_handle MAGNA_CALL handle_from_pointer
     (
         void *pointer
     )
