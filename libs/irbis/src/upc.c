@@ -1,11 +1,17 @@
-/* This is an open source non-commercial project. Dear PVS-Studio, please check it.
- * PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com */
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include "magna/irbis.h"
 
-/* ReSharper disable StringLiteralTypo */
-/* ReSharper disable IdentifierTypo */
-/* ReSharper disable CommentTypo */
+// ReSharper disable StringLiteralTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable CommentTypo
+
+/*=========================================================*/
+
+#include "warnpush.h"
+
+/*=========================================================*/
 
 #include <assert.h>
 
@@ -52,12 +58,12 @@ MAGNA_API am_byte MAGNA_CALL upc12_compute_check_digit
         const Span text
     )
 {
-    int sum, i, length;
+    am_int32 sum, i, length;
     am_byte result;
 
     assert (text.len >= 11);
 
-    length = min (text.len, 11);
+    length = min_int32 (text.len, 11);
     for (sum = i = 0; i < length; ++i) {
         sum = sum + (text.ptr[i] - '0') * coefficients[i];
     }
@@ -78,11 +84,11 @@ MAGNA_API am_bool MAGNA_CALL upc12_check_control_digit
         const Span text
     )
 {
-    int sum, i, length;
+    am_int32 sum, i, length;
 
     assert (text.len >= 12);
 
-    length = min (text.len, 11);
+    length = min_int32 (text.len, 12);
 
     for (sum = i = 0; i < length; ++i) {
         sum = sum + (text.ptr[i] - '0') * coefficients[i];
@@ -90,5 +96,9 @@ MAGNA_API am_bool MAGNA_CALL upc12_check_control_digit
 
     return sum % 10 == 0;
 }
+
+/*=========================================================*/
+
+#include "warnpop.h"
 
 /*=========================================================*/

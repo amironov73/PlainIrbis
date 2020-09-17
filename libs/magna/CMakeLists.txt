@@ -48,6 +48,7 @@ set(CFiles
     src/tcp4.c
     src/thread.c
     src/utf8.c
+    src/utils.c
 )
 
 add_library(${PROJECT_NAME}

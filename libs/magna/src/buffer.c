@@ -1,11 +1,11 @@
-/* This is an open source non-commercial project. Dear PVS-Studio, please check it.
- * PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com */
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include "magna/core.h"
 
-/* ReSharper disable StringLiteralTypo */
-/* ReSharper disable IdentifierTypo */
-/* ReSharper disable CommentTypo */
+// ReSharper disable StringLiteralTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable CommentTypo
 
 /*=========================================================*/
 
@@ -65,7 +65,7 @@ MAGNA_API am_size_t MAGNA_CALL buffer_calculate_size
         newSize = 8;
     }
 
-    while (result <= newSize) {
+    while (result < newSize) {
         result *= 2;
     }
 
@@ -77,7 +77,7 @@ MAGNA_API am_size_t MAGNA_CALL buffer_calculate_size
  *
  * @param target Неинициализированный буфер назначения.
  * @param source Буфер, подлежащий клонированию.
- * @return
+ * @return Буфер назначения либо `NULL`.
  */
 MAGNA_API Buffer* MAGNA_CALL buffer_clone
     (
@@ -90,12 +90,19 @@ MAGNA_API Buffer* MAGNA_CALL buffer_clone
 
     target->position = source->position;
     target->capacity = source->capacity;
-    target->ptr = malloc (source->capacity);
-    if (target->ptr == NULL) {
-        return NULL;
+    if (source->capacity == 0 || source->ptr == NULL) {
+        target->position = 0;
+        target->capacity = 0;
+        target->ptr = NULL;
     }
+    else {
+        target->ptr = mem_alloc (source->capacity);
+        if (target->ptr == NULL) {
+            return NULL;
+        }
 
-    memcpy (target->ptr, source->ptr, source->position);
+        mem_copy (target->ptr, source->ptr, source->position);
+    }
 
     return target;
 }
@@ -123,7 +130,7 @@ MAGNA_API am_bool MAGNA_CALL buffer_copy
     target->position = 0;
 
     if (source->position != 0) {
-        memcpy(target->ptr, source->ptr, source->position);
+        mem_copy (target->ptr, source->ptr, source->position);
     }
 
     target->position = source->position;
@@ -150,8 +157,15 @@ MAGNA_API am_bool MAGNA_CALL buffer_concat
         return AM_FALSE;
     }
 
-    memcpy (target-> ptr + target->position, source->ptr, source->position);
-    target->position += source->position;
+    if (source->position != 0) {
+        mem_copy
+            (
+                target->ptr + target->position,
+                source->ptr,
+                source->position
+            );
+        target->position += source->position;
+    }
 
     return AM_TRUE;
 }
@@ -160,15 +174,15 @@ MAGNA_API am_bool MAGNA_CALL buffer_concat
  * Создаёт буфер, предназначенный для динамического роста, копируя
  * уже имеющиеся данные в кучк.
  *
- * @param buffer
- * @param data
- * @param length
+ * @param buffer Указатель на неиницализированный буфер.
+ * @param data Данные для инициализации (может быть `NULL`).
+ * @param length Длина данных в байтах.
  */
 MAGNA_API am_bool MAGNA_CALL buffer_create
     (
-            Buffer *buffer,
-            am_byte *data,
-            am_size_t length
+        Buffer *buffer,
+        const am_byte *data,
+        am_size_t length
     )
 {
     assert (buffer != NULL);
@@ -183,7 +197,7 @@ MAGNA_API am_bool MAGNA_CALL buffer_create
         }
 
         if (data != NULL) {
-            memcpy (buffer->ptr, data, length);
+            mem_copy (buffer->ptr, data, length);
             buffer->position = length;
         }
     }
@@ -194,22 +208,23 @@ MAGNA_API am_bool MAGNA_CALL buffer_create
 /**
  * Создаёт статический буфер, не предназначенный для роста.
  *
- * @param buffer
- * @param data
- * @param newSize
+ * @param buffer Указатель на неиницализированную структуру.
+ * @param data Данные.
+ * @param length Длина данных в байтах.
+ * @return Указатель на иницализированный буфер.
  */
 MAGNA_API Buffer* MAGNA_CALL buffer_static
     (
-            Buffer *buffer,
-            am_byte *data,
-            am_size_t newSize
+        Buffer *buffer,
+        const am_byte *data,
+        am_size_t length
     )
 {
     assert (buffer != NULL);
 
-    buffer->ptr = data;
+    buffer->ptr = (am_byte*) data;
     buffer->position = 0;
-    buffer->capacity = newSize;
+    buffer->capacity = length;
 
     return buffer;
 }
@@ -230,6 +245,7 @@ MAGNA_API void MAGNA_CALL buffer_free
         free (buffer->ptr);
         buffer->ptr = NULL;
     }
+
     buffer->position = 0;
     buffer->capacity = 0;
 }
@@ -261,6 +277,7 @@ MAGNA_API am_bool MAGNA_CALL buffer_grow
             memcpy(newPtr, buffer->ptr, buffer->position);
             free (buffer->ptr);
         }
+
         buffer->ptr = newPtr;
         buffer->capacity = newSize;
     }
@@ -270,13 +287,15 @@ MAGNA_API am_bool MAGNA_CALL buffer_grow
 
 /**
  * Дописывает байт в конец буфера.
- * @param buffer
- * @param c
+ *
+ * @param buffer Указатель на буфер.
+ * @param value Байт для записи.
+ * @return Признак успешности завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL buffer_putc
     (
         Buffer *buffer,
-        am_byte c
+        am_byte value
     )
 {
     assert (buffer != NULL);
@@ -284,7 +303,8 @@ MAGNA_API am_bool MAGNA_CALL buffer_putc
     if (!buffer_grow (buffer, buffer->position + 1)) {
         return AM_FALSE;
     }
-    buffer->ptr [buffer->position++] = c;
+
+    buffer->ptr [buffer->position++] = value;
 
     return AM_TRUE;
 }
@@ -311,10 +331,37 @@ MAGNA_API am_bool MAGNA_CALL buffer_puts
         return AM_FALSE;
     }
 
-    memcpy (buffer->ptr + buffer->position, str, delta);
+    mem_copy (buffer->ptr + buffer->position, str, delta);
     buffer->position += delta;
 
     return AM_TRUE;
+}
+
+/**
+ * Чтение данных из буфера.
+ *
+ * @param buffer Указатель на буфер.
+ * @param data Куда помещать прочитанные данные.
+ * @param length Предполагаемое число байт для считывания.
+ * @return Количество реально прочитанных байт.
+ */
+MAGNA_API am_size_t MAGNA_CALL buffer_read
+    (
+        Buffer *buffer,
+        am_byte *data,
+        am_size_t length
+    )
+{
+    assert (buffer != NULL);
+    assert (data != NULL);
+
+    length = min_size_t (length, buffer->capacity - buffer->position);
+    if (length != 0) {
+        mem_copy (data, buffer->ptr + buffer->position, length);
+        buffer->position += length;
+    }
+
+    return length;
 }
 
 /**
@@ -337,7 +384,7 @@ MAGNA_API am_bool MAGNA_CALL buffer_write
         if (!buffer_grow (buffer, buffer->position + length)) {
             return AM_FALSE;
         }
-        memcpy (buffer->ptr + buffer->position, data, length);
+        mem_copy (buffer->ptr + buffer->position, data, length);
         buffer->position += length;
     }
 
@@ -432,14 +479,20 @@ MAGNA_API Buffer* MAGNA_CALL buffer_from_text
     assert (buffer != NULL);
 
     if (text == NULL) {
-        buffer_grow (buffer, 1);
+        if (!buffer_grow (buffer, 1)) {
+            return NULL;
+        }
+
         buffer->ptr[0] = '\0';
         buffer->position = 0;
     }
     else {
         len = strlen (text) + 1;
-        buffer_grow (buffer, len);
-        memcpy (buffer->ptr, text, len);
+        if (!buffer_grow (buffer, len)) {
+            return NULL;
+        }
+
+        mem_copy (buffer->ptr, text, len);
         buffer->position = len - 1;
     }
 
@@ -669,7 +722,7 @@ MAGNA_API int MAGNA_CALL buffer_compare_text
 
             return -1;
         }
-        else if (!ptr) {
+        else if (!*ptr) {
             return 1;
         }
         else {

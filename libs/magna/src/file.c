@@ -1,5 +1,5 @@
-/* This is an open source non-commercial project. Dear PVS-Studio, please check it.
- * PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com */
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include "magna/core.h"
 
@@ -347,7 +347,8 @@ MAGNA_API am_bool MAGNA_CALL file_read_all
     )
 {
     am_handle handle;
-    am_size_t rc, totalLength;
+    am_ssize_t rc;
+    am_size_t totalLength;
     am_byte temp [1024];
 
     assert (fileName != NULL);
@@ -847,12 +848,12 @@ MAGNA_API am_bool MAGNA_CALL file_copy
     assert (sourceName != NULL);
 
     sourceHandle = file_create (sourceName);
-    if (!is_good_handle (sourceHandle)) {
+    if (!handle_is_good (sourceHandle)) {
         return AM_FALSE;
     }
 
     targetHandle = file_create (targetName);
-    if (!is_good_handle (targetHandle)) {
+    if (!handle_is_good (targetHandle)) {
         file_close (sourceHandle);
         return AM_FALSE;
     }
@@ -882,6 +883,36 @@ MAGNA_API am_bool MAGNA_CALL file_copy
     file_close (targetHandle);
 
     return AM_TRUE;
+
+#endif
+}
+
+/**
+ * Синхронизирует состояние файла в памяти с диском.
+ *
+ * @param handle Файловый дескриптор.
+ * @return Признак успешности завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL file_sync
+    (
+        am_handle handle
+    )
+{
+#ifdef MAGNA_WINDOWS
+
+    assert (handle_is_good (handle));
+
+    return FlushFileBuffers (handle.pointer);
+
+#elif defined (MAGNA_UNIX)
+
+    assert (handle_is_good (handle));
+
+    return fsync (handle.value) == 0;
+
+#else
+
+    return AM_FALSE;
 
 #endif
 }

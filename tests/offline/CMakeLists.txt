@@ -23,6 +23,9 @@ set(CFiles
     src/retry.c
     src/span.c
     src/spanarry.c
+    src/stream.c
+    src/upc.c
+    src/utils.c
 )
 
 set(HeaderFiles

@@ -1,5 +1,5 @@
-/* This is an open source non-commercial project. Dear PVS-Studio, please check it.
- * PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com */
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include "magna/core.h"
 
@@ -72,7 +72,7 @@ MAGNA_API am_ssize_t MAGNA_CALL stream_read
  * @param length
  * @return Признак успешности завершения операции.
  */
-MAGNA_API am_byte MAGNA_CALL stream_write
+MAGNA_API am_bool MAGNA_CALL stream_write
     (
         Stream *stream,
         const am_byte *buffer,
@@ -82,7 +82,7 @@ MAGNA_API am_byte MAGNA_CALL stream_write
     assert (stream != NULL);
     assert (stream->writeFunction != NULL);
 
-    return stream->writeFunction (stream, buffer, length) != ((am_ssize_t) length);
+    return stream->writeFunction (stream, buffer, length) == length;
 }
 
 /**
@@ -251,10 +251,10 @@ MAGNA_API am_bool MAGNA_CALL null_stream_open
         return AM_FALSE;
     }
 
-    stream->readFunction = null_read_function;
+    stream->readFunction  = null_read_function;
     stream->writeFunction = null_write_function;
-    stream->seekFunction = null_seek_function;
-    stream->tellFunction = null_tell_function;
+    stream->seekFunction  = null_seek_function;
+    stream->tellFunction  = null_tell_function;
     stream->closeFunction = null_close_function;
 
     return AM_TRUE;
@@ -278,9 +278,7 @@ MAGNA_API am_ssize_t MAGNA_CALL memory_read_function
     buffer = (Buffer *) stream->data;
     assert (buffer != NULL);
 
-    /* TODO: implement */
-
-    return 0;
+    return (am_ssize_t) buffer_read (buffer, data, length);
 }
 
 MAGNA_API am_ssize_t MAGNA_CALL memory_write_function
@@ -346,15 +344,9 @@ MAGNA_API am_bool MAGNA_CALL memory_close_function_1
         Stream *stream
     )
 {
-    Buffer *buffer;
-
     assert (stream != NULL);
 
-    buffer = (Buffer *) stream->data;
-    if (buffer != NULL) {
-        buffer_free (buffer);
-        stream->data = NULL;
-    }
+    stream->data = NULL;
 
     return AM_TRUE;
 }
@@ -491,6 +483,90 @@ MAGNA_API am_byte* MAGNA_CALL memory_stream_to_text
     assert (buffer != NULL);
 
     return (am_byte*) buffer_to_text (buffer);
+}
+
+/*=========================================================*/
+
+/* Поток, выдающий ошибки (для отладки) */
+
+MAGNA_API am_ssize_t MAGNA_CALL broken_read_function
+    (
+        Stream *stream,
+        am_byte *buffer, /* NOLINT(readability-non-const-parameter) */
+        am_size_t length
+    )
+{
+    (void) stream;
+    (void) buffer;
+    (void) length;
+
+    return -1;
+}
+
+MAGNA_API am_ssize_t MAGNA_CALL broken_write_function
+    (
+        Stream *stream,
+        const am_byte *buffer,
+        am_size_t length
+    )
+{
+    (void) stream;
+    (void) buffer;
+    (void) length;
+
+    return -1;
+}
+
+MAGNA_API am_ssize_t MAGNA_CALL broken_seek_function
+    (
+        Stream *stream,
+        am_size_t position
+    )
+{
+    (void) stream;
+    (void) position;
+
+    return -1;
+}
+
+MAGNA_API am_ssize_t MAGNA_CALL broken_tell_function
+    (
+        Stream *stream
+    )
+{
+    (void) stream;
+
+    return -1;
+}
+
+MAGNA_API am_bool MAGNA_CALL broken_close_function
+    (
+        Stream *stream
+    )
+{
+    (void) stream;
+
+    return AM_FALSE;
+}
+
+MAGNA_API am_bool MAGNA_CALL broken_stream_open
+    (
+        Stream *stream
+    )
+{
+    assert (stream != NULL);
+
+    if (!stream_init (stream)) {
+        return AM_FALSE;
+    }
+
+    stream->readFunction  = broken_read_function;
+    stream->writeFunction = broken_write_function;
+    stream->seekFunction  = broken_seek_function;
+    stream->tellFunction  = broken_tell_function;
+    stream->closeFunction = broken_close_function;
+
+    return AM_TRUE;
 }
 
 /*=========================================================*/

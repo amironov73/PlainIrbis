@@ -1,5 +1,5 @@
-/* This is an open source non-commercial project. Dear PVS-Studio, please check it.
- * PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com */
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include "magna/core.h"
 
@@ -99,7 +99,7 @@ MAGNA_API am_size_t MAGNA_CALL count_utf
     )
 {
     am_size_t result = 0;
-    unsigned int c;
+    am_uint32 c;
 
     while (length != 0) {
         c = *src++;
