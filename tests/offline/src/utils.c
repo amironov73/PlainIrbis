@@ -59,6 +59,20 @@ TESTER(max_uint64_1)
     CHECK (max_uint64 (123ul, 123ul) == 123ul);
 }
 
+TESTER(min_size_t_1)
+{
+    CHECK (min_size_t (123, 641) == 123);
+    CHECK (min_size_t (641, 123) == 123);
+    CHECK (min_size_t (123, 123) == 123);
+}
+
+TESTER(max_size_t_1)
+{
+    CHECK (max_size_t (123, 641) == 641);
+    CHECK (max_size_t (641, 123) == 641);
+    CHECK (max_size_t (123, 123) == 123);
+}
+
 TESTER(choose_string_1)
 {
     const char *first = "Hello", *second = "World";

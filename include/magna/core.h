@@ -211,11 +211,11 @@
 
 #ifndef MAGNA_INLINE
 
-#ifdef _MSC_VER
-#if _MSC_VER >= 1910
-#define MAGNA_INLINE inline
-#endif
-#endif
+//#ifdef _MSC_VER
+//#if _MSC_VER >= 1910
+//#define MAGNA_INLINE inline
+//#endif
+//#endif
 
 #ifdef __GNUC__
 #define MAGNA_INLINE __attribute__ ((gnu_inline)) inline

@@ -27,12 +27,12 @@
 /*=========================================================*/
 
 /**
- * Инициализация.
+ * Инициализация навигатора.
  *
- * @param nav
- * @param data
- * @param dataSize
- * @return
+ * @param nav Указатель на неинициализированную структуру.
+ * @param data Указатель на начало данных.
+ * @param dataSize Длина данных в байтах.
+ * @return Указатель на инициализированную структуру.
  */
 MAGNA_API TextNavigator* MAGNA_CALL nav_init
     (
@@ -44,12 +44,12 @@ MAGNA_API TextNavigator* MAGNA_CALL nav_init
     assert (nav != NULL);
     assert (data != NULL);
 
-    mem_clear (nav, sizeof (TextNavigator));
-    nav->data = data;
-    nav->length = dataSize;
+    // mem_clear (nav, sizeof (TextNavigator));
+    nav->data     = data;
+    nav->length   = dataSize;
     nav->position = 0;
-    nav->line = 1;
-    nav->column = 1;
+    nav->line     = 1;
+    nav->column   = 1;
 
     return nav;
 }
@@ -57,9 +57,9 @@ MAGNA_API TextNavigator* MAGNA_CALL nav_init
 /**
  * Инициализация из фрагмента.
  *
- * @param nav Навигатор.
+ * @param nav Указатель на неинициализированную структуру.
  * @param span Фрагмент.
- * @return Навигатор.
+ * @return Указатель на инициализированную структуру.
  */
 MAGNA_API TextNavigator* MAGNA_CALL nav_from_span
     (
@@ -73,11 +73,12 @@ MAGNA_API TextNavigator* MAGNA_CALL nav_from_span
 }
 
 /**
- * Инициализация из буфера.
+ * Инициализация навигатора из буфера.
+ * Навигатор воспримет данные от начала буфера до `position`.
  *
- * @param nav Навигатор.
- * @param buffer Буфер.
- * @return Навигатор.
+ * @param nav Указатель на неинициализированную структуру.
+ * @param buffer Указатель на буфер.
+ * @return Указатель на инициализированную структуру.
  */
 MAGNA_API TextNavigator* MAGNA_CALL nav_from_buffer
     (
@@ -92,11 +93,12 @@ MAGNA_API TextNavigator* MAGNA_CALL nav_from_buffer
 }
 
 /**
- * Инициализация строкой. Стоп-символ в навигатор не помещается.
+ * Инициализация навигатора строкой.
+ * Стоп-символ в навигатор не помещается.
  *
- * @param nav Навигатор.
+ * @param nav Указатель на неинициализированную структуру.
  * @param text Строка с текстом.
- * @return Навигатор.
+ * @return Указатель на инициализированную структуру.
  */
 MAGNA_API TextNavigator* MAGNA_CALL nav_from_text
     (
@@ -113,10 +115,10 @@ MAGNA_API TextNavigator* MAGNA_CALL nav_from_text
 /**
  * Указатель прямо за последним байтом.
  *
- * @param nav
- * @return
+ * @param nav Навигатор.
+ * @return Указатель за последним байтом.
  */
-MAGNA_API const am_byte* MAGNA_CALL nav_end
+MAGNA_API MAGNA_INLINE const am_byte* MAGNA_CALL nav_end
     (
         const TextNavigator *nav
     )
@@ -129,10 +131,10 @@ MAGNA_API const am_byte* MAGNA_CALL nav_end
 /**
  * Указатель на текущий байт.
  *
- * @param nav
- * @return
+ * @param nav Навигатор.
+ * @return Указатель на текущий байт.
  */
-MAGNA_API const am_byte* MAGNA_CALL nav_current
+MAGNA_API MAGNA_INLINE const am_byte* MAGNA_CALL nav_current
     (
         const TextNavigator *nav
     )
@@ -145,10 +147,10 @@ MAGNA_API const am_byte* MAGNA_CALL nav_current
 /**
  * Достигнут ли конец текста?
  *
- * @param nav
- * @return
+ * @param nav Навигатор.
+ * @return Результат проверки.
  */
-MAGNA_API am_bool MAGNA_CALL nav_eot
+MAGNA_API MAGNA_INLINE am_bool MAGNA_CALL nav_eot
     (
         const TextNavigator *nav
     )
@@ -161,10 +163,12 @@ MAGNA_API am_bool MAGNA_CALL nav_eot
 /**
  * Подглядываем символ в указанной позиции
  * (отсчет от начала текста, от 0).
+ * Движения по тексту не происходит.
  *
- * @param nav
- * @param position
- * @return
+ * @param nav Навигатор.
+ * @param position Предполагаемая позиция.
+ * @return Подсмотренный символ либо `NAV_EOT`,
+ * если позиция за пределами текста.
  */
 MAGNA_API int MAGNA_CALL nav_at
     (
@@ -180,12 +184,12 @@ MAGNA_API int MAGNA_CALL nav_at
 }
 
 /**
- * Первый символ в тексте.
+ * Самый первый символ в тексте.
  *
- * @param nav
- * @return
+ * @param nav Навигатор.
+ * @return Первый символ либо `NAV_EOT`, если текст пустой.
  */
-MAGNA_API int MAGNA_CALL nav_front
+MAGNA_API MAGNA_INLINE int MAGNA_CALL nav_front
     (
         const TextNavigator *nav
     )
@@ -196,10 +200,10 @@ MAGNA_API int MAGNA_CALL nav_front
 }
 
 /**
- * Последний символ в тексте.
+ * Самый последний символ в тексте.
  *
- * @param nav
- * @return
+ * @param nav Навигатор.
+ * @return Последний символ, либо `NAV_EOT`, если текст пустой.
  */
 MAGNA_API int MAGNA_CALL nav_back
     (
@@ -213,10 +217,12 @@ MAGNA_API int MAGNA_CALL nav_back
 
 /**
  * Заглядывание вперед на указанное количество символов.
+ * Движения по тексту не происходит.
  *
- * @param nav
- * @param distance
- * @return
+ * @param nav Навигатор.
+ * @param distance Предполагаемая дистанция.
+ * @return Подсмотренный символ либо `NAV_EOT`,
+ * если позиция выходит за пределы текста.
  */
 MAGNA_API int MAGNA_CALL nav_look_ahead
     (
@@ -224,21 +230,19 @@ MAGNA_API int MAGNA_CALL nav_look_ahead
         am_size_t distance
     )
 {
-    am_size_t newPos;
-
     assert (nav != NULL);
 
-    newPos = nav->position + distance;
-
-    return nav_at (nav, newPos);
+    return nav_at (nav, nav->position + distance);
 }
 
 /**
  * Заглядывание назад на указанное количество символов.
+ * Движения по тексту не происходит.
  *
- * @param nav
- * @param distance
- * @return
+ * @param nav Навигатор.
+ * @param distance Предполагаемая дистанция (положительное число).
+ * @return Подсмотренный символ либо `NAV_EOT`,
+ * если позиция выходит за пределы текста.
  */
 MAGNA_API int MAGNA_CALL nav_look_behind
     (
@@ -246,26 +250,23 @@ MAGNA_API int MAGNA_CALL nav_look_behind
         am_size_t distance
     )
 {
-    am_size_t newPos;
-
     assert (nav != NULL);
 
-    newPos = nav->position - distance;
-
-    return nav_at (nav, newPos);
+    return nav_at (nav, nav->position - distance);
 }
 
 /**
  * Перемещение по тексту вперед/назад.
  *
- * @param nav
- * @param distance
- * @return
+ * @param nav Навигатор.
+ * @param distance Предполагаемая дистанция (положительное число
+ * при движении вперед, отрицательное при движении назад).
+ * @return Навигатор.
  */
 MAGNA_API TextNavigator* MAGNA_CALL nav_move
     (
-            TextNavigator *nav,
-            am_ssize_t distance
+        TextNavigator *nav,
+        am_ssize_t distance
     )
 {
     assert (nav != NULL);
@@ -279,9 +280,11 @@ MAGNA_API TextNavigator* MAGNA_CALL nav_move
 
 /**
  * Подсматриваем текущий символ.
+ * Движения по тексту не происходит.
  *
- * @param nav
- * @return
+ * @param nav Навигатор.
+ * @return Подсмотренный символ либо `NAV_EOT`,
+ * если произошел выход за границы текста.
  */
 MAGNA_API int MAGNA_CALL nav_peek
     (
@@ -294,9 +297,12 @@ MAGNA_API int MAGNA_CALL nav_peek
 }
 
 /**
- * Подсматриваем текущий символ.
- * @param nav
- * @return
+ * Подсматриваем текущий символ (без учета перевода строки).
+ * Движения по тексту не происходит.
+ *
+ * @param nav Навигатор.
+ * @return Подсмотренный символ либо `NAV_EOT`,
+ * если произошел выход за границы текста.
  */
 MAGNA_API int MAGNA_CALL nav_peek_no_crlf
     (
@@ -335,14 +341,16 @@ MAGNA_API int MAGNA_CALL nav_read
     assert (nav != NULL);
 
     result = nav_at (nav, nav->position);
-    if (result == '\n') {
-        ++nav->line;
-        nav->column = 1;
+    if (result >= 0) {
+        if (result == '\n') {
+            ++nav->line;
+            nav->column = 0;
+        } else {
+            ++nav->column;
+        }
+
+        ++nav->position;
     }
-    else {
-        ++nav->column;
-    }
-    ++nav->position;
 
     return result;
 }
@@ -375,16 +383,16 @@ MAGNA_API int MAGNA_CALL nav_read_no_crlf
 
 /**
  * Подглядывание строки вплоть до указанной длины.
- * Движения не происходит.
+ * Движения по тексту не происходит.
  *
- * @param nav
- * @param length
+ * @param nav Навигатор.
+ * @param length Предполгаемая длина строки.
  * @return Подсмотренная строка (возможно, пустая).
  */
 MAGNA_API Span MAGNA_CALL nav_peek_string
     (
-            const TextNavigator *nav,
-            am_size_t length
+        const TextNavigator *nav,
+        am_size_t length
     )
 {
     int c;
@@ -407,10 +415,10 @@ MAGNA_API Span MAGNA_CALL nav_peek_string
 
 /**
  * Подглядывание вплоть до указанного символа (включая его).
- * Движения не происходит.
+ * Движения по тексту не происходит.
  *
- * @param nav
- * @param stopChar
+ * @param nav Навигатор.
+ * @param stopChar Стоп-символ.
  * @return Подсмотренная строка (возможно, пустая).
  */
 MAGNA_API Span MAGNA_CALL nav_peek_to
@@ -421,11 +429,12 @@ MAGNA_API Span MAGNA_CALL nav_peek_to
 {
     int c;
     am_size_t i, length;
-    Span result = SPAN_INIT;
+    Span result;
 
     assert (nav != NULL);
 
     result.ptr = (am_byte*) nav->data + nav->position;
+    result.len = 0;
     length = nav->length - nav->position;
     for (i = 0; i < length; ++i) {
         c = nav_look_ahead (nav, i);
@@ -440,10 +449,10 @@ MAGNA_API Span MAGNA_CALL nav_peek_to
 
 /**
  * Подглядывание вплоть до указанного символа (не включая его).
- * Движения не происходит.
+ * Движения по тексту не происходит.
  *
- * @param nav
- * @param stopChar
+ * @param nav Навигатор.
+ * @param stopChar Стоп-символ.
  * @return Подсмотренная строка (возможно, пустая).
  */
 MAGNA_API Span MAGNA_CALL nav_peek_until
@@ -454,17 +463,19 @@ MAGNA_API Span MAGNA_CALL nav_peek_until
 {
     int c;
     am_size_t i, length;
-    Span result = SPAN_INIT;
+    Span result;
 
     assert (nav != NULL);
 
     result.ptr = (am_byte*) nav->data + nav->position;
+    result.len = 0;
     length = nav->length - nav->position;
     for (i = 0; i < length; ++i) {
         c = nav_look_ahead (nav, i);
         if (c == stopChar) {
             break;
         }
+
         ++result.len;
     }
 
@@ -474,10 +485,10 @@ MAGNA_API Span MAGNA_CALL nav_peek_until
 /**
  * Считывание строки (вплоть до символа перевода строки).
  * Символ перевода строки считывается, но в результат не помещается.
- * Происходит движение вперед.
+ * Происходит движение вперед по тексту.
  *
- * @param nav
- * @return Считанная строка (возможно, пустая).
+ * @param nav Навигатор.
+ * @return Прочитанная строка (возможно, пустая).
  */
 MAGNA_API Span MAGNA_CALL nav_read_line
     (
@@ -486,11 +497,12 @@ MAGNA_API Span MAGNA_CALL nav_read_line
 {
     am_byte c;
     am_size_t start;
-    Span result = SPAN_INIT;
+    Span result;
 
     assert (nav != NULL);
 
     result.ptr = (am_byte*) nav->data + nav->position;
+    result.len = 0;
     start = nav->position;
     while (nav->position < nav->length) {
         c = nav->data[nav->position];
@@ -520,10 +532,11 @@ MAGNA_API Span MAGNA_CALL nav_read_line
 
 /**
  * Текущий символ -- управляющий?
- * Движения не происходит.
+ * Движения по тексту не происходит.
  *
- * @param nav
- * @return
+ * @param nav Навигатор.
+ * @return Результат проверки.
+ * Если достигнут конец текста, возвращается `AM_FALSE`.
  */
 MAGNA_API am_bool MAGNA_CALL nav_is_control
     (
@@ -541,10 +554,11 @@ MAGNA_API am_bool MAGNA_CALL nav_is_control
 
 /**
  * Текущий символ -- арабская цифра?
- * Движения не происходит.
+ * Движения по тексту не происходит.
  *
- * @param nav
- * @return
+ * @param nav Навигатор.
+ * @return Результат проверки.
+ * Если достигнут конец текста, возвращается `AM_FALSE`.
  */
 MAGNA_API am_bool MAGNA_CALL nav_is_digit
     (
@@ -562,10 +576,11 @@ MAGNA_API am_bool MAGNA_CALL nav_is_digit
 
 /**
  * Текущий символ -- буква латинского алфавита?
- * Движения не происходит.
+ * Движения по тексту не происходит.
  *
- * @param nav
- * @return
+ * @param nav Навигатор.
+ * @return Результат проверки.
+ * Если достигнут конец текста, возвращается `AM_FALSE`.
  */
 MAGNA_API am_bool MAGNA_CALL nav_is_letter
     (
@@ -583,10 +598,11 @@ MAGNA_API am_bool MAGNA_CALL nav_is_letter
 
 /**
  * Текущий символ -- пробельный?
- * Движения не происходит.
+ * Движения по тексту не происходит.
  *
- * @param nav
- * @return
+ * @param nav Навигатор.
+ * @return Результат проверки.
+ * Если достигнут конец текста, возвращается `AM_FALSE`.
  */
 MAGNA_API am_bool MAGNA_CALL nav_is_whitespace
     (
@@ -605,9 +621,10 @@ MAGNA_API am_bool MAGNA_CALL nav_is_whitespace
 
 /**
  * Чтение целого числа без знака.
- * Происходит движение вперед.
+ * Считываются все символы до первого нецифрового.
+ * Происходит движение вперед по тексту.
  *
- * @param nav
+ * @param nav Навигатор.
  * @return Прочитанная строка с числом (возможно, пустая).
  */
 MAGNA_API Span MAGNA_CALL nav_read_integer
@@ -615,11 +632,12 @@ MAGNA_API Span MAGNA_CALL nav_read_integer
         TextNavigator *nav
     )
 {
-    Span result = SPAN_INIT;
+    Span result;
 
     assert (nav != NULL);
 
     result.ptr = (am_byte*) nav->data + nav->position;
+    result.len = 0;
     while (nav_is_digit (nav)) {
         ++result.len;
         (void) nav_read (nav);
@@ -631,9 +649,10 @@ MAGNA_API Span MAGNA_CALL nav_read_integer
 /**
  * Извлечение целого числа без знака.
  * Сначала пропускаются все не-цифры,
- * затем считывается число (если возможно).
+ * затем считываются все цифры (если есть).
+ * Происходит движение вперед по тексту.
  *
- * @param nav
+ * @param nav Навигатор.
  * @return Прочитанная строка с числом (возможно, пустая).
  */
 MAGNA_API Span MAGNA_CALL nav_extract_integer
@@ -652,30 +671,32 @@ MAGNA_API Span MAGNA_CALL nav_extract_integer
 
 /**
  * Чтение строки вплоть до указанной длины.
- * Происходит движение вперед.
+ * Происходит движение вперед по тексту.
  *
- * @param nav
+ * @param nav Навигатор.
  * @param length Максимальная длина строки.
  * @return Прочитанная строка (возможно, пустая).
  */
 MAGNA_API Span MAGNA_CALL nav_read_string
     (
-            TextNavigator *nav,
-            am_size_t length
+        TextNavigator *nav,
+        am_size_t length
     )
 {
     int c;
     am_size_t i;
-    Span result = SPAN_INIT;
+    Span result;
 
     assert (nav != NULL);
 
     result.ptr = (am_byte*) nav->data + nav->position;
+    result.len = 0;
     for (i = 0; i < length; ++i) {
         c = nav_read (nav);
         if (c == NAV_EOT) {
             break;
         }
+
         ++result.len;
     }
 
@@ -685,7 +706,7 @@ MAGNA_API Span MAGNA_CALL nav_read_string
 /**
  * Считывание вплоть до указанного символа (не включая его).
  * Сам стоп-символ считывается, но в результат не помещается.
- * Происходит движение вперед.
+ * Происходит движение вперед по тексту.
  *
  * @param nav Навигатор.
  * @param stopChar Стоп-символ.
@@ -717,7 +738,7 @@ MAGNA_API Span MAGNA_CALL nav_read_to
 /**
  * Считывание вплоть до указанного символа (не включая его).
  * Сам стоп-символ остается не прочитанным.
- * Происходит движение вперед.
+ * Происходит движение вперед по тексту.
  *
  * @param nav Навигатор.
  * @param stopChar Стоп-символ.
@@ -782,8 +803,8 @@ MAGNA_API Span MAGNA_CALL nav_read_while
 }
 
 /**
- * Чтение слова.
- * Происходит двжиение вперед.
+ * Чтение слова из текста.
+ * Происходит двжиение вперед по тексту.
  *
  * @param nav Навигатор.
  * @return Прочитанное слово (возможно, пустое).
@@ -812,8 +833,8 @@ MAGNA_API Span MAGNA_CALL nav_read_word
 }
 
 /**
- * Получение непрочитанного остатка.
- * Движения не происходит.
+ * Получение непрочитанного остатка текста.
+ * Движения по тексту не происходит.
  *
  * @param nav Навигатор.
  * @return Непрочитанный фрагмент (возможно, пустой).
@@ -834,8 +855,8 @@ MAGNA_API Span MAGNA_CALL nav_remaining
 }
 
 /**
- * Преобразование в фрагмент.
- * Движения не происходит.
+ * Преобразование всего текста в навигаторе в фрагмент.
+ * Движения по тексту не происходит.
  *
  * @param nav Навигатор.
  * @return Фрагмент (возможно, пустой).
@@ -857,18 +878,18 @@ MAGNA_API Span MAGNA_CALL nav_to_span
 
 /**
  * Получение фрагмента заданного размера.
- * Движения не происходит.
+ * Движения по тексту не происходит.
  *
  * @param nav Навигатор.
  * @param offset Смечение от начала данных.
- * @param length Желаемая длина фрагмента.
+ * @param length Предполагаемая длина фрагмента.
  * @return Полученный фрагмент (возможно, пустой).
  */
 MAGNA_API Span MAGNA_CALL nav_slice
     (
-            const TextNavigator *nav,
-            am_size_t offset,
-            am_size_t size
+        const TextNavigator *nav,
+        am_size_t offset,
+        am_size_t size
     )
 {
     Span result;
@@ -883,16 +904,17 @@ MAGNA_API Span MAGNA_CALL nav_slice
 
 /**
  * Получение нескольких последних прочитанных символов.
- * Движения не происходит.
+ * Движения по тексту не происходит.
  *
  * @param nav Навигатор.
- * @param length Сколько символов надо.
+ * @param length Предполагаемая длина фрагмента с последними символами
+ * (положительное число).
  * @return Полученный фрагмент (возможно, пустой).
  */
 MAGNA_API Span MAGNA_CALL nav_recent
     (
-            const TextNavigator *nav,
-            am_ssize_t length
+        const TextNavigator *nav,
+        am_ssize_t length
     )
 {
     am_ssize_t start;
@@ -919,7 +941,7 @@ MAGNA_API Span MAGNA_CALL nav_recent
 
 /**
  * Пропуск символов, не входящих в слово.
- * Происходит движение вперед.
+ * Происходит движение вперед по тексту.
  *
  * @param nav Навигатор.
  */
@@ -943,8 +965,8 @@ MAGNA_API void MAGNA_CALL nav_skip_non_word
 }
 
 /**
- * Пропуск пробельных.
- * Происходит движение вперед.
+ * Пропуск пробельных символов.
+ * Происходит движение вперед по тексту.
  *
  * @param nav Навигатор.
  */
@@ -968,8 +990,8 @@ MAGNA_API void MAGNA_CALL nav_skip_whitespace
 }
 
 /**
- * Пропуск пробельных.
- * Происходит движение вперед.
+ * Пропуск символов пунктуации.
+ * Происходит движение вперед по тексту.
  *
  * @param nav Навигатор.
  */
@@ -994,9 +1016,11 @@ MAGNA_API void MAGNA_CALL nav_skip_punctuation
 
 /**
  * Считывание одного символа в кодировке UTF-8.
+ * Происходит движение вперед по тексту.
  *
- * @param nav
- * @return
+ * @param nav Навигатор.
+ * @return Прочитанный символ либо `NAV_EOT`,
+ * если достигнут конец текста.
  */
 MAGNA_API int MAGNA_CALL nav_read_utf8
     (

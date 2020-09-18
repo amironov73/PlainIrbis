@@ -113,7 +113,7 @@ MAGNA_API Buffer* choose_buffer
     va_start (args, first);
 
     while (AM_TRUE) {
-        next = va_arg (args, const Buffer *);
+        next = va_arg (args, const Buffer*);
         if (next != NULL && next->position != 0) {
             va_end (args);
             return (Buffer*) next;
