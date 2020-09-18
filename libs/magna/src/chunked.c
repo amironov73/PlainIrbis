@@ -24,6 +24,14 @@
  *
  * Владеет своей памятью.
  * Для освобождения ресурсов используйте `chunked_free`.
+ *
+ * Потоконебезопасный.
+ *
+ * Находится в одном из двух режимов: записи (сразу после создания)
+ * или чтения (переводится вызовом `chunked_rewind`). Совмещать эти
+ * режимы невозможно. Попытки чтения без вызова `chunked_rewind`
+ * приведут к неопределенному поведению. Повторный вызов `chunked_rewind`
+ * отмотает буфер к началу, это предусмотренное поведение.
  */
 
 /*=========================================================*/
@@ -92,8 +100,9 @@ static am_bool append_chunk
 /**
  * Инициализация буфера.
  *
- * @param chunked Буфер, подлежащий инициализации.
- * @param chunkSize Размер блока.
+ * @param chunked Указатель на ненинициализированную структуру.
+ * @param chunkSize Размер блока (<= означает "на усмотрение системы").
+ * @return Указатель на инициализированную структуру.
  */
 MAGNA_API ChunkedBuffer* MAGNA_CALL chunked_init
     (
@@ -139,7 +148,7 @@ MAGNA_API void MAGNA_CALL chunked_free
 }
 
 /**
- * Буфер пуст (при записи)?
+ * Прверка, пуст ли буфер (при записи)?
  *
  * @param chunked Указатель на буфер.
  * @return Результат проверки.
@@ -235,12 +244,15 @@ MAGNA_API am_size_t MAGNA_CALL chunked_position
 
     result = chunked->read;
     for (chunk = chunked->first; chunk != NULL; chunk = chunk->next) {
-        if (chunk != chunked->last) {
+        if (chunk == chunked->current) {
+            break;
+        }
+        else {
             result += chunked->chunkSize;
         }
     }
 
-    return 0;
+    return result;
 }
 
 /**
@@ -656,10 +668,10 @@ MAGNA_API am_ssize_t MAGNA_CALL chunked_all
     if (chunked->current != NULL) {
 
         /* У нас есть данные */
-        if (chunked->current == chunked->last) {
+        if (chunked->first == chunked->last) {
             /* Все поместилось в одном чанке */
             portion = chunked->position - chunked->read;
-            data = chunked->current->data + chunked->read;
+            data = chunked->first->data + chunked->read;
             if (!buffer_write (buffer, data, portion)) {
                 return -1;
             }
@@ -680,7 +692,7 @@ MAGNA_API am_ssize_t MAGNA_CALL chunked_all
 
             /* Теперь последующие чанки кроме последнего */
             for (
-                    chunk = chunked->current->next;
+                    chunk = chunked->first->next;
                     chunk != chunked->last;
                     chunk = chunk->next
                 ) {
@@ -1090,13 +1102,13 @@ MAGNA_API am_bool MAGNA_CALL chunked_close_function
         Stream *stream
     )
 {
-    Buffer *buffer;
+    ChunkedBuffer *buffer;
 
     assert (stream != NULL);
 
-    buffer = (Buffer *) stream->data;
+    buffer = (ChunkedBuffer *) stream->data;
     if (buffer != NULL) {
-        buffer_free (buffer);
+        chunked_free (buffer);
         stream->data = NULL;
     }
 
@@ -1124,7 +1136,7 @@ MAGNA_API am_bool MAGNA_CALL chunked_stream_create
         return AM_FALSE;
     }
 
-    chunked = (ChunkedBuffer*) calloc (1, sizeof (ChunkedBuffer));
+    chunked = (ChunkedBuffer*) mem_alloc (sizeof (ChunkedBuffer));
     if (chunked == NULL) {
         return AM_FALSE;
     }
@@ -1135,6 +1147,29 @@ MAGNA_API am_bool MAGNA_CALL chunked_stream_create
     stream->readFunction  = chunked_read_function;
     stream->writeFunction = chunked_write_function;
     stream->closeFunction = chunked_close_function;
+
+    return AM_TRUE;
+}
+
+/**
+ * Перемотка к началу, чтобы начать чтение.
+ *
+ * @param stream Указатель на буфер.
+ * @return Тот же указатель на буфер.
+ */
+MAGNA_API am_bool MAGNA_CALL chunked_stream_rewind
+    (
+        Stream *stream
+    )
+{
+    ChunkedBuffer *buffer;
+
+    assert (stream != NULL);
+
+    buffer = (ChunkedBuffer *) stream->data;
+    assert (buffer != NULL);
+
+    chunked_rewind (buffer);
 
     return AM_TRUE;
 }

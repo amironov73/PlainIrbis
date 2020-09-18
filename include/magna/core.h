@@ -752,6 +752,7 @@ MAGNA_API am_bool    MAGNA_CALL memory_stream_open     (Stream *stream, am_byte 
 MAGNA_API Span       MAGNA_CALL memory_stream_to_span  (const Stream *stream);
 MAGNA_API am_byte*   MAGNA_CALL memory_stream_to_text  (Stream *stream);
 MAGNA_API am_bool    MAGNA_CALL chunked_stream_create  (Stream *stream, am_size_t chunkSize);
+MAGNA_API am_bool    MAGNA_CALL chunked_stream_rewind  (Stream *stream);
 MAGNA_API am_bool    MAGNA_CALL file_stream_create     (Stream *stream, const char *filename);
 MAGNA_API am_bool    MAGNA_CALL file_stream_open_read  (Stream *stream, const char *filename);
 MAGNA_API am_bool    MAGNA_CALL file_stream_open_write (Stream *stream, const char *filename);
