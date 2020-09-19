@@ -3,6 +3,11 @@ language: cpp
 compiler: gcc
 sudo: required
 
+addons:
+  apt:
+    packages:
+       - valgrind
+
 script:
  - source ./build.sh
- - source ./runtests.sh
+ - valgrind artifacts/offline

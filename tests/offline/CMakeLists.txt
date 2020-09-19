@@ -15,6 +15,7 @@ set(CFiles
     src/ean.c
     src/enumertr.c
     src/intarray.c
+    src/io.c
     src/koi8r.c
     src/main.c
     src/memory.c

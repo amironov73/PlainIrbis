@@ -315,6 +315,45 @@ extern MAGNA_API MAGNA_INLINE am_handle MAGNA_CALL handle_from_value   (int valu
 
 /*=========================================================*/
 
+/* Свалка всех типов в одном union */
+
+typedef union {
+    void     *pointer;
+    am_byte   byte;
+    am_int16  int16;
+    am_int32  int32;
+    am_int64  int64;
+    am_uint16 uint16;
+    am_uint32 uint32;
+    am_uint64 uint64;
+    am_size_t size;
+
+    struct {
+        am_byte byte0;
+        am_byte byte1;
+        am_byte byte2;
+        am_byte byte3;
+        am_byte byte4;
+        am_byte byte5;
+        am_byte byte6;
+        am_byte byte7;
+    } eightBytes;
+
+    struct {
+        am_uint16 word0;
+        am_uint16 word1;
+        am_uint16 word2;
+        am_uint16 word3;
+    } fourWords;
+
+    struct {
+        am_uint32 dword0;
+        am_uint32 dword1;
+    } twoDwords;
+} am_mix;
+
+/*=========================================================*/
+
 MAGNA_API am_int32            magna_get_version     (void);
 MAGNA_API am_bool  MAGNA_CALL magna_require_version (am_int32 version);
 MAGNA_API am_bool             magna_on_windows      (void);
@@ -356,6 +395,15 @@ MAGNA_API MAGNA_INLINE am_size_t MAGNA_CALL max_size_t (am_size_t first, am_size
 MAGNA_API const char* choose_string (const char *first, ...);
 MAGNA_API Span        choose_span   (Span first, ...);
 MAGNA_API Buffer*     choose_buffer (const Buffer *first, ...);
+
+/*=========================================================*/
+
+/* Ввод-вывод */
+
+extern MAGNA_API MAGNA_INLINE am_uint16 MAGNA_CALL magna_ntohs     (am_uint16 value);
+extern MAGNA_API MAGNA_INLINE am_uint32 MAGNA_CALL magna_ntohl     (am_uint32 value);
+extern MAGNA_API              am_uint64 MAGNA_CALL irbis_decode_64 (am_uint32 junior, am_uint32 senior);
+extern MAGNA_API              void      MAGNA_CALL irbis_encode_64 (am_uint32 *buffer, am_uint64 value);
 
 /*=========================================================*/
 
