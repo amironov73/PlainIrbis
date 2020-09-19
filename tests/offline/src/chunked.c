@@ -755,6 +755,8 @@ TESTER(chunked_write_utf8_1)
     CHECK (chunked_write_utf8 (&buffer, 0x2661));
     CHECK (chunked_size (&buffer) == 3);
     CHECK (chunked_capacity (&buffer) == 1024);
+
+    chunked_free (&buffer);
 }
 
 TESTER(chunked_new_line_1)

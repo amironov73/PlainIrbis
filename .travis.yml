@@ -10,4 +10,4 @@ addons:
 
 script:
  - source ./build.sh
- - valgrind artifacts/offline
+ - valgrind --leak-check=full --leak-resolution=med --track-origins=yes --vgdb=no artifacts/offline

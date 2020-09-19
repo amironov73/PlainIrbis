@@ -146,7 +146,7 @@ MAGNA_API am_bool MAGNA_CALL array_create
     array->len = 0;
     array->capacity = capacity;
 
-    array->ptr = (void**) calloc (capacity, sizeof (void*));
+    array->ptr = (void**) mem_alloc (capacity * sizeof (void*));
     if (array->ptr == NULL) {
         return AM_FALSE;
     }

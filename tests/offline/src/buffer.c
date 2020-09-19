@@ -126,7 +126,10 @@ TESTER(buffer_concat_1)
     buffer2.position = buffer2.capacity;
     buffer_concat (&buffer3, &buffer1);
     buffer_concat (&buffer3, &buffer2);
+
     CHECK (buffer_compare_text (&buffer3, "Hello, world!"));
+
+    buffer_free (&buffer3);
 }
 
 TESTER(buffer_putc_1)
@@ -139,7 +142,10 @@ TESTER(buffer_putc_1)
     buffer_putc (&buffer, 'l');
     buffer_putc (&buffer, 'o');
     buffer_putc (&buffer, '!');
+
     CHECK (buffer_compare_text (&buffer, "Hello!") == 0);
+
+    buffer_free (&buffer);
 }
 
 TESTER(buffer_puts_1)
@@ -149,7 +155,10 @@ TESTER(buffer_puts_1)
     buffer_puts (&buffer, "Hello,");
     buffer_puts (&buffer, " ");
     buffer_puts (&buffer, "world!");
+
     CHECK (buffer_compare_text (&buffer, "Hello, world!") == 0);
+
+    buffer_free (&buffer);
 }
 
 TESTER(buffer_from_span_1)
@@ -159,6 +168,7 @@ TESTER(buffer_from_span_1)
     Buffer buffer;
 
     buffer_from_span (&buffer, span);
+
     CHECK (buffer.ptr == span.ptr);
     CHECK (buffer.position == 0);
     CHECK (buffer.capacity == span.len);
@@ -170,9 +180,12 @@ TESTER(buffer_assign_1)
     Buffer buffer = BUFFER_INIT;
 
     buffer_assign (&buffer, data, sizeof (data));
+
     CHECK (buffer.position == sizeof (data));
     CHECK (buffer.ptr[0] == 1);
     CHECK (buffer.ptr[6] == 7);
+
+    buffer_free (&buffer);
 }
 
 TESTER(buffer_calculate_size_1)
@@ -214,6 +227,8 @@ TESTER(buffer_from_text_1)
     CHECK (buffer_from_text (&buffer, NULL) == &buffer);
     CHECK (buffer.ptr[0] == 0);
     CHECK (buffer.position == 0);
+
+    buffer_free (&buffer);
 }
 
 TESTER(buffer_from_text_2)
@@ -223,6 +238,8 @@ TESTER(buffer_from_text_2)
 
     CHECK (buffer_from_text (&buffer, text) == &buffer);
     CHECK (buffer_compare_text (&buffer, text) == 0);
+
+    buffer_free (&buffer);
 }
 
 TESTER(buffer_compare_text_1)
@@ -236,6 +253,8 @@ TESTER(buffer_compare_text_1)
     CHECK (buffer_compare_text (&buffer, text2) < 0);
     CHECK (buffer_compare_text (&buffer, text3) > 0);
     CHECK (buffer_compare_text (&buffer, text4) < 0);
+
+    buffer_free (&buffer);
 }
 
 TESTER(buffer_compare_1)
@@ -248,6 +267,9 @@ TESTER(buffer_compare_1)
     CHECK (buffer_compare (&buffer1, &buffer1) == 0);
     CHECK (buffer_compare (&buffer2, &buffer2) == 0);
     CHECK (buffer_compare (&buffer1, &buffer2) > 0);
+
+    buffer_free (&buffer1);
+    buffer_free (&buffer2);
 }
 
 TESTER(buffer_compare_2)
@@ -258,6 +280,9 @@ TESTER(buffer_compare_2)
     CHECK (buffer_from_text (&buffer1, text1) == &buffer1);
     CHECK (buffer_from_text (&buffer2, text2) == &buffer2);
     CHECK (buffer_compare (&buffer1, &buffer2) < 0);
+
+    buffer_free (&buffer1);
+    buffer_free (&buffer2);
 }
 
 TESTER(buffer_read_1)
@@ -275,6 +300,7 @@ TESTER(buffer_read_2)
 
     CHECK (buffer_from_text (&buffer, "Hello, World!") == &buffer);
     buffer.position = 0;
+
     CHECK (buffer_read (&buffer, data, sizeof (data)) == sizeof (data));
     CHECK (data[0] == 'H');
     CHECK (data[1] == 'e');
@@ -286,6 +312,8 @@ TESTER(buffer_read_2)
     CHECK (data[7] == 'W');
     CHECK (data[8] == 'o');
     CHECK (data[9] == 'r');
+
+    buffer_free (&buffer);
 }
 
 TESTER(buffer_assign_text_1)

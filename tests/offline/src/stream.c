@@ -107,7 +107,9 @@ TESTER(memory_stream_to_span_1)
 
     CHECK (memory_stream_open (&memory, data, sizeof (data)));
     CHECK (stream_seek (&memory, sizeof (data)));
+
     span = memory_stream_to_span (&memory);
+
     CHECK (span.ptr == data);
     CHECK (span.len == sizeof (data));
     CHECK (stream_close (&memory));
@@ -122,7 +124,9 @@ TESTER(memory_stream_to_text_1)
 
     CHECK (memory_stream_create (&memory));
     CHECK (stream_write (&memory, text, length));
+
     data = memory_stream_to_text (&memory);
+
     CHECK (data != NULL);
     CHECK (strlen (data) == length);
     CHECK (strcmp (data, text) == 0);

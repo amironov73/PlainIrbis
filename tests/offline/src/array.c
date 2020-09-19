@@ -143,6 +143,8 @@ TESTER(array_set_1)
     p1 = (Canary*) array_get (&a1, 0);
     CHECK (p1 ->first == c1.first);
     CHECK (p1 ->second == c1.second);
+
+    array_free (&a1);
 }
 
 TESTER(array_clone_1)
@@ -238,6 +240,9 @@ TESTER(array_copy_1)
 
     CHECK (p1->first == c1.first);
     CHECK (p1->second == c1.second);
+
+    array_free (&a1);
+    array_free (&a2);
 }
 
 TESTER(array_concat_1)
@@ -275,4 +280,7 @@ TESTER(array_concat_1)
 
     CHECK (p1->first == c2.first);
     CHECK (p1->second == c2.second);
+
+    array_free (&a1);
+    array_free (&a2);
 }

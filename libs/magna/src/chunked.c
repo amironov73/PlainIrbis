@@ -1109,6 +1109,7 @@ MAGNA_API am_bool MAGNA_CALL chunked_close_function
     buffer = (ChunkedBuffer *) stream->data;
     if (buffer != NULL) {
         chunked_free (buffer);
+        mem_free (buffer);
         stream->data = NULL;
     }
 

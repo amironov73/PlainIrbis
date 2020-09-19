@@ -344,9 +344,15 @@ MAGNA_API am_bool MAGNA_CALL memory_close_function_1
         Stream *stream
     )
 {
+    Buffer *buffer;
+
     assert (stream != NULL);
 
-    stream->data = NULL;
+    buffer = (Buffer *) stream->data;
+    if (buffer != NULL) {
+        mem_free (buffer);
+        stream->data = NULL;
+    }
 
     return AM_TRUE;
 }
@@ -369,6 +375,7 @@ MAGNA_API am_bool MAGNA_CALL memory_close_function_2
     buffer = (Buffer *) stream->data;
     if (buffer != NULL) {
         buffer_free (buffer);
+        mem_free (buffer);
         stream->data = NULL;
     }
 
