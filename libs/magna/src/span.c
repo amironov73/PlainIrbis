@@ -42,6 +42,18 @@ MAGNA_API Span MAGNA_CALL span_init
 }
 
 /**
+ * Сверхпростая инициализация.
+ *
+ * @return Пустой спан.
+ */
+MAGNA_API MAGNA_INLINE Span span_null (void)
+{
+    Span result = { NULL, 0 };
+
+    return result;
+}
+
+/**
  * Инициализация строкой, завершающейся нулём.
  *
  * @param str Указатель на начало строки.
@@ -220,7 +232,7 @@ MAGNA_API Span MAGNA_CALL span_tolower
  * @param span Проверяемый спан.
  * @return Результат проверки.
  */
-MAGNA_API am_bool MAGNA_CALL span_is_empty
+MAGNA_API MAGNA_INLINE am_bool MAGNA_CALL span_is_empty
     (
         Span span
     )

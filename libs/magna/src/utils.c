@@ -281,6 +281,47 @@ MAGNA_API am_size_t MAGNA_CALL max_size_t
     return first > second ? first : second;
 }
 
+/**
+ * Знак целого числа.
+ *
+ * @param value Изучаемое значение.
+ * @return -1, если отрицательное, 1 если положительное, иначе 0.
+ */
+MAGNA_API MAGNA_INLINE int MAGNA_CALL magna_sign_int
+    (
+        int value
+    )
+{
+    return value > 0 ? 1 : (value < 0) ? -1 : 0;
+}
+
+/**
+ * Знак целого числа.
+ *
+ * @param value Изучаемое значение.
+ * @return -1, если отрицательное, 1 если положительное, иначе 0.
+ */
+MAGNA_API MAGNA_INLINE int MAGNA_CALL magna_sign_int32
+    (
+        am_int32 value
+    )
+{
+    return value > 0 ? 1 : (value < 0) ? -1 : 0;
+}
+
+/**
+ * Знак целого числа.
+ *
+ * @param value Изучаемое значение.
+ * @return -1, если отрицательное, 1 если положительное, иначе 0.
+ */
+MAGNA_API MAGNA_INLINE int MAGNA_CALL magna_sign_int64
+    (
+        am_int64 value
+    )
+{
+    return value > 0 ? 1 : (value < 0) ? -1 : 0;
+}
 
 /*=========================================================*/
 

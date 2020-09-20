@@ -20,6 +20,7 @@ set(CFiles
     src/main.c
     src/memory.c
     src/navigatr.c
+    src/number.c
     src/path.c
     src/retry.c
     src/span.c

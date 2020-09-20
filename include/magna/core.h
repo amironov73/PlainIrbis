@@ -381,16 +381,19 @@ MAGNA_API void print_error   (void);
 
 /* Мелкие утилиты */
 
-MAGNA_API MAGNA_INLINE am_int32  MAGNA_CALL min_int32  (am_int32  first, am_int32  second);
-MAGNA_API MAGNA_INLINE am_int32  MAGNA_CALL max_int32  (am_int32  first, am_int32  second);
-MAGNA_API MAGNA_INLINE am_int32  MAGNA_CALL min_uint32 (am_uint32 first, am_uint32 second);
-MAGNA_API MAGNA_INLINE am_uint32 MAGNA_CALL max_uint32 (am_uint32 first, am_uint32 second);
-MAGNA_API MAGNA_INLINE am_int64  MAGNA_CALL min_int64  (am_int64  first, am_int64  second);
-MAGNA_API MAGNA_INLINE am_int64  MAGNA_CALL max_int64  (am_int64  first, am_int64  second);
-MAGNA_API MAGNA_INLINE am_uint64 MAGNA_CALL min_uint64 (am_uint64 first, am_uint64 second);
-MAGNA_API MAGNA_INLINE am_uint64 MAGNA_CALL max_uint64 (am_uint64 first, am_uint64 second);
-MAGNA_API MAGNA_INLINE am_size_t MAGNA_CALL min_size_t (am_size_t first, am_size_t second);
-MAGNA_API MAGNA_INLINE am_size_t MAGNA_CALL max_size_t (am_size_t first, am_size_t second);
+MAGNA_API MAGNA_INLINE am_int32  MAGNA_CALL min_int32        (am_int32  first, am_int32  second);
+MAGNA_API MAGNA_INLINE am_int32  MAGNA_CALL max_int32        (am_int32  first, am_int32  second);
+MAGNA_API MAGNA_INLINE am_int32  MAGNA_CALL min_uint32       (am_uint32 first, am_uint32 second);
+MAGNA_API MAGNA_INLINE am_uint32 MAGNA_CALL max_uint32       (am_uint32 first, am_uint32 second);
+MAGNA_API MAGNA_INLINE am_int64  MAGNA_CALL min_int64        (am_int64  first, am_int64  second);
+MAGNA_API MAGNA_INLINE am_int64  MAGNA_CALL max_int64        (am_int64  first, am_int64  second);
+MAGNA_API MAGNA_INLINE am_uint64 MAGNA_CALL min_uint64       (am_uint64 first, am_uint64 second);
+MAGNA_API MAGNA_INLINE am_uint64 MAGNA_CALL max_uint64       (am_uint64 first, am_uint64 second);
+MAGNA_API MAGNA_INLINE am_size_t MAGNA_CALL min_size_t       (am_size_t first, am_size_t second);
+MAGNA_API MAGNA_INLINE am_size_t MAGNA_CALL max_size_t       (am_size_t first, am_size_t second);
+MAGNA_API MAGNA_INLINE int       MAGNA_CALL magna_sign_int   (int value);
+MAGNA_API MAGNA_INLINE int       MAGNA_CALL magna_sign_int32 (am_int32 value);
+MAGNA_API MAGNA_INLINE int       MAGNA_CALL magna_sign_int64 (am_int64 value);
 
 MAGNA_API const char* choose_string (const char *first, ...);
 MAGNA_API Span        choose_span   (Span first, ...);
@@ -456,6 +459,7 @@ extern MAGNA_API MAGNA_INLINE Span       MAGNA_CALL span_init             (const
 extern MAGNA_API              am_ssize_t MAGNA_CALL span_index_of         (Span span, am_byte value);
 extern MAGNA_API MAGNA_INLINE am_bool    MAGNA_CALL span_is_empty         (Span span);
 extern MAGNA_API              am_ssize_t MAGNA_CALL span_last_index_of    (Span span, am_byte value);
+extern MAGNA_API MAGNA_INLINE Span                  span_null             (void);
 extern MAGNA_API MAGNA_INLINE Span       MAGNA_CALL span_slice            (Span span, am_ssize_t start, am_ssize_t length);
 extern MAGNA_API              am_bool    MAGNA_CALL span_split_by_char    (Span span, SpanArray *array, am_byte value);
 extern MAGNA_API              am_bool    MAGNA_CALL span_split_by_chars   (Span span, SpanArray *array, const am_byte *values, am_size_t valueCount);
@@ -604,6 +608,7 @@ MAGNA_API Buffer*        MAGNA_CALL buffer_init           (Buffer *buffer);
 MAGNA_API am_bool        MAGNA_CALL buffer_new_line       (Buffer *buffer);
 MAGNA_API Buffer*        MAGNA_CALL buffer_null           (Buffer *buffer);
 MAGNA_API am_bool        MAGNA_CALL buffer_put_uint_32    (Buffer *buffer, am_uint32 value);
+MAGNA_API am_bool        MAGNA_CALL buffer_put_uint_64    (Buffer *buffer, am_uint64 value);
 MAGNA_API am_bool        MAGNA_CALL buffer_putc           (Buffer *buffer, char c);
 MAGNA_API am_bool        MAGNA_CALL buffer_puts           (Buffer *buffer, const char *str);
 MAGNA_API am_size_t      MAGNA_CALL buffer_read           (Buffer *buffer, am_byte *data, am_size_t length);
@@ -765,6 +770,26 @@ typedef struct {
 
 } NumberText;
 
+extern MAGNA_API              int                    MAGNA_CALL ntc_compare         (const NumberTextChunk *first, const NumberTextChunk *second);
+extern MAGNA_API              void                   MAGNA_CALL ntc_free            (NumberTextChunk *chunk);
+extern MAGNA_API MAGNA_INLINE am_bool                MAGNA_CALL ntc_have_prefix     (const NumberTextChunk *chunk);
+extern MAGNA_API              void                   MAGNA_CALL ntc_init            (NumberTextChunk *chunk);
+extern MAGNA_API              am_bool                MAGNA_CALL ntc_setup           (NumberTextChunk *chunk, Span prefix, Span number);
+extern MAGNA_API              am_bool                MAGNA_CALL ntc_to_string       (const NumberTextChunk *chunk, Buffer *output);
+
+extern MAGNA_API              am_bool                MAGNA_CALL number_append       (NumberText *number, Span prefix, am_int64 value, int length);
+extern MAGNA_API              NumberTextChunk*       MAGNA_CALL number_append_chunk (NumberText *number);
+extern MAGNA_API              int                    MAGNA_CALL number_compare      (const NumberText *first, const NumberText *second);
+extern MAGNA_API              void                   MAGNA_CALL number_free         (NumberText *number);
+extern MAGNA_API              const NumberTextChunk* MAGNA_CALL number_get_chunk    (const NumberText *number, am_size_t index);
+extern MAGNA_API              NumberText*            MAGNA_CALL number_increment    (NumberText *number);
+extern MAGNA_API              NumberText*            MAGNA_CALL number_increment_ex (NumberText *number, am_size_t index, am_int64 delta);
+extern MAGNA_API              NumberText*            MAGNA_CALL number_init         (NumberText *number);
+extern MAGNA_API MAGNA_INLINE const NumberTextChunk* MAGNA_CALL number_last         (const NumberText *number);
+extern MAGNA_API              am_bool                MAGNA_CALL number_parse        (NumberText *number, Span text);
+extern MAGNA_API MAGNA_INLINE am_size_t              MAGNA_CALL number_size         (const NumberText *number);
+extern MAGNA_API              am_bool                MAGNA_CALL number_to_string    (const NumberText *number, Buffer *output);
+
 /*=========================================================*/
 
 /* Простая абстракция потока */
@@ -856,6 +881,7 @@ MAGNA_API am_bool MAGNA_CALL path_set_current_directory   (const Buffer *path);
 /* Работа со строками */
 
 MAGNA_API am_uint32   MAGNA_CALL fastParse32      (const am_byte *text, am_size_t length);
+MAGNA_API am_uint64   MAGNA_CALL fastParse64      (const am_byte *text, am_size_t length);
 MAGNA_API am_bool     MAGNA_CALL same_char        (int first, int second);
 MAGNA_API am_bool     MAGNA_CALL same_text        (const char *first, const char *second);
 MAGNA_API char*       MAGNA_CALL str_dup          (const char *text);

@@ -173,6 +173,28 @@ MAGNA_API am_uint32 MAGNA_CALL fastParse32
 }
 
 /**
+ * Быстрый грязный разбор 64-битного целого без знака.
+ *
+ * @param text
+ * @param length
+ * @return
+ */
+MAGNA_API am_uint64 MAGNA_CALL fastParse64
+    (
+        const am_byte *text,
+        am_size_t length
+    )
+{
+    am_uint64 result = 0;
+
+    while (length--) {
+        result = result * 10 + (*text++ - '0');
+    }
+
+    return result;
+}
+
+/**
  * Копия строки в куче. Освобождать должен вызывающий.
  *
  * @param text

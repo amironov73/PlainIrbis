@@ -4,14 +4,15 @@
 
 .PHONY: all clean
 
-LIBRARY_NAME := libmagna.a
-PWD          := $(shell pwd)
-SRCDIR       := $(PWD)/src
-OBJDIR       := $(PWD)/obj
-BINDIR       := $(PWD)/bin
-INCLUDE_DIR1 := $(PWD)/../include
-INCLUDE_DIR2 := $(PWD)/../../include
-TARGET       := $(BINDIR)/$(LIBRARY_NAME)
+APPLICATION_NAME := offline
+PWD              := $(shell pwd)
+SRCDIR           := $(PWD)/src
+OBJDIR           := $(PWD)/obj
+BINDIR           := $(PWD)/bin
+INCLUDE_DIR1     := $(PWD)/include
+INCLUDE_DIR2     := $(PWD)/../../include
+LIBRARIES        := $(PWD)/../../libs/magna/bin/libmagna.a $(PWD)/../../libs/irbis/bin/libirbis.a
+TARGET           := $(BINDIR)/$(APPLICATION_NAME)
 
 AR     := ar
 CC     := gcc
@@ -27,9 +28,9 @@ all: $(TARGET)
 clean:
 	rm -rf $(TARGET) $(OBJECT_FILES)
 
-$(TARGET): $(OBJECT_FILES)
+$(TARGET): $(OBJECT_FILES) $(LIBRARIES)
 	mkdir -p $(BINDIR)
-	$(AR) rcs $@ $(OBJECT_FILES)
+	$(CC) -o $@ $^
 
 $(OBJECT_FILES): $(OBJDIR)/%.o : $(SRCDIR)/%.c $(INCLUDE_FILES1) $(INCLUDE_FILES2)
 	mkdir -p $(OBJDIR)

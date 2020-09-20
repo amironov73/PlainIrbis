@@ -1,38 +1,36 @@
-#
+#########################
 # Network client library
-#
-
-AR	:= ar
-CC	:= gcc
-CFLAGS	:= -Wall -Wextra -O2 -Wno-unknown-pragmas -I ../include -I ../../include
-
-SRCDIR	:= src
-OBJDIR	:= obj
-BINDIR	:= bin
-
-TARGETS	:= $(BINDIR)/libirbis.a
-
-SOURCES	:= src/connect.c src/dll.c src/ean.c src/error.c src/field.c src/format.c \
-src/guard.c src/ini.c src/isbn.c iso2709.c src/menu.c src/query.c src/record.c \
-src/response.c src/search.c src/spec.c src/subfield.c src/tree.c src/upc.c \
-src/version.c src/xrf.c
-
-OBJ	:= obj/connect.o obj/dll.o obj/ean.o obj/error.o obj/field.o obj/format.o \
-obj/guard.o obj/ini.o obj/isbn.o obj/iso2709.o obj/menu.o obj/query.o obj/record.o \
-obj/response.o obj/search.o obj/spec.o obj/subfield.o obj/tree.o obj/upc.o \
-obj/version.o obj/xrf.o
+#########################
 
 .PHONY: all clean
 
-all: $(TARGETS)
+LIBRARY_NAME := libirbis.a
+PWD          := $(shell pwd)
+SRCDIR       := $(PWD)/src
+OBJDIR       := $(PWD)/obj
+BINDIR       := $(PWD)/bin
+INCLUDE_DIR1 := $(PWD)/../include
+INCLUDE_DIR2 := $(PWD)/../../include
+TARGET       := $(BINDIR)/$(LIBRARY_NAME)
+
+AR     := ar
+CC     := gcc
+CFLAGS := -Wall -Wextra -O2 -Wno-unknown-pragmas -I $(INCLUDE_DIR1) -I $(INCLUDE_DIR2)
+
+INCLUDE_FILES1 := $(shell ls $(INCLUDE_DIR1)/*.h)
+INCLUDE_FILES2 := $(shell ls $(INCLUDE_DIR2)/magna/*.h)
+SOURCE_FILES   := $(shell ls $(SRCDIR)/*.c)
+OBJECT_FILES   := $(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.o, $(SOURCE_FILES))
+
+all: $(TARGET)
 
 clean:
-	rm -rf $(TARGETS) $(OBJDIR)
+	rm -rf $(TARGET) $(OBJECT_FILES)
 
-$(OBJ): $(OBJDIR)/%.o : $(SRCDIR)/%.c
-	-mkdir $(OBJDIR)
+$(TARGET): $(OBJECT_FILES)
+	mkdir -p $(BINDIR)
+	$(AR) rcs $@ $(OBJECT_FILES)
+
+$(OBJECT_FILES): $(OBJDIR)/%.o : $(SRCDIR)/%.c $(INCLUDE_FILES1) $(INCLUDE_FILES2)
+	mkdir -p $(OBJDIR)
 	$(CC) -c -o $@ $< $(CFLAGS)
-
-$(BINDIR)/libirbis.a: $(OBJ)
-	-mkdir $(BINDIR)
-	$(AR) rcs $@ $(OBJ)

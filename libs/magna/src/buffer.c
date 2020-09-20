@@ -931,6 +931,28 @@ MAGNA_API am_bool MAGNA_CALL buffer_put_uint_32
     return buffer_puts (buffer, temp);
 }
 
+/**
+ * Добавление в буфер целого числа без знака.
+ *
+ * @param buffer Буфер.
+ * @param value Целое число.
+ * @return Признак успешности завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL buffer_put_uint_64
+    (
+        Buffer *buffer,
+        am_uint64 value
+    )
+{
+    am_byte temp [64];
+
+    assert (buffer != NULL);
+
+    sprintf (temp, "%llu", value);
+
+    return buffer_puts (buffer, temp);
+}
+
 /*=========================================================*/
 
 #include "warnpop.h"
