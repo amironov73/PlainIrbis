@@ -66,9 +66,13 @@ MAGNA_API MAGNA_INLINE am_uint16 MAGNA_CALL magna_ntohs
 
 #if defined(__GCC__) || defined(__GNUC__) || defined(__CLANG__)
 
+#ifndef __APPLE__
+
     return __rolw (value, 8);
 
 #define IMPLEMENTED
+
+#endif
 
 #endif
 
@@ -94,9 +98,13 @@ MAGNA_API MAGNA_INLINE am_uint32 MAGNA_CALL magna_ntohl
 
 #if defined(_MSC_VER) || defined(__GCC__) || defined(__GNUC__) || defined(__CLANG__)
 
+#ifndef __APPLE__
+
     return _rotr (value & 0x00FF00FFu, 8) | _rotl (value &0xFF00FF00u, 8);
 
 #define IMPLEMENTED
+
+#endif
 
 #endif
 

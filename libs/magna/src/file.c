@@ -103,7 +103,7 @@ MAGNA_API am_handle MAGNA_CALL file_create
 
 #if defined (MAGNA_APPLE) || defined (MAGNA_FREEBSD) || defined (MAGNA_ANDROID)
 
-    result = open (fileName, flags, mode);
+    result.value = open (fileName, flags, mode);
 
 #else
 
@@ -159,7 +159,7 @@ MAGNA_API am_handle MAGNA_CALL file_open_read
 
 #if defined (MAGNA_APPLE) || defined (MAGNA_FREEBSD) || defined (MAGNA_ANDROID)
 
-    result = open (fileName, flags);
+    result.value = open (fileName, flags);
 
 #else
 
@@ -215,7 +215,7 @@ MAGNA_API am_handle MAGNA_CALL file_open_write
 
 #if defined (MAGNA_APPLE) || defined (MAGNA_FREEBSD) || defined (MAGNA_ANDROID)
 
-    result = open (fileName, flags);
+    result.value = open (fileName, flags);
 
 #else
 
@@ -682,7 +682,7 @@ MAGNA_API am_bool MAGNA_CALL file_exist
         return AM_FALSE;
     }
 
-    return (info.st_mode & S_IFREG != 0);
+    return (info.st_mode & S_IFREG) != 0;
 
 #else
 
@@ -757,7 +757,7 @@ MAGNA_API am_bool MAGNA_CALL directory_exist
         return AM_FALSE;
     }
 
-    return (info.st_mode & S_IFDIR != 0);
+    return (info.st_mode & S_IFDIR) != 0;
 
 #else
 
