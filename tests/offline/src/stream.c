@@ -132,3 +132,198 @@ TESTER(memory_stream_to_text_1)
     CHECK (strcmp (data, text) == 0);
     CHECK (stream_close (&memory));
 }
+
+TESTER(texter_init_1)
+{
+    Stream memory;
+    StreamTexter texter;
+
+    CHECK (memory_stream_create (&memory));
+    CHECK (texter_init (&texter, &memory, 0));
+    CHECK (texter.stream == &memory);
+    CHECK (texter.position == 0);
+    CHECK (texter.buffer.position == 0);
+    CHECK (texter.buffer.capacity != 0);
+    CHECK (texter.buffer.ptr != NULL);
+
+    texter_free (&texter);
+}
+
+TESTER(texter_init_2)
+{
+    Stream memory;
+    StreamTexter texter;
+    am_byte *text = "Hello World";
+    am_ssize_t length = strlen (text);
+
+    CHECK (memory_stream_open (&memory, text, strlen (text)));
+    CHECK (texter_init (&texter, &memory, 0));
+    CHECK (texter.stream == &memory);
+    CHECK (texter.position == 0);
+    CHECK (texter.buffer.position == 0);
+    CHECK (texter.buffer.capacity != 0);
+    CHECK (texter.buffer.ptr != NULL);
+
+    texter_free (&texter);
+}
+
+TESTER(texter_read_byte_1)
+{
+    Stream memory;
+    StreamTexter texter;
+    int chr;
+
+    CHECK (memory_stream_create (&memory));
+    CHECK (texter_init (&texter, &memory, 0));
+
+    chr = texter_read_byte (&texter);
+    CHECK (chr == 0);
+    CHECK (texter.eot);
+
+    texter_free (&texter);
+}
+
+TESTER(texter_read_byte_2)
+{
+    Stream memory;
+    StreamTexter texter;
+    am_byte *text = "Hello World";
+
+    CHECK (memory_stream_open (&memory, text, strlen (text)));
+    CHECK (texter_init (&texter, &memory, 0));
+
+    CHECK (texter_read_byte (&texter) == 'H');
+    CHECK (texter_read_byte (&texter) == 'e');
+    CHECK (texter_read_byte (&texter) == 'l');
+    CHECK (texter_read_byte (&texter) == 'l');
+    CHECK (texter_read_byte (&texter) == 'o');
+    CHECK (texter_read_byte (&texter) == ' ');
+    CHECK (texter_read_byte (&texter) == 'W');
+    CHECK (texter_read_byte (&texter) == 'o');
+    CHECK (texter_read_byte (&texter) == 'r');
+    CHECK (texter_read_byte (&texter) == 'l');
+    CHECK (texter_read_byte (&texter) == 'd');
+    CHECK (texter_read_byte (&texter) == 0);
+    CHECK (texter.eot);
+
+    texter_free (&texter);
+}
+
+TESTER(texter_read_line_1)
+{
+    Stream memory;
+    StreamTexter texter;
+    Buffer line = BUFFER_INIT;
+
+    CHECK (memory_stream_create (&memory));
+    CHECK (texter_init (&texter, &memory, 0));
+
+    CHECK (texter_read_line (&texter, &line) == 0);
+    CHECK (line.position == 0);
+    CHECK (texter.eot);
+
+    texter_free (&texter);
+    buffer_free (&line);
+}
+
+TESTER(texter_read_line_2)
+{
+    Stream memory;
+    StreamTexter texter;
+    am_byte *text = "Hello World";
+    Buffer line = BUFFER_INIT;
+    am_size_t length = strlen (text);
+
+    CHECK (memory_stream_open (&memory, text, length));
+    CHECK (texter_init (&texter, &memory, 0));
+
+    CHECK (texter_read_line (&texter, &line) == length);
+    CHECK (line.position == length);
+
+    texter_free (&texter);
+    buffer_free (&line);
+}
+
+TESTER(texter_read_line_3)
+{
+    Stream memory;
+    StreamTexter texter;
+    am_byte *text = "Hello\r\nWorld!";
+    Buffer line = BUFFER_INIT;
+    am_size_t length = strlen (text);
+
+    CHECK (memory_stream_open (&memory, text, length));
+    CHECK (texter_init (&texter, &memory, 0));
+
+    CHECK (texter_read_line (&texter, &line) == 5);
+    CHECK (line.position == 5);
+
+    buffer_clear (&line);
+    CHECK (texter_read_line (&texter, &line) == 6);
+    CHECK (line.position == 6);
+
+    texter_free (&texter);
+    buffer_free (&line);
+}
+
+TESTER(texter_read_line_4)
+{
+    Stream memory;
+    StreamTexter texter;
+    am_byte *text = "Hello\nWorld!";
+    Buffer line = BUFFER_INIT;
+    am_size_t length = strlen (text);
+
+    CHECK (memory_stream_open (&memory, text, length));
+    CHECK (texter_init (&texter, &memory, 0));
+
+    CHECK (texter_read_line (&texter, &line) == 5);
+    CHECK (line.position == 5);
+
+    buffer_clear (&line);
+    CHECK (texter_read_line (&texter, &line) == 6);
+    CHECK (line.position == 6);
+
+    texter_free (&texter);
+    buffer_free (&line);
+}
+
+TESTER(texter_read_line_5)
+{
+    Stream memory;
+    StreamTexter texter;
+    am_byte *text = "Hello\rWorld!";
+    Buffer line = BUFFER_INIT;
+    am_size_t length = strlen (text);
+
+    CHECK (memory_stream_open (&memory, text, length));
+    CHECK (texter_init (&texter, &memory, 0));
+
+    CHECK (texter_read_line (&texter, &line) == 5);
+    CHECK (line.position == 5);
+
+    buffer_clear (&line);
+    CHECK (texter_read_line (&texter, &line) == 6);
+    CHECK (line.position == 6);
+
+    texter_free (&texter);
+    buffer_free (&line);
+}
+
+TESTER(texter_read_line_6)
+{
+    Stream memory;
+    StreamTexter texter;
+    am_byte *text = "Hello\r";
+    Buffer line = BUFFER_INIT;
+    am_size_t length = strlen (text);
+
+    CHECK (memory_stream_open (&memory, text, length));
+    CHECK (texter_init (&texter, &memory, 0));
+
+    CHECK (texter_read_line (&texter, &line) == 5);
+    CHECK (line.position == 5);
+
+    texter_free (&texter);
+    buffer_free (&line);
+}

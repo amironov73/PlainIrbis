@@ -3,9 +3,9 @@
 
 #include "magna/core.h"
 
-/* ReSharper disable StringLiteralTypo */
-/* ReSharper disable IdentifierTypo */
-/* ReSharper disable CommentTypo */
+// ReSharper disable StringLiteralTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable CommentTypo
 
 /*=========================================================*/
 
@@ -139,6 +139,25 @@ MAGNA_API am_bool MAGNA_CALL stream_close
     }
 
     return AM_TRUE;
+}
+
+/**
+ * Запись строки в поток.
+ *
+ * @param stream Поток.
+ * @param text Строка.
+ * @return Признак успешности завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL stream_write_line
+    (
+        Stream *stream,
+        const char *text
+    )
+{
+    assert (stream != NULL);
+    assert (text != NULL);
+
+    return stream_write (stream, text, strlen (text));
 }
 
 /**
@@ -574,6 +593,159 @@ MAGNA_API am_bool MAGNA_CALL broken_stream_open
     stream->closeFunction = broken_close_function;
 
     return AM_TRUE;
+}
+
+/*=========================================================*/
+
+/* Работа с текстом в потоке */
+
+/**
+ * Инициализация текстора.
+ *
+ * @param texter Указатель на неинициализированную структуру.
+ * @param stream Поток.
+ * @param bufsize Размер буфера (0 означает "использовать значение по умолчанию).
+ * @return Признак успешности завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL texter_init
+    (
+        StreamTexter *texter,
+        Stream *stream,
+        am_size_t bufsize
+    )
+{
+    assert (texter != NULL);
+    assert (stream != NULL);
+
+    if (bufsize == 0) {
+        bufsize = 512;
+    }
+
+    texter->stream = stream;
+    texter->position = 0;
+    texter->eot = AM_FALSE;
+    buffer_init (&texter->buffer);
+
+    return buffer_grow (&texter->buffer, bufsize);
+}
+
+/**
+ * Освобождение ресурсов.
+ *
+ * @param texter Текстор.
+ */
+MAGNA_API void MAGNA_CALL texter_free
+    (
+        StreamTexter *texter
+    )
+{
+    assert (texter != NULL);
+
+    buffer_free (&texter->buffer);
+    if (texter->stream != NULL) {
+        stream_close (texter->stream);
+    }
+}
+
+/**
+ * Чтение из потока одного байта.
+ *
+ * @param texter Текстор.
+ * @return Прочитанный байт либо -1, что означает ошибку.
+ * При достижении конца потока выставляется флаг `eot`.
+ */
+MAGNA_API int MAGNA_CALL texter_read_byte
+    (
+        StreamTexter *texter
+    )
+{
+    am_ssize_t rc;
+    Buffer *buffer;
+    int chr;
+
+    assert (texter != NULL);
+
+    buffer = &texter->buffer;
+    if (texter->position >= buffer->position) {
+        buffer->position = 0;
+        rc = stream_read (texter->stream, buffer->ptr, buffer->capacity);
+        if (rc < 0) {
+            return -1;
+        }
+
+        if (rc == 0) {
+            texter->eot = AM_TRUE;
+            return 0;
+        }
+
+        buffer->position = rc;
+        texter->position = 0;
+    }
+
+    chr = buffer->ptr [texter->position++];
+
+    return chr;
+}
+
+/**
+ * Чтение строки из потока.
+ *
+ * @param texter Текстор.
+ * @param output Буфер для размещения результата.
+ * @return Длина прочитанной строки: <0 -- возника ошибка,
+ * =0 -- достигнут конец потока.
+ */
+MAGNA_API am_ssize_t MAGNA_CALL texter_read_line
+    (
+        StreamTexter *texter,
+        Buffer *output
+    )
+{
+    am_ssize_t result = 0;
+    am_byte chr;
+
+    assert (texter != NULL);
+    assert (output != NULL);
+
+    while (AM_TRUE) {
+        chr = texter_read_byte (texter);
+        if (texter->eot) {
+            break;
+        }
+
+        if (chr < 0) {
+            return -1;
+        }
+
+        if (chr == '\n') {
+            break;
+        }
+
+        if (chr == '\r') {
+            chr = texter_read_byte (texter);
+            if (texter->eot) {
+                break;
+            }
+
+            if (chr < 0) {
+                return -1;
+            }
+
+            if (chr != '\n') {
+                --texter->position;
+            }
+
+            break;
+        }
+
+        if (!buffer_putc (output, (char) chr)) {
+            return -1;
+        }
+
+        ++result;
+    }
+
+    return result;
 }
 
 /*=========================================================*/

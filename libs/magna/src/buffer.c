@@ -13,6 +13,7 @@
 
 /*=========================================================*/
 
+#include <ctype.h>
 #include <assert.h>
 
 /*=========================================================*/
@@ -658,9 +659,10 @@ MAGNA_API am_bool MAGNA_CALL buffer_replace_text
 /**
  * Побайтовое сравнение двух буферов.
  *
- * @param first
- * @param second
- * @return
+ * @param first Первый буфер.
+ * @param second Второй буфер.
+ * @return Результат сравнения: <0, если первый буфер меньше,
+ * >0, если первый буфер больше, =0, если содержимое буферов совпадает.
  */
 MAGNA_API int MAGNA_CALL buffer_compare
     (
@@ -695,11 +697,90 @@ MAGNA_API int MAGNA_CALL buffer_compare
 }
 
 /**
+ * Побайтовое сравнение буфера и спана.
+ *
+ * @param buffer Первый буфер.
+ * @param span Спан.
+ * @return Результат сравнения: <0, если буфер меньше,
+ * >0, если буфер больше, =0, если содержимое буфера и спана совпадает.
+ */
+MAGNA_API int MAGNA_CALL buffer_compare_span
+    (
+        const Buffer *buffer,
+        Span span
+    )
+{
+    am_size_t i;
+    int result;
+
+    assert (buffer != NULL);
+
+    for (i = 0; ; ++i) {
+        if (i == buffer->position) {
+            if (i == span.len) {
+                return 0;
+            }
+
+            return -1;
+        }
+        else if (i == span.len) {
+                return 1;
+            }
+        else {
+            result = buffer->ptr[i] - span.ptr[i];
+            if (result != 0) {
+                return result;
+            }
+        }
+    }
+}
+
+/**
+ * Побайтовое сравнение буфера и спана без учета регистра символов.
+ *
+ * @param buffer Первый буфер.
+ * @param span Спан.
+ * @return Результат сравнения: <0, если буфер меньше,
+ * >0, если буфер больше, =0, если содержимое буфера и спана совпадает.
+ */
+MAGNA_API int MAGNA_CALL buffer_compare_span_ignore_case
+    (
+        const Buffer *buffer,
+        Span span
+    )
+{
+    am_size_t i;
+    int result;
+
+    assert (buffer != NULL);
+
+    for (i = 0; ; ++i) {
+        if (i == buffer->position) {
+            if (i == span.len) {
+                return 0;
+            }
+
+            return -1;
+        }
+        else if (i == span.len) {
+                return 1;
+            }
+        else {
+            result = toupper (buffer->ptr[i]) - toupper (span.ptr[i]);
+            if (result != 0) {
+                return result;
+            }
+        }
+    }
+}
+
+/**
  * Побайтовое сравнение буфера со строкой.
  *
- * @param buffer
- * @param text
- * @return
+ * @param buffer Буфер.
+ * @param text Строка для сравнения (не может быть `NULL`).
+ * @return Результат сравнения: <0, если буфер меньше,
+ * >0, если буфер больше, и =0, если буфер совпадает со строкой.
  */
 MAGNA_API int MAGNA_CALL buffer_compare_text
     (
@@ -727,6 +808,47 @@ MAGNA_API int MAGNA_CALL buffer_compare_text
         }
         else {
             result = buffer->ptr[i] - *ptr;
+            if (result != 0) {
+                return result;
+            }
+        }
+    }
+}
+
+/**
+ * Побайтовое сравнение буфера со строкой без учета регистра.
+ *
+ * @param buffer Буфер.
+ * @param text Строка для сравнения (не может быть `NULL`).
+ * @return Результат сравнения: <0, если буфер меньше,
+ * >0, если буфер больше, и =0, если буфер совпадает со строкой.
+ */
+MAGNA_API int MAGNA_CALL buffer_compare_text_ignore_case
+    (
+        const Buffer *buffer,
+        const am_byte *text
+    )
+{
+    const am_byte *ptr = text;
+    am_size_t i;
+    int result;
+
+    assert (buffer != NULL);
+    assert (text != NULL);
+
+    for (i = 0; ; ++i, ++ptr) {
+        if (i == buffer->position) {
+            if (!*ptr) {
+                return 0;
+            }
+
+            return -1;
+        }
+        else if (!*ptr) {
+            return 1;
+        }
+        else {
+            result = toupper (buffer->ptr[i]) - toupper (*ptr);
             if (result != 0) {
                 return result;
             }
@@ -951,6 +1073,40 @@ MAGNA_API am_bool MAGNA_CALL buffer_put_uint_64
     sprintf (temp, "%llu", value);
 
     return buffer_puts (buffer, temp);
+}
+
+/**
+ * Очистка буфера (текущая позиция устанавливается в 0).
+ *
+ * @param buffer Буфер.
+ * @return Буфер.
+ */
+MAGNA_API Buffer* MAGNA_CALL buffer_clear
+    (
+        Buffer *buffer
+    )
+{
+    assert (buffer != NULL);
+
+    buffer->position = 0;
+
+    return buffer;
+}
+
+/**
+ * Проверка, не пуст ли буфер?
+ *
+ * @param buffer Проверяемый буфер.
+ * @return Резульат проверки.
+ */
+MAGNA_API am_bool MAGNA_CALL buffer_empty
+    (
+        const Buffer *buffer
+    )
+{
+    assert (buffer != NULL);
+
+    return buffer->position == 0;
 }
 
 /*=========================================================*/

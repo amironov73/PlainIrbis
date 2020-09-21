@@ -345,6 +345,35 @@ MAGNA_API Span     MAGNA_CALL response_remaining_utf_text    (Response *response
 
 /*=========================================================*/
 
+/* Меню */
+
+/* Пара строк в MNU-файле. */
+typedef struct
+{
+    Buffer code;
+    Buffer comment;
+} MenuEntry;
+
+MAGNA_API void    MAGNA_CALL menu_entry_init      (MenuEntry *entry);
+MAGNA_API void    MAGNA_CALL menu_entry_free      (MenuEntry *entry);
+MAGNA_API am_bool MAGNA_CALL menu_entry_to_string (const MenuEntry *entry, Buffer *output);
+
+/* MNU-файл. состоит из пар строк (см. MenuEntry). */
+typedef struct
+{
+    Array entries;
+} MenuFile;
+
+MAGNA_API am_bool          MAGNA_CALL menu_init        (MenuFile *menu);
+MAGNA_API void             MAGNA_CALL menu_free        (MenuFile *menu);
+MAGNA_API am_bool          MAGNA_CALL menu_append      (MenuFile *menu, Span code, Span comment);
+MAGNA_API const MenuEntry* MAGNA_CALL menu_get_entry   (const MenuFile *menu, Span code);
+MAGNA_API Span             MAGNA_CALL menu_get_comment (const MenuFile *menu, Span code, Span defaultValue);
+MAGNA_API am_bool          MAGNA_CALL menu_parse       (MenuFile *menu, StreamTexter *texter);
+MAGNA_API am_bool          MAGNA_CALL menu_to_stream   (const MenuFile *menu, Stream *stream);
+
+/*=========================================================*/
+
 /* Поиск */
 
 /* Параметры для поиска записей */

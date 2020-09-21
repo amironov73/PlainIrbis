@@ -19,6 +19,7 @@ set(CFiles
     src/koi8r.c
     src/main.c
     src/memory.c
+    src/menu.c
     src/navigatr.c
     src/number.c
     src/path.c
