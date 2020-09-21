@@ -3,9 +3,9 @@
 
 #include "magna/core.h"
 
-/* ReSharper disable StringLiteralTypo */
-/* ReSharper disable IdentifierTypo */
-/* ReSharper disable CommentTypo */
+// ReSharper disable StringLiteralTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable CommentTypo
 
 /*=========================================================*/
 
@@ -603,7 +603,7 @@ MAGNA_API am_bool MAGNA_CALL file_write_buffer
 MAGNA_API am_bool MAGNA_CALL file_write_span
     (
         am_handle handle,
-        const Span span
+        Span span
     )
 {
     am_bool result;
@@ -1077,6 +1077,31 @@ MAGNA_API am_bool MAGNA_CALL file_stream_open_write
     }
 
     return AM_TRUE;
+}
+
+/**
+ * Открывает файл для построчного ввода.
+ *
+ * @param texter Указатель на неинициализированную структуру.
+ * @param stream Указатель на неинициализированную структуру.
+ * @param filename Имя файла.
+ * @return Признак успешности завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL file_texter
+    (
+        StreamTexter *texter,
+        Stream *stream,
+        const char *filename
+    )
+{
+    assert (texter != NULL);
+    assert (filename != NULL);
+
+    if (!file_stream_open_read (stream, filename)) {
+        return AM_FALSE;
+    }
+
+    return texter_init (texter, stream, 0);
 }
 
 /*=========================================================*/

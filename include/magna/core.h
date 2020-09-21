@@ -875,12 +875,13 @@ MAGNA_API am_bool    MAGNA_CALL file_seek         (am_handle handle, am_int64 of
 MAGNA_API am_uint64  MAGNA_CALL file_size         (am_handle handle);
 MAGNA_API am_bool    MAGNA_CALL file_sync         (am_handle handle);
 MAGNA_API am_int64   MAGNA_CALL file_tell         (am_handle handle);
+MAGNA_API am_bool    MAGNA_CALL file_texter       (StreamTexter *texter, Stream *stream, const char *filename);
 MAGNA_API am_bool    MAGNA_CALL file_write        (am_handle handle, const am_byte *data, am_size_t size);
 MAGNA_API am_bool    MAGNA_CALL file_write_buffer (am_handle handle, const Buffer *buffer);
 MAGNA_API am_bool    MAGNA_CALL file_write_byte   (am_handle handle, am_byte value);
 MAGNA_API am_bool    MAGNA_CALL file_write_int_32 (am_handle handle, am_uint32 value);
 MAGNA_API am_bool    MAGNA_CALL file_write_int_64 (am_handle handle, am_uint64 value);
-MAGNA_API am_bool    MAGNA_CALL file_write_span   (am_handle handle, const Span span);
+MAGNA_API am_bool    MAGNA_CALL file_write_span   (am_handle handle, Span span);
 MAGNA_API am_bool    MAGNA_CALL file_write_text   (am_handle handle, const char *text);
 
 MAGNA_API am_bool    MAGNA_CALL directory_create  (const char *dirname, am_bool createNew);
@@ -891,11 +892,17 @@ MAGNA_API am_bool    MAGNA_CALL directory_exist   (const char *dirname);
 
 /* Работа с путями */
 
+MAGNA_API am_bool            path_combine                 (Buffer *output, ...);
+MAGNA_API void    MAGNA_CALL path_convert_slashes         (Buffer *path);
 MAGNA_API am_bool MAGNA_CALL path_get_current_directory   (Buffer *path);
 MAGNA_API am_bool MAGNA_CALL path_get_executable          (Buffer *buffer);
 MAGNA_API Span    MAGNA_CALL path_get_extension           (const Buffer *path);
+MAGNA_API Span    MAGNA_CALL path_get_directory           (const Buffer *path);
+MAGNA_API Span    MAGNA_CALL path_get_extension           (const Buffer *path);
+MAGNA_API Span    MAGNA_CALL path_get_filename            (const Buffer *path);
 MAGNA_API am_bool MAGNA_CALL path_get_temporary_directory (Buffer *path);
 MAGNA_API am_bool MAGNA_CALL path_set_current_directory   (const Buffer *path);
+MAGNA_API void    MAGNA_CALL path_trim_trailing_slashes   (Buffer *path);
 
 /*=========================================================*/
 

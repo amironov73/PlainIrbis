@@ -1,15 +1,15 @@
 // This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-#include "magna/irbis.h"
+#include "magna/core.h"
+
+// ReSharper disable StringLiteralTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable CommentTypo
 
 /*=========================================================*/
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable: 4820)
-#pragma warning(disable: 5045)
-#endif
+#include "warnpush.h"
 
 /*=========================================================*/
 
@@ -64,6 +64,9 @@
 #endif
 
 #include <assert.h>
+#include <stdarg.h>
+
+/*=========================================================*/
 
 /**
  * Получение текущей директории.
@@ -280,10 +283,10 @@ MAGNA_API Span MAGNA_CALL path_get_filename
 }
 
 /**
- * Получение директории для указанного пути.
+ * Получение директории для указанного файла.
  *
- * @param path Путь (возможно, неполный).
- * @return Директория (возможно, пустой фрагмент).
+ * @param path Путь к файлу (возможно, неполный).
+ * @return Директория (возможно, пустая).
  */
 MAGNA_API Span MAGNA_CALL path_get_directory
     (
@@ -292,19 +295,45 @@ MAGNA_API Span MAGNA_CALL path_get_directory
 {
     Span result;
     char c;
+    const am_byte *ptr;
 
-    assert (path != NULL);
+    assert(path != NULL);
 
-    if (path->position <= 2) {
-        result.ptr = path->ptr;
-        result.len = 0;
-        return result;
+    if (buffer_empty (path)) {
+        return buffer_to_span (path);
     }
 
-    result.ptr = path->ptr + path->position - 1;
-    result.len = 0;
+    result.ptr = path->ptr;
+    ptr = path->ptr + path->position - 1;
+    if (ptr >= path->ptr) {
+        while (AM_TRUE) {
+            c = *ptr;
+            if (c == '/' || c == '\\') {
+                if (ptr != path->ptr) {
+                    --ptr;
+                }
+                break;
+            }
 
-    /* TODO: implement */
+            if (ptr == path->ptr) {
+                break;
+            }
+
+            --ptr;
+        }
+    }
+
+    if (ptr == path->ptr) {
+        if (*ptr == '/' || *ptr == '\\') {
+            result.len = 1;
+            return result;
+        }
+
+        result.len = 0;
+    }
+    else {
+        result.len = ptr - path->ptr + 1;
+    }
 
     return result;
 }
@@ -312,10 +341,9 @@ MAGNA_API Span MAGNA_CALL path_get_directory
 /**
  * Превращает неправильные слэши в правильные.
  *
- * @param path Путь (возможно, пустой).
- * @return Обработанный путь.
+ * @param path Путь к файлу (возможно, пустой).
  */
-MAGNA_API Buffer* MAGNA_CALL path_convert_slashes
+MAGNA_API void MAGNA_CALL path_convert_slashes
     (
         Buffer *path
     )
@@ -340,19 +368,86 @@ MAGNA_API Buffer* MAGNA_CALL path_convert_slashes
 
 #endif
     }
-
-    return path;
 }
 
+/**
+ * Склеивание пути из компонентов.
+ *
+ * @param output Инициализированный буфер для результата.
+ * @param ... Компоненты пути, последний должен быть `NULL`.
+ * @return Признак успешности завершения операции.
+ */
 MAGNA_API am_bool path_combine
     (
-        Buffer *result,
+        Buffer *output,
         ...
     )
 {
-    assert (result != NULL);
+    va_list args;
+    Buffer *path;
+    am_bool first = AM_TRUE, result = AM_FALSE;
 
-    return AM_FALSE;
+#if defined(MAGNA_WINDOWS) || defined(MAGNA_MSDOS)
+    char slash = '\\';
+#else
+    char slash = '/';
+#endif
+
+    assert (output != NULL);
+
+    va_start (args, output);
+    while (AM_TRUE) {
+        path = va_arg (args, Buffer*);
+        if (path == NULL) {
+            result = AM_TRUE;
+            break;
+        }
+
+        if (buffer_empty (path)) {
+            continue;
+        }
+
+        path_trim_trailing_slashes (output);
+
+        if (!first) {
+            if (!buffer_putc (output, slash)) {
+                break;
+            }
+        }
+
+        first = AM_FALSE;
+
+        if (!buffer_concat (output, path)) {
+            break;
+        }
+    }
+
+    va_end (args);
+
+    return result;
+}
+
+/**
+ * Удаление слэшей в конце пути.
+ *
+ * @param path Путь для обработки.
+ */
+MAGNA_API void MAGNA_CALL path_trim_trailing_slashes
+    (
+        Buffer *path
+    )
+{
+    am_byte chr;
+
+    assert (path != NULL);
+
+    while (path->position > 1) {
+        chr = path->ptr [path->position - 1];
+        if (chr != '/' && chr != '\\') {
+            break;
+        }
+        --path->position;
+    }
 }
 
 /**
@@ -478,8 +573,6 @@ MAGNA_API am_bool MAGNA_CALL path_get_executable
 
 /*=========================================================*/
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
+#include "warnpop.h"
 
 /*=========================================================*/

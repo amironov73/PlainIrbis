@@ -128,7 +128,7 @@ MAGNA_API am_bool MAGNA_CALL buffer_copy
         return AM_FALSE;
     }
 
-    target->position = 0;
+    buffer_clear (target);
 
     if (source->position != 0) {
         mem_copy (target->ptr, source->ptr, source->position);

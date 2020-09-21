@@ -1,0 +1,13 @@
+PWD          := $(shell pwd)
+SRCDIR       := $(PWD)/src
+OBJDIR       := $(PWD)/obj
+BINDIR       := $(PWD)/bin
+
+AR     := ar
+CC     := gcc
+CFLAGS := -Wall -Wextra -O2 -Wno-unknown-pragmas
+
+SOURCE_FILES   := $(shell ls $(SRCDIR)/*.c)
+OBJECT_FILES   := $(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.o, $(SOURCE_FILES))
+
+LIBRARIES      := $(PWD)/../../libs/magna/bin/libmagna.a $(PWD)/../../libs/irbis/bin/libirbis.a
