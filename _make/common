@@ -5,7 +5,7 @@ BINDIR       := $(PWD)/bin
 
 AR     := ar
 CC     := gcc
-CFLAGS := -Wall -Wextra -O2 -Wno-unknown-pragmas
+CFLAGS := -Wall -Wextra -O2 -std=c89 -Wno-unknown-pragmas
 
 SOURCE_FILES   := $(shell ls $(SRCDIR)/*.c)
 OBJECT_FILES   := $(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.o, $(SOURCE_FILES))

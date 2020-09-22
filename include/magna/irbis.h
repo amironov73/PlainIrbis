@@ -374,6 +374,53 @@ MAGNA_API am_bool          MAGNA_CALL menu_to_stream   (const MenuFile *menu, St
 
 /*=========================================================*/
 
+/* INI-файл */
+
+/* Строка INI-файла. Состоит из ключа и (опционально) значения. c*/
+typedef struct
+{
+    Buffer key;
+    Buffer value;
+    am_bool modified;
+
+} IniLine;
+
+MAGNA_API void    MAGNA_CALL ini_line_free      (IniLine *line);
+MAGNA_API void    MAGNA_CALL ini_line_init      (IniLine *line);
+MAGNA_API am_bool MAGNA_CALL ini_line_set_key   (IniLine *line, Span key);
+MAGNA_API am_bool MAGNA_CALL ini_line_set_value (IniLine *line, Span value);
+MAGNA_API am_bool MAGNA_CALL ini_line_to_string (const IniLine *line, Buffer *output);
+MAGNA_API am_bool MAGNA_CALL ini_line_verify    (const IniLine *line);
+
+/* Секция INI-файла. Состоит из строк (см. IniLine). Имеет опциональное имя. */
+typedef struct
+{
+    Buffer name;
+    Array lines;
+
+} IniSection;
+
+MAGNA_API void           MAGNA_CALL ini_section_clear        (IniSection *section);
+MAGNA_API void           MAGNA_CALL ini_section_free         (IniSection *section);
+MAGNA_API const IniLine* MAGNA_CALL ini_section_get_line     (const IniSection *section, Span key);
+MAGNA_API Span           MAGNA_CALL ini_section_get_value    (const IniSection *section, Span key, Span defaultValue);
+MAGNA_API am_bool        MAGNA_CALL ini_section_init         (IniSection *section);
+MAGNA_API am_bool        MAGNA_CALL ini_section_is_modified  (const IniSection *section);
+MAGNA_API void           MAGNA_CALL ini_section_not_modified (IniSection *section);
+
+/* INI-файл. Состоит из секций. */
+typedef struct
+{
+    Array sections;
+} IniFile;
+
+MAGNA_API void    MAGNA_CALL ini_file_free         (IniFile *file);
+MAGNA_API am_bool MAGNA_CALL ini_file_init         (IniFile *file);
+MAGNA_API am_bool MAGNA_CALL ini_file_is_modified  (const IniFile *file);
+MAGNA_API void    MAGNA_CALL ini_file_not_modified (IniFile *file);
+
+/*=========================================================*/
+
 /* Поиск */
 
 /* Параметры для поиска записей */
