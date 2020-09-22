@@ -3,16 +3,13 @@
 
 #include "magna/core.h"
 
-/* ReSharper disable StringLiteralTypo */
-/* ReSharper disable IdentifierTypo */
-/* ReSharper disable CommentTypo */
+// ReSharper disable StringLiteralTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable CommentTypo
 
 /*=========================================================*/
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable: 5045)
-#endif
+#include "warnpush.h"
 
 /*=========================================================*/
 
@@ -253,8 +250,147 @@ MAGNA_API am_uint64 mem_avail_virtual (void)
 
 /*=========================================================*/
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
+/* Добавление чанка к аллокатору */
+static am_byte append_chunk
+    (
+        Allocator *allocator
+    )
+{
+
+    AllocatorChunk *chunk;
+
+    chunk = mem_alloc (allocator->chunkSize);
+    if (chunk == NULL) {
+        return AM_FALSE;
+    }
+
+    chunk->next = NULL;
+
+    if (allocator->first == NULL) {
+        allocator->first = allocator->last = chunk;
+    }
+    else {
+        allocator->last->next = chunk;
+        allocator->last = chunk;
+    }
+
+    allocator->current = (am_byte*) (chunk + 1);
+    allocator->remaining = allocator->chunkSize - sizeof (AllocatorChunk);
+
+    return AM_TRUE;
+}
+
+/**
+ * Инициализация аллокатора.
+ *
+ * @param allocator Указатель на неинициализированную структуру.
+ * @param chunkSize Размер чанка. 0 означает "определяется системой".
+ * @return Признак успешности завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL allocator_init
+    (
+        Allocator *allocator,
+        am_size_t chunkSize
+    )
+{
+    assert (allocator != NULL);
+
+    if (chunkSize < (sizeof (void*) * 2)) {
+        chunkSize = 4096;
+    }
+
+    allocator->first = allocator->last = NULL;
+    allocator->chunkSize = chunkSize;
+
+    return append_chunk (allocator);
+}
+
+/**
+ * Освобождение ресурсов, занятых аллокатором.
+ *
+ * @param allocator Указатель на аллокатор.
+ */
+MAGNA_API void MAGNA_CALL allocator_free
+    (
+        Allocator *allocator
+    )
+{
+    AllocatorChunk *chunk, *next;
+
+    assert (allocator != NULL);
+
+    for (chunk = allocator->first; chunk != NULL; ) {
+        next = chunk->next;
+        mem_free (chunk);
+        chunk = next;
+    }
+
+    allocator->first = allocator->last = NULL;
+}
+
+/**
+ * Запрос блока памяти.
+ *
+ * @param allocator Аллокатор.
+ * @param length Требуемая длина блока.
+ * Запросы на блоки больше `chunkSize - sizeof (void*)`
+ * не могут быть удовлетворены.
+ * @return Указатель на выделенный блок либо `NULL`.
+ */
+MAGNA_API void* MAGNA_CALL allocator_alloc
+    (
+        Allocator *allocator,
+        am_size_t length
+    )
+{
+    void *result;
+
+    assert (allocator != NULL);
+    assert (allocator->first != NULL);
+    assert (length != 0);
+
+    if (length > (allocator->chunkSize - sizeof (AllocatorChunk))) {
+        return NULL;
+    }
+
+    if (length > allocator->remaining) {
+        if (!append_chunk (allocator)) {
+            return NULL;
+        }
+    }
+
+    result = (void*) allocator->current;
+    allocator->current += length;
+    allocator->remaining -= length;
+
+    return result;
+}
+
+/**
+ * Вычисление общего размера памяти, занятой аллокатором.
+ *
+ * @param allocator Аллокатор.
+ * @return Общий размер занятой памяти.
+ */
+MAGNA_API am_size_t MAGNA_CALL allocator_total
+    (
+        const Allocator *allocator
+    )
+{
+    am_size_t result = 0;
+    const AllocatorChunk *chunk;
+
+    assert (allocator != NULL);
+
+    for (chunk =  allocator->first; chunk != NULL; chunk = chunk->next) {
+        result += allocator->chunkSize;
+    }
+
+    return result;
+}
+
+/*=========================================================*/
+
+#include "warnpop.h"
 
 /*=========================================================*/

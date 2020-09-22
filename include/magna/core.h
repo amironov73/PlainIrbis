@@ -350,6 +350,7 @@ typedef union {
         am_uint32 dword0;
         am_uint32 dword1;
     } twoDwords;
+
 } am_mix;
 
 /*=========================================================*/
@@ -362,13 +363,14 @@ MAGNA_API am_bool             magna_on_windows      (void);
 
 /* Опережающее объявление */
 
-typedef struct MagnaArray       Array;
-typedef struct MagnaBuffer      Buffer;
-typedef struct MangaEnumerator  Enumerator;
-typedef struct MagnaMemoryChunk MemoryChunk;
-typedef struct MagnaSpan        Span;
-typedef struct MagnaSpanArray   SpanArray;
-typedef struct MagnaStream      Stream;
+typedef struct MagnaAllocatorChunk AllocatorChunk;
+typedef struct MagnaArray          Array;
+typedef struct MagnaBuffer         Buffer;
+typedef struct MangaEnumerator     Enumerator;
+typedef struct MagnaMemoryChunk    MemoryChunk;
+typedef struct MagnaSpan           Span;
+typedef struct MagnaSpanArray      SpanArray;
+typedef struct MagnaStream         Stream;
 
 /*=========================================================*/
 
@@ -421,6 +423,24 @@ MAGNA_API am_uint64            mem_avail_physical  (void);
 MAGNA_API am_uint64            mem_avail_virtual   (void);
 MAGNA_API am_uint64            mem_total_installed (void);
 MAGNA_API am_uint64            mem_total_virtual   (void);
+
+/* Супер-пупер-простой аллокатор */
+
+struct MagnaAllocatorChunk {
+    AllocatorChunk *next;
+};
+
+typedef struct {
+    AllocatorChunk *first, *last;
+    am_byte *current;
+    am_size_t chunkSize, remaining;
+
+} Allocator;
+
+MAGNA_API void*     MAGNA_CALL allocator_alloc (Allocator *allocator, am_size_t length);
+MAGNA_API void      MAGNA_CALL allocator_free  (Allocator *allocator);
+MAGNA_API am_bool   MAGNA_CALL allocator_init  (Allocator *allocator, am_size_t chunkSize);
+MAGNA_API am_size_t MAGNA_CALL allocator_total (const Allocator *allocator);
 
 /*=========================================================*/
 
@@ -573,6 +593,43 @@ MAGNA_API void    MAGNA_CALL span_array_set        (SpanArray *array, am_size_t 
 MAGNA_API am_bool MAGNA_CALL span_array_shrink     (SpanArray *array);
 MAGNA_API am_bool MAGNA_CALL span_array_to_text    (const SpanArray *array, struct MagnaBuffer *buffer, const am_byte *delimiter);
 MAGNA_API void    MAGNA_CALL span_array_truncate   (SpanArray *array, am_size_t newSize);
+
+/*=========================================================*/
+
+/* Простой ассоциативный динамический массив */
+
+typedef am_size_t (MAGNA_CALL *HashFunction) (void*);
+typedef am_bool   (MAGNA_CALL *KeyComparer)  (void *firstKey, void *secondKey);
+typedef am_bool   (MAGNA_CALL *MapWalker)    (void *data, void *key, void *value);
+
+typedef struct {
+    void *key;
+    void *value;
+
+} MapEntry;
+
+typedef struct {
+    am_size_t len;
+    am_size_t capacity;
+    MapEntry *entries;
+
+} MapBacket;
+
+typedef struct {
+    am_size_t factor;
+    Array **buckets;
+    HashFunction hasher;
+    KeyComparer comparer;
+    Liberator keyLiberator, valueLiberator;
+
+} Map;
+
+MAGNA_API am_bool MAGNA_CALL map_create (Map *map, am_size_t factor, KeyComparer comparer, HashFunction hasher, Liberator keyLiberator, Liberator valueLiberator);
+MAGNA_API void    MAGNA_CALL map_free   (Map *map);
+MAGNA_API void*   MAGNA_CALL map_get    (const Map *map, void *key);
+MAGNA_API am_bool MAGNA_CALL map_set    (Map *map, void *key, void *value);
+MAGNA_API am_bool MAGNA_CALL map_unset  (Map *map, void *key);
+MAGNA_API am_bool MAGNA_CALL map_walk   (const Map *map, MapWalker walker, void *data);
 
 /*=========================================================*/
 

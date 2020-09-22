@@ -34,6 +34,7 @@ set(CFiles
     src/keyboard.c
     src/koi8r.c
     src/magna.c
+    src/map.c
     src/memory.c
     src/navigatr.c
     src/number.c
