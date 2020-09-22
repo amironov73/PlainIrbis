@@ -824,7 +824,6 @@ typedef struct {
     am_bool eot;
 } StreamTexter;
 
-
 MAGNA_API am_bool    MAGNA_CALL stream_close      (Stream *stream);
 MAGNA_API am_bool    MAGNA_CALL stream_copy       (Stream *target, Stream *source);
 MAGNA_API am_bool    MAGNA_CALL stream_init       (Stream *stream);
