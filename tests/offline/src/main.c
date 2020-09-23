@@ -90,6 +90,7 @@ int main (int argc, const char **argv)
         printf ("test data=");
         fwrite (tdp.ptr, 1, tdp.position, stdout);
         printf ("\n");
+        buffer_free (&tdp);
     }
 
     int result = tester_main (argc, argv);

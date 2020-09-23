@@ -96,7 +96,7 @@ MAGNA_API am_bool MAGNA_CALL array_copy
 }
 
 /**
- * Добавление массива в конец другого.
+ * Добавление одного массива в конец другого.
  *
  * @param target Массив назначения.
  * @param source Исходный массив.
@@ -139,7 +139,7 @@ MAGNA_API am_bool MAGNA_CALL array_create
     )
 {
     assert (array != NULL);
-    assert (capacity > 0);
+    assert (capacity != 0);
 
     array->cloner = NULL;
     array->liberator = NULL;
@@ -176,7 +176,7 @@ MAGNA_API void MAGNA_CALL array_free
 
     array->len = 0;
     array->capacity = 0;
-    free (array->ptr);
+    mem_free (array->ptr);
     array->ptr = NULL;
 }
 
@@ -187,7 +187,7 @@ MAGNA_API void MAGNA_CALL array_free
  * @param index Индекс.
  * @return Элемент массива.
  */
-MAGNA_API void* MAGNA_CALL array_get
+MAGNA_API MAGNA_INLINE void* MAGNA_CALL array_get
     (
         const Array *array,
         am_size_t index
@@ -196,7 +196,7 @@ MAGNA_API void* MAGNA_CALL array_get
     assert (array != NULL);
     assert (index < array->len);
 
-    return array->ptr[index];
+    return array->ptr [index];
 }
 
 /**
@@ -220,13 +220,13 @@ MAGNA_API am_bool MAGNA_CALL array_grow
     assert (newSize > 0);
 
     if (newSize > array->capacity) {
-        newPtr = (void**) calloc (newSize, sizeof (void*));
+        newPtr = (void**) mem_alloc (newSize * sizeof (void*));
         if (newPtr == NULL) {
             return AM_FALSE;
         }
 
-        memcpy (newPtr, array->ptr, array->len * sizeof (void*));
-        free (array->ptr);
+        mem_copy (newPtr, array->ptr, array->len * sizeof (void*));
+        mem_free (array->ptr);
         array->ptr = newPtr;
         array->capacity = newSize;
     }
@@ -235,7 +235,7 @@ MAGNA_API am_bool MAGNA_CALL array_grow
 }
 
 /**
- * Извлечение элемента (с последующим удалением из массива).
+ * Извлечение последнего элемента (с последующим удалением из массива).
  * Оставшиеся элементы не перемещаются.
  *
  * @param array Массив.
@@ -314,6 +314,7 @@ MAGNA_API am_bool MAGNA_CALL array_push_back
 
 /**
  * Помещение элемента в начало массива.
+ * Остальные элементы соответственно сдвигаются к концу массива.
  *
  * @param array Массив.
  * @param item Помещаемый элемент.

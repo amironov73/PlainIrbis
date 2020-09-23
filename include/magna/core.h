@@ -371,6 +371,7 @@ typedef struct MagnaMemoryChunk    MemoryChunk;
 typedef struct MagnaSpan           Span;
 typedef struct MagnaSpanArray      SpanArray;
 typedef struct MagnaStream         Stream;
+typedef struct MagnaValueArray     ValueArray;
 
 /*=========================================================*/
 
@@ -518,19 +519,55 @@ struct MagnaArray
 
 #define ARRAY_INIT { NULL, 0, 0, NULL, NULL }
 
-MAGNA_API am_bool MAGNA_CALL array_clone      (Array *target, const Array *source);
-MAGNA_API am_bool MAGNA_CALL array_concat     (Array *target, const Array *source);
-MAGNA_API am_bool MAGNA_CALL array_copy       (Array *target, const Array *source);
-MAGNA_API am_bool MAGNA_CALL array_create     (Array *array, am_size_t capacity);
-MAGNA_API void    MAGNA_CALL array_free       (Array *array);
-MAGNA_API void*   MAGNA_CALL array_get        (const Array *array, am_size_t index);
-MAGNA_API am_bool MAGNA_CALL array_grow       (Array *array, am_size_t newSize);
-MAGNA_API void*   MAGNA_CALL array_pop_back   (Array *array);
-MAGNA_API void*   MAGNA_CALL array_pop_front  (Array *array);
-MAGNA_API am_bool MAGNA_CALL array_push_back  (Array *array,  void *item);
-MAGNA_API am_bool MAGNA_CALL array_push_front (Array *array,  void *item);
-MAGNA_API void    MAGNA_CALL array_set        (Array *array, am_size_t index, void *item);
-MAGNA_API void    MAGNA_CALL array_truncate   (Array *array, am_size_t newSize);
+extern MAGNA_API              am_bool MAGNA_CALL array_clone      (Array *target, const Array *source);
+extern MAGNA_API              am_bool MAGNA_CALL array_concat     (Array *target, const Array *source);
+extern MAGNA_API              am_bool MAGNA_CALL array_copy       (Array *target, const Array *source);
+extern MAGNA_API              am_bool MAGNA_CALL array_create     (Array *array, am_size_t capacity);
+extern MAGNA_API              void    MAGNA_CALL array_free       (Array *array);
+extern MAGNA_API MAGNA_INLINE void*   MAGNA_CALL array_get        (const Array *array, am_size_t index);
+extern MAGNA_API              am_bool MAGNA_CALL array_grow       (Array *array, am_size_t newSize);
+extern MAGNA_API              void*   MAGNA_CALL array_pop_back   (Array *array);
+extern MAGNA_API              void*   MAGNA_CALL array_pop_front  (Array *array);
+extern MAGNA_API              am_bool MAGNA_CALL array_push_back  (Array *array,  void *item);
+extern MAGNA_API              am_bool MAGNA_CALL array_push_front (Array *array,  void *item);
+extern MAGNA_API              void    MAGNA_CALL array_set        (Array *array, am_size_t index, void *item);
+extern MAGNA_API              void    MAGNA_CALL array_truncate   (Array *array, am_size_t newSize);
+
+/*=========================================================*/
+
+/* Массив мелких объектов */
+
+struct MagnaValueArray
+{
+    am_byte *ptr;
+    am_size_t itemSize;
+    am_size_t len;
+    am_size_t capacity;
+    am_size_t offset;
+
+    Liberator liberator;
+};
+
+#define VARRAY_INIT(__itemSize) { NULL, __itemSize, 0, 0, 0, NULL };
+
+MAGNA_API              void    MAGNA_CALL varray_clear        (ValueArray *array);
+MAGNA_API              am_bool MAGNA_CALL varray_clone        (ValueArray *target, const ValueArray *source, Cloner cloner);
+MAGNA_API              am_bool MAGNA_CALL varray_concat       (ValueArray *target, const ValueArray *source);
+MAGNA_API              am_bool MAGNA_CALL varray_copy         (ValueArray *target, const ValueArray *source);
+MAGNA_API              am_bool MAGNA_CALL varray_create       (ValueArray *array, am_size_t itemSize, am_size_t capacity);
+MAGNA_API              void*   MAGNA_CALL varray_emplace_back (ValueArray *array);
+MAGNA_API              void    MAGNA_CALL varray_free         (ValueArray *array);
+MAGNA_API MAGNA_INLINE void*   MAGNA_CALL varray_get          (const ValueArray *array, am_size_t index);
+MAGNA_API              am_bool MAGNA_CALL varray_grow         (ValueArray *array, am_size_t newSize);
+MAGNA_API              void    MAGNA_CALL varray_init         (ValueArray *array, am_size_t itemSize);
+MAGNA_API              void*   MAGNA_CALL varray_pop_back     (ValueArray *array);
+MAGNA_API              void*   MAGNA_CALL varray_pop_front    (ValueArray *array);
+MAGNA_API              am_bool MAGNA_CALL varray_push_back    (ValueArray *array, void *item);
+MAGNA_API              am_bool MAGNA_CALL varray_push_front   (ValueArray *array, void *item);
+MAGNA_API              void    MAGNA_CALL varray_remove_index (ValueArray *array, am_size_t index);
+MAGNA_API              void    MAGNA_CALL varray_remove_item  (ValueArray *array, void *item);
+MAGNA_API              void    MAGNA_CALL varray_set          (ValueArray *array, am_size_t index, void *value);
+MAGNA_API              void    MAGNA_CALL varray_truncate     (ValueArray *array, am_size_t newSize);
 
 /*=========================================================*/
 

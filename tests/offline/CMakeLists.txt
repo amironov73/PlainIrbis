@@ -29,6 +29,7 @@ set(CFiles
     src/stream.c
     src/upc.c
     src/utils.c
+    src/varray.c
 )
 
 set(HeaderFiles

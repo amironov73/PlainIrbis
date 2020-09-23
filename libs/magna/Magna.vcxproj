@@ -54,6 +54,7 @@
     <ClCompile Include="src\tcp4.c" />
     <ClCompile Include="src\thread.c" />
     <ClCompile Include="src\utf8.c" />
+    <ClCompile Include="src\varray.c" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

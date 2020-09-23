@@ -23,8 +23,9 @@ sources = [ 'src/array.c',
     'src/spanarry.c',
     'src/stream.c',
     'src/upc.c',
-    'src/utils.c'
-    ]
+    'src/utils.c',
+    'src/varray.c'
+]
 
 localInclude = commonInclude
 localInclude += include_directories ('include')

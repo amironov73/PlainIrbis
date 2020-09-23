@@ -37,7 +37,8 @@ sources = [ 'src/array.c',
     'src/tcp4.c',
     'src/thread.c',
     'src/utf8.c',
-    'src/utils.c'
+    'src/utils.c',
+    'src/varray.c'
     ]
 
 libmagna = static_library('magna',

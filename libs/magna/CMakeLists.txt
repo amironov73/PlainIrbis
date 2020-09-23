@@ -50,6 +50,7 @@ set(CFiles
     src/thread.c
     src/utf8.c
     src/utils.c
+    src/varray.c
 )
 
 add_library(${PROJECT_NAME}
