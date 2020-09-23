@@ -478,3 +478,139 @@ TESTER(varray_grow_1)
 
     varray_free (&array);
 }
+
+static int my_int32_comparer (const void *left, const void *right, const void *data)
+{
+    (void) data;
+
+    return *((const am_int32*) left) - *((const am_int32*) right);
+}
+
+TESTER(varray_sort_1)
+{
+    ValueArray array;
+
+    varray_init (&array, sizeof (am_int32));
+    *(am_int32*) varray_emplace_back (&array) = 3;
+    *(am_int32*) varray_emplace_back (&array) = 2;
+    *(am_int32*) varray_emplace_back (&array) = 1;
+
+    varray_sort (&array, my_int32_comparer, NULL);
+
+    CHECK (*(const am_int32*) varray_get (&array, 0) == 1);
+    CHECK (*(const am_int32*) varray_get (&array, 1) == 2);
+    CHECK (*(const am_int32*) varray_get (&array, 2) == 3);
+
+    varray_free (&array);
+}
+
+TESTER(varray_sort_2)
+{
+    ValueArray array;
+
+    varray_init (&array, sizeof (am_int32));
+    *(am_int32*) varray_emplace_back (&array) = 1;
+    *(am_int32*) varray_emplace_back (&array) = 2;
+    *(am_int32*) varray_emplace_back (&array) = 3;
+
+    varray_sort (&array, my_int32_comparer, NULL);
+
+    CHECK (*(const am_int32*) varray_get (&array, 0) == 1);
+    CHECK (*(const am_int32*) varray_get (&array, 1) == 2);
+    CHECK (*(const am_int32*) varray_get (&array, 2) == 3);
+
+    varray_free (&array);
+}
+
+TESTER(varray_sort_3)
+{
+    ValueArray array;
+
+    varray_init (&array, sizeof (am_int32));
+    *(am_int32*) varray_emplace_back (&array) = 1;
+    *(am_int32*) varray_emplace_back (&array) = 2;
+    *(am_int32*) varray_emplace_back (&array) = 6;
+    *(am_int32*) varray_emplace_back (&array) = 5;
+    *(am_int32*) varray_emplace_back (&array) = 4;
+    *(am_int32*) varray_emplace_back (&array) = 3;
+    *(am_int32*) varray_emplace_back (&array) = 3;
+
+    varray_sort (&array, my_int32_comparer, NULL);
+
+    CHECK (*(const am_int32*) varray_get (&array, 0) == 1);
+    CHECK (*(const am_int32*) varray_get (&array, 1) == 2);
+    CHECK (*(const am_int32*) varray_get (&array, 2) == 3);
+    CHECK (*(const am_int32*) varray_get (&array, 3) == 3);
+    CHECK (*(const am_int32*) varray_get (&array, 4) == 4);
+    CHECK (*(const am_int32*) varray_get (&array, 5) == 5);
+    CHECK (*(const am_int32*) varray_get (&array, 6) == 6);
+
+    varray_free (&array);
+}
+
+TESTER(varray_sort_4)
+{
+    ValueArray array;
+
+    varray_init (&array, sizeof (am_int32));
+    varray_sort (&array, my_int32_comparer, NULL);
+
+    CHECK (array.len == 0);
+
+    varray_free (&array);
+}
+
+TESTER(varray_bsearch_1)
+{
+    ValueArray array;
+    am_int32 value = 123;
+    const am_int32 *found;
+
+    varray_init (&array, sizeof (am_int32));
+    found = (const am_int32*) varray_bsearch (&array, &value, my_int32_comparer, NULL);
+
+    CHECK (found == NULL);
+
+    varray_free (&array);
+}
+
+TESTER(varray_bsearch_2)
+{
+    ValueArray array;
+    am_int32 value = 123;
+    const am_int32 *found;
+
+    varray_init (&array, sizeof (am_int32));
+    *(am_int32*) varray_emplace_back (&array) = 1;
+    *(am_int32*) varray_emplace_back (&array) = 2;
+    *(am_int32*) varray_emplace_back (&array) = 3;
+    *(am_int32*) varray_emplace_back (&array) = 4;
+    *(am_int32*) varray_emplace_back (&array) = 5;
+    *(am_int32*) varray_emplace_back (&array) = 6;
+    *(am_int32*) varray_emplace_back (&array) = 7;
+
+    found = (const am_int32*) varray_bsearch (&array, &value, my_int32_comparer, NULL);
+    CHECK (found == NULL);
+
+    value = 2;
+    found = (const am_int32*) varray_bsearch (&array, &value, my_int32_comparer, NULL);
+    CHECK (found != NULL);
+    CHECK (*found == 2);
+
+    value = 1;
+    found = (const am_int32*) varray_bsearch (&array, &value, my_int32_comparer, NULL);
+    CHECK (found != NULL);
+    CHECK (*found == 1);
+
+    value = 7;
+    found = (const am_int32*) varray_bsearch (&array, &value, my_int32_comparer, NULL);
+    CHECK (found != NULL);
+    CHECK (*found == 7);
+
+    value = 0;
+    found = (const am_int32*) varray_bsearch (&array, &value, my_int32_comparer, NULL);
+    CHECK (found == NULL);
+
+    varray_free (&array);
+}
+

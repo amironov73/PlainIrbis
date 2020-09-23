@@ -27,6 +27,7 @@ set(CFiles
     src/span.c
     src/spanarry.c
     src/stream.c
+    src/subfield.c
     src/upc.c
     src/utils.c
     src/varray.c

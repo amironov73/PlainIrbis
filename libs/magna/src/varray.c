@@ -537,7 +537,7 @@ MAGNA_API void MAGNA_CALL varray_remove_item
     }
     else {
         /* Элемент где-то в середине */
-        memmove (item, item + array->itemSize, array->itemSize);
+        memmove (item, ((am_byte*) item) + array->itemSize, array->itemSize);
         --array->len;
     }
 }
@@ -562,6 +562,170 @@ MAGNA_API void MAGNA_CALL varray_remove_index
 
     item = varray_get (array, index);
     varray_remove_item (array, item);
+}
+
+static void va_swap
+    (
+        am_byte *left,
+        am_byte *right,
+        am_size_t size
+    )
+{
+    am_size_t index;
+    am_byte temp;
+
+    /* TODO: optimize */
+
+    for (index = 0; index < size; ++index) {
+        temp = left[index];
+        left[index] = right[index];
+        right[index] = temp;
+    }
+}
+
+static void va_qsort
+    (
+        am_byte *ptr,
+        am_ssize_t left,
+        am_ssize_t right,
+        am_size_t size,
+        Comparer comparer,
+        const void *data
+    )
+{
+    am_size_t i, j, pivot;
+
+    if (left < right) {
+        pivot = left;
+        i = left;
+        j = right;
+
+        while(i < j) {
+            while (comparer (ptr + i * size, ptr + pivot * size, data) <= 0
+                && (i < right)) {
+                i++;
+            }
+
+            while (comparer (ptr + j * size, ptr + pivot * size, data) > 0) {
+                j--;
+            }
+
+            if (i < j) {
+                va_swap (ptr + i * size, ptr + j * size, size);
+            }
+        }
+
+        va_swap (ptr + pivot * size, ptr + j * size, size);
+        va_qsort (ptr, left, j-1, size, comparer, data);
+        va_qsort (ptr, j+1, right, size, comparer, data);
+    }
+}
+
+/**
+ * Сортировка массива.
+ *
+ * @param array Массив.
+ * @param comparer Функция сравнения.
+ * @param data Произвольные пользовательские данные.
+ */
+MAGNA_API void MAGNA_CALL varray_sort
+    (
+        ValueArray *array,
+        Comparer comparer,
+        const void *data
+    )
+{
+    am_byte *ptr;
+
+    assert (array != NULL);
+    assert (comparer != NULL);
+
+    if (array->len == 0) {
+        return;
+    }
+
+    ptr = array->ptr + array->offset * array->itemSize;
+    va_qsort (ptr, 0, array->len - 1, array->itemSize, comparer, data);
+}
+
+static void* va_bsearch
+    (
+        const am_byte *ptr,
+        const void *value,
+        am_ssize_t left,
+        am_ssize_t right,
+        am_size_t size,
+        Comparer comparer,
+        const void *data
+    )
+{
+    am_ssize_t middle;
+    const am_byte *pmiddle;
+    int rc;
+
+    if (right >= left) {
+        middle = left + (right - left) / 2;
+        pmiddle = ptr + middle * size;
+        rc = comparer (pmiddle, value, data);
+
+        /* Если сразу попали куда надо */
+        if (rc == 0) {
+            return (void*) pmiddle;
+        }
+
+        /* Если элемент посередине оказался меньше,
+           ищем в левом подмассиве */
+        if (rc > 0) {
+            return va_bsearch (ptr, value, left, middle - 1, size, comparer, data);
+        }
+
+        /* Иначе ищем в правом подмассиве */
+        return va_bsearch (ptr, value, middle + 1, right, size, comparer, data);
+    }
+
+    /* Сюда мы попадаем, если ничего не найдено */
+
+    return NULL;
+}
+
+/**
+ * Бинарный поиск в массиве.
+ *
+ * @param array Массив.
+ * @param value Искомое значение.
+ * @param comparer Функция сравнения.
+ * @param data Произвольные пользовательские данные.
+ * @return Указатель на найденный элемент либо `NULL`.
+ */
+MAGNA_API void* MAGNA_CALL varray_bsearch
+    (
+        ValueArray *array,
+        const void *value,
+        Comparer comparer,
+        const void *data
+    )
+{
+    am_byte *ptr;
+
+    assert (array != NULL);
+    assert (value != NULL);
+    assert (comparer != NULL);
+
+    if (array->len == 0) {
+        return NULL;
+    }
+
+    ptr = array->ptr + array->offset * array->itemSize;
+    return va_bsearch
+        (
+            ptr,
+            value,
+            0,
+            array->len - 1,
+            array->itemSize,
+            comparer,
+            data
+        );
 }
 
 /*=========================================================*/

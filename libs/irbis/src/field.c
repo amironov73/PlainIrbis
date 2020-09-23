@@ -22,7 +22,7 @@ MAGNA_API SubField* MAGNA_CALL field_add
     (
         MarcField *field,
         char code,
-        const char *value
+        Span value
     )
 {
     SubField *subfield;

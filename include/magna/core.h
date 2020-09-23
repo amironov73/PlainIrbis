@@ -501,6 +501,7 @@ extern MAGNA_API              Span       MAGNA_CALL span_tolower          (Span 
 
 typedef void* (*Cloner)    (void*);
 typedef void  (*Liberator) (void*);
+typedef int   (*Comparer)  (const void*, const void*, const void*);
 
 /*=========================================================*/
 
@@ -550,6 +551,7 @@ struct MagnaValueArray
 
 #define VARRAY_INIT(__itemSize) { NULL, __itemSize, 0, 0, 0, NULL };
 
+MAGNA_API              void*   MAGNA_CALL varray_bsearch      (ValueArray *array, const void *value, Comparer comparer, const void *data);
 MAGNA_API              void    MAGNA_CALL varray_clear        (ValueArray *array);
 MAGNA_API              am_bool MAGNA_CALL varray_clone        (ValueArray *target, const ValueArray *source, Cloner cloner);
 MAGNA_API              am_bool MAGNA_CALL varray_concat       (ValueArray *target, const ValueArray *source);
@@ -567,6 +569,7 @@ MAGNA_API              am_bool MAGNA_CALL varray_push_front   (ValueArray *array
 MAGNA_API              void    MAGNA_CALL varray_remove_index (ValueArray *array, am_size_t index);
 MAGNA_API              void    MAGNA_CALL varray_remove_item  (ValueArray *array, void *item);
 MAGNA_API              void    MAGNA_CALL varray_set          (ValueArray *array, am_size_t index, void *value);
+MAGNA_API              void    MAGNA_CALL varray_sort         (ValueArray *array, Comparer comparer, const void *data);
 MAGNA_API              void    MAGNA_CALL varray_truncate     (ValueArray *array, am_size_t newSize);
 
 /*=========================================================*/

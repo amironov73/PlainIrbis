@@ -201,7 +201,8 @@ typedef struct
 MAGNA_API SubField* MAGNA_CALL subfield_clone     (SubField *target, const SubField *source);
 MAGNA_API SubField* MAGNA_CALL subfield_decode    (SubField *subfield, Span span);
 MAGNA_API am_bool   MAGNA_CALL subfield_empty     (const SubField *subfield);
-MAGNA_API SubField* MAGNA_CALL subfield_init      (SubField *subfield, char code, const char *value);
+MAGNA_API void      MAGNA_CALL subfield_free      (SubField *subfield);
+MAGNA_API SubField* MAGNA_CALL subfield_init      (SubField *subfield, char code, Span value);
 MAGNA_API Buffer*   MAGNA_CALL subfield_to_string (const SubField *subfield, Buffer *buffer);
 MAGNA_API am_bool   MAGNA_CALL subfield_verify    (const SubField *subfield);
 
@@ -217,9 +218,10 @@ typedef struct
 
 } MarcField;
 
-MAGNA_API SubField*  MAGNA_CALL field_add                      (MarcField *field, char code, const char *value);
+MAGNA_API SubField*  MAGNA_CALL field_add                      (MarcField *field, char code, Span value);
 MAGNA_API MarcField* MAGNA_CALL field_clear                    (MarcField *field);
 MAGNA_API MarcField* MAGNA_CALL field_clone                    (MarcField *target, const MarcField *source);
+MAGNA_API SubField*  MAGNA_CALL subfield_create                (SubField *subfield, char code, Span value);
 MAGNA_API MarcField* MAGNA_CALL field_decode                   (MarcField *field, Span span);
 MAGNA_API am_bool    MAGNA_CALL field_empty                    (const MarcField *field);
 MAGNA_API Array*     MAGNA_CALL field_get_embedded_fields      (const MarcField *field, Array *array);

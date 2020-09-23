@@ -135,19 +135,59 @@ MAGNA_API am_bool MAGNA_CALL subfield_empty
  * @param value Указатель на строку с данными.
  * @return Указатель на подполе.
  */
-MAGNA_API SubField* MAGNA_CALL subfield_init
+MAGNA_API SubField* MAGNA_CALL subfield_create
     (
         SubField *subfield,
         char code,
-        const char *value
+        Span value
     )
 {
     assert (subfield != NULL);
 
     subfield->code = code;
-    buffer_from_text (&subfield->value, value);
+    buffer_create (&subfield->value, value.ptr, value.len);
+    subfield->value.position = value.len;
 
     return subfield;
+}
+
+/**
+ * Инициализация подполя.
+ *
+ * @param subfield Указатель на неинициализированное подполе.
+ * @param code Код подполя.
+ * @param value Указатель на строку с данными.
+ * @return Указатель на подполе.
+ */
+MAGNA_API SubField* MAGNA_CALL subfield_init
+    (
+        SubField *subfield,
+        char code,
+        Span value
+    )
+{
+    assert (subfield != NULL);
+
+    subfield->code = code;
+    buffer_from_span (&subfield->value, value);
+    subfield->value.position = value.len;
+
+    return subfield;
+}
+
+/**
+ * Освобождение ресурсов, занятых подполем.
+ *
+ * @param subfield Подполе, подлежащее освобождению.
+ */
+MAGNA_API void MAGNA_CALL subfield_free
+    (
+        SubField *subfield
+    )
+{
+    assert (subfield != NULL);
+
+    buffer_free (&subfield->value);
 }
 
 /**
