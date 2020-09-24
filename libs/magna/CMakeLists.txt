@@ -33,11 +33,13 @@ set(CFiles
     src/io.c
     src/keyboard.c
     src/koi8r.c
+    src/list.c
     src/magna.c
     src/map.c
     src/memory.c
     src/navigatr.c
     src/number.c
+    src/object.c
     src/path.c
     src/retry.c
     src/screen.c

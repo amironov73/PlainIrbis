@@ -367,6 +367,7 @@ typedef struct MagnaAllocatorChunk AllocatorChunk;
 typedef struct MagnaArray          Array;
 typedef struct MagnaBuffer         Buffer;
 typedef struct MangaEnumerator     Enumerator;
+typedef struct MaganaListItem      ListItem;
 typedef struct MagnaMemoryChunk    MemoryChunk;
 typedef struct MagnaSpan           Span;
 typedef struct MagnaSpanArray      SpanArray;

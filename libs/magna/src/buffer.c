@@ -14,6 +14,7 @@
 /*=========================================================*/
 
 #include <ctype.h>
+#include <stdarg.h>
 #include <assert.h>
 
 /*=========================================================*/
@@ -1107,6 +1108,32 @@ MAGNA_API am_bool MAGNA_CALL buffer_empty
     assert (buffer != NULL);
 
     return buffer->position == 0;
+}
+
+/**
+ * Аналог printf.
+ *
+ * @param buffer Буфер для вывода.
+ * @param format Строка формата.
+ * @param ... Прочие аргументы.
+ * @return Признак успешности завершения операции.
+ */
+MAGNA_API am_bool buffer_format
+    (
+        Buffer *buffer,
+        Span format,
+        ...
+    )
+{
+    va_list args;
+
+    assert (buffer != NULL);
+
+    va_start (args, format);
+
+    va_end (args);
+
+    return AM_FALSE;
 }
 
 /*=========================================================*/

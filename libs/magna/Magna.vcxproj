@@ -38,11 +38,13 @@
     <ClCompile Include="src\io.c" />
     <ClCompile Include="src\keyboard.c" />
     <ClCompile Include="src\koi8r.c" />
+    <ClCompile Include="src\list.c" />
     <ClCompile Include="src\magna.c" />
     <ClCompile Include="src\map.c" />
     <ClCompile Include="src\memory.c" />
     <ClCompile Include="src\navigatr.c" />
     <ClCompile Include="src\number.c" />
+    <ClCompile Include="src\object.c" />
     <ClCompile Include="src\path.c" />
     <ClCompile Include="src\retry.c" />
     <ClCompile Include="src\screen.c" />
