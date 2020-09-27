@@ -20,7 +20,7 @@
 /**
  * \file object.c
  *
- * Объект.
+ * Простая объектная система.
  *
  */
 
@@ -28,21 +28,21 @@
 
 /* Простейший объект */
 
+typedef void (*Destroyer) (void*);
+typedef am_bool (*GetString) (const void*, Buffer*);
+
 typedef struct
 {
     char *name;
+    GetString to_string;
+    Destroyer destroy;
 
 } TypeInfo;
 
-typedef void (*Destroyer) (void*);
 typedef const TypeInfo* (*GetType) (const void*);
-typedef am_bool (*GetString) (const void*, Buffer*);
 
 #define MAGNA_OBJECT_HEADER \
-    GetType get_type;       \
-    GetString to_string;    \
-    Destroyer destroy;      \
-    void *auxData;
+    GetType get_type;
 
 typedef struct
 {
@@ -63,8 +63,6 @@ MAGNA_API void MAGNA_CALL object_init
     assert (object != NULL);
 
     object->get_type  = NULL;
-    object->to_string = NULL;
-    object->destroy   = NULL;
 }
 
 /**
@@ -77,11 +75,17 @@ MAGNA_API void MAGNA_CALL object_destroy
         Object *object
     )
 {
+    const TypeInfo *type;
+
     assert (object != NULL);
 
-    if (object->destroy != NULL) {
-        object->destroy (object);
-        object->destroy = NULL;
+    if (object->get_type != NULL) {
+        type = object->get_type (object);
+        if (type != NULL) {
+            if (type->destroy != NULL) {
+                type->destroy (object);
+            }
+        }
     }
 }
 
@@ -98,20 +102,18 @@ MAGNA_API am_bool MAGNA_CALL object_to_string
         Buffer *buffer
     )
 {
-    const TypeInfo *info;
+    const TypeInfo *type;
 
     assert (object != NULL);
     assert (buffer != NULL);
 
-    if (object->to_string != NULL) {
-        return object->to_string (object, buffer);
-    }
-
     if (object->get_type != NULL) {
-        info = object->get_type (object);
-        if (info != NULL) {
-            return buffer_puts (buffer, info->name);
+        type = object->get_type (object);
+        if (type != NULL) {
+            return type->to_string (object, buffer);
         }
+
+        return buffer_puts (buffer, type->name);
     }
 
     return AM_TRUE;
@@ -130,13 +132,12 @@ MAGNA_API const TypeInfo* MAGNA_CALL object_get_type
 {
     assert (object != NULL);
 
-    if (object->to_string != NULL) {
-        return object_get_type (object);
+    if (object->get_type != NULL) {
+        return object->get_type (object);
     }
 
     return NULL;
 }
-
 
 /*=========================================================*/
 
