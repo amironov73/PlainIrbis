@@ -637,6 +637,25 @@ MAGNA_API void    MAGNA_CALL span_array_truncate   (SpanArray *array, am_size_t 
 
 /*=========================================================*/
 
+/* Простой двусвязный список. */
+
+struct MaganaListItem
+{
+    ListItem *next;
+    ListItem *previous;
+    am_byte dataStart;
+};
+
+typedef struct
+{
+    ListItem *first;
+    ListItem *last;
+    am_size_t itemSize;
+
+} LinkedList;
+
+/*=========================================================*/
+
 /* Простой ассоциативный динамический массив */
 
 typedef am_size_t (MAGNA_CALL *HashFunction) (void*);

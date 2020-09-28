@@ -1,5 +1,5 @@
 #########################
-# Common support library
+# Core library
 #########################
 
 .PHONY: all clean
