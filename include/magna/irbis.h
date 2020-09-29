@@ -578,6 +578,30 @@ MAGNA_API am_bool MAGNA_CALL isbn_check_control_digit (const Span isbn);
 
 /*=========================================================*/
 
+/* Формат ISO 2709 */
+
+/* Маркер записи */
+typedef struct
+{
+    am_byte length[5];
+    am_byte status;
+    am_byte type;
+    am_byte index;
+    am_byte unused[2];
+    am_byte indicatorLength;
+    am_byte identifierLength;
+    am_byte base[5];
+    am_byte level;
+    am_byte rules;
+    am_byte related;
+    am_byte lengthOfLength;
+    am_byte offsetLength;
+    am_byte zero[2];
+
+} IsoMarker;
+
+/*=========================================================*/
+
 #ifdef _M_IX86
 
 /* Работа с irbis64.dll */

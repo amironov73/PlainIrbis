@@ -654,6 +654,18 @@ typedef struct
 
 } LinkedList;
 
+extern MAGNA_API              void      MAGNA_CALL list_clear          (LinkedList *list, Liberator liberator);
+extern MAGNA_API              void*     MAGNA_CALL list_emplace_back   (LinkedList *list);
+extern MAGNA_API              void*     MAGNA_CALL list_emplace_front  (LinkedList *list);
+extern MAGNA_API              void      MAGNA_CALL list_init           (LinkedList *list, am_size_t itemSize);
+extern MAGNA_API              ListItem* MAGNA_CALL list_insert_after   (LinkedList *list, ListItem *item, const void *data);
+extern MAGNA_API              ListItem* MAGNA_CALL list_insert_before  (LinkedList *list, ListItem *item, const void *data);
+extern MAGNA_API MAGNA_INLINE am_bool   MAGNA_CALL list_is_empty       (const LinkedList *list);
+extern MAGNA_API              am_size_t MAGNA_CALL list_length         (const LinkedList *list);
+extern MAGNA_API              ListItem* MAGNA_CALL list_push_back      (LinkedList *list, const void *data);
+extern MAGNA_API              ListItem* MAGNA_CALL list_push_front     (LinkedList *list, const void *data);
+extern MAGNA_API              void      MAGNA_CALL list_remove         (LinkedList *list, ListItem *item, Liberator liberator);
+
 /*=========================================================*/
 
 /* Простой ассоциативный динамический массив */
