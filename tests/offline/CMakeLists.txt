@@ -17,6 +17,7 @@ set(CFiles
     src/intarray.c
     src/io.c
     src/koi8r.c
+    src/list.c
     src/main.c
     src/memory.c
     src/menu.c

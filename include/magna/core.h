@@ -654,17 +654,31 @@ typedef struct
 
 } LinkedList;
 
+typedef am_bool (*ListWalker) (LinkedList*, ListItem*, void*);
+
 extern MAGNA_API              void      MAGNA_CALL list_clear          (LinkedList *list, Liberator liberator);
+extern MAGNA_API MAGNA_INLINE void*     MAGNA_CALL list_data           (const ListItem *item);
+extern MAGNA_API              void*     MAGNA_CALL list_emplace_after  (LinkedList *list, ListItem *item);
 extern MAGNA_API              void*     MAGNA_CALL list_emplace_back   (LinkedList *list);
+extern MAGNA_API              void*     MAGNA_CALL list_emplace_before (LinkedList *list, ListItem *item);
 extern MAGNA_API              void*     MAGNA_CALL list_emplace_front  (LinkedList *list);
+extern MAGNA_API              am_bool   MAGNA_CALL list_extract_back   (LinkedList *list, void *place);
+extern MAGNA_API              am_bool   MAGNA_CALL list_extract_front  (LinkedList *list, void *place);
+extern MAGNA_API              ListItem* MAGNA_CALL list_find_first     (const LinkedList *list, Comparer comparer, void *data, void *extra);
+extern MAGNA_API              ListItem* MAGNA_CALL list_find_last      (const LinkedList *list, Comparer comparer, void *data, void *extra);
 extern MAGNA_API              void      MAGNA_CALL list_init           (LinkedList *list, am_size_t itemSize);
 extern MAGNA_API              ListItem* MAGNA_CALL list_insert_after   (LinkedList *list, ListItem *item, const void *data);
 extern MAGNA_API              ListItem* MAGNA_CALL list_insert_before  (LinkedList *list, ListItem *item, const void *data);
 extern MAGNA_API MAGNA_INLINE am_bool   MAGNA_CALL list_is_empty       (const LinkedList *list);
+extern MAGNA_API MAGNA_INLINE ListItem* MAGNA_CALL list_item           (const void *data);
 extern MAGNA_API              am_size_t MAGNA_CALL list_length         (const LinkedList *list);
+extern MAGNA_API              ListItem* MAGNA_CALL list_pop_back       (LinkedList *list);
+extern MAGNA_API              ListItem* MAGNA_CALL list_pop_front      (LinkedList *list);
 extern MAGNA_API              ListItem* MAGNA_CALL list_push_back      (LinkedList *list, const void *data);
 extern MAGNA_API              ListItem* MAGNA_CALL list_push_front     (LinkedList *list, const void *data);
 extern MAGNA_API              void      MAGNA_CALL list_remove         (LinkedList *list, ListItem *item, Liberator liberator);
+extern MAGNA_API              am_bool   MAGNA_CALL list_walk_backward  (LinkedList *list, ListWalker walker, void *data);
+extern MAGNA_API              am_bool   MAGNA_CALL list_walk_forward   (LinkedList *list, ListWalker walker, void *data);
 
 /*=========================================================*/
 
