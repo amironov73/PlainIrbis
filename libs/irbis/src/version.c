@@ -57,12 +57,12 @@ MAGNA_API am_bool MAGNA_CALL version_parse
     )
 {
     am_bool result = AM_FALSE;
-    Array lines;
+    Vector lines;
 
     assert (version != NULL);
     assert (response != NULL);
 
-    if (!array_create (&lines, 4)) {
+    if (!vector_create(&lines, 4)) {
         return AM_FALSE;
     }
 
@@ -82,7 +82,8 @@ MAGNA_API am_bool MAGNA_CALL version_parse
 
     result = AM_TRUE;
 
-    DONE: array_free (&lines);
+    DONE:
+    vector_destroy(&lines);
 
     return result;
 }

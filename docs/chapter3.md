@@ -30,7 +30,7 @@
 
 Поле структуры | Тип      | Назначение
 ---------------|----------|-----------
-fields         | Array    | Динамический массив указателей на поля.
+fields         | Vector    | Динамический массив указателей на поля.
 database       | Buffer   | Имя базы данных. Для вновь созданных записей пустое.
 data           | void*    | Произвольные пользовательские данные.
 mfn            | am_mfn   | MFN.
@@ -43,15 +43,15 @@ version        | am_int32 | Версия записи.
 
 * MarcRecord\* **record_clone** (MarcRecord \*target, const MarcRecord \*source)
 
-* am_bool **record_decode_lines** (MarcRecord \*record, Array \*lines)
+* am_bool **record_decode_lines** (MarcRecord \*record, Vector \*lines)
 
 * am_bool **record_encode** (const MarcRecord \*record, const char \*delimiter, Buffer \*buffer)
 
 * Span **record_fm** (const MarcRecord \*record, am_uint32 tag, char code)
 
-* am_bool **record_fma** (const MarcRecord \*record, Array \*array, am_uint32 tag, char code)
+* am_bool **record_fma** (const MarcRecord \*record, Vector \*array, am_uint32 tag, char code)
 
-* MarcField\* **record_get_field** (const MarcRecord \*record, am_uint32 tag, am_size_t occurrence)
+* MarcField\* **record_get_field** (const MarcRecord \*record, am_uint32 tag, size_t occurrence)
 
 #### MarcField
 
@@ -96,7 +96,7 @@ version        | am_int32 | Версия записи.
 Поле структуры | Тип       | Назначение
 ---------------|-----------|-----------
 value          | Buffer    | Данные до первого разделителя (может быть пустым).
-subfields      | Array     | Динамический массив указателей на подполя.
+subfields      | Vector     | Динамический массив указателей на подполя.
 tag            | am_uint32 | Метка поля.
 
 С данной структорой работают следующие функции:
@@ -111,7 +111,7 @@ tag            | am_uint32 | Метка поля.
 
 * am_bool **field_empty** (const MarcField \*field)
 
-* Array\* **field_get_embedded_fields** (const MarcField \*field, Array \*array)
+* Vector\* **field_get_embedded_fields** (const MarcField \*field, Vector \*array)
 
 * SubField\* **field_get_first_subfield** (const MarcField \*field, char code)
 
@@ -119,9 +119,9 @@ tag            | am_uint32 | Метка поля.
 
 * MarcField\* **field_init** (MarcField \*field, am_uint32 tag)
 
-* MarcField\* **field_insert_at** (MarcField \*field, am_size_t index, const SubField \*subfield)
+* MarcField\* **field_insert_at** (MarcField \*field, size_t index, const SubField \*subfield)
 
-* MarcField\* **field_remove_at** (MarcField \*field, am_size_t index)
+* MarcField\* **field_remove_at** (MarcField \*field, size_t index)
 
 * MarcField\* **field_remove_subfield** (MarcField \*field, char code)
 

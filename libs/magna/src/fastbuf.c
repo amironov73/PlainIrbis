@@ -63,7 +63,7 @@
 MAGNA_API void MAGNA_CALL fastbuf_init
     (
         FastBuffer *buffer,
-        am_size_t static_capacity
+        size_t static_capacity
     )
 {
     assert (buffer != NULL);
@@ -140,7 +140,7 @@ MAGNA_API am_bool MAGNA_CALL fastbuf_empty
 MAGNA_API am_bool MAGNA_CALL fastbuf_grow
     (
         FastBuffer *buffer,
-        am_size_t newSize
+        size_t newSize
     )
 {
     assert (buffer != NULL);
@@ -166,7 +166,7 @@ MAGNA_API am_bool MAGNA_CALL fastbuf_write
     (
         FastBuffer *buffer,
         const am_byte *data,
-        am_size_t dataSize
+        size_t dataSize
     )
 {
     assert (buffer != NULL);
@@ -220,11 +220,11 @@ MAGNA_API void MAGNA_CALL fastbuf_rewind
     assert (buffer != NULL);
 }
 
-MAGNA_API am_size_t MAGNA_CALL fastbuf_read
+MAGNA_API size_t MAGNA_CALL fastbuf_read
     (
         FastBuffer *buffer,
         am_byte *data,
-        am_size_t size
+        size_t size
     )
 {
     assert (buffer != NULL);
@@ -252,7 +252,7 @@ MAGNA_API am_int32 MAGNA_CALL fastbuf_getc_utf8
     return -1;
 }
 
-MAGNA_API am_size_t MAGNA_CALL fastbuf_gets
+MAGNA_API size_t MAGNA_CALL fastbuf_gets
     (
         FastBuffer *buffer,
         Buffer *text

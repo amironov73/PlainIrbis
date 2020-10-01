@@ -56,12 +56,12 @@ MAGNA_API Buffer* MAGNA_CALL buffer_init
  * @param newSize Предполагаемый размер.
  * @return Вычисленный размер.
  */
-MAGNA_API am_size_t MAGNA_CALL buffer_calculate_size
+MAGNA_API size_t MAGNA_CALL buffer_calculate_size
     (
-        am_size_t newSize
+        size_t newSize
     )
 {
-    am_size_t result = 8;
+    size_t result = 8;
 
     if (newSize < 8) {
         newSize = 8;
@@ -184,7 +184,7 @@ MAGNA_API am_bool MAGNA_CALL buffer_create
     (
         Buffer *buffer,
         const am_byte *data,
-        am_size_t length
+        size_t length
     )
 {
     assert (buffer != NULL);
@@ -219,7 +219,7 @@ MAGNA_API Buffer* MAGNA_CALL buffer_static
     (
         Buffer *buffer,
         const am_byte *data,
-        am_size_t length
+        size_t length
     )
 {
     assert (buffer != NULL);
@@ -261,7 +261,7 @@ MAGNA_API void MAGNA_CALL buffer_free
 MAGNA_API am_bool MAGNA_CALL buffer_grow
     (
             Buffer *buffer,
-            am_size_t newSize
+            size_t newSize
     )
 {
     am_byte *newPtr;
@@ -323,7 +323,7 @@ MAGNA_API am_bool MAGNA_CALL buffer_puts
         const char *str
     )
 {
-    am_size_t delta;
+    size_t delta;
 
     assert (buffer != NULL);
     assert (str != NULL);
@@ -347,11 +347,11 @@ MAGNA_API am_bool MAGNA_CALL buffer_puts
  * @param length Предполагаемое число байт для считывания.
  * @return Количество реально прочитанных байт.
  */
-MAGNA_API am_size_t MAGNA_CALL buffer_read
+MAGNA_API size_t MAGNA_CALL buffer_read
     (
         Buffer *buffer,
         am_byte *data,
-        am_size_t length
+        size_t length
     )
 {
     assert (buffer != NULL);
@@ -377,7 +377,7 @@ MAGNA_API am_bool MAGNA_CALL buffer_write
     (
         Buffer *buffer,
         const am_byte *data,
-        am_size_t length
+        size_t length
     )
 {
     assert (buffer != NULL);
@@ -405,7 +405,7 @@ MAGNA_API am_bool MAGNA_CALL buffer_assign
     (
         Buffer *buffer,
         const am_byte *data,
-        am_size_t length
+        size_t length
     )
 {
     assert (buffer != NULL);
@@ -438,7 +438,7 @@ MAGNA_API am_bool MAGNA_CALL buffer_assign_text
         const char *text
     )
 {
-    am_size_t len;
+    size_t len;
 
     assert (buffer != NULL);
 
@@ -476,7 +476,7 @@ MAGNA_API Buffer* MAGNA_CALL buffer_from_text
         const char *text
     )
 {
-    am_size_t len;
+    size_t len;
 
     assert (buffer != NULL);
 
@@ -604,7 +604,7 @@ MAGNA_API am_bool MAGNA_CALL buffer_replace_text
     )
 {
     am_byte *ptr1, *ptr2, *end;
-    am_size_t lenFrom, lenTo, count, offset;
+    size_t lenFrom, lenTo, count, offset;
 
     assert (buffer != NULL);
     assert (from != NULL);
@@ -671,7 +671,7 @@ MAGNA_API int MAGNA_CALL buffer_compare
         const Buffer *second
     )
 {
-    am_size_t i;
+    size_t i;
     int result;
 
     assert (first != NULL);
@@ -711,7 +711,7 @@ MAGNA_API int MAGNA_CALL buffer_compare_span
         Span span
     )
 {
-    am_size_t i;
+    size_t i;
     int result;
 
     assert (buffer != NULL);
@@ -750,7 +750,7 @@ MAGNA_API int MAGNA_CALL buffer_compare_span_ignore_case
         Span span
     )
 {
-    am_size_t i;
+    size_t i;
     int result;
 
     assert (buffer != NULL);
@@ -790,7 +790,7 @@ MAGNA_API int MAGNA_CALL buffer_compare_text
     )
 {
     const am_byte *ptr = text;
-    am_size_t i;
+    size_t i;
     int result;
 
     assert (buffer != NULL);
@@ -831,7 +831,7 @@ MAGNA_API int MAGNA_CALL buffer_compare_text_ignore_case
     )
 {
     const am_byte *ptr = text;
-    am_size_t i;
+    size_t i;
     int result;
 
     assert (buffer != NULL);
@@ -894,7 +894,7 @@ MAGNA_API am_bool MAGNA_CALL buffer_utf8_to_ansi
         const Buffer *source
     )
 {
-    am_size_t delta;
+    size_t delta;
 
     assert (target != NULL);
     assert (source != NULL);
@@ -922,7 +922,7 @@ MAGNA_API am_bool MAGNA_CALL buffer_ansi_to_utf8
         const Buffer *source
     )
 {
-    am_size_t delta;
+    size_t delta;
 
     assert (target != NULL);
     assert (source != NULL);
@@ -976,7 +976,7 @@ MAGNA_API Buffer* MAGNA_CALL buffer_swap
     )
 {
     am_byte *tempPointer;
-    am_size_t tempNumber;
+    size_t tempNumber;
 
     assert (first != NULL);
     assert (second != NULL);

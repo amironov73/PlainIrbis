@@ -623,7 +623,7 @@ TESTER(chunked_at_4)
 {
     ChunkedBuffer buffer;
     am_byte waste[1024], *ptr;
-    am_size_t position;
+    size_t position;
 
     chunked_init (&buffer, 1024);
     chunked_write (&buffer, waste, sizeof (waste) - 2);
@@ -676,7 +676,7 @@ TESTER(chunked_all_3)
     ChunkedBuffer chunked;
     Buffer buffer;
     am_byte waste [1024];
-    am_size_t expected;
+    size_t expected;
 
     chunked_init (&chunked, 1024);
     buffer_init (&buffer);

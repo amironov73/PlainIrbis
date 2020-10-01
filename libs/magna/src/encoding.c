@@ -45,17 +45,17 @@ Encoding koi8r_encoding = {
 
 static Encoding* _builtin_encodings[] = { &cp1251_encoding, &cp866_encoding, &koi8r_encoding };
 
-static Array _registered_encodings = ARRAY_INIT;
+static Vector _registered_encodings = VECTOR_INIT;
 
 static void _register_builtin_encodings()
 {
-    am_size_t index, count;
+    size_t index, count;
 
     if (_registered_encodings.ptr == NULL) {
         count = sizeof (_builtin_encodings) / sizeof (_builtin_encodings[0]);
-        array_create (&_registered_encodings, count);
+        vector_create(&_registered_encodings, count);
         for (index = 0; index < count; ++index) {
-            array_push_back (&_registered_encodings, _builtin_encodings[index]);
+            vector_push_back(&_registered_encodings, _builtin_encodings[index]);
         }
     }
 }
@@ -80,7 +80,7 @@ MAGNA_API am_bool MAGNA_CALL encoding_register
         return AM_TRUE;
     }
 
-    return array_push_back (&_registered_encodings, (void*) encoding);
+    return vector_push_back(&_registered_encodings, (void *) encoding);
 }
 
 /**
@@ -94,13 +94,13 @@ MAGNA_API Encoding* MAGNA_CALL encoding_get
         const char *name
     )
 {
-    am_size_t index;
+    size_t index;
     Encoding *encoding;
 
     assert (name != NULL);
 
     for (index = 0; index < _registered_encodings.len; ++index) {
-        encoding = (Encoding*) array_get (&_registered_encodings, index);
+        encoding = (Encoding*) vector_get(&_registered_encodings, index);
         if (same_text(encoding->name, name)) {
             return encoding;
         }
@@ -129,15 +129,15 @@ MAGNA_API Encoding* encoding_ansi (void)
  * @param value Искомый широкий символ.
  * @return Поизиция, в которой символ найден, либо -1.
  */
-MAGNA_API am_ssize_t MAGNA_CALL search_for_unicode
+MAGNA_API ssize_t MAGNA_CALL search_for_unicode
     (
         am_wchar *array,
-        am_ssize_t left,
-        am_ssize_t right,
+        ssize_t left,
+        ssize_t right,
         am_wchar value
     )
 {
-    am_ssize_t mid;
+    ssize_t mid;
 
     AGAIN:
     if (right >= left) {

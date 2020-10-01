@@ -213,7 +213,7 @@ MAGNA_API am_bool   MAGNA_CALL subfield_verify    (const SubField *subfield);
 typedef struct
 {
     Buffer value;
-    Array subfields;
+    Vector subfields;
     am_uint32 tag;
 
 } MarcField;
@@ -224,12 +224,12 @@ MAGNA_API MarcField* MAGNA_CALL field_clone                    (MarcField *targe
 MAGNA_API SubField*  MAGNA_CALL subfield_create                (SubField *subfield, char code, Span value);
 MAGNA_API MarcField* MAGNA_CALL field_decode                   (MarcField *field, Span span);
 MAGNA_API am_bool    MAGNA_CALL field_empty                    (const MarcField *field);
-MAGNA_API Array*     MAGNA_CALL field_get_embedded_fields      (const MarcField *field, Array *array);
+MAGNA_API Vector*     MAGNA_CALL field_get_embedded_fields      (const MarcField *field, Vector *array);
 MAGNA_API SubField*  MAGNA_CALL field_get_first_subfield       (const MarcField *field, char code);
 MAGNA_API Span       MAGNA_CALL field_get_first_subfield_value (const MarcField *field, char code);
 MAGNA_API MarcField* MAGNA_CALL field_init                     (MarcField *field, am_uint32 tag);
-MAGNA_API MarcField* MAGNA_CALL field_insert_at                (MarcField *field, am_size_t index, const SubField *subfield);
-MAGNA_API MarcField* MAGNA_CALL field_remove_at                (MarcField *field, am_size_t index);
+MAGNA_API MarcField* MAGNA_CALL field_insert_at                (MarcField *field, size_t index, const SubField *subfield);
+MAGNA_API MarcField* MAGNA_CALL field_remove_at                (MarcField *field, size_t index);
 MAGNA_API MarcField* MAGNA_CALL field_remove_subfield          (MarcField *field, char code);
 MAGNA_API Buffer*    MAGNA_CALL field_to_string                (const MarcField *field, Buffer *buffer);
 MAGNA_API am_bool    MAGNA_CALL field_verify                   (const MarcField *field);
@@ -240,7 +240,7 @@ MAGNA_API am_bool    MAGNA_CALL field_verify                   (const MarcField 
 
 typedef struct
 {
-    Array fields;
+    Vector fields;
     Buffer database;
     void *data;
     am_mfn mfn;
@@ -251,11 +251,11 @@ typedef struct
 
 MAGNA_API MarcField*  MAGNA_CALL record_add          (MarcRecord *record, am_uint32 tag, const char *value);
 MAGNA_API MarcRecord* MAGNA_CALL record_clone        (MarcRecord *target, const MarcRecord *source);
-MAGNA_API am_bool     MAGNA_CALL record_decode_lines (MarcRecord *record, Array *lines);
+MAGNA_API am_bool     MAGNA_CALL record_decode_lines (MarcRecord *record, Vector *lines);
 MAGNA_API am_bool     MAGNA_CALL record_encode       (const MarcRecord *record, const char *delimiter, Buffer *buffer);
 MAGNA_API Span        MAGNA_CALL record_fm           (const MarcRecord *record, am_uint32 tag, char code);
-MAGNA_API am_bool     MAGNA_CALL record_fma          (const MarcRecord *record, Array *array, am_uint32 tag, char code);
-MAGNA_API MarcField*  MAGNA_CALL record_get_field    (const MarcRecord *record, am_uint32 tag, am_size_t occurrence);
+MAGNA_API am_bool     MAGNA_CALL record_fma          (const MarcRecord *record, Vector *array, am_uint32 tag, char code);
+MAGNA_API MarcField*  MAGNA_CALL record_get_field    (const MarcRecord *record, am_uint32 tag, size_t occurrence);
 
 /*=========================================================*/
 
@@ -340,9 +340,9 @@ MAGNA_API am_int32 MAGNA_CALL response_get_return_code       (Response *response
 MAGNA_API Span     MAGNA_CALL response_read_ansi             (Response *response);
 MAGNA_API am_int32 MAGNA_CALL response_read_int32            (Response *response);
 MAGNA_API Span     MAGNA_CALL response_read_utf              (Response *response);
-MAGNA_API am_bool  MAGNA_CALL response_remaining_ansi_lines  (Response *response, Array *array);
+MAGNA_API am_bool  MAGNA_CALL response_remaining_ansi_lines  (Response *response, Vector *array);
 MAGNA_API Span     MAGNA_CALL response_remaining_ansi_text   (Response *response);
-MAGNA_API am_bool  MAGNA_CALL response_remaining_utf_lines   (Response *response, Array *array);
+MAGNA_API am_bool  MAGNA_CALL response_remaining_utf_lines   (Response *response, Vector *array);
 MAGNA_API Span     MAGNA_CALL response_remaining_utf_text    (Response *response);
 
 /*=========================================================*/
@@ -363,7 +363,7 @@ MAGNA_API am_bool MAGNA_CALL menu_entry_to_string (const MenuEntry *entry, Buffe
 /* MNU-файл. состоит из пар строк (см. MenuEntry). */
 typedef struct
 {
-    Array entries;
+    Vector entries;
 } MenuFile;
 
 MAGNA_API am_bool          MAGNA_CALL menu_init        (MenuFile *menu);
@@ -398,7 +398,7 @@ MAGNA_API am_bool MAGNA_CALL ini_line_verify    (const IniLine *line);
 typedef struct
 {
     Buffer name;
-    Array lines;
+    Vector lines;
 
 } IniSection;
 
@@ -413,7 +413,7 @@ MAGNA_API void           MAGNA_CALL ini_section_not_modified (IniSection *sectio
 /* INI-файл. Состоит из секций. */
 typedef struct
 {
-    Array sections;
+    Vector sections;
 } IniFile;
 
 MAGNA_API void    MAGNA_CALL ini_file_free         (IniFile *file);
@@ -496,8 +496,8 @@ typedef struct
     Int32Array mfnList;
     Buffer searchExpression;
     Buffer sequentialSearch;
-    Array statements;
-    Array parameters;
+    Vector statements;
+    Vector parameters;
     am_bool actualize;
     am_bool autoin;
     am_mfn firstRecord;

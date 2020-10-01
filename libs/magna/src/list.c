@@ -45,7 +45,7 @@
 MAGNA_API void MAGNA_CALL list_init
     (
         LinkedList *list,
-        am_size_t itemSize
+        size_t itemSize
     )
 {
     assert (list != NULL);
@@ -311,13 +311,13 @@ MAGNA_API MAGNA_INLINE am_bool MAGNA_CALL list_is_empty
  * @param list Список.
  * @return Количество элементов в списке.
  */
-MAGNA_API am_size_t MAGNA_CALL list_length
+MAGNA_API size_t MAGNA_CALL list_length
     (
         const LinkedList *list
     )
 {
     const ListItem *item;
-    am_size_t result = 0;
+    size_t result = 0;
 
     assert (list != NULL);
 

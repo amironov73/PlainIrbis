@@ -2,8 +2,7 @@
 # Safe tests
 #
 
-sources = [ 'src/array.c',
-    'src/buffer.c',
+sources = [ 'src/buffer.c',
     'src/chunked.c',
     'src/cp1251.c',
     'src/cp866.c',
@@ -26,7 +25,8 @@ sources = [ 'src/array.c',
     'src/subfield.c',
     'src/upc.c',
     'src/utils.c',
-    'src/varray.c'
+    'src/varray.c',
+    'src/vector.c'
 ]
 
 localInclude = commonInclude

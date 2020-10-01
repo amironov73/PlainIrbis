@@ -111,7 +111,7 @@ MAGNA_API am_bool MAGNA_CALL span_array_concat
 MAGNA_API am_bool MAGNA_CALL span_array_create
     (
         SpanArray *array,
-        am_size_t capacity
+        size_t capacity
     )
 {
     assert (array != NULL);
@@ -157,7 +157,7 @@ MAGNA_API void MAGNA_CALL span_array_free
 MAGNA_API Span MAGNA_CALL span_array_get
     (
         const SpanArray *array,
-        am_size_t index
+        size_t index
     )
 {
     assert (array != NULL);
@@ -178,10 +178,10 @@ MAGNA_API Span MAGNA_CALL span_array_get
 MAGNA_API am_bool MAGNA_CALL span_array_grow
     (
         SpanArray *array,
-        am_size_t newSize
+        size_t newSize
     )
 {
-    am_size_t size;
+    size_t size;
     Span *newPtr;
 
     assert (array != NULL);
@@ -230,7 +230,7 @@ MAGNA_API am_bool MAGNA_CALL span_array_shrink
     )
 {
     Span *newPtr;
-    am_size_t newSize;
+    size_t newSize;
 
     assert (array != NULL);
     assert (array->len <= array->capacity);
@@ -376,7 +376,7 @@ MAGNA_API am_bool MAGNA_CALL span_array_push_front
 MAGNA_API void MAGNA_CALL span_array_set
     (
         SpanArray *array,
-        am_size_t index,
+        size_t index,
         Span value
     )
 {
@@ -396,7 +396,7 @@ MAGNA_API void MAGNA_CALL span_array_set
 MAGNA_API void MAGNA_CALL span_array_truncate
     (
         SpanArray *array,
-        am_size_t newSize
+        size_t newSize
     )
 {
     assert (array != NULL);
@@ -421,7 +421,7 @@ MAGNA_API am_bool MAGNA_CALL span_array_to_text
         const am_byte *delimiter
     )
 {
-    am_size_t index;
+    size_t index;
     Span *span;
 
     assert (array != NULL);
@@ -455,10 +455,10 @@ MAGNA_API am_bool MAGNA_CALL span_array_from_text
     (
         SpanArray *array,
         const char **text,
-        am_size_t count
+        size_t count
     )
 {
-    am_size_t index;
+    size_t index;
     Span *span;
 
     assert (array != NULL);

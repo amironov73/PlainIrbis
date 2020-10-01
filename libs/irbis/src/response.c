@@ -104,7 +104,7 @@ MAGNA_API Span MAGNA_CALL response_read_utf
 MAGNA_API am_bool MAGNA_CALL response_remaining_ansi_lines
     (
         Response *response,
-        Array *array
+        Vector *array
     )
 {
     assert (response != NULL);
@@ -128,7 +128,7 @@ MAGNA_API Span MAGNA_CALL response_remaining_ansi_text
 MAGNA_API am_bool MAGNA_CALL response_remaining_utf_lines
     (
         Response *response,
-        Array *array
+        Vector *array
     )
 {
     assert (response != NULL);

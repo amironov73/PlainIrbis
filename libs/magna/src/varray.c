@@ -38,7 +38,7 @@
 MAGNA_API void MAGNA_CALL varray_init
     (
         ValueArray *array,
-        am_size_t itemSize
+        size_t itemSize
     )
 {
     assert (array != NULL);
@@ -63,8 +63,8 @@ MAGNA_API void MAGNA_CALL varray_init
 MAGNA_API am_bool MAGNA_CALL varray_create
     (
         ValueArray *array,
-        am_size_t itemSize,
-        am_size_t capacity
+        size_t itemSize,
+        size_t capacity
     )
 {
     assert (array != NULL);
@@ -91,7 +91,7 @@ MAGNA_API void MAGNA_CALL varray_free
         ValueArray *array
     )
 {
-    am_size_t index;
+    size_t index;
     am_byte *ptr;
 
     assert (array != NULL);
@@ -121,7 +121,7 @@ MAGNA_API void MAGNA_CALL varray_free
 MAGNA_API MAGNA_INLINE void* MAGNA_CALL varray_get
     (
         const ValueArray *array,
-        am_size_t index
+        size_t index
     )
 {
     assert (array != NULL);
@@ -140,7 +140,7 @@ MAGNA_API MAGNA_INLINE void* MAGNA_CALL varray_get
 MAGNA_API void MAGNA_CALL varray_set
     (
         ValueArray *array,
-        am_size_t index,
+        size_t index,
         void *value
     )
 {
@@ -168,11 +168,11 @@ MAGNA_API void MAGNA_CALL varray_set
 MAGNA_API am_bool MAGNA_CALL varray_grow
     (
         ValueArray *array,
-        am_size_t newSize
+        size_t newSize
     )
 {
     am_byte *newPtr;
-    am_size_t size;
+    size_t size;
 
     assert (array != NULL);
     assert (newSize != 0);
@@ -380,7 +380,7 @@ MAGNA_API am_bool MAGNA_CALL varray_push_front
 MAGNA_API void MAGNA_CALL varray_truncate
     (
         ValueArray *array,
-        am_size_t newSize
+        size_t newSize
     )
 {
     assert (array != NULL);
@@ -409,7 +409,7 @@ MAGNA_API am_bool MAGNA_CALL varray_clone
     )
 {
     am_byte *sourceItem, *targetItem;
-    am_size_t index;
+    size_t index;
 
     assert (target != NULL);
     assert (source != NULL);
@@ -471,7 +471,7 @@ MAGNA_API am_bool MAGNA_CALL varray_concat
         const ValueArray *source
     )
 {
-    am_size_t index;
+    size_t index;
     am_byte *sourceItem, *targetItem;
 
     assert (target != NULL);
@@ -552,7 +552,7 @@ MAGNA_API void MAGNA_CALL varray_remove_item
 MAGNA_API void MAGNA_CALL varray_remove_index
     (
         ValueArray *array,
-        am_size_t index
+        size_t index
     )
 {
     am_byte *item;
@@ -568,10 +568,10 @@ static void va_swap
     (
         am_byte *left,
         am_byte *right,
-        am_size_t size
+        size_t size
     )
 {
-    am_size_t index;
+    size_t index;
     am_byte temp;
 
     /* TODO: optimize */
@@ -586,14 +586,14 @@ static void va_swap
 static void va_qsort
     (
         am_byte *ptr,
-        am_ssize_t left,
-        am_ssize_t right,
-        am_size_t size,
+        ssize_t left,
+        ssize_t right,
+        size_t size,
         Comparer comparer,
         const void *data
     )
 {
-    am_size_t i, j, pivot;
+    size_t i, j, pivot;
 
     if (left < right) {
         pivot = left;
@@ -652,14 +652,14 @@ static void* va_bsearch
     (
         const am_byte *ptr,
         const void *value,
-        am_ssize_t left,
-        am_ssize_t right,
-        am_size_t size,
+        ssize_t left,
+        ssize_t right,
+        size_t size,
         Comparer comparer,
         const void *data
     )
 {
-    am_ssize_t middle;
+    ssize_t middle;
     const am_byte *pmiddle;
     int rc;
 

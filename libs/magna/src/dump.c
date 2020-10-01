@@ -36,10 +36,10 @@ MAGNA_API void MAGNA_CALL dump_bytes
     (
         FILE *file,
         const am_byte *bytes,
-        am_size_t length
+        size_t length
     )
 {
-    am_size_t offset, i, run;
+    size_t offset, i, run;
 
     assert (bytes != NULL);
 

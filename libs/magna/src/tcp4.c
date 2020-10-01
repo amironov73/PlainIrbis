@@ -179,11 +179,11 @@ MAGNA_API am_bool MAGNA_CALL tcp4_disconnect
  * @param dataLength Объем данных в байтах.
  * @return Число успешно отосланных байт.
  */
-MAGNA_API am_ssize_t MAGNA_CALL tcp4_send
+MAGNA_API ssize_t MAGNA_CALL tcp4_send
     (
         am_int32 handle,
         const am_byte *data,
-        am_ssize_t dataLength
+        ssize_t dataLength
     )
 {
     assert (handle >= 0);
@@ -200,14 +200,14 @@ MAGNA_API am_ssize_t MAGNA_CALL tcp4_send
  * @param limit Предельный объем вычитываемых данных в байтах.
  * @return Количество прочитанных байт, отрицательное в случае ошибки.
  */
-MAGNA_API am_ssize_t MAGNA_CALL tcp4_receive_with_limit
+MAGNA_API ssize_t MAGNA_CALL tcp4_receive_with_limit
     (
         am_int32 handle,
         Buffer *buffer,
-        am_ssize_t limit
+        ssize_t limit
     )
 {
-    am_ssize_t result;
+    ssize_t result;
 
     assert (handle >= 0);
     assert (buffer != NULL);
@@ -231,13 +231,13 @@ MAGNA_API am_ssize_t MAGNA_CALL tcp4_receive_with_limit
  * @param buffer Буфер, в который должны быть помещены данные.
  * @return Количество прочитанных байт, отрицательное в случае ошибки.
  */
-MAGNA_API am_ssize_t MAGNA_CALL tcp4_receive_all
+MAGNA_API ssize_t MAGNA_CALL tcp4_receive_all
     (
         am_int32 handle,
         Buffer *buffer
     )
 {
-    am_ssize_t result = 0, rc;
+    ssize_t result = 0, rc;
     am_byte temp[1024];
 
     assert (buffer != NULL);
@@ -266,11 +266,11 @@ MAGNA_API am_ssize_t MAGNA_CALL tcp4_receive_all
 
 /* Сетевой поток (TCP) */
 
-MAGNA_API am_ssize_t MAGNA_CALL tcp4_read_function
+MAGNA_API ssize_t MAGNA_CALL tcp4_read_function
     (
         Stream *stream,
         am_byte *data,
-        am_size_t length
+        size_t length
     )
 {
     am_int32 handle;
@@ -284,11 +284,11 @@ MAGNA_API am_ssize_t MAGNA_CALL tcp4_read_function
     return recv (handle, data, length, 0);
 }
 
-MAGNA_API am_ssize_t MAGNA_CALL tcp4_write_function
+MAGNA_API ssize_t MAGNA_CALL tcp4_write_function
     (
         Stream *stream,
         const am_byte *data,
-        am_size_t length
+        size_t length
     )
 {
     am_int32 handle;

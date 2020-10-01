@@ -177,7 +177,7 @@ MAGNA_API am_bool MAGNA_CALL ntc_to_string
 MAGNA_API const NumberTextChunk* MAGNA_CALL number_get_chunk
     (
         const NumberText *number,
-        am_size_t index
+        size_t index
     )
 {
     assert (number != NULL);
@@ -201,7 +201,7 @@ MAGNA_API MAGNA_INLINE const NumberTextChunk* MAGNA_CALL number_last
         const NumberText *number
     )
 {
-    am_size_t length;
+    size_t length;
 
     assert (number != NULL);
 
@@ -225,7 +225,7 @@ MAGNA_API NumberText* MAGNA_CALL number_init
 {
     assert (number != NULL);
 
-    array_create (&number->chunks, 2);
+    vector_create(&number->chunks, 2);
 
     return number;
 }
@@ -240,7 +240,7 @@ MAGNA_API void MAGNA_CALL number_free
         NumberText *number
     )
 {
-    am_size_t index;
+    size_t index;
     NumberTextChunk *chunk;
 
     assert (number != NULL);
@@ -251,7 +251,7 @@ MAGNA_API void MAGNA_CALL number_free
         mem_free (chunk);
     }
 
-    array_free (&number->chunks);
+    vector_destroy(&number->chunks);
 }
 
 /**
@@ -275,7 +275,7 @@ MAGNA_API NumberTextChunk* MAGNA_CALL number_append_chunk
     }
 
     ntc_init (result);
-    if (array_push_back (&number->chunks, result)) {
+    if (vector_push_back(&number->chunks, result)) {
         mem_free (result);
         result = NULL;
         return result;
@@ -327,7 +327,7 @@ MAGNA_API am_bool MAGNA_CALL number_append
  * @param number Исследуемый текст.
  * @return Количество фрагментов.
  */
-MAGNA_API MAGNA_INLINE am_size_t MAGNA_CALL number_size
+MAGNA_API MAGNA_INLINE size_t MAGNA_CALL number_size
     (
         const NumberText *number
     )
@@ -384,7 +384,7 @@ MAGNA_API am_bool MAGNA_CALL number_parse
 
                 ntc_init (chunk);
                 if (!ntc_setup (chunk, prefix, num)
-                    || array_push_back (&number->chunks, chunk)) {
+                    || vector_push_back(&number->chunks, chunk)) {
                     return AM_FALSE;
                 }
 
@@ -407,7 +407,7 @@ MAGNA_API am_bool MAGNA_CALL number_parse
         }
 
         mem_copy (chunk, &temp, sizeof (temp));
-        if (!array_push_back (&number->chunks, chunk)) {
+        if (!vector_push_back(&number->chunks, chunk)) {
             ntc_free (&temp);
             return AM_FALSE;
         }
@@ -453,7 +453,7 @@ MAGNA_API NumberText* MAGNA_CALL number_increment
 MAGNA_API NumberText* MAGNA_CALL number_increment_ex
     (
         NumberText *number,
-        am_size_t index,
+        size_t index,
         am_int64 delta
     )
 {
@@ -482,7 +482,7 @@ MAGNA_API am_bool MAGNA_CALL number_to_string
         Buffer *output
     )
 {
-    am_size_t index;
+    size_t index;
     const NumberTextChunk *chunk;
 
     assert (number != NULL);
@@ -512,7 +512,7 @@ MAGNA_API int MAGNA_CALL number_compare
         const NumberText *second
     )
 {
-    am_size_t index;
+    size_t index;
     const NumberTextChunk *firstChunk, *secondChunk;
     int result;
 

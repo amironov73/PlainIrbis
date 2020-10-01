@@ -35,7 +35,7 @@ static Span trim_code
         Span code
     )
 {
-    am_size_t i, j;
+    size_t i, j;
     am_byte chr;
 
     for (i = 0; i < code.len; ++i) {
@@ -125,7 +125,7 @@ MAGNA_API am_bool MAGNA_CALL menu_init
 {
     assert (menu != NULL);
 
-    return array_create (&menu->entries, 4);
+    return vector_create(&menu->entries, 4);
 }
 
 /**
@@ -138,7 +138,7 @@ MAGNA_API void MAGNA_CALL menu_free
         MenuFile *menu
     )
 {
-    am_size_t index;
+    size_t index;
     MenuEntry *entry;
 
     assert (menu != NULL);
@@ -149,7 +149,7 @@ MAGNA_API void MAGNA_CALL menu_free
         mem_free (entry);
     }
 
-    array_free (&menu->entries);
+    vector_destroy(&menu->entries);
 }
 
 /**
@@ -184,7 +184,7 @@ MAGNA_API am_bool MAGNA_CALL menu_append
         return AM_FALSE;
     }
 
-    if (!array_push_back (&menu->entries, entry)) {
+    if (!vector_push_back(&menu->entries, entry)) {
         menu_entry_free (entry);
         mem_free (entry);
         return AM_FALSE;
@@ -206,7 +206,7 @@ MAGNA_API const MenuEntry* MAGNA_CALL menu_get_entry
         Span code
     )
 {
-    am_size_t index;
+    size_t index;
     const MenuEntry *entry;
 
     assert (menu != NULL);
@@ -284,7 +284,7 @@ MAGNA_API am_bool MAGNA_CALL menu_parse
     am_bool result = AM_FALSE;
     Buffer line1 = BUFFER_INIT, line2 = BUFFER_INIT;
     Span span1, span2;
-    am_ssize_t rc1, rc2;
+    ssize_t rc1, rc2;
 
     assert (menu != NULL);
     assert (texter != NULL);

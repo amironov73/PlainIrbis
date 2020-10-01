@@ -224,7 +224,7 @@ TESTER(span_index_of_1)
 {
     const char *text = "123456789";
     Span span = span_from_text (text);
-    am_ssize_t found = span_index_of (span, '?');
+    ssize_t found = span_index_of (span, '?');
 
     CHECK (found < 0);
 
@@ -237,7 +237,7 @@ TESTER(span_last_index_of_1)
 {
     const char *text = "123456789";
     Span span = span_from_text (text);
-    am_ssize_t found = span_last_index_of (span, '?');
+    ssize_t found = span_last_index_of (span, '?');
 
     CHECK (found < 0);
 
@@ -510,7 +510,7 @@ TESTER(span_split_n_by_char_1)
 {
     Span span = SPAN_INIT;
     Span parts [2];
-    am_size_t count = span_split_n_by_char (span, parts, 2, '?');
+    size_t count = span_split_n_by_char (span, parts, 2, '?');
 
     CHECK (count == 0);
 }
@@ -520,7 +520,7 @@ TESTER(span_split_n_by_char_2)
     const char *text = "123456789";
     Span span = span_from_text (text);
     Span parts [2];
-    am_size_t count = span_split_n_by_char (span, parts, 2, '?');
+    size_t count = span_split_n_by_char (span, parts, 2, '?');
 
     CHECK (count == 1);
     CHECK (parts[0].ptr == text);
@@ -532,7 +532,7 @@ TESTER(span_split_n_by_char_3)
     const char *text = "123456789";
     Span span = span_from_text (text);
     Span parts [2];
-    am_size_t count = span_split_n_by_char (span, parts, 2, '5');
+    size_t count = span_split_n_by_char (span, parts, 2, '5');
 
     CHECK (count == 2);
     CHECK (parts[0].ptr == text);
@@ -546,7 +546,7 @@ TESTER(span_split_n_by_char_4)
     const char *text = "123,567,9";
     Span span = span_from_text (text);
     Span parts [2];
-    am_size_t count = span_split_n_by_char (span, parts, 2, ',');
+    size_t count = span_split_n_by_char (span, parts, 2, ',');
 
     CHECK (count == 2);
     CHECK (parts[0].ptr == text);
@@ -560,7 +560,7 @@ TESTER(span_split_n_by_char_5)
     const char *text = ",123,,567,9";
     Span span = span_from_text (text);
     Span parts [3];
-    am_size_t count = span_split_n_by_char (span, parts, 3, ',');
+    size_t count = span_split_n_by_char (span, parts, 3, ',');
 
     CHECK (count == 3);
     CHECK (parts[0].ptr == text + 1);
@@ -575,7 +575,7 @@ TESTER(span_split_n_by_chars_1)
 {
     Span span = SPAN_INIT;
     Span parts [2];
-    am_size_t count = span_split_n_by_chars (span, parts, 2, "!?", 2);
+    size_t count = span_split_n_by_chars (span, parts, 2, "!?", 2);
 
     CHECK (count == 0);
 }
@@ -585,7 +585,7 @@ TESTER(span_split_n_by_chars_2)
     const char *text = "123456789";
     Span span = span_from_text (text);
     Span parts [2];
-    am_size_t count = span_split_n_by_chars (span, parts, 2, "!?", 2);
+    size_t count = span_split_n_by_chars (span, parts, 2, "!?", 2);
 
     CHECK (count == 1);
     CHECK (parts[0].ptr == text);
@@ -597,7 +597,7 @@ TESTER(span_split_n_by_chars_3)
     const char *text = "123456789";
     Span span = span_from_text (text);
     Span parts [2];
-    am_size_t count = span_split_n_by_chars (span, parts, 2, "5?", 2);
+    size_t count = span_split_n_by_chars (span, parts, 2, "5?", 2);
 
     CHECK (count == 2);
     CHECK (parts[0].ptr == text);
@@ -611,7 +611,7 @@ TESTER(span_split_n_by_chars_4)
     const char *text = "123.567,9";
     Span span = span_from_text (text);
     Span parts [2];
-    am_size_t count = span_split_n_by_chars (span, parts, 2, ",.", 2);
+    size_t count = span_split_n_by_chars (span, parts, 2, ",.", 2);
 
     CHECK (count == 2);
     CHECK (parts[0].ptr == text);
@@ -625,7 +625,7 @@ TESTER(span_split_n_by_chars_5)
     const char *text = ",123,.567.9";
     Span span = span_from_text (text);
     Span parts [3];
-    am_size_t count = span_split_n_by_chars (span, parts, 3, ",.", 2);
+    size_t count = span_split_n_by_chars (span, parts, 3, ",.", 2);
 
     CHECK (count == 3);
     CHECK (parts[0].ptr == text + 1);

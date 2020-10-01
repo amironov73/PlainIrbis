@@ -33,7 +33,7 @@
 MAGNA_API Span MAGNA_CALL span_init
     (
         const am_byte *ptr,
-        am_size_t len
+        size_t len
     )
 {
     Span result = { (am_byte*) ptr, len };
@@ -151,7 +151,7 @@ MAGNA_API am_uint32 MAGNA_CALL span_to_uint_32
 {
     am_uint32 result = 0;
     am_byte *ptr = span.ptr;
-    am_size_t len = span.len;
+    size_t len = span.len;
 
     while (len--) {
         result = result * 10 + (*ptr++ - '0');
@@ -173,7 +173,7 @@ MAGNA_API am_uint64 MAGNA_CALL span_to_uint_64
 {
     am_uint64 result = 0;
     am_byte *ptr = span.ptr;
-    am_size_t len = span.len;
+    size_t len = span.len;
 
     while (len--) {
         result = result * 10 + (*ptr++ - '0');
@@ -194,7 +194,7 @@ MAGNA_API Span MAGNA_CALL span_toupper
     )
 {
     am_byte *ptr = span.ptr;
-    am_size_t len = span.len;
+    size_t len = span.len;
 
     while (len--) {
         *ptr = (am_byte) toupper (*ptr);
@@ -216,7 +216,7 @@ MAGNA_API Span MAGNA_CALL span_tolower
     )
 {
     am_byte *ptr = span.ptr;
-    am_size_t len = span.len;
+    size_t len = span.len;
 
     while (len--) {
         *ptr = (am_byte) tolower (*ptr);
@@ -254,7 +254,7 @@ MAGNA_API am_byte* MAGNA_CALL span_find_byte
     )
 {
     am_byte *ptr = span.ptr;
-    am_size_t len = span.len;
+    size_t len = span.len;
 
     while (len--) {
         if (*ptr == value) {
@@ -280,7 +280,7 @@ MAGNA_API Span MAGNA_CALL span_fill
     )
 {
     am_byte *ptr = span.ptr;
-    am_size_t len = span.len;
+    size_t len = span.len;
 
     while (len--) {
         *ptr++ = value;
@@ -296,17 +296,17 @@ MAGNA_API Span MAGNA_CALL span_fill
  * @param value Искомое значение.
  * @return Найденный индекс либо -1.
  */
-MAGNA_API am_ssize_t MAGNA_CALL span_index_of
+MAGNA_API ssize_t MAGNA_CALL span_index_of
     (
         Span span,
         am_byte value
     )
 {
-    am_size_t i;
+    size_t i;
 
     for (i = 0; i < span.len; ++i) {
         if (span.ptr[i] == value) {
-            return (am_ssize_t) i;
+            return (ssize_t) i;
         }
     }
 
@@ -320,13 +320,13 @@ MAGNA_API am_ssize_t MAGNA_CALL span_index_of
  * @param value Искомое значение.
  * @return Найденный индекс либо -1.
  */
-MAGNA_API am_ssize_t MAGNA_CALL span_last_index_of
+MAGNA_API ssize_t MAGNA_CALL span_last_index_of
     (
         Span span,
         am_byte value
     )
 {
-    am_ssize_t i;
+    ssize_t i;
 
     for (i = span.len - 1; i >= 0; --i) {
         if (span.ptr[i] == value) {
@@ -348,8 +348,8 @@ MAGNA_API am_ssize_t MAGNA_CALL span_last_index_of
 MAGNA_API Span MAGNA_CALL span_slice
     (
         Span span,
-        am_ssize_t start,
-        am_ssize_t length
+        ssize_t start,
+        ssize_t length
     )
 {
     Span result = span;
@@ -367,7 +367,7 @@ MAGNA_API Span MAGNA_CALL span_slice
     }
 
     result.ptr += start;
-    result.len = (am_size_t) length;
+    result.len = (size_t) length;
 
     return result;
 }
@@ -430,7 +430,7 @@ MAGNA_API am_bool MAGNA_CALL span_starts_with
     )
 {
     am_bool result = prefix.len <= span.len;
-    am_size_t i;
+    size_t i;
 
     if (result) {
         for (i = 0; i < prefix.len; ++i) {
@@ -458,7 +458,7 @@ MAGNA_API am_bool MAGNA_CALL span_ends_with
     )
 {
     am_bool result = suffix.len <= span.len;
-    am_size_t i;
+    size_t i;
 
     if (result) {
         for (i = 0; i < suffix.len; ++i) {
@@ -487,7 +487,7 @@ MAGNA_API int MAGNA_CALL span_compare
     )
 {
     int result;
-    am_size_t i;
+    size_t i;
 
     for (i = 0; ; ++i) {
         if (i == first.len) {
@@ -524,7 +524,7 @@ MAGNA_API am_bool MAGNA_CALL span_split_by_char
         am_byte value
     )
 {
-    am_size_t left, right;
+    size_t left, right;
     am_bool found;
     Span item;
 
@@ -578,10 +578,10 @@ MAGNA_API am_bool MAGNA_CALL span_split_by_chars
         Span span,
         SpanArray *array,
         const am_byte *values,
-        am_size_t valueCount
+        size_t valueCount
     )
 {
-    am_size_t left, right, i;
+    size_t left, right, i;
     Span item;
     am_byte c;
     am_bool found;
@@ -652,7 +652,7 @@ static const am_byte* find_many
         const am_byte *from,
         const am_byte *to,
         const am_byte *values,
-        am_size_t valueCount
+        size_t valueCount
     )
 {
     const am_byte *ptr1, *ptr2 = values + valueCount, *ptr3;
@@ -676,15 +676,15 @@ static const am_byte* find_many
  * @param value Символ-разделитель.
  * @return Количество получившихся фрагметов.
  */
-MAGNA_API am_size_t MAGNA_CALL span_split_n_by_char
+MAGNA_API size_t MAGNA_CALL span_split_n_by_char
     (
         Span span,
         Span *array,
-        am_size_t arraySize,
+        size_t arraySize,
         am_byte value
     )
 {
-    am_size_t count;
+    size_t count;
     const am_byte *ptr = span.ptr, *end = ptr + span.len, *found;
     Span *item;
 
@@ -728,16 +728,16 @@ MAGNA_API am_size_t MAGNA_CALL span_split_n_by_char
  * @param valueCount Количество символов-разделителей.
  * @return Количество получившихся фрагментов.
  */
-MAGNA_API am_size_t MAGNA_CALL span_split_n_by_chars
+MAGNA_API size_t MAGNA_CALL span_split_n_by_chars
     (
         Span span,
         Span *array,
-        am_size_t arraySize,
+        size_t arraySize,
         const am_byte *values,
-        am_size_t valueCount
+        size_t valueCount
     )
 {
-    am_size_t count;
+    size_t count;
     const am_byte *ptr = span.ptr, *end = ptr + span.len, *found;
     Span *item;
 

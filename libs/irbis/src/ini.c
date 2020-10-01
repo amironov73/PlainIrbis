@@ -156,7 +156,7 @@ MAGNA_API am_bool MAGNA_CALL ini_section_init
 
     buffer_null (&section->name);
 
-    return array_create (&section->lines, 4);
+    return vector_create(&section->lines, 4);
 }
 
 /**
@@ -169,7 +169,7 @@ MAGNA_API void MAGNA_CALL ini_section_free
         IniSection *section
     )
 {
-    am_size_t index;
+    size_t index;
     IniLine *line;
 
     assert (section != NULL);
@@ -181,7 +181,7 @@ MAGNA_API void MAGNA_CALL ini_section_free
         mem_free (line);
     }
 
-    array_free (&section->lines);
+    vector_destroy(&section->lines);
 }
 
 /**
@@ -197,7 +197,7 @@ MAGNA_API am_bool MAGNA_CALL ini_section_is_modified
     )
 {
     am_bool result = AM_FALSE;
-    am_size_t index;
+    size_t index;
     const IniLine *line;
 
     assert (section != NULL);
@@ -223,7 +223,7 @@ MAGNA_API void MAGNA_CALL ini_section_not_modified
         IniSection *section
     )
 {
-    am_size_t index;
+    size_t index;
     IniLine *line;
 
     assert (section != NULL);
@@ -244,7 +244,7 @@ MAGNA_API void MAGNA_CALL ini_section_clear
         IniSection *section
     )
 {
-    am_size_t index;
+    size_t index;
     IniLine *line;
 
     assert (section != NULL);
@@ -255,7 +255,7 @@ MAGNA_API void MAGNA_CALL ini_section_clear
         mem_free (line);
     }
 
-    array_truncate (&section->lines, 0);
+    vector_truncate(&section->lines, 0);
 }
 
 /**
@@ -271,7 +271,7 @@ MAGNA_API const IniLine* MAGNA_CALL ini_section_get_line
         Span key
     )
 {
-    am_size_t index;
+    size_t index;
     const IniLine *line;
 
     assert (section != NULL);
@@ -340,7 +340,7 @@ MAGNA_API IniLine* MAGNA_CALL ini_section_append_line
     ini_line_init (line);
     if (!ini_line_set_key (line, key)
         || !ini_line_set_value (line, value)
-        || !array_push_back (&section->lines, line)) {
+        || !vector_push_back(&section->lines, line)) {
         ini_line_free (line);
         mem_free (line);
         return AM_FALSE;
@@ -412,7 +412,7 @@ MAGNA_API am_bool MAGNA_CALL ini_file_init
 {
     assert (file != NULL);
 
-    return array_create (&file->sections, 4);
+    return vector_create(&file->sections, 4);
 }
 
 /**
@@ -425,7 +425,7 @@ MAGNA_API void MAGNA_CALL ini_file_free
         IniFile *file
     )
 {
-    am_size_t index;
+    size_t index;
     IniSection *section;
 
     assert (file != NULL);
@@ -436,7 +436,7 @@ MAGNA_API void MAGNA_CALL ini_file_free
         mem_free (section);
     }
 
-    array_free (&file->sections);
+    vector_destroy(&file->sections);
 }
 
 /**
@@ -452,7 +452,7 @@ MAGNA_API am_bool MAGNA_CALL ini_file_is_modified
     )
 {
     am_bool result = AM_FALSE;
-    am_size_t index;
+    size_t index;
     const IniSection *section;
 
     assert (file != NULL);
@@ -478,7 +478,7 @@ MAGNA_API void MAGNA_CALL ini_file_not_modified
         IniFile *file
     )
 {
-    am_size_t index;
+    size_t index;
     IniSection *section;
 
     assert (file != NULL);

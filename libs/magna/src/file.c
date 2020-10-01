@@ -272,14 +272,14 @@ MAGNA_API am_bool MAGNA_CALL file_eof
  * @param size Количество считываемых байт.
  * @return Количество прочитанных байт, либо отрицательное значение.
  */
-MAGNA_API am_ssize_t MAGNA_CALL file_read
+MAGNA_API ssize_t MAGNA_CALL file_read
     (
         am_handle handle,
         am_byte *buffer,
-        am_ssize_t size
+        ssize_t size
     )
 {
-    am_size_t result;
+    size_t result;
 
 #ifdef MAGNA_WINDOWS
 
@@ -324,7 +324,7 @@ MAGNA_API int MAGNA_CALL file_read_byte
     )
 {
     am_byte result;
-    am_ssize_t rc;
+    ssize_t rc;
 
     assert (handle_is_good(handle));
 
@@ -347,8 +347,8 @@ MAGNA_API am_bool MAGNA_CALL file_read_all
     )
 {
     am_handle handle;
-    am_ssize_t rc;
-    am_size_t totalLength;
+    ssize_t rc;
+    size_t totalLength;
     am_byte temp [1024];
 
     assert (fileName != NULL);
@@ -502,7 +502,7 @@ MAGNA_API am_bool MAGNA_CALL file_write
     (
         am_handle handle,
         const am_byte *data,
-        am_size_t size
+        size_t size
     )
 {
     assert (handle_is_good(handle));
@@ -842,7 +842,7 @@ MAGNA_API am_bool MAGNA_CALL file_copy
 
     am_handle targetHandle, sourceHandle;
     am_byte buffer [1024];
-    am_size_t rc;
+    size_t rc;
 
     assert (targetName != NULL);
     assert (sourceName != NULL);
@@ -921,11 +921,11 @@ MAGNA_API am_bool MAGNA_CALL file_sync
 
 /* Файловый поток */
 
-MAGNA_API am_ssize_t MAGNA_CALL file_read_function
+MAGNA_API ssize_t MAGNA_CALL file_read_function
     (
         Stream *stream,
         am_byte *buffer,
-        am_size_t length
+        size_t length
     )
 {
     am_handle handle;
@@ -938,11 +938,11 @@ MAGNA_API am_ssize_t MAGNA_CALL file_read_function
     return file_read (handle, buffer, length);
 }
 
-MAGNA_API am_ssize_t MAGNA_CALL file_write_function
+MAGNA_API ssize_t MAGNA_CALL file_write_function
     (
         Stream *stream,
         const am_byte *buffer,
-        am_size_t length
+        size_t length
     )
 {
     am_handle handle;
@@ -955,10 +955,10 @@ MAGNA_API am_ssize_t MAGNA_CALL file_write_function
     return file_write (handle, buffer, length) ? length : -1;
 }
 
-MAGNA_API am_ssize_t MAGNA_CALL file_seek_function
+MAGNA_API ssize_t MAGNA_CALL file_seek_function
     (
         Stream *stream,
-        am_size_t position
+        size_t position
     )
 {
     am_handle handle;
@@ -968,10 +968,10 @@ MAGNA_API am_ssize_t MAGNA_CALL file_seek_function
     handle = *(am_handle*) &stream->data;
     assert (handle_is_good(handle));
 
-    return file_seek (handle, position) ? (am_ssize_t) position : -1;
+    return file_seek (handle, position) ? (ssize_t) position : -1;
 }
 
-MAGNA_API am_ssize_t MAGNA_CALL file_tell_function
+MAGNA_API ssize_t MAGNA_CALL file_tell_function
     (
         Stream *stream
     )
@@ -983,7 +983,7 @@ MAGNA_API am_ssize_t MAGNA_CALL file_tell_function
     handle = *(am_handle*) &stream->data;
     assert (handle_is_good(handle));
 
-    return (am_ssize_t) file_tell (handle);
+    return (ssize_t) file_tell (handle);
 }
 
 MAGNA_API am_bool MAGNA_CALL file_close_function

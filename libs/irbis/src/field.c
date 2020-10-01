@@ -30,10 +30,10 @@ MAGNA_API SubField* MAGNA_CALL field_add
     assert (field != NULL);
 
     subfield = (SubField*) calloc(1, sizeof (SubField));
-    array_push_back
+    vector_push_back
         (
             &field->subfields,
-            subfield_init (subfield, code, value)
+            subfield_init(subfield, code, value)
         );
 
     return subfield;
@@ -84,10 +84,10 @@ MAGNA_API am_bool MAGNA_CALL field_empty
     return 0;
 }
 
-MAGNA_API Array* MAGNA_CALL field_get_embedded_fields
+MAGNA_API Vector* MAGNA_CALL field_get_embedded_fields
     (
         const MarcField *field,
-        Array *array
+        Vector *array
     )
 {
     assert (field != NULL);
@@ -136,7 +136,7 @@ MAGNA_API MarcField* MAGNA_CALL field_init
 MAGNA_API MarcField* MAGNA_CALL field_insert_at
     (
         MarcField *field,
-        am_size_t index,
+        size_t index,
         const SubField *subfield
     )
 {
@@ -151,7 +151,7 @@ MAGNA_API MarcField* MAGNA_CALL field_insert_at
 MAGNA_API MarcField* MAGNA_CALL field_remove_at
     (
         MarcField *field,
-        am_size_t index
+        size_t index
     )
 {
     assert (field != NULL);

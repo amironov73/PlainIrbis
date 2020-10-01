@@ -131,13 +131,13 @@ MAGNA_API int MAGNA_CALL strchg
  * @return The number of occurrences of the given character
  * in the string.
  */
-MAGNA_API am_size_t MAGNA_CALL strocc
+MAGNA_API size_t MAGNA_CALL strocc
     (
         char *str,
         int ch
     )
 {
-    am_size_t result = 0;
+    size_t result = 0;
     char *ptr = str;
 
     while (*ptr) {
@@ -160,7 +160,7 @@ MAGNA_API am_size_t MAGNA_CALL strocc
 MAGNA_API am_uint32 MAGNA_CALL fastParse32
     (
         const am_byte *text,
-        am_size_t length
+        size_t length
     )
 {
     am_uint32 result = 0;
@@ -182,7 +182,7 @@ MAGNA_API am_uint32 MAGNA_CALL fastParse32
 MAGNA_API am_uint64 MAGNA_CALL fastParse64
     (
         const am_byte *text,
-        am_size_t length
+        size_t length
     )
 {
     am_uint64 result = 0;
@@ -205,7 +205,7 @@ MAGNA_API char* MAGNA_CALL str_dup
         const char *text
     )
 {
-    am_size_t size;
+    size_t size;
     char *result;
 
     assert (text != NULL);

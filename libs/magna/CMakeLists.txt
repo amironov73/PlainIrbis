@@ -14,7 +14,6 @@ set(HeaderFiles
 )
 
 set(CFiles
-    src/array.c
     src/beep.c
     src/buffer.c
     src/chunked.c
@@ -53,6 +52,7 @@ set(CFiles
     src/utf8.c
     src/utils.c
     src/varray.c
+    src/vector.c
 )
 
 add_library(${PROJECT_NAME}

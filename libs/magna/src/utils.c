@@ -256,10 +256,10 @@ MAGNA_API am_uint64 MAGNA_CALL max_uint64
  * @param second Второе число.
  * @return Значение минимума.
  */
-MAGNA_API am_size_t MAGNA_CALL min_size_t
+MAGNA_API size_t MAGNA_CALL min_size_t
     (
-        am_size_t first,
-        am_size_t second
+        size_t first,
+        size_t second
     )
 {
     return first < second ? first : second;
@@ -272,10 +272,10 @@ MAGNA_API am_size_t MAGNA_CALL min_size_t
  * @param second Второе число.
  * @return Значение максимума.
  */
-MAGNA_API am_size_t MAGNA_CALL max_size_t
+MAGNA_API size_t MAGNA_CALL max_size_t
     (
-        am_size_t first,
-        am_size_t second
+        size_t first,
+        size_t second
     )
 {
     return first > second ? first : second;

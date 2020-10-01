@@ -51,11 +51,11 @@ MAGNA_API am_bool MAGNA_CALL stream_init
  * @param length
  * @return Количество успешно прочитанных байт. Отрицательное значение свидетельствует об ошибке.
  */
-MAGNA_API am_ssize_t MAGNA_CALL stream_read
+MAGNA_API ssize_t MAGNA_CALL stream_read
     (
         Stream *stream,
         am_byte *buffer,
-        am_size_t length
+        size_t length
     )
 {
     assert (stream != NULL);
@@ -76,7 +76,7 @@ MAGNA_API am_bool MAGNA_CALL stream_write
     (
         Stream *stream,
         const am_byte *buffer,
-        am_size_t length
+        size_t length
     )
 {
     assert (stream != NULL);
@@ -92,10 +92,10 @@ MAGNA_API am_bool MAGNA_CALL stream_write
  * @param position
  * @return
  */
-MAGNA_API am_ssize_t MAGNA_CALL stream_seek
+MAGNA_API ssize_t MAGNA_CALL stream_seek
     (
         Stream *stream,
-        am_size_t position
+        size_t position
     )
 {
     assert (stream != NULL);
@@ -110,7 +110,7 @@ MAGNA_API am_ssize_t MAGNA_CALL stream_seek
  * @param stream
  * @return
  */
-MAGNA_API am_ssize_t MAGNA_CALL stream_tell
+MAGNA_API ssize_t MAGNA_CALL stream_tell
     (
         Stream *stream
     )
@@ -174,7 +174,7 @@ MAGNA_API am_bool MAGNA_CALL stream_copy
     )
 {
     am_byte buffer [1024];
-    am_ssize_t rc;
+    ssize_t rc;
 
     assert (target != NULL);
     assert (source != NULL);
@@ -201,11 +201,11 @@ MAGNA_API am_bool MAGNA_CALL stream_copy
 
 /* Нулевой (пустой) поток */
 
-MAGNA_API am_ssize_t MAGNA_CALL null_read_function
+MAGNA_API ssize_t MAGNA_CALL null_read_function
     (
         Stream *stream,
         am_byte *buffer, /* NOLINT(readability-non-const-parameter) */
-        am_size_t length
+        size_t length
     )
 {
     (void) stream;
@@ -215,11 +215,11 @@ MAGNA_API am_ssize_t MAGNA_CALL null_read_function
     return 0;
 }
 
-MAGNA_API am_ssize_t MAGNA_CALL null_write_function
+MAGNA_API ssize_t MAGNA_CALL null_write_function
     (
         Stream *stream,
         const am_byte *buffer,
-        am_size_t length
+        size_t length
     )
 {
     (void) stream;
@@ -228,10 +228,10 @@ MAGNA_API am_ssize_t MAGNA_CALL null_write_function
     return length;
 }
 
-MAGNA_API am_ssize_t MAGNA_CALL null_seek_function
+MAGNA_API ssize_t MAGNA_CALL null_seek_function
     (
         Stream *stream,
-        am_size_t position
+        size_t position
     )
 {
     (void) stream;
@@ -239,7 +239,7 @@ MAGNA_API am_ssize_t MAGNA_CALL null_seek_function
     return position;
 }
 
-MAGNA_API am_ssize_t MAGNA_CALL null_tell_function
+MAGNA_API ssize_t MAGNA_CALL null_tell_function
     (
         Stream *stream
     )
@@ -283,11 +283,11 @@ MAGNA_API am_bool MAGNA_CALL null_stream_open
 
 /* Поток в памяти (буфер) */
 
-MAGNA_API am_ssize_t MAGNA_CALL memory_read_function
+MAGNA_API ssize_t MAGNA_CALL memory_read_function
     (
         Stream *stream,
         am_byte *data,
-        am_size_t length
+        size_t length
     )
 {
     Buffer *buffer;
@@ -297,14 +297,14 @@ MAGNA_API am_ssize_t MAGNA_CALL memory_read_function
     buffer = (Buffer *) stream->data;
     assert (buffer != NULL);
 
-    return (am_ssize_t) buffer_read (buffer, data, length);
+    return (ssize_t) buffer_read (buffer, data, length);
 }
 
-MAGNA_API am_ssize_t MAGNA_CALL memory_write_function
+MAGNA_API ssize_t MAGNA_CALL memory_write_function
     (
         Stream *stream,
         const am_byte *data,
-        am_size_t length
+        size_t length
     )
 {
     Buffer *buffer;
@@ -317,10 +317,10 @@ MAGNA_API am_ssize_t MAGNA_CALL memory_write_function
     return buffer_write (buffer, data, length) ? length : 0;
 }
 
-MAGNA_API am_ssize_t MAGNA_CALL memory_seek_function
+MAGNA_API ssize_t MAGNA_CALL memory_seek_function
     (
         Stream *stream,
-        am_size_t position
+        size_t position
     )
 {
     Buffer *buffer;
@@ -337,7 +337,7 @@ MAGNA_API am_ssize_t MAGNA_CALL memory_seek_function
     return buffer->position = position;
 }
 
-MAGNA_API am_ssize_t MAGNA_CALL memory_tell_function
+MAGNA_API ssize_t MAGNA_CALL memory_tell_function
     (
         Stream *stream
     )
@@ -349,7 +349,7 @@ MAGNA_API am_ssize_t MAGNA_CALL memory_tell_function
     buffer = (Buffer *) stream->data;
     assert (buffer != NULL);
 
-    return (am_ssize_t) buffer->position;
+    return (ssize_t) buffer->position;
 }
 
 /**
@@ -447,7 +447,7 @@ MAGNA_API am_bool MAGNA_CALL memory_stream_open
     (
         Stream *stream,
         am_byte *data,
-        am_size_t length
+        size_t length
     )
 {
     Buffer *buffer;
@@ -515,11 +515,11 @@ MAGNA_API am_byte* MAGNA_CALL memory_stream_to_text
 
 /* Поток, выдающий ошибки (для отладки) */
 
-MAGNA_API am_ssize_t MAGNA_CALL broken_read_function
+MAGNA_API ssize_t MAGNA_CALL broken_read_function
     (
         Stream *stream,
         am_byte *buffer, /* NOLINT(readability-non-const-parameter) */
-        am_size_t length
+        size_t length
     )
 {
     (void) stream;
@@ -529,11 +529,11 @@ MAGNA_API am_ssize_t MAGNA_CALL broken_read_function
     return -1;
 }
 
-MAGNA_API am_ssize_t MAGNA_CALL broken_write_function
+MAGNA_API ssize_t MAGNA_CALL broken_write_function
     (
         Stream *stream,
         const am_byte *buffer,
-        am_size_t length
+        size_t length
     )
 {
     (void) stream;
@@ -543,10 +543,10 @@ MAGNA_API am_ssize_t MAGNA_CALL broken_write_function
     return -1;
 }
 
-MAGNA_API am_ssize_t MAGNA_CALL broken_seek_function
+MAGNA_API ssize_t MAGNA_CALL broken_seek_function
     (
         Stream *stream,
-        am_size_t position
+        size_t position
     )
 {
     (void) stream;
@@ -555,7 +555,7 @@ MAGNA_API am_ssize_t MAGNA_CALL broken_seek_function
     return -1;
 }
 
-MAGNA_API am_ssize_t MAGNA_CALL broken_tell_function
+MAGNA_API ssize_t MAGNA_CALL broken_tell_function
     (
         Stream *stream
     )
@@ -611,7 +611,7 @@ MAGNA_API am_bool MAGNA_CALL texter_init
     (
         StreamTexter *texter,
         Stream *stream,
-        am_size_t bufsize
+        size_t bufsize
     )
 {
     assert (texter != NULL);
@@ -659,7 +659,7 @@ MAGNA_API int MAGNA_CALL texter_read_byte
         StreamTexter *texter
     )
 {
-    am_ssize_t rc;
+    ssize_t rc;
     Buffer *buffer;
     int chr;
 
@@ -692,16 +692,16 @@ MAGNA_API int MAGNA_CALL texter_read_byte
  *
  * @param texter Текстор.
  * @param output Буфер для размещения результата.
- * @return Длина прочитанной строки: <0 -- возника ошибка,
+ * @return Длина прочитанной строки: &lt;0 -- возника ошибка,
  * =0 -- достигнут конец потока.
  */
-MAGNA_API am_ssize_t MAGNA_CALL texter_read_line
+MAGNA_API ssize_t MAGNA_CALL texter_read_line
     (
         StreamTexter *texter,
         Buffer *output
     )
 {
-    am_ssize_t result = 0;
+    ssize_t result = 0;
     am_byte chr;
 
     assert (texter != NULL);

@@ -36,6 +36,7 @@
 #endif
 
 #include <assert.h>
+#include <ctype.h>
 
 /*=========================================================*/
 
@@ -47,7 +48,7 @@
  */
 MAGNA_API void* MAGNA_CALL mem_alloc
     (
-        am_size_t size
+        size_t size
     )
 {
     return calloc (1, size);
@@ -62,7 +63,7 @@ MAGNA_API void* MAGNA_CALL mem_alloc
  */
 MAGNA_API void* MAGNA_CALL mem_alloc_ex
     (
-        am_size_t size
+        size_t size
     )
 {
     void* result = calloc (1, size);
@@ -96,7 +97,7 @@ MAGNA_API void MAGNA_CALL mem_free
 MAGNA_API void MAGNA_CALL mem_clear
     (
         void *ptr,
-        am_size_t size
+        size_t size
     )
 {
     assert (ptr != NULL);
@@ -115,13 +116,80 @@ MAGNA_API void MAGNA_CALL mem_copy
     (
         void *destination,
         const void *source,
-        am_size_t size
+        size_t size
     )
 {
     assert (destination != NULL);
     assert (source != NULL);
 
     memcpy (destination, source, size);
+}
+
+/* Парсим /proc/meminfo в поисках строки */
+static size_t parse_value
+    (
+        const char *prefix
+    )
+{
+    Stream stream;
+    StreamTexter texter;
+    Span parts[2], sought = span_from_text (prefix), found, unit = span_null();
+    size_t result = 0, nparts, multiplier;
+    Buffer line = BUFFER_INIT;
+
+    if (!file_stream_open_read (&stream, "/proc/meminfo")) {
+        return 0;
+    }
+
+    if (!texter_init (&texter, &stream, 256)) {
+        stream_close (&stream);
+        return 0;
+    }
+
+    while (AM_TRUE) {
+        buffer_clear (&line);
+        if (texter_read_line (&texter, &line) <= 0) {
+            break;
+        }
+        nparts = span_split_n_by_char (buffer_to_span (&line), parts, 2, ':');
+        if (nparts != 2) {
+            continue;
+        }
+        if (span_compare (parts[0], sought) == 0) {
+            found = parts[1];
+            found = span_trim_start (found);
+            nparts = span_split_n_by_char (found, parts, 2, ' ');
+            if (nparts != 2) {
+                break;
+            }
+
+            found = parts[0];
+            unit = parts[1];
+            result = (size_t) span_to_uint_64 (found);
+            break;
+        }
+    }
+
+    if (span_compare (unit, span_from_text ("kB")) == 0) {
+        multiplier = MAGNA_INT64 (1024);
+    }
+    else if (span_compare (unit, span_from_text ("MB")) == 0) {
+        multiplier = MAGNA_INT64 (1024) * MAGNA_INT64 (1024);
+    }
+    else if (span_compare (unit, span_from_text ("GB")) == 0) {
+        multiplier = MAGNA_INT64 (1024) * MAGNA_INT64 (1024)
+            * MAGNA_INT64 (1024);
+    }
+    else {
+        multiplier = 0;
+    }
+
+    result *= multiplier;
+
+    buffer_free (&line);
+    texter_free (&texter);
+
+    return result;
 }
 
 /**
@@ -146,7 +214,7 @@ MAGNA_API am_uint64 mem_total_installed (void)
 
 #elif defined(MAGNA_LINUX)
 
-    return 0;
+    return parse_value ("MemTotal");
 
 #else
 
@@ -177,7 +245,7 @@ MAGNA_API am_uint64 mem_total_virtual (void)
 
 #elif defined(MAGNA_LINUX)
 
-    return 0;
+    return parse_value ("MemTotal") + parse_value ("SwapTotal");
 
 #else
 
@@ -208,7 +276,14 @@ MAGNA_API am_uint64 mem_avail_physical (void)
 
 #elif defined(MAGNA_LINUX)
 
-    return 0;
+    am_uint64 result;
+
+    result = parse_value ("MemAvailable");
+    if (result == 0) {
+        result = parse_value("MemFree");
+    }
+
+    return result;
 
 #else
 
@@ -239,13 +314,35 @@ MAGNA_API am_uint64 mem_avail_virtual (void)
 
 #elif defined(MAGNA_LINUX)
 
-    return 0;
+    return parse_value ("MemFree") + parse_value ("SwapFree");
 
 #else
 
     return 0;
 
 #endif
+}
+
+/*=========================================================*/
+
+/**
+ * Мы выполняемся на машине с маленькой памятью?
+ *
+ * @return Результат проверки.
+ */
+MAGNA_API am_bool mem_is_small_machine (void)
+{
+    return mem_avail_physical() < (MAGNA_INT64 (1024) * MAGNA_INT64 (1024));
+}
+
+/**
+ * Мы выполняемся на машине с огромной памятью?
+ *
+ * @return Результат проверки.
+ */
+MAGNA_API am_bool mem_is_huge_machine (void)
+{
+    return mem_avail_physical() > (MAGNA_INT64(2) * MAGNA_INT64 (1024) * MAGNA_INT64 (1024));
 }
 
 /*=========================================================*/
@@ -290,7 +387,7 @@ static am_byte append_chunk
 MAGNA_API am_bool MAGNA_CALL allocator_init
     (
         Allocator *allocator,
-        am_size_t chunkSize
+        size_t chunkSize
     )
 {
     assert (allocator != NULL);
@@ -340,7 +437,7 @@ MAGNA_API void MAGNA_CALL allocator_free
 MAGNA_API void* MAGNA_CALL allocator_alloc
     (
         Allocator *allocator,
-        am_size_t length
+        size_t length
     )
 {
     void *result;
@@ -372,12 +469,12 @@ MAGNA_API void* MAGNA_CALL allocator_alloc
  * @param allocator Аллокатор.
  * @return Общий размер занятой памяти.
  */
-MAGNA_API am_size_t MAGNA_CALL allocator_total
+MAGNA_API size_t MAGNA_CALL allocator_total
     (
         const Allocator *allocator
     )
 {
-    am_size_t result = 0;
+    size_t result = 0;
     const AllocatorChunk *chunk;
 
     assert (allocator != NULL);

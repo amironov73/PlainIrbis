@@ -114,7 +114,7 @@ static am_bool append_chunk
 MAGNA_API ChunkedBuffer* MAGNA_CALL chunked_init
     (
         ChunkedBuffer *chunked,
-        am_size_t chunkSize
+        size_t chunkSize
     )
 {
     assert (chunked != NULL);
@@ -239,12 +239,12 @@ MAGNA_API int MAGNA_CALL chunked_peek
  * @param chunked Указатель на буфер.
  * @return Смещение от начала в байтах.
  */
-MAGNA_API am_size_t MAGNA_CALL chunked_position
+MAGNA_API size_t MAGNA_CALL chunked_position
     (
         const ChunkedBuffer *chunked
     )
 {
-    am_size_t result;
+    size_t result;
     const MemoryChunk *chunk;
 
     assert (chunked != NULL);
@@ -301,14 +301,14 @@ MAGNA_API int MAGNA_CALL chunked_read_byte
  * @param count Число байт для чтения.
  * @return Количество прочитанных байт. -1 при ошибке.
  */
-MAGNA_API am_ssize_t MAGNA_CALL chunked_read
+MAGNA_API ssize_t MAGNA_CALL chunked_read
     (
         ChunkedBuffer *chunked,
         Buffer *buffer,
-        am_size_t count
+        size_t count
     )
 {
-    am_size_t total = 0, remaining, portion;
+    size_t total = 0, remaining, portion;
 
     assert (chunked != NULL);
     assert (buffer != NULL);
@@ -349,7 +349,7 @@ MAGNA_API am_ssize_t MAGNA_CALL chunked_read
 
     } while (count);
 
-    return (am_ssize_t) total;
+    return (ssize_t) total;
 }
 
 /**
@@ -360,14 +360,14 @@ MAGNA_API am_ssize_t MAGNA_CALL chunked_read
  * @param count Число байт для чтения.
  * @return Количество прочитанных байт. -1 при ошибке.
  */
-MAGNA_API am_ssize_t MAGNA_CALL chunked_read_raw
+MAGNA_API ssize_t MAGNA_CALL chunked_read_raw
     (
         ChunkedBuffer *chunked,
         am_byte *buffer,
-        am_size_t count
+        size_t count
     )
 {
-    am_size_t total = 0, remaining, portion, offset = 0;
+    size_t total = 0, remaining, portion, offset = 0;
 
     assert (chunked != NULL);
     assert (buffer != NULL);
@@ -407,7 +407,7 @@ MAGNA_API am_ssize_t MAGNA_CALL chunked_read_raw
 
     } while (count);
 
-    return (am_ssize_t) total;
+    return (ssize_t) total;
 }
 
 /**
@@ -417,13 +417,13 @@ MAGNA_API am_ssize_t MAGNA_CALL chunked_read_raw
  * @param buffer Куда помещать строку. Перевод строки считывается но в результат не помещается.
  * @return Длина прочитанной строки, -1 при ошибке.
  */
-MAGNA_API am_ssize_t MAGNA_CALL chunked_read_line
+MAGNA_API ssize_t MAGNA_CALL chunked_read_line
     (
         ChunkedBuffer *chunked,
         Buffer *buffer
     )
 {
-    am_size_t result = 0;
+    size_t result = 0;
     int c;
 
     assert (chunked != NULL);
@@ -453,7 +453,7 @@ MAGNA_API am_ssize_t MAGNA_CALL chunked_read_line
         ++result;
     }
 
-    return (am_ssize_t) result;
+    return (ssize_t) result;
 }
 
 /**
@@ -464,13 +464,13 @@ MAGNA_API am_ssize_t MAGNA_CALL chunked_read_line
  * @param buffer Куда складывать результат.
  * @return Количество успешно прочитанных байт. -1 при ошибке.
  */
-MAGNA_API am_ssize_t MAGNA_CALL chunked_read_remaining
+MAGNA_API ssize_t MAGNA_CALL chunked_read_remaining
     (
         const ChunkedBuffer *chunked,
         Buffer *buffer
     )
 {
-    am_size_t result = 0, portion;
+    size_t result = 0, portion;
     am_byte *data;
     MemoryChunk *chunk;
 
@@ -530,7 +530,7 @@ MAGNA_API am_ssize_t MAGNA_CALL chunked_read_remaining
         }
     }
 
-    return (am_ssize_t) result;
+    return (ssize_t) result;
 }
 
 /**
@@ -539,12 +539,12 @@ MAGNA_API am_ssize_t MAGNA_CALL chunked_read_remaining
  * @param chunked Буфер.
  * @return Общее количество непрочитванных байт.
  */
-MAGNA_API am_size_t MAGNA_CALL chunked_remaining_size
+MAGNA_API size_t MAGNA_CALL chunked_remaining_size
     (
         const ChunkedBuffer *chunked
     )
 {
-    am_size_t result = 0;
+    size_t result = 0;
     const MemoryChunk *chunk;
 
     assert (chunked != NULL);
@@ -603,12 +603,12 @@ MAGNA_API ChunkedBuffer* MAGNA_CALL chunked_rewind
  * @param chunked Указатель на буфер.
  * @return Общий размер данных в байтах.
  */
-MAGNA_API am_size_t MAGNA_CALL chunked_size
+MAGNA_API size_t MAGNA_CALL chunked_size
     (
         const ChunkedBuffer *chunked
     )
 {
-    am_size_t result;
+    size_t result;
     const MemoryChunk *chunk;
 
     assert (chunked != NULL);
@@ -630,12 +630,12 @@ MAGNA_API am_size_t MAGNA_CALL chunked_size
  * @param chunked Указатель на буфер.
  * @return Общая емкость в байтах.
  */
-MAGNA_API am_size_t MAGNA_CALL chunked_capacity
+MAGNA_API size_t MAGNA_CALL chunked_capacity
     (
         const ChunkedBuffer *chunked
     )
 {
-    am_size_t result = 0;
+    size_t result = 0;
     const MemoryChunk *chunk;
 
     assert (chunked != NULL);
@@ -655,13 +655,13 @@ MAGNA_API am_size_t MAGNA_CALL chunked_capacity
  * @param buffer Куда помещать результат.
  * @return Общий размер считанных данных.
  */
-MAGNA_API am_ssize_t MAGNA_CALL chunked_all
+MAGNA_API ssize_t MAGNA_CALL chunked_all
     (
         const ChunkedBuffer *chunked,
         Buffer *buffer
     )
 {
-    am_size_t result = 0, portion;
+    size_t result = 0, portion;
     am_byte *data;
     MemoryChunk *chunk;
 
@@ -721,7 +721,7 @@ MAGNA_API am_ssize_t MAGNA_CALL chunked_all
         }
     }
 
-    return (am_ssize_t) result;
+    return (ssize_t) result;
 }
 
 /**
@@ -734,7 +734,7 @@ MAGNA_API am_ssize_t MAGNA_CALL chunked_all
 MAGNA_API am_byte* MAGNA_CALL chunked_at
     (
         const ChunkedBuffer *chunked,
-        am_size_t offset
+        size_t offset
     )
 {
     const MemoryChunk *chunk;
@@ -772,12 +772,12 @@ MAGNA_API am_byte* MAGNA_CALL chunked_at
 MAGNA_API am_bool MAGNA_CALL chunked_grow
     (
         ChunkedBuffer *chunked,
-        am_size_t newSize
+        size_t newSize
     )
 {
     MemoryChunk *newChunk;
     am_byte *data;
-    am_size_t alreadyHave;
+    size_t alreadyHave;
 
     assert (chunked != NULL);
 
@@ -833,10 +833,10 @@ MAGNA_API am_bool MAGNA_CALL chunked_write
     (
         ChunkedBuffer *chunked,
         const am_byte *data,
-        am_size_t dataSize
+        size_t dataSize
     )
 {
-    am_size_t available, portion;
+    size_t available, portion;
     am_byte *ptr;
 
     assert (chunked != NULL);
@@ -1025,7 +1025,7 @@ MAGNA_API am_bool MAGNA_CALL chunked_utf8_to_ansi
         const Buffer *source
     )
 {
-    am_size_t delta;
+    size_t delta;
 
     assert (target != NULL);
     assert (source != NULL);
@@ -1070,11 +1070,11 @@ MAGNA_API am_bool MAGNA_CALL chunked_ansi_to_utf8
 
 /* Stream-обертка */
 
-MAGNA_API am_ssize_t MAGNA_CALL chunked_read_function
+MAGNA_API ssize_t MAGNA_CALL chunked_read_function
     (
         Stream *stream,
         am_byte *data,
-        am_size_t length
+        size_t length
     )
 {
     ChunkedBuffer *buffer;
@@ -1087,11 +1087,11 @@ MAGNA_API am_ssize_t MAGNA_CALL chunked_read_function
     return chunked_read_raw (buffer, data, length);
 }
 
-MAGNA_API am_ssize_t MAGNA_CALL chunked_write_function
+MAGNA_API ssize_t MAGNA_CALL chunked_write_function
     (
         Stream *stream,
         const am_byte *data,
-        am_size_t length
+        size_t length
     )
 {
     ChunkedBuffer *buffer;
@@ -1133,7 +1133,7 @@ MAGNA_API am_bool MAGNA_CALL chunked_close_function
 MAGNA_API am_bool MAGNA_CALL chunked_stream_create
     (
         Stream *stream,
-        am_size_t chunkSize
+        size_t chunkSize
     )
 {
     ChunkedBuffer *chunked;

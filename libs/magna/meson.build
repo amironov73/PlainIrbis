@@ -2,8 +2,7 @@
 # Common support library
 #
 
-sources = [ 'src/array.c',
-    'src/beep.c',
+sources = [ 'src/beep.c',
     'src/buffer.c',
     'src/chunked.c',
     'src/cp1251.c',
@@ -40,7 +39,8 @@ sources = [ 'src/array.c',
     'src/thread.c',
     'src/utf8.c',
     'src/utils.c',
-    'src/varray.c'
+    'src/varray.c',
+    'src/vector.c'
     ]
 
 libmagna = static_library('magna',

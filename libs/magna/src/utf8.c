@@ -72,10 +72,10 @@ MAGNA_API am_bool MAGNA_CALL buffer_putc_utf8
  * @param dataLength Длина данных в байтах.
  * @return Число code point.
  */
-MAGNA_API am_size_t MAGNA_CALL utf8_code_points
+MAGNA_API size_t MAGNA_CALL utf8_code_points
     (
         const am_byte *data,
-        am_size_t dataLength
+        size_t dataLength
     )
 {
     assert (data != NULL);
@@ -92,13 +92,13 @@ MAGNA_API am_size_t MAGNA_CALL utf8_code_points
  * @param length Длина текста в символах.
  * @return Длина заданного текста в UTF-8 в байтах.
  */
-MAGNA_API am_size_t MAGNA_CALL count_utf
+MAGNA_API size_t MAGNA_CALL count_utf
     (
         const am_wchar *src,
-        am_size_t length
+        size_t length
     )
 {
-    am_size_t result = 0;
+    size_t result = 0;
     am_uint32 c;
 
     while (length != 0) {

@@ -19,7 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\array.c" />
     <ClCompile Include="src\beep.c" />
     <ClCompile Include="src\buffer.c" />
     <ClCompile Include="src\chunked.c" />
@@ -57,6 +56,7 @@
     <ClCompile Include="src\thread.c" />
     <ClCompile Include="src\utf8.c" />
     <ClCompile Include="src\varray.c" />
+    <ClCompile Include="src\vector.c" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

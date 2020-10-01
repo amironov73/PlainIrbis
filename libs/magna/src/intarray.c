@@ -111,7 +111,7 @@ MAGNA_API am_bool MAGNA_CALL int32_array_concat
 MAGNA_API am_bool MAGNA_CALL int32_array_create
     (
         Int32Array *array,
-        am_size_t capacity
+        size_t capacity
     )
 {
     assert (array != NULL);
@@ -157,7 +157,7 @@ MAGNA_API void MAGNA_CALL int32_array_free
 MAGNA_API am_int32 MAGNA_CALL int32_array_get
     (
         const Int32Array *array,
-        am_size_t index
+        size_t index
     )
 {
     assert (array != NULL);
@@ -178,10 +178,10 @@ MAGNA_API am_int32 MAGNA_CALL int32_array_get
 MAGNA_API am_bool MAGNA_CALL int32_array_grow
     (
         Int32Array *array,
-        am_size_t newSize
+        size_t newSize
     )
 {
-    am_size_t size;
+    size_t size;
     am_int32 *newPtr;
 
     assert (array != NULL);
@@ -230,7 +230,7 @@ MAGNA_API am_bool MAGNA_CALL int32_array_shrink
     )
 {
     am_int32 *newPtr;
-    am_size_t newSize;
+    size_t newSize;
 
     assert (array != NULL);
     assert (array->len <= array->capacity);
@@ -376,7 +376,7 @@ MAGNA_API am_bool MAGNA_CALL int32_array_push_front
 MAGNA_API void MAGNA_CALL int32_array_set
     (
         Int32Array *array,
-        am_size_t index,
+        size_t index,
         am_int32 value
     )
 {
@@ -396,7 +396,7 @@ MAGNA_API void MAGNA_CALL int32_array_set
 MAGNA_API void MAGNA_CALL int32_array_truncate
     (
         Int32Array *array,
-        am_size_t newSize
+        size_t newSize
     )
 {
     assert (array != NULL);
@@ -421,7 +421,7 @@ MAGNA_API am_bool MAGNA_CALL int32_array_to_text
         const am_byte *delimiter
     )
 {
-    am_size_t index;
+    size_t index;
     am_int32 *item;
 
     assert (array != NULL);
@@ -473,7 +473,7 @@ MAGNA_API am_bool MAGNA_CALL int32_array_compress
 {
     am_bool first = AM_TRUE;
     am_uint32 previous, last, current;
-    am_size_t index;
+    size_t index;
 
     assert (array != NULL);
     assert (buffer != NULL);

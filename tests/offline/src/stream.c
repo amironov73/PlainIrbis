@@ -119,7 +119,7 @@ TESTER(memory_stream_to_text_1)
 {
     Stream memory;
     const char *text = "Hello World";
-    am_ssize_t length = strlen (text);
+    ssize_t length = strlen (text);
     am_byte *data;
 
     CHECK (memory_stream_create (&memory));
@@ -154,7 +154,7 @@ TESTER(texter_init_2)
     Stream memory;
     StreamTexter texter;
     am_byte *text = "Hello World";
-    am_ssize_t length = strlen (text);
+    ssize_t length = strlen (text);
 
     CHECK (memory_stream_open (&memory, text, strlen (text)));
     CHECK (texter_init (&texter, &memory, 0));
@@ -232,7 +232,7 @@ TESTER(texter_read_line_2)
     StreamTexter texter;
     am_byte *text = "Hello World";
     Buffer line = BUFFER_INIT;
-    am_size_t length = strlen (text);
+    size_t length = strlen (text);
 
     CHECK (memory_stream_open (&memory, text, length));
     CHECK (texter_init (&texter, &memory, 0));
@@ -250,7 +250,7 @@ TESTER(texter_read_line_3)
     StreamTexter texter;
     am_byte *text = "Hello\r\nWorld!";
     Buffer line = BUFFER_INIT;
-    am_size_t length = strlen (text);
+    size_t length = strlen (text);
 
     CHECK (memory_stream_open (&memory, text, length));
     CHECK (texter_init (&texter, &memory, 0));
@@ -272,7 +272,7 @@ TESTER(texter_read_line_4)
     StreamTexter texter;
     am_byte *text = "Hello\nWorld!";
     Buffer line = BUFFER_INIT;
-    am_size_t length = strlen (text);
+    size_t length = strlen (text);
 
     CHECK (memory_stream_open (&memory, text, length));
     CHECK (texter_init (&texter, &memory, 0));
@@ -294,7 +294,7 @@ TESTER(texter_read_line_5)
     StreamTexter texter;
     am_byte *text = "Hello\rWorld!";
     Buffer line = BUFFER_INIT;
-    am_size_t length = strlen (text);
+    size_t length = strlen (text);
 
     CHECK (memory_stream_open (&memory, text, length));
     CHECK (texter_init (&texter, &memory, 0));
@@ -316,7 +316,7 @@ TESTER(texter_read_line_6)
     StreamTexter texter;
     am_byte *text = "Hello\r";
     Buffer line = BUFFER_INIT;
-    am_size_t length = strlen (text);
+    size_t length = strlen (text);
 
     CHECK (memory_stream_open (&memory, text, length));
     CHECK (texter_init (&texter, &memory, 0));

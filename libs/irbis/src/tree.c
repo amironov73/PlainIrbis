@@ -14,7 +14,7 @@
  */
 typedef struct
 {
-    Array children;
+    Vector children;
     Buffer value;
     int level;
 } TreeNode;
@@ -24,5 +24,5 @@ typedef struct
  */
 typedef struct
 {
-    Array roots;
+    Vector roots;
 } TreeFile;

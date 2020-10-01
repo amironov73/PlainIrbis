@@ -110,7 +110,7 @@ MAGNA_API am_byte MAGNA_CALL koi8r_unicode_to_char
         unsigned uchr
     )
 {
-    am_ssize_t found = search_for_unicode (_koi8r_from_unicode, 0, 255, uchr);
+    ssize_t found = search_for_unicode (_koi8r_from_unicode, 0, 255, uchr);
 
     return found < 0 ? '?' : _koi8r_xlat [found];
 }
@@ -151,7 +151,7 @@ MAGNA_API am_bool MAGNA_CALL koi8r_buffer_to_utf8
     )
 {
     am_byte c;
-    am_size_t index;
+    size_t index;
 
     assert (target != NULL);
     assert (source != NULL);

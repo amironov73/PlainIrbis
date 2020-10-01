@@ -5,28 +5,28 @@
 
 TESTER(mem_avail_physical_1)
 {
-    am_size_t rc = mem_avail_physical();
+    size_t rc = mem_avail_physical();
 
     CHECK (rc != 0);
 }
 
 TESTER(mem_avail_virtual_1)
 {
-    am_size_t rc = mem_avail_virtual();
+    size_t rc = mem_avail_virtual();
 
     CHECK (rc != 0);
 }
 
 TESTER(mem_total_installed_1)
 {
-    am_size_t rc = mem_total_installed();
+    size_t rc = mem_total_installed();
 
     CHECK (rc != 0);
 }
 
 TESTER(mem_total_virtual_1)
 {
-    am_size_t rc = mem_total_virtual();
+    size_t rc = mem_total_virtual();
 
     CHECK (rc != 0);
 }
@@ -86,3 +86,12 @@ TESTER(allocator_total_1)
     allocator_free (&allocator);
 }
 
+TESTER(mem_is_small_machine_1)
+{
+    am_bool small, huge;
+
+    small = mem_is_small_machine ();
+    huge  = mem_is_huge_machine  ();
+
+    CHECK (small != huge);
+}

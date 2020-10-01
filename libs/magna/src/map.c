@@ -55,7 +55,7 @@ static am_bool MAGNA_CALL trivial_comparer
 MAGNA_API am_bool MAGNA_CALL map_create
     (
         Map *map,
-        am_size_t factor,
+        size_t factor,
         KeyComparer comparer,
         HashFunction hasher,
         Liberator keyLiberator,
@@ -74,12 +74,12 @@ MAGNA_API am_bool MAGNA_CALL map_create
     map->hasher = hasher;
     map->keyLiberator = keyLiberator;
     map->valueLiberator = valueLiberator;
-    map->buckets = (Array**) mem_alloc (sizeof (Array*) * factor);
+    map->buckets = (Vector**) mem_alloc (sizeof (Vector*) * factor);
     if (map->buckets == NULL) {
         return AM_FALSE;
     }
 
-    mem_clear (map->buckets, sizeof (Array*) * factor);
+    mem_clear (map->buckets, sizeof (Vector*) * factor);
 
     return AM_TRUE;
 }
@@ -94,8 +94,8 @@ MAGNA_API void MAGNA_CALL map_free
         Map *map
     )
 {
-    am_size_t i, j;
-    Array *bucket;
+    size_t i, j;
+    Vector *bucket;
     MapEntry *entry;
 
     assert (map != NULL);
@@ -118,7 +118,7 @@ MAGNA_API void MAGNA_CALL map_free
                 }
             }
 
-            array_free (bucket);
+            vector_destroy(bucket);
             mem_free (bucket);
         }
     }
@@ -139,8 +139,8 @@ MAGNA_API void* MAGNA_CALL map_get
         void *key
     )
 {
-    am_size_t hash, index, j;
-    Array *bucket;
+    size_t hash, index, j;
+    Vector *bucket;
     const MapEntry *entry;
 
     assert (map != NULL);
@@ -179,8 +179,8 @@ MAGNA_API am_bool MAGNA_CALL map_set
         void *value
     )
 {
-    am_size_t hash, index, j;
-    Array *bucket;
+    size_t hash, index, j;
+    Vector *bucket;
     MapEntry *entry;
 
     assert (map != NULL);
@@ -189,12 +189,12 @@ MAGNA_API am_bool MAGNA_CALL map_set
     index = hash % map->factor;
     bucket = map->buckets [index];
     if (bucket == NULL) {
-        bucket = mem_alloc (sizeof (Array));
+        bucket = mem_alloc (sizeof (Vector));
         if (bucket == NULL) {
             return AM_FALSE;
         }
 
-        if (!array_create (bucket, 4)) {
+        if (!vector_create(bucket, 4)) {
             return AM_FALSE;
         }
     }
@@ -221,7 +221,7 @@ MAGNA_API am_bool MAGNA_CALL map_set
         return AM_FALSE;
     }
 
-    if (!array_push_back (bucket, entry)) {
+    if (!vector_push_back(bucket, entry)) {
         mem_free (entry);
         return AM_FALSE;
     }
@@ -269,15 +269,15 @@ MAGNA_API am_bool MAGNA_CALL map_walk
         void *data
     )
 {
-    am_size_t i, j;
-    const Array *bucket;
+    size_t i, j;
+    const Vector *bucket;
     const MapEntry *entry;
 
     assert (map != NULL);
     assert (walker != NULL);
 
     for (i = 0; i < map->factor; ++i) {
-        bucket = (const Array*) map->buckets [i];
+        bucket = (const Vector*) map->buckets [i];
         if (bucket != NULL) {
             for (j = 0; j < bucket->len; ++j) {
                 entry = (const MapEntry*) bucket->ptr [j];
