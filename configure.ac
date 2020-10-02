@@ -29,7 +29,9 @@ AC_TYPE_UINT8_T
 AC_TYPE_UINT16_T
 AC_TYPE_UINT32_T
 AC_TYPE_UINT64_T
+AC_TYPE_LONG_LONG_INT
 AC_CHECK_TYPES([ptrdiff_t])
+AC_CHECK_SIZEOF([size_t])
 
 # Checks for library functions.
 

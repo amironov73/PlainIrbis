@@ -39,12 +39,12 @@ int main (int argc, char **argv)
     printf ("Library version: %d\n", magna_version());
 
     connection_init (&connection);
-    buffer_from_text (&connection.host, "localhost");
-    connection.port = 6666;
-    buffer_from_text (&connection.username, "librarian");
-    buffer_from_text (&connection.password, "secret");
-    buffer_from_text (&connection.database, "IBIS");
+    CONNECTION_SET_HOST     (connection, "localhost");
+    CONNECTION_SET_USERNAME (connection, "librarian");
+    CONNECTION_SET_PASSWORD (connection, "secret");
+    CONNECTION_SET_DATABASE (connection, "IBIS");
     connection.workstation = CATALOGER;
+    connection.port = 6666;
 
     if (!connection_connect (&connection)) {
         fputs ("Connection failed", stderr);
@@ -56,7 +56,7 @@ int main (int argc, char **argv)
     printf ("Max MFN=%u\n", maxMfn);
 
     connection_disconnect (&connection);
-    connection_free (&connection);
+    connection_destroy (&connection);
 
     return 0;
 }

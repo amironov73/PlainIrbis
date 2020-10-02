@@ -53,7 +53,7 @@ am_bool where_test_data
         path->position = directory.len;
     }
 
-    buffer_free (&candidate);
+    buffer_destroy(&candidate);
 
     return result;
 }
@@ -90,7 +90,7 @@ int main (int argc, const char **argv)
         printf ("test data=");
         fwrite (tdp.ptr, 1, tdp.position, stdout);
         printf ("\n");
-        buffer_free (&tdp);
+        buffer_destroy(&tdp);
     }
 
     int result = tester_main (argc, argv);

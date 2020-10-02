@@ -4,6 +4,10 @@
 #ifndef MAGNA_CORE_H
 #define MAGNA_CORE_H
 
+#ifdef HAVE_CONFIG_H
+#include "magna/config/config.h"
+#endif
+
 #define WIN32_LEAN_AND_MEAN /* Exclude rarely-used stuff from Windows headers */
 
 /*=========================================================*/
@@ -271,6 +275,22 @@ typedef void      *am_pointer;
 #define AM_FALSE 0
 #define AM_TRUE  1
 
+#ifdef _MSC_VER
+
+/* Visual C doesn't have `ssize_t` */
+
+#ifdef MAGNA_64BIT
+
+typedef long long int ssize_t;
+
+#else
+
+typedef int ssize_t;
+
+#endif
+
+#endif
+
 /*=========================================================*/
 
 /* Простая обертка над Win32 HANDLE */
@@ -307,7 +327,7 @@ typedef union {
     am_uint16 uint16;
     am_uint32 uint32;
     am_uint64 uint64;
-    size_t size;
+    size_t    size;
 
     struct {
         am_byte byte0;
@@ -344,7 +364,7 @@ MAGNA_API am_bool             magna_on_windows      (void);
 
 /* Опережающее объявление */
 
-typedef struct MagnaAllocatorChunk AllocatorChunk;
+typedef struct MagnaAllocatorChunk ArenaChunk;
 typedef struct MagnaBuffer         Buffer;
 typedef struct MangaEnumerator     Enumerator;
 typedef struct MaganaListItem      ListItem;
@@ -352,7 +372,7 @@ typedef struct MagnaMemoryChunk    MemoryChunk;
 typedef struct MagnaSpan           Span;
 typedef struct MagnaSpanArray      SpanArray;
 typedef struct MagnaStream         Stream;
-typedef struct MagnaValueArray     ValueArray;
+typedef struct MagnaArray     Array;
 typedef struct MagnaVector         Vector;
 
 /*=========================================================*/
@@ -382,8 +402,8 @@ MAGNA_API MAGNA_INLINE am_int64  MAGNA_CALL min_int64        (am_int64  first, a
 MAGNA_API MAGNA_INLINE am_int64  MAGNA_CALL max_int64        (am_int64  first, am_int64  second);
 MAGNA_API MAGNA_INLINE am_uint64 MAGNA_CALL min_uint64       (am_uint64 first, am_uint64 second);
 MAGNA_API MAGNA_INLINE am_uint64 MAGNA_CALL max_uint64       (am_uint64 first, am_uint64 second);
-MAGNA_API MAGNA_INLINE size_t MAGNA_CALL min_size_t       (size_t first, size_t second);
-MAGNA_API MAGNA_INLINE size_t MAGNA_CALL max_size_t       (size_t first, size_t second);
+MAGNA_API MAGNA_INLINE size_t    MAGNA_CALL min_size_t       (size_t first, size_t second);
+MAGNA_API MAGNA_INLINE size_t    MAGNA_CALL max_size_t       (size_t first, size_t second);
 MAGNA_API MAGNA_INLINE int       MAGNA_CALL magna_sign_int   (int value);
 MAGNA_API MAGNA_INLINE int       MAGNA_CALL magna_sign_int32 (am_int32 value);
 MAGNA_API MAGNA_INLINE int       MAGNA_CALL magna_sign_int64 (am_int64 value);
@@ -420,20 +440,20 @@ MAGNA_API am_uint64            mem_total_virtual    (void);
 /* Супер-пупер-простой аллокатор */
 
 struct MagnaAllocatorChunk {
-    AllocatorChunk *next;
+    ArenaChunk *next;
 };
 
 typedef struct {
-    AllocatorChunk *first, *last;
+    ArenaChunk *first, *last;
     am_byte *current;
     size_t chunkSize, remaining;
 
-} Allocator;
+} Arena;
 
-MAGNA_API void*     MAGNA_CALL allocator_alloc (Allocator *allocator, size_t length);
-MAGNA_API void      MAGNA_CALL allocator_free  (Allocator *allocator);
-MAGNA_API am_bool   MAGNA_CALL allocator_init  (Allocator *allocator, size_t chunkSize);
-MAGNA_API size_t MAGNA_CALL allocator_total (const Allocator *allocator);
+MAGNA_API void*     MAGNA_CALL arena_alloc (Arena *arena, size_t length);
+MAGNA_API void      MAGNA_CALL arena_destroy  (Arena *arena);
+MAGNA_API am_bool   MAGNA_CALL arena_init  (Arena *arena, size_t chunkSize);
+MAGNA_API size_t    MAGNA_CALL arena_total (const Arena *arena);
 
 /*=========================================================*/
 
@@ -469,15 +489,15 @@ extern MAGNA_API              Span       MAGNA_CALL span_fill             (Span 
 extern MAGNA_API              am_byte*   MAGNA_CALL span_find_byte        (Span span, am_byte value);
 extern MAGNA_API MAGNA_INLINE Span       MAGNA_CALL span_from_text        (const char *str);
 extern MAGNA_API MAGNA_INLINE Span       MAGNA_CALL span_init             (const am_byte *ptr, size_t len);
-extern MAGNA_API              ssize_t MAGNA_CALL span_index_of         (Span span, am_byte value);
+extern MAGNA_API              ssize_t    MAGNA_CALL span_index_of         (Span span, am_byte value);
 extern MAGNA_API MAGNA_INLINE am_bool    MAGNA_CALL span_is_empty         (Span span);
-extern MAGNA_API              ssize_t MAGNA_CALL span_last_index_of    (Span span, am_byte value);
+extern MAGNA_API              ssize_t    MAGNA_CALL span_last_index_of    (Span span, am_byte value);
 extern MAGNA_API MAGNA_INLINE Span                  span_null             (void);
 extern MAGNA_API MAGNA_INLINE Span       MAGNA_CALL span_slice            (Span span, ssize_t start, ssize_t length);
 extern MAGNA_API              am_bool    MAGNA_CALL span_split_by_char    (Span span, SpanArray *array, am_byte value);
 extern MAGNA_API              am_bool    MAGNA_CALL span_split_by_chars   (Span span, SpanArray *array, const am_byte *values, size_t valueCount);
-extern MAGNA_API              size_t  MAGNA_CALL span_split_n_by_char  (Span span, Span *array, size_t arraySize, am_byte value);
-extern MAGNA_API              size_t  MAGNA_CALL span_split_n_by_chars (Span span, Span *array, size_t arraySize, const am_byte *values, size_t valueCount);
+extern MAGNA_API              size_t     MAGNA_CALL span_split_n_by_char  (Span span, Span *array, size_t arraySize, am_byte value);
+extern MAGNA_API              size_t     MAGNA_CALL span_split_n_by_chars (Span span, Span *array, size_t arraySize, const am_byte *values, size_t valueCount);
 extern MAGNA_API              am_bool    MAGNA_CALL span_starts_with      (Span span, Span prefix);
 extern MAGNA_API              Span       MAGNA_CALL span_trim_start       (Span span);
 extern MAGNA_API              Span       MAGNA_CALL span_trim_end         (Span span);
@@ -491,9 +511,10 @@ extern MAGNA_API              Span       MAGNA_CALL span_tolower          (Span 
 
 /*=========================================================*/
 
-typedef void* (*Cloner)    (void*);
-typedef void  (*Liberator) (void*);
-typedef int   (*Comparer)  (const void*, const void*, const void*);
+typedef void*   (*Cloner)     (void*);
+typedef void    (*Liberator)  (void*);
+typedef int     (*Comparer)   (const void*, const void*, const void*);
+typedef am_bool (*Outputer)   (const void*, struct MagnaBuffer*);
 
 /*=========================================================*/
 
@@ -529,7 +550,7 @@ extern MAGNA_API              void    MAGNA_CALL vector_truncate   (Vector *vect
 
 /* Массив мелких объектов */
 
-struct MagnaValueArray
+struct MagnaArray
 {
     am_byte *ptr;
     size_t itemSize;
@@ -542,26 +563,26 @@ struct MagnaValueArray
 
 #define VARRAY_INIT(__itemSize) { NULL, __itemSize, 0, 0, 0, NULL };
 
-MAGNA_API              void*   MAGNA_CALL varray_bsearch      (ValueArray *array, const void *value, Comparer comparer, const void *data);
-MAGNA_API              void    MAGNA_CALL varray_clear        (ValueArray *array);
-MAGNA_API              am_bool MAGNA_CALL varray_clone        (ValueArray *target, const ValueArray *source, Cloner cloner);
-MAGNA_API              am_bool MAGNA_CALL varray_concat       (ValueArray *target, const ValueArray *source);
-MAGNA_API              am_bool MAGNA_CALL varray_copy         (ValueArray *target, const ValueArray *source);
-MAGNA_API              am_bool MAGNA_CALL varray_create       (ValueArray *array, size_t itemSize, size_t capacity);
-MAGNA_API              void*   MAGNA_CALL varray_emplace_back (ValueArray *array);
-MAGNA_API              void    MAGNA_CALL varray_free         (ValueArray *array);
-MAGNA_API MAGNA_INLINE void*   MAGNA_CALL varray_get          (const ValueArray *array, size_t index);
-MAGNA_API              am_bool MAGNA_CALL varray_grow         (ValueArray *array, size_t newSize);
-MAGNA_API              void    MAGNA_CALL varray_init         (ValueArray *array, size_t itemSize);
-MAGNA_API              void*   MAGNA_CALL varray_pop_back     (ValueArray *array);
-MAGNA_API              void*   MAGNA_CALL varray_pop_front    (ValueArray *array);
-MAGNA_API              am_bool MAGNA_CALL varray_push_back    (ValueArray *array, void *item);
-MAGNA_API              am_bool MAGNA_CALL varray_push_front   (ValueArray *array, void *item);
-MAGNA_API              void    MAGNA_CALL varray_remove_index (ValueArray *array, size_t index);
-MAGNA_API              void    MAGNA_CALL varray_remove_item  (ValueArray *array, void *item);
-MAGNA_API              void    MAGNA_CALL varray_set          (ValueArray *array, size_t index, void *value);
-MAGNA_API              void    MAGNA_CALL varray_sort         (ValueArray *array, Comparer comparer, const void *data);
-MAGNA_API              void    MAGNA_CALL varray_truncate     (ValueArray *array, size_t newSize);
+MAGNA_API              void*   MAGNA_CALL array_bsearch      (Array *array, const void *value, Comparer comparer, const void *data);
+MAGNA_API              void    MAGNA_CALL array_clear        (Array *array);
+MAGNA_API              am_bool MAGNA_CALL array_clone        (Array *target, const Array *source, Cloner cloner);
+MAGNA_API              am_bool MAGNA_CALL array_concat       (Array *target, const Array *source);
+MAGNA_API              am_bool MAGNA_CALL array_copy         (Array *target, const Array *source);
+MAGNA_API              am_bool MAGNA_CALL array_create       (Array *array, size_t itemSize, size_t capacity);
+MAGNA_API              void*   MAGNA_CALL array_emplace_back (Array *array);
+MAGNA_API              void    MAGNA_CALL array_destroy      (Array *array);
+MAGNA_API MAGNA_INLINE void*   MAGNA_CALL array_get          (const Array *array, size_t index);
+MAGNA_API              am_bool MAGNA_CALL array_grow         (Array *array, size_t newSize);
+MAGNA_API              void    MAGNA_CALL array_init         (Array *array, size_t itemSize);
+MAGNA_API              void*   MAGNA_CALL array_pop_back     (Array *array);
+MAGNA_API              void*   MAGNA_CALL array_pop_front    (Array *array);
+MAGNA_API              am_bool MAGNA_CALL array_push_back    (Array *array, void *item);
+MAGNA_API              am_bool MAGNA_CALL array_push_front   (Array *array, void *item);
+MAGNA_API              void    MAGNA_CALL array_remove_index (Array *array, size_t index);
+MAGNA_API              void    MAGNA_CALL array_remove_item  (Array *array, void *item);
+MAGNA_API              void    MAGNA_CALL array_set          (Array *array, size_t index, void *value);
+MAGNA_API              void    MAGNA_CALL array_sort         (Array *array, Comparer comparer, const void *data);
+MAGNA_API              void    MAGNA_CALL array_truncate     (Array *array, size_t newSize);
 
 /*=========================================================*/
 
@@ -661,12 +682,16 @@ extern MAGNA_API              ListItem* MAGNA_CALL list_insert_after   (LinkedLi
 extern MAGNA_API              ListItem* MAGNA_CALL list_insert_before  (LinkedList *list, ListItem *item, const void *data);
 extern MAGNA_API MAGNA_INLINE am_bool   MAGNA_CALL list_is_empty       (const LinkedList *list);
 extern MAGNA_API MAGNA_INLINE ListItem* MAGNA_CALL list_item           (const void *data);
-extern MAGNA_API              size_t MAGNA_CALL list_length         (const LinkedList *list);
+extern MAGNA_API              size_t    MAGNA_CALL list_length         (const LinkedList *list);
 extern MAGNA_API              ListItem* MAGNA_CALL list_pop_back       (LinkedList *list);
 extern MAGNA_API              ListItem* MAGNA_CALL list_pop_front      (LinkedList *list);
 extern MAGNA_API              ListItem* MAGNA_CALL list_push_back      (LinkedList *list, const void *data);
 extern MAGNA_API              ListItem* MAGNA_CALL list_push_front     (LinkedList *list, const void *data);
 extern MAGNA_API              void      MAGNA_CALL list_remove         (LinkedList *list, ListItem *item, Liberator liberator);
+extern MAGNA_API              void      MAGNA_CALL list_reverse        (LinkedList *list);
+extern MAGNA_API              am_bool   MAGNA_CALL list_sort           (LinkedList *list, Comparer comparer, void *userData);
+extern MAGNA_API              am_bool   MAGNA_CALL list_to_string      (const LinkedList *list, Buffer *buffer, Outputer outputer, const char *separator);
+extern MAGNA_API              am_bool   MAGNA_CALL list_to_vector      (const LinkedList *list, Vector *vector);
 extern MAGNA_API              am_bool   MAGNA_CALL list_walk_backward  (LinkedList *list, ListWalker walker, void *data);
 extern MAGNA_API              am_bool   MAGNA_CALL list_walk_forward   (LinkedList *list, ListWalker walker, void *data);
 
@@ -674,9 +699,9 @@ extern MAGNA_API              am_bool   MAGNA_CALL list_walk_forward   (LinkedLi
 
 /* Простой ассоциативный динамический массив */
 
-typedef size_t (MAGNA_CALL *HashFunction) (void*);
-typedef am_bool   (MAGNA_CALL *KeyComparer)  (void *firstKey, void *secondKey);
-typedef am_bool   (MAGNA_CALL *MapWalker)    (void *data, void *key, void *value);
+typedef size_t  (MAGNA_CALL *HashFunction) (void*);
+typedef am_bool (MAGNA_CALL *KeyComparer)  (void *firstKey, void *secondKey);
+typedef am_bool (MAGNA_CALL *MapWalker)    (void *data, void *key, void *value);
 
 typedef struct {
     void *key;
@@ -725,7 +750,7 @@ MAGNA_API am_bool        MAGNA_CALL buffer_ansi_to_utf8              (Buffer *ta
 MAGNA_API am_bool        MAGNA_CALL buffer_assign                    (Buffer *buffer, const am_byte *data, size_t length);
 MAGNA_API am_bool        MAGNA_CALL buffer_assign_span               (Buffer *buffer, const Span span);
 MAGNA_API am_bool        MAGNA_CALL buffer_assign_text               (Buffer *buffer, const char *text);
-MAGNA_API size_t      MAGNA_CALL buffer_calculate_size            (size_t newSize);
+MAGNA_API size_t         MAGNA_CALL buffer_calculate_size            (size_t newSize);
 MAGNA_API Buffer*        MAGNA_CALL buffer_clear                     (Buffer *buffer);
 MAGNA_API Buffer*        MAGNA_CALL buffer_clone                     (Buffer *target, const Buffer *source);
 MAGNA_API int            MAGNA_CALL buffer_compare                   (const Buffer *first, const Buffer *second);
@@ -738,7 +763,7 @@ MAGNA_API am_bool        MAGNA_CALL buffer_copy                      (Buffer *ta
 MAGNA_API am_bool        MAGNA_CALL buffer_create                    (Buffer *buffer, const am_byte *data, size_t length);
 MAGNA_API am_bool        MAGNA_CALL buffer_empty                     (const Buffer *buffer);
 MAGNA_API am_byte*       MAGNA_CALL buffer_find_text                 (const Buffer *buffer, const am_byte *text);
-MAGNA_API void           MAGNA_CALL buffer_free                      (Buffer *buffer);
+MAGNA_API void           MAGNA_CALL buffer_destroy                      (Buffer *buffer);
 MAGNA_API Buffer*        MAGNA_CALL buffer_from_span                 (Buffer *buffer, Span span);
 MAGNA_API Buffer*        MAGNA_CALL buffer_from_text                 (Buffer *buffer, const char *text);
 MAGNA_API am_bool        MAGNA_CALL buffer_grow                      (Buffer *buffer, size_t newSize);
@@ -749,7 +774,7 @@ MAGNA_API am_bool        MAGNA_CALL buffer_put_uint_32               (Buffer *bu
 MAGNA_API am_bool        MAGNA_CALL buffer_put_uint_64               (Buffer *buffer, am_uint64 value);
 MAGNA_API am_bool        MAGNA_CALL buffer_putc                      (Buffer *buffer, char c);
 MAGNA_API am_bool        MAGNA_CALL buffer_puts                      (Buffer *buffer, const char *str);
-MAGNA_API size_t      MAGNA_CALL buffer_read                      (Buffer *buffer, am_byte *data, size_t length);
+MAGNA_API size_t         MAGNA_CALL buffer_read                      (Buffer *buffer, am_byte *data, size_t length);
 MAGNA_API am_bool        MAGNA_CALL buffer_replace_text              (Buffer *buffer, const am_byte *from, const am_byte *to);
 MAGNA_API Buffer*        MAGNA_CALL buffer_static                    (Buffer *buffer, const am_byte *data, size_t length);
 MAGNA_API Buffer*        MAGNA_CALL buffer_swap                      (Buffer *first, Buffer *second);
@@ -778,10 +803,10 @@ typedef struct
 
 } ChunkedBuffer;
 
-MAGNA_API ssize_t       MAGNA_CALL chunked_all            (const ChunkedBuffer *chunked, Buffer *buffer);
+MAGNA_API ssize_t          MAGNA_CALL chunked_all            (const ChunkedBuffer *chunked, Buffer *buffer);
 MAGNA_API am_bool          MAGNA_CALL chunked_ansi_to_utf8   (ChunkedBuffer *target, const Buffer *source);
 MAGNA_API am_byte*         MAGNA_CALL chunked_at             (const ChunkedBuffer *chunked, size_t offset);
-MAGNA_API size_t        MAGNA_CALL chunked_capacity       (const ChunkedBuffer *chunked);
+MAGNA_API size_t           MAGNA_CALL chunked_capacity       (const ChunkedBuffer *chunked);
 MAGNA_API am_bool          MAGNA_CALL chunked_empty          (const ChunkedBuffer *chunked);
 MAGNA_API am_bool          MAGNA_CALL chunked_eof            (const ChunkedBuffer *chunked);
 MAGNA_API void             MAGNA_CALL chunked_free           (ChunkedBuffer *chunked);
@@ -789,16 +814,16 @@ MAGNA_API am_bool          MAGNA_CALL chunked_grow           (ChunkedBuffer *chu
 MAGNA_API ChunkedBuffer*   MAGNA_CALL chunked_init           (ChunkedBuffer *chunked, size_t chunkSize);
 MAGNA_API am_bool          MAGNA_CALL chunked_new_line       (ChunkedBuffer *chunked);
 MAGNA_API int              MAGNA_CALL chunked_peek           (ChunkedBuffer *chunked);
-MAGNA_API size_t        MAGNA_CALL chunked_position       (const ChunkedBuffer *chunked);
+MAGNA_API size_t           MAGNA_CALL chunked_position       (const ChunkedBuffer *chunked);
 MAGNA_API int              MAGNA_CALL chunked_read_byte      (ChunkedBuffer *chunked);
-MAGNA_API ssize_t       MAGNA_CALL chunked_read           (ChunkedBuffer *chunked, Buffer *buffer, size_t count);
-MAGNA_API ssize_t       MAGNA_CALL chunked_read_line      (ChunkedBuffer *chunked, Buffer *buffer);
-MAGNA_API ssize_t       MAGNA_CALL chunked_read_raw       (ChunkedBuffer *chunked, am_byte *buffer, size_t count);
-MAGNA_API ssize_t       MAGNA_CALL chunked_read_remaining (const ChunkedBuffer *chunked, Buffer *buffer);
+MAGNA_API ssize_t          MAGNA_CALL chunked_read           (ChunkedBuffer *chunked, Buffer *buffer, size_t count);
+MAGNA_API ssize_t          MAGNA_CALL chunked_read_line      (ChunkedBuffer *chunked, Buffer *buffer);
+MAGNA_API ssize_t          MAGNA_CALL chunked_read_raw       (ChunkedBuffer *chunked, am_byte *buffer, size_t count);
+MAGNA_API ssize_t          MAGNA_CALL chunked_read_remaining (const ChunkedBuffer *chunked, Buffer *buffer);
 MAGNA_API int              MAGNA_CALL chunked_read_utf8      (ChunkedBuffer *chunked);
-MAGNA_API size_t        MAGNA_CALL chunked_remaining_size (const ChunkedBuffer *chunked);
+MAGNA_API size_t           MAGNA_CALL chunked_remaining_size (const ChunkedBuffer *chunked);
 MAGNA_API ChunkedBuffer*   MAGNA_CALL chunked_rewind         (ChunkedBuffer *chunked);
-MAGNA_API size_t        MAGNA_CALL chunked_size           (const ChunkedBuffer *chunked);
+MAGNA_API size_t           MAGNA_CALL chunked_size           (const ChunkedBuffer *chunked);
 MAGNA_API am_bool          MAGNA_CALL chunked_utf8_to_ansi   (ChunkedBuffer *target, const Buffer *source);
 MAGNA_API am_bool          MAGNA_CALL chunked_write          (ChunkedBuffer *chunked, const am_byte *data, size_t dataSize);
 MAGNA_API am_bool          MAGNA_CALL chunked_write_byte     (ChunkedBuffer *chunked, am_byte value);
@@ -824,13 +849,13 @@ MAGNA_API am_bool       MAGNA_CALL fastbuf_empty     (const FastBuffer *buffer);
 MAGNA_API void          MAGNA_CALL fastbuf_free      (FastBuffer *buffer);
 MAGNA_API am_int32      MAGNA_CALL fastbuf_getc      (FastBuffer *buffer);
 MAGNA_API am_int32      MAGNA_CALL fastbuf_getc_utf8 (FastBuffer *buffer);
-MAGNA_API size_t     MAGNA_CALL fastbuf_gets      (FastBuffer *buffer, Buffer *text);
+MAGNA_API size_t        MAGNA_CALL fastbuf_gets      (FastBuffer *buffer, Buffer *text);
 MAGNA_API am_bool       MAGNA_CALL fastbuf_grow      (FastBuffer *buffer, size_t newSize);
 MAGNA_API void          MAGNA_CALL fastbuf_init      (FastBuffer *buffer, size_t static_capacity);
 MAGNA_API am_bool       MAGNA_CALL fastbuf_puts      (FastBuffer *buffer, const char *text);
 MAGNA_API am_bool       MAGNA_CALL fastbuf_putc      (FastBuffer *buffer, char c        );
 MAGNA_API am_bool       MAGNA_CALL fastbuf_put_utf8  (FastBuffer *buffer, int c);
-MAGNA_API size_t     MAGNA_CALL fastbuf_read      (FastBuffer *buffer, am_byte *data, size_t size);
+MAGNA_API size_t        MAGNA_CALL fastbuf_read      (FastBuffer *buffer, am_byte *data, size_t size);
 MAGNA_API void          MAGNA_CALL fastbuf_rewind    (FastBuffer *buffer);
 MAGNA_API am_bool       MAGNA_CALL fastbuf_write     (FastBuffer *buffer, const am_byte *data, size_t dataSize);
 
@@ -925,7 +950,7 @@ extern MAGNA_API              NumberText*            MAGNA_CALL number_increment
 extern MAGNA_API              NumberText*            MAGNA_CALL number_init         (NumberText *number);
 extern MAGNA_API MAGNA_INLINE const NumberTextChunk* MAGNA_CALL number_last         (const NumberText *number);
 extern MAGNA_API              am_bool                MAGNA_CALL number_parse        (NumberText *number, Span text);
-extern MAGNA_API MAGNA_INLINE size_t              MAGNA_CALL number_size         (const NumberText *number);
+extern MAGNA_API MAGNA_INLINE size_t                 MAGNA_CALL number_size         (const NumberText *number);
 extern MAGNA_API              am_bool                MAGNA_CALL number_to_string    (const NumberText *number, Buffer *output);
 
 /*=========================================================*/
@@ -936,7 +961,7 @@ typedef ssize_t (MAGNA_CALL *ReadFunction)  (Stream*, am_byte*, size_t);
 typedef ssize_t (MAGNA_CALL *WriteFunction) (Stream*, const am_byte*, size_t);
 typedef ssize_t (MAGNA_CALL *SeekFunction)  (Stream*, size_t);
 typedef ssize_t (MAGNA_CALL *TellFunction)  (Stream*);
-typedef am_bool    (MAGNA_CALL *CloseFunction) (Stream*);
+typedef am_bool (MAGNA_CALL *CloseFunction) (Stream*);
 
 struct MagnaStream
 {
@@ -960,16 +985,16 @@ typedef struct {
 MAGNA_API am_bool    MAGNA_CALL stream_close      (Stream *stream);
 MAGNA_API am_bool    MAGNA_CALL stream_copy       (Stream *target, Stream *source);
 MAGNA_API am_bool    MAGNA_CALL stream_init       (Stream *stream);
-MAGNA_API ssize_t MAGNA_CALL stream_read       (Stream *stream, am_byte *buffer, size_t length);
-MAGNA_API ssize_t MAGNA_CALL stream_seek       (Stream *stream, size_t position);
-MAGNA_API ssize_t MAGNA_CALL stream_tell       (Stream *stream);
+MAGNA_API ssize_t    MAGNA_CALL stream_read       (Stream *stream, am_byte *buffer, size_t length);
+MAGNA_API ssize_t    MAGNA_CALL stream_seek       (Stream *stream, size_t position);
+MAGNA_API ssize_t    MAGNA_CALL stream_tell       (Stream *stream);
 MAGNA_API am_bool    MAGNA_CALL stream_write      (Stream *stream, const am_byte *buffer, size_t length);
 MAGNA_API am_bool    MAGNA_CALL stream_write_line (Stream *stream, const char *text);
 
 MAGNA_API am_bool    MAGNA_CALL texter_init      (StreamTexter *texter, Stream *stream, size_t bufsize);
 MAGNA_API void       MAGNA_CALL texter_free      (StreamTexter *texter);
 MAGNA_API int        MAGNA_CALL texter_read_byte (StreamTexter *texter);
-MAGNA_API ssize_t MAGNA_CALL texter_read_line (StreamTexter *texter, Buffer *output);
+MAGNA_API ssize_t    MAGNA_CALL texter_read_line (StreamTexter *texter, Buffer *output);
 
 MAGNA_API am_bool    MAGNA_CALL null_stream_open       (Stream *stream);
 MAGNA_API am_bool    MAGNA_CALL broken_stream_open     (Stream *stream);
@@ -997,7 +1022,7 @@ MAGNA_API am_bool    MAGNA_CALL file_eof          (am_handle handle);
 MAGNA_API am_bool    MAGNA_CALL file_exist        (const char *filename);
 MAGNA_API am_handle  MAGNA_CALL file_open_read    (const char *fileName);
 MAGNA_API am_handle  MAGNA_CALL file_open_write   (const char *fileName);
-MAGNA_API ssize_t MAGNA_CALL file_read         (am_handle handle, am_byte *buffer, ssize_t size);
+MAGNA_API ssize_t    MAGNA_CALL file_read         (am_handle handle, am_byte *buffer, ssize_t size);
 MAGNA_API am_bool    MAGNA_CALL file_read_all     (const char *fileName, Buffer *buffer);
 MAGNA_API int        MAGNA_CALL file_read_byte    (am_handle handle);
 MAGNA_API am_uint32  MAGNA_CALL file_read_int_32  (am_handle handle);
@@ -1062,7 +1087,8 @@ struct MangaEnumerator
 {
     EnumerationCleanup cleanup;
     EnumerationNext next;
-    void *data;
+    am_mix data1;
+    am_mix data2;
 };
 
 MAGNA_API am_bool MAGNA_CALL enum_for_all (Enumerator *enumerator, EnumerationAction action);

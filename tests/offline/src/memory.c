@@ -5,62 +5,62 @@
 
 TESTER(mem_avail_physical_1)
 {
-    size_t rc = mem_avail_physical();
+    size_t rc = mem_avail_physical ();
 
     CHECK (rc != 0);
 }
 
 TESTER(mem_avail_virtual_1)
 {
-    size_t rc = mem_avail_virtual();
+    size_t rc = mem_avail_virtual ();
 
     CHECK (rc != 0);
 }
 
 TESTER(mem_total_installed_1)
 {
-    size_t rc = mem_total_installed();
+    size_t rc = mem_total_installed ();
 
     CHECK (rc != 0);
 }
 
 TESTER(mem_total_virtual_1)
 {
-    size_t rc = mem_total_virtual();
+    size_t rc = mem_total_virtual ();
 
     CHECK (rc != 0);
 }
 
-TESTER(allocator_init_1)
+TESTER(arena_init_1)
 {
-    Allocator allocator;
+    Arena allocator;
 
-    CHECK (allocator_init (&allocator, 0));
+    CHECK (arena_init (&allocator, 0));
     CHECK (allocator.chunkSize != 0);
-    CHECK (allocator.remaining == allocator.chunkSize - sizeof (AllocatorChunk));
+    CHECK (allocator.remaining == allocator.chunkSize - sizeof (ArenaChunk));
     CHECK (allocator.first != NULL);
     CHECK (allocator.first == allocator.last);
 
-    allocator_free (&allocator);
+    arena_destroy (&allocator);
 }
 
 TESTER(allocator_alloc_1)
 {
-    Allocator allocator;
+    Arena allocator;
     void *pointer1, *pointer2, *pointer3, *pointer4;
 
-    CHECK (allocator_init (&allocator, 16));
+    CHECK (arena_init (&allocator, 16));
 
-    pointer1 = allocator_alloc (&allocator, 8);
+    pointer1 = arena_alloc (&allocator, 8);
     CHECK (pointer1 != NULL);
 
-    pointer2 = allocator_alloc (&allocator, 8);
+    pointer2 = arena_alloc (&allocator, 8);
     CHECK (pointer2 != NULL);
 
-    pointer3 = allocator_alloc (&allocator, 8);
+    pointer3 = arena_alloc (&allocator, 8);
     CHECK (pointer3 != NULL);
 
-    pointer4 = allocator_alloc (&allocator, 8);
+    pointer4 = arena_alloc (&allocator, 8);
     CHECK (pointer4 != NULL);
 
     CHECK (pointer1 != pointer2);
@@ -68,22 +68,22 @@ TESTER(allocator_alloc_1)
     CHECK (pointer3 != pointer4);
     CHECK (allocator.first != allocator.last);
 
-    allocator_free (&allocator);
+    arena_destroy (&allocator);
 }
 
-TESTER(allocator_total_1)
+TESTER(arena_total_1)
 {
-    Allocator allocator;
+    Arena allocator;
 
-    CHECK (allocator_init (&allocator, 16));
-    (void) allocator_alloc (&allocator, 8);
-    (void) allocator_alloc (&allocator, 8);
-    (void) allocator_alloc (&allocator, 8);
-    (void) allocator_alloc (&allocator, 8);
+    CHECK (arena_init (&allocator, 16));
+    (void) arena_alloc (&allocator, 8);
+    (void) arena_alloc (&allocator, 8);
+    (void) arena_alloc (&allocator, 8);
+    (void) arena_alloc (&allocator, 8);
 
-    CHECK (allocator_total (&allocator) > 16);
+    CHECK (arena_total (&allocator) > 16);
 
-    allocator_free (&allocator);
+    arena_destroy (&allocator);
 }
 
 TESTER(mem_is_small_machine_1)

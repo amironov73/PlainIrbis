@@ -27,6 +27,7 @@ libmagna_a_SOURCES = \
     src/number.c     \
     src/object.c     \
     src/path.c       \
+    src/process.c    \
     src/retry.c      \
     src/screen.c     \
     src/sleep.c      \

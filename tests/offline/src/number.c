@@ -132,7 +132,7 @@ TESTER(ntc_to_string_1)
     CHECK (buffer.position == 0);
 
     ntc_free (&chunk);
-    buffer_free (&buffer);
+    buffer_destroy(&buffer);
 }
 
 TESTER(ntc_to_string_2)
@@ -151,7 +151,7 @@ TESTER(ntc_to_string_2)
     CHECK (buffer_compare_text (&buffer, "Hello123") == 0);
 
     ntc_free (&chunk);
-    buffer_free (&buffer);
+    buffer_destroy(&buffer);
 }
 
 TESTER(ntc_to_string_3)
@@ -168,7 +168,7 @@ TESTER(ntc_to_string_3)
     CHECK (buffer_compare_text (&buffer, "Hello") == 0);
 
     ntc_free (&chunk);
-    buffer_free (&buffer);
+    buffer_destroy(&buffer);
 }
 
 TESTER(ntc_to_string_4)
@@ -186,7 +186,7 @@ TESTER(ntc_to_string_4)
     CHECK (buffer_compare_text (&buffer, "123") == 0);
 
     ntc_free (&chunk);
-    buffer_free (&buffer);
+    buffer_destroy(&buffer);
 }
 
 TESTER(number_get_chunk_1)

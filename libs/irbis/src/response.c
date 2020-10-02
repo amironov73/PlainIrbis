@@ -32,7 +32,7 @@ MAGNA_API void MAGNA_CALL response_free
 {
     assert (response != NULL);
 
-    buffer_free (&response->answer);
+    buffer_destroy(&response->answer);
     memset (response, 0, sizeof (Response));
 }
 

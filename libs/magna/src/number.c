@@ -59,7 +59,7 @@ MAGNA_API void MAGNA_CALL ntc_free
 {
     assert (chunk != NULL);
 
-    buffer_free (&chunk->prefix);
+    buffer_destroy(&chunk->prefix);
 }
 
 /**

@@ -11,7 +11,7 @@ TESTER(path_get_current_directory_1)
     CHECK (rc);
     CHECK (buffer.position != 0);
 
-    buffer_free (&buffer);
+    buffer_destroy(&buffer);
 }
 
 TESTER(path_get_executable_1)
@@ -22,5 +22,5 @@ TESTER(path_get_executable_1)
     CHECK (rc);
     CHECK (buffer.position != 0);
 
-    buffer_free (&buffer);
+    buffer_destroy(&buffer);
 }

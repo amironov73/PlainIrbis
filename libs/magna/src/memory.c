@@ -125,6 +125,8 @@ MAGNA_API void MAGNA_CALL mem_copy
     memcpy (destination, source, size);
 }
 
+#ifdef MAGNA_LINUX
+
 /* Парсим /proc/meminfo в поисках строки */
 static size_t parse_value
     (
@@ -186,11 +188,13 @@ static size_t parse_value
 
     result *= multiplier;
 
-    buffer_free (&line);
+    buffer_destroy(&line);
     texter_free (&texter);
 
     return result;
 }
+
+#endif
 
 /**
  * Общее количество инсталлированой физической памяти в компьютере.
@@ -332,6 +336,8 @@ MAGNA_API am_uint64 mem_avail_virtual (void)
  */
 MAGNA_API am_bool mem_is_small_machine (void)
 {
+    /* Установлено меньше 1 Мб оперативной памяти? */
+
     return mem_avail_physical() < (MAGNA_INT64 (1024) * MAGNA_INT64 (1024));
 }
 
@@ -342,6 +348,8 @@ MAGNA_API am_bool mem_is_small_machine (void)
  */
 MAGNA_API am_bool mem_is_huge_machine (void)
 {
+    /* Доступно больше 2 Гб оперативной памяти? */
+
     return mem_avail_physical() > (MAGNA_INT64(2) * MAGNA_INT64 (1024) * MAGNA_INT64 (1024));
 }
 
@@ -350,29 +358,29 @@ MAGNA_API am_bool mem_is_huge_machine (void)
 /* Добавление чанка к аллокатору */
 static am_byte append_chunk
     (
-        Allocator *allocator
+        Arena *arena
     )
 {
 
-    AllocatorChunk *chunk;
+    ArenaChunk *chunk;
 
-    chunk = mem_alloc (allocator->chunkSize);
+    chunk = mem_alloc (arena->chunkSize);
     if (chunk == NULL) {
         return AM_FALSE;
     }
 
     chunk->next = NULL;
 
-    if (allocator->first == NULL) {
-        allocator->first = allocator->last = chunk;
+    if (arena->first == NULL) {
+        arena->first = arena->last = chunk;
     }
     else {
-        allocator->last->next = chunk;
-        allocator->last = chunk;
+        arena->last->next = chunk;
+        arena->last = chunk;
     }
 
-    allocator->current = (am_byte*) (chunk + 1);
-    allocator->remaining = allocator->chunkSize - sizeof (AllocatorChunk);
+    arena->current = (am_byte*) (chunk + 1);
+    arena->remaining = arena->chunkSize - sizeof (ArenaChunk);
 
     return AM_TRUE;
 }
@@ -380,85 +388,89 @@ static am_byte append_chunk
 /**
  * Инициализация аллокатора.
  *
- * @param allocator Указатель на неинициализированную структуру.
+ * @param arena Указатель на неинициализированную структуру.
  * @param chunkSize Размер чанка. 0 означает "определяется системой".
  * @return Признак успешности завершения операции.
  */
-MAGNA_API am_bool MAGNA_CALL allocator_init
+MAGNA_API am_bool MAGNA_CALL arena_init
     (
-        Allocator *allocator,
+        Arena *arena,
         size_t chunkSize
     )
 {
-    assert (allocator != NULL);
+    assert (arena != NULL);
 
     if (chunkSize < (sizeof (void*) * 2)) {
         chunkSize = 4096;
     }
 
-    allocator->first = allocator->last = NULL;
-    allocator->chunkSize = chunkSize;
+    arena->first = arena->last = NULL;
+    arena->chunkSize = chunkSize;
 
-    return append_chunk (allocator);
+    return append_chunk (arena);
 }
 
 /**
  * Освобождение ресурсов, занятых аллокатором.
  *
- * @param allocator Указатель на аллокатор.
+ * @param arena Указатель на аллокатор.
  */
-MAGNA_API void MAGNA_CALL allocator_free
+MAGNA_API void MAGNA_CALL arena_destroy
     (
-        Allocator *allocator
+        Arena *arena
     )
 {
-    AllocatorChunk *chunk, *next;
+    ArenaChunk *chunk, *next;
 
-    assert (allocator != NULL);
+    assert (arena != NULL);
 
-    for (chunk = allocator->first; chunk != NULL; ) {
+    for (chunk = arena->first; chunk != NULL; ) {
         next = chunk->next;
         mem_free (chunk);
         chunk = next;
     }
 
-    allocator->first = allocator->last = NULL;
+    arena->first = arena->last = NULL;
 }
 
 /**
  * Запрос блока памяти.
  *
- * @param allocator Аллокатор.
+ * @param arena Аллокатор.
  * @param length Требуемая длина блока.
  * Запросы на блоки больше `chunkSize - sizeof (void*)`
  * не могут быть удовлетворены.
  * @return Указатель на выделенный блок либо `NULL`.
  */
-MAGNA_API void* MAGNA_CALL allocator_alloc
+MAGNA_API void* MAGNA_CALL arena_alloc
     (
-        Allocator *allocator,
+        Arena *arena,
         size_t length
     )
 {
     void *result;
 
-    assert (allocator != NULL);
-    assert (allocator->first != NULL);
+
+    assert (arena != NULL);
+    assert (arena->first != NULL);
     assert (length != 0);
 
-    if (length > (allocator->chunkSize - sizeof (AllocatorChunk))) {
+    if (length > (arena->chunkSize - sizeof (ArenaChunk))) {
         return NULL;
     }
 
-    if (length > allocator->remaining) {
-        if (!append_chunk (allocator)) {
+    /* Округляем вверх по модулю 4 */
+    length = (length + 3) & ~3;
+
+    if (length > arena->remaining) {
+        if (!append_chunk (arena)) {
             return NULL;
         }
     }
 
-    result = (void*) allocator->current;
-    allocator->current += length;
-    allocator->remaining -= length;
+    result = (void*) arena->current;
+    arena->current += length;
+    arena->remaining -= length;
 
     return result;
 }
@@ -466,21 +478,21 @@ MAGNA_API void* MAGNA_CALL allocator_alloc
 /**
  * Вычисление общего размера памяти, занятой аллокатором.
  *
- * @param allocator Аллокатор.
+ * @param arena Аллокатор.
  * @return Общий размер занятой памяти.
  */
-MAGNA_API size_t MAGNA_CALL allocator_total
+MAGNA_API size_t MAGNA_CALL arena_total
     (
-        const Allocator *allocator
+        const Arena *arena
     )
 {
     size_t result = 0;
-    const AllocatorChunk *chunk;
+    const ArenaChunk *chunk;
 
-    assert (allocator != NULL);
+    assert (arena != NULL);
 
-    for (chunk =  allocator->first; chunk != NULL; chunk = chunk->next) {
-        result += allocator->chunkSize;
+    for (chunk =  arena->first; chunk != NULL; chunk = chunk->next) {
+        result += arena->chunkSize;
     }
 
     return result;

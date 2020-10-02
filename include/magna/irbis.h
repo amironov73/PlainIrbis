@@ -535,6 +535,11 @@ struct IrbisConnection
 
 };
 
+#define CONNECTION_SET_HOST(__c,__h)     buffer_from_text (&(__c).host,     __h)
+#define CONNECTION_SET_USERNAME(__c,__h) buffer_from_text (&(__c).username, __h)
+#define CONNECTION_SET_PASSWORD(__c,__h) buffer_from_text (&(__c).password, __h)
+#define CONNECTION_SET_DATABASE(__c,__h) buffer_from_text (&(__c).database, __h)
+
 MAGNA_API am_bool MAGNA_CALL connection_actualize_database (Connection *connection, const char *database);
 MAGNA_API am_bool MAGNA_CALL connection_actualize_record   (Connection *connection, const char *database, am_mfn mfn);
 MAGNA_API am_bool MAGNA_CALL connection_check              (Connection *connection);
@@ -547,7 +552,7 @@ MAGNA_API am_bool MAGNA_CALL connection_delete_record      (Connection *connecti
 MAGNA_API am_bool MAGNA_CALL connection_disconnect         (Connection *connection);
 MAGNA_API am_bool MAGNA_CALL connection_execute            (Connection *connection, Query *query, Response *response);
 MAGNA_API am_bool            connection_execute_simple     (Connection *connection, Response *response, const char *command, int argCount, ...);
-MAGNA_API void    MAGNA_CALL connection_free               (Connection *connection);
+MAGNA_API void    MAGNA_CALL connection_destroy            (Connection *connection);
 MAGNA_API am_mfn  MAGNA_CALL connection_get_max_mfn        (Connection *connection, const char *database);
 MAGNA_API am_bool MAGNA_CALL connection_init               (Connection *connection);
 MAGNA_API am_bool MAGNA_CALL connection_no_operation       (Connection *connection);

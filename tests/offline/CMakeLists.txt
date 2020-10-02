@@ -7,6 +7,7 @@
 project(offline C)
 
 set(CFiles
+    src/array.c
     src/buffer.c
     src/chunked.c
     src/cp1251.c
@@ -30,7 +31,6 @@ set(CFiles
     src/subfield.c
     src/upc.c
     src/utils.c
-    src/varray.c
     src/vector.c
 )
 

@@ -13,7 +13,7 @@ TESTER(buffer_create_1)
     CHECK (buffer.position == sizeof (data));
     CHECK (buffer.capacity >= sizeof (data));
 
-    buffer_free (&buffer);
+    buffer_destroy(&buffer);
     CHECK (buffer.ptr == NULL);
     CHECK (buffer.capacity == 0);
     CHECK (buffer.position == 0);
@@ -28,7 +28,7 @@ TESTER(buffer_create_2)
     CHECK (buffer.position == 0);
     CHECK (buffer.capacity == 0);
 
-    buffer_free (&buffer);
+    buffer_destroy(&buffer);
     CHECK (buffer.ptr == NULL);
     CHECK (buffer.capacity == 0);
     CHECK (buffer.position == 0);
@@ -68,7 +68,7 @@ TESTER(buffer_replace_1)
         ));
     CHECK (buffer_replace_text (&buffer, "собака", "СБЕРКНИЖКА"));
     CHECK (buffer_compare_text (&buffer, "У попа была СБЕРКНИЖКА. Он ее любил") == 0);
-    buffer_free (&buffer);
+    buffer_destroy(&buffer);
 }
 
 TESTER(buffer_find_text_1)
@@ -95,7 +95,7 @@ TESTER(buffer_copy_1)
     CHECK (target.position == source.position);
     CHECK (memcmp (target.ptr, source.ptr, source.position) == 0);
 
-    buffer_free (&target);
+    buffer_destroy(&target);
 }
 
 TESTER(buffer_copy_2)
@@ -112,7 +112,7 @@ TESTER(buffer_copy_2)
     CHECK (target.position == source.position);
     CHECK (memcmp (target.ptr, source.ptr, source.position) == 0);
 
-    buffer_free (&target);
+    buffer_destroy(&target);
 }
 
 TESTER(buffer_concat_1)
@@ -129,7 +129,7 @@ TESTER(buffer_concat_1)
 
     CHECK (buffer_compare_text (&buffer3, "Hello, world!"));
 
-    buffer_free (&buffer3);
+    buffer_destroy(&buffer3);
 }
 
 TESTER(buffer_putc_1)
@@ -145,7 +145,7 @@ TESTER(buffer_putc_1)
 
     CHECK (buffer_compare_text (&buffer, "Hello!") == 0);
 
-    buffer_free (&buffer);
+    buffer_destroy(&buffer);
 }
 
 TESTER(buffer_puts_1)
@@ -158,7 +158,7 @@ TESTER(buffer_puts_1)
 
     CHECK (buffer_compare_text (&buffer, "Hello, world!") == 0);
 
-    buffer_free (&buffer);
+    buffer_destroy(&buffer);
 }
 
 TESTER(buffer_from_span_1)
@@ -185,7 +185,7 @@ TESTER(buffer_assign_1)
     CHECK (buffer.ptr[0] == 1);
     CHECK (buffer.ptr[6] == 7);
 
-    buffer_free (&buffer);
+    buffer_destroy(&buffer);
 }
 
 TESTER(buffer_calculate_size_1)
@@ -217,7 +217,7 @@ TESTER(buffer_clone_2)
     CHECK (memcmp (data, target.ptr, sizeof (data)) == 0);
     CHECK (target.capacity == source.capacity);
 
-    buffer_free (&target);
+    buffer_destroy(&target);
 }
 
 TESTER(buffer_from_text_1)
@@ -228,7 +228,7 @@ TESTER(buffer_from_text_1)
     CHECK (buffer.ptr[0] == 0);
     CHECK (buffer.position == 0);
 
-    buffer_free (&buffer);
+    buffer_destroy(&buffer);
 }
 
 TESTER(buffer_from_text_2)
@@ -239,7 +239,7 @@ TESTER(buffer_from_text_2)
     CHECK (buffer_from_text (&buffer, text) == &buffer);
     CHECK (buffer_compare_text (&buffer, text) == 0);
 
-    buffer_free (&buffer);
+    buffer_destroy(&buffer);
 }
 
 TESTER(buffer_compare_text_1)
@@ -254,7 +254,7 @@ TESTER(buffer_compare_text_1)
     CHECK (buffer_compare_text (&buffer, text3) > 0);
     CHECK (buffer_compare_text (&buffer, text4) < 0);
 
-    buffer_free (&buffer);
+    buffer_destroy(&buffer);
 }
 
 TESTER(buffer_compare_1)
@@ -268,8 +268,8 @@ TESTER(buffer_compare_1)
     CHECK (buffer_compare (&buffer2, &buffer2) == 0);
     CHECK (buffer_compare (&buffer1, &buffer2) > 0);
 
-    buffer_free (&buffer1);
-    buffer_free (&buffer2);
+    buffer_destroy(&buffer1);
+    buffer_destroy(&buffer2);
 }
 
 TESTER(buffer_compare_2)
@@ -281,8 +281,8 @@ TESTER(buffer_compare_2)
     CHECK (buffer_from_text (&buffer2, text2) == &buffer2);
     CHECK (buffer_compare (&buffer1, &buffer2) < 0);
 
-    buffer_free (&buffer1);
-    buffer_free (&buffer2);
+    buffer_destroy(&buffer1);
+    buffer_destroy(&buffer2);
 }
 
 TESTER(buffer_read_1)
@@ -313,7 +313,7 @@ TESTER(buffer_read_2)
     CHECK (data[8] == 'o');
     CHECK (data[9] == 'r');
 
-    buffer_free (&buffer);
+    buffer_destroy(&buffer);
 }
 
 TESTER(buffer_assign_text_1)
@@ -329,5 +329,5 @@ TESTER(buffer_assign_text_1)
     CHECK (buffer_assign_text (&buffer, text2));
     CHECK (buffer_compare_text (&buffer, text2) == 0);
 
-    buffer_free (&buffer);
+    buffer_destroy(&buffer);
 }

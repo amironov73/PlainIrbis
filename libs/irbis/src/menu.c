@@ -78,8 +78,8 @@ MAGNA_API void MAGNA_CALL menu_entry_free
 {
     assert (entry != NULL);
 
-    buffer_free (&entry->code);
-    buffer_free (&entry->comment);
+    buffer_destroy(&entry->code);
+    buffer_destroy(&entry->comment);
 }
 
 /**
@@ -315,8 +315,8 @@ MAGNA_API am_bool MAGNA_CALL menu_parse
         }
     }
 
-    buffer_free (&line1);
-    buffer_free (&line2);
+    buffer_destroy(&line1);
+    buffer_destroy(&line2);
 
     return result;
 }

@@ -27,7 +27,7 @@ TESTER(menu_entry_to_string_1)
     CHECK (buffer_empty (&text));
 
     menu_entry_free (&entry);
-    buffer_free (&text);
+    buffer_destroy(&text);
 }
 
 TESTER(menu_entry_to_string_2)
@@ -43,7 +43,7 @@ TESTER(menu_entry_to_string_2)
     CHECK (buffer_compare_text (&text, "A") == 0);
 
     menu_entry_free (&entry);
-    buffer_free (&text);
+    buffer_destroy(&text);
 }
 
 TESTER(menu_entry_to_string_3)
@@ -60,7 +60,7 @@ TESTER(menu_entry_to_string_3)
     CHECK (buffer_compare_text (&text, "A - first letter") == 0);
 
     menu_entry_free (&entry);
-    buffer_free (&text);
+    buffer_destroy(&text);
 }
 
 TESTER(menu_init_1)

@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\array.c" />
     <ClCompile Include="src\beep.c" />
     <ClCompile Include="src\buffer.c" />
     <ClCompile Include="src\chunked.c" />
@@ -45,6 +46,7 @@
     <ClCompile Include="src\number.c" />
     <ClCompile Include="src\object.c" />
     <ClCompile Include="src\path.c" />
+    <ClCompile Include="src\process.c" />
     <ClCompile Include="src\retry.c" />
     <ClCompile Include="src\screen.c" />
     <ClCompile Include="src\sleep.c" />
@@ -55,7 +57,6 @@
     <ClCompile Include="src\tcp4.c" />
     <ClCompile Include="src\thread.c" />
     <ClCompile Include="src\utf8.c" />
-    <ClCompile Include="src\varray.c" />
     <ClCompile Include="src\vector.c" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

@@ -25,7 +25,7 @@
  * Простой динамический буфер для данных.
  *
  * Владеет своей памятью (кроме специальных случаев).
- * Для освобождения ресурсов используйте `buffer_free`.
+ * Для освобождения ресурсов используйте `buffer_destroy`.
  */
 
 /*=========================================================*/
@@ -236,7 +236,7 @@ MAGNA_API Buffer* MAGNA_CALL buffer_static
  *
  * @param buffer
  */
-MAGNA_API void MAGNA_CALL buffer_free
+MAGNA_API void MAGNA_CALL buffer_destroy
     (
         Buffer *buffer
     )

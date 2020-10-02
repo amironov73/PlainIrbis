@@ -18,16 +18,16 @@ int main (int argc, char **argv)
 
     printf ("Library version: %d\n", magna_get_version());
     connection_init (&connection);
-    buffer_from_text (&connection.host, "localhost");
-    connection.port = 6666;
-    buffer_from_text (&connection.username, "librarian");
-    buffer_from_text (&connection.password, "secret");
-    buffer_from_text (&connection.database, "IBIS");
+    CONNECTION_SET_HOST     (connection, "localhost");
+    CONNECTION_SET_USERNAME (connection, "librarian");
+    CONNECTION_SET_PASSWORD (connection, "secret");
+    CONNECTION_SET_DATABASE (connection, "IBIS");
     connection.workstation = CATALOGER;
+    connection.port = 6666;
 
     if (!connection_connect (&connection)) {
         fputs ("Connection failed", stderr);
-        connection_free (&connection);
+        connection_destroy (&connection);
         return 1;
     }
 
@@ -36,7 +36,7 @@ int main (int argc, char **argv)
 
     connection_disconnect (&connection);
 
-    connection_free (&connection);
+    connection_destroy (&connection);
 
 /*
 #ifdef _M_IX86

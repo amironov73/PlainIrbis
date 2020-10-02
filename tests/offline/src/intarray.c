@@ -313,5 +313,5 @@ TESTER(int32_array_compress_1)
     CHECK (text != NULL);
     CHECK (strcmp (text, "1-3, 6, 7") == 0);
 
-    buffer_free (&buffer);
+    buffer_destroy(&buffer);
 }

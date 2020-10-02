@@ -18,9 +18,11 @@ set(CFiles
     src/dll.c
     src/ean.c
     src/error.c
+    src/exemplar.c
     src/field.c
     src/format.c
     src/guard.c
+    src/impex.c
     src/ini.c
     src/isbn.c
     src/iso2709.c

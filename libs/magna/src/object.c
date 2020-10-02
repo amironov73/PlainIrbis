@@ -30,11 +30,13 @@
 
 typedef void (*Destroyer) (void*);
 typedef am_bool (*GetString) (const void*, Buffer*);
+typedef void* (*GetInterface) (const void*, const char*, void*);
 
 typedef struct
 {
     char *name;
     GetString to_string;
+    GetInterface get_interface;
     Destroyer destroy;
 
 } TypeInfo;
@@ -137,6 +139,38 @@ MAGNA_API const TypeInfo* MAGNA_CALL object_get_type
     }
 
     return NULL;
+}
+
+/**
+ * Запрос именованного интерфейса у объекта.
+ *
+ * @param object Объект.
+ * @param name Имя интерфейса.
+ * @param auxData Произвольные пользовательские данные (могут быть `NULL`).
+ * @return Запрошенный интерфейс либо `NULL`.
+ */
+MAGNA_API void* MAGNA_CALL object_get_interface
+    (
+        const Object *object,
+        const char *name,
+        void *auxData
+    )
+{
+    const TypeInfo *type;
+    void *result = NULL;
+
+    assert (object != NULL);
+    assert (name != NULL);
+
+    type = object_get_type (object);
+    if (type != NULL) {
+        if (type->get_interface != NULL) {
+            result = type->get_interface (object, name, auxData);
+        }
+    }
+
+    return result;
+
 }
 
 /*=========================================================*/

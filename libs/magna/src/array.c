@@ -18,7 +18,7 @@
 /*=========================================================*/
 
 /**
- * \file varray.c
+ * \file array.c
  *
  * Простой динамический массив, хранящий собственно объекты.
  *
@@ -31,21 +31,24 @@
 
 /**
  * Инициализация пустого массива.
+ * Размер элемента округляется вверх по модулю 4
+ * с целью оптимизации доступа к памяти.
  *
  * @param array Указатель на неинициализированную структуру.
  * @param itemSize Размер элемента в байтах.
  */
-MAGNA_API void MAGNA_CALL varray_init
+MAGNA_API void MAGNA_CALL array_init
     (
-        ValueArray *array,
+        Array *array,
         size_t itemSize
     )
 {
     assert (array != NULL);
     assert (itemSize != 0);
 
+    /* Округляем вверх по модулю 4 */
+    array->itemSize = (itemSize + 3) & ~3;
     array->ptr = NULL;
-    array->itemSize = itemSize;
     array->len = 0;
     array->capacity = 0;
     array->offset = 0;
@@ -60,9 +63,9 @@ MAGNA_API void MAGNA_CALL varray_init
  * @param capacity Начальная емкость массива.
  * @return Признак успешности завершения операции.
  */
-MAGNA_API am_bool MAGNA_CALL varray_create
+MAGNA_API am_bool MAGNA_CALL array_create
     (
-        ValueArray *array,
+        Array *array,
         size_t itemSize,
         size_t capacity
     )
@@ -86,9 +89,9 @@ MAGNA_API am_bool MAGNA_CALL varray_create
  *
  * @param array Массив, подлежащий освобождению.
  */
-MAGNA_API void MAGNA_CALL varray_free
+MAGNA_API void MAGNA_CALL array_destroy
     (
-        ValueArray *array
+        Array *array
     )
 {
     size_t index;
@@ -118,9 +121,9 @@ MAGNA_API void MAGNA_CALL varray_free
  * @param index Индекс.
  * @return Указатель на элемент массива.
  */
-MAGNA_API MAGNA_INLINE void* MAGNA_CALL varray_get
+MAGNA_API MAGNA_INLINE void* MAGNA_CALL array_get
     (
-        const ValueArray *array,
+        const Array *array,
         size_t index
     )
 {
@@ -137,9 +140,9 @@ MAGNA_API MAGNA_INLINE void* MAGNA_CALL varray_get
  * @param index Индекс.
  * @param value Указатель на новое значение элемента массива.
  */
-MAGNA_API void MAGNA_CALL varray_set
+MAGNA_API void MAGNA_CALL array_set
     (
-        ValueArray *array,
+        Array *array,
         size_t index,
         void *value
     )
@@ -165,9 +168,9 @@ MAGNA_API void MAGNA_CALL varray_set
  * @param newSize Требуемая емкость в элементах.
  * @return Признак успешности операции.
  */
-MAGNA_API am_bool MAGNA_CALL varray_grow
+MAGNA_API am_bool MAGNA_CALL array_grow
     (
-        ValueArray *array,
+        Array *array,
         size_t newSize
     )
 {
@@ -232,9 +235,9 @@ MAGNA_API am_bool MAGNA_CALL varray_grow
  * @return Указатель на извлеченный элемент.
  * @warning На пустом массиве приводит к неопределенному поведению.
  */
-MAGNA_API void* MAGNA_CALL varray_pop_back
+MAGNA_API void* MAGNA_CALL array_pop_back
     (
-        ValueArray *array
+        Array *array
     )
 {
     am_byte *result;
@@ -258,9 +261,9 @@ MAGNA_API void* MAGNA_CALL varray_pop_back
  * @return Указатель на извлеченный элемент.
  * @warning На пустом массиве приводит к неопределенному поведению.
  */
-MAGNA_API void* MAGNA_CALL varray_pop_front
+MAGNA_API void* MAGNA_CALL array_pop_front
     (
-        ValueArray *array
+        Array *array
     )
 {
     am_byte *result;
@@ -284,9 +287,9 @@ MAGNA_API void* MAGNA_CALL varray_pop_front
  * @param item Указатель на помещаемый элемент.
  * @return Признак успешности завершения операции.
  */
-MAGNA_API am_bool MAGNA_CALL varray_push_back
+MAGNA_API am_bool MAGNA_CALL array_push_back
     (
-        ValueArray *array,
+        Array *array,
         void *item
     )
 {
@@ -295,7 +298,7 @@ MAGNA_API am_bool MAGNA_CALL varray_push_back
     assert (array != NULL);
     assert (item != NULL);
 
-    if (!varray_grow (array, array->len + 1)) {
+    if (!array_grow(array, array->len + 1)) {
         return AM_FALSE;
     }
 
@@ -312,16 +315,16 @@ MAGNA_API am_bool MAGNA_CALL varray_push_back
  * @param array Массив.
  * @return Указатель на выделенное место либо `NULL`.
  */
-MAGNA_API void* MAGNA_CALL varray_emplace_back
+MAGNA_API void* MAGNA_CALL array_emplace_back
     (
-        ValueArray *array
+        Array *array
     )
 {
     am_byte *result;
 
     assert (array != NULL);
 
-    if (!varray_grow (array, array->len + 1)) {
+    if (!array_grow(array, array->len + 1)) {
         return NULL;
     }
 
@@ -339,9 +342,9 @@ MAGNA_API void* MAGNA_CALL varray_emplace_back
  * @param item Указатель на помещаемый элемент.
  * @return Признак успешности завершения операции.
  */
-MAGNA_API am_bool MAGNA_CALL varray_push_front
+MAGNA_API am_bool MAGNA_CALL array_push_front
     (
-        ValueArray *array,
+        Array *array,
         void *item
     )
 {
@@ -355,7 +358,7 @@ MAGNA_API am_bool MAGNA_CALL varray_push_front
         ptr = array->ptr + array->offset * array->itemSize;
     }
     else {
-        if (!varray_grow (array, array->len + 1)) {
+        if (!array_grow(array, array->len + 1)) {
             return AM_FALSE;
         }
 
@@ -377,9 +380,9 @@ MAGNA_API am_bool MAGNA_CALL varray_push_front
  * @param array Массив.
  * @param newSize Новая длина массива (должна быть не больше старой).
  */
-MAGNA_API void MAGNA_CALL varray_truncate
+MAGNA_API void MAGNA_CALL array_truncate
     (
-        ValueArray *array,
+        Array *array,
         size_t newSize
     )
 {
@@ -401,10 +404,10 @@ MAGNA_API void MAGNA_CALL varray_truncate
  * @param cloner Функция, клонирующая элементы (опционально).
  * @return Признак успешности завершения операции.
  */
-MAGNA_API am_bool MAGNA_CALL varray_clone
+MAGNA_API am_bool MAGNA_CALL array_clone
     (
-        ValueArray *target,
-        const ValueArray *source,
+        Array *target,
+        const Array *source,
         Cloner cloner
     )
 {
@@ -415,9 +418,9 @@ MAGNA_API am_bool MAGNA_CALL varray_clone
     assert (source != NULL);
     assert (source->itemSize == target->itemSize);
 
-    varray_truncate (target, 0);
+    array_truncate(target, 0);
     target->offset = 0;
-    if (!varray_grow (target, source->len)) {
+    if (!array_grow(target, source->len)) {
         return AM_FALSE;
     }
 
@@ -443,19 +446,19 @@ MAGNA_API am_bool MAGNA_CALL varray_clone
  * @param source Массив-источник.
  * @return Признак успешности завершения операции.
  */
-MAGNA_API am_bool MAGNA_CALL varray_copy
+MAGNA_API am_bool MAGNA_CALL array_copy
     (
-        ValueArray *target,
-        const ValueArray *source
+        Array *target,
+        const Array *source
     )
 {
     assert (target != NULL);
     assert (source != NULL);
     assert (source->itemSize == target->itemSize);
 
-    varray_clear (target);
+    array_clear(target);
 
-    return varray_concat (target, source);
+    return array_concat(target, source);
 }
 
 /**
@@ -465,10 +468,10 @@ MAGNA_API am_bool MAGNA_CALL varray_copy
  * @param source Массив-источник.
  * @return Признак успешности завершения операции.
  */
-MAGNA_API am_bool MAGNA_CALL varray_concat
+MAGNA_API am_bool MAGNA_CALL array_concat
     (
-        ValueArray *target,
-        const ValueArray *source
+        Array *target,
+        const Array *source
     )
 {
     size_t index;
@@ -478,7 +481,7 @@ MAGNA_API am_bool MAGNA_CALL varray_concat
     assert (source != NULL);
     assert (source->itemSize == target->itemSize);
 
-    if (!varray_grow (target, target->len + source->len)) {
+    if (!array_grow(target, target->len + source->len)) {
         return AM_FALSE;
     }
 
@@ -498,9 +501,9 @@ MAGNA_API am_bool MAGNA_CALL varray_concat
  *
  * @param array Массив.
  */
-MAGNA_API void MAGNA_CALL varray_clear
+MAGNA_API void MAGNA_CALL array_clear
     (
-        ValueArray *array
+        Array *array
     )
 {
     assert (array != NULL);
@@ -516,9 +519,9 @@ MAGNA_API void MAGNA_CALL varray_clear
  * @param item Указатель на удалемый элемент.
  * @warning Указатель вне пределов массива приводит к неопределенному поведению.
  */
-MAGNA_API void MAGNA_CALL varray_remove_item
+MAGNA_API void MAGNA_CALL array_remove_item
     (
-        ValueArray *array,
+        Array *array,
         void *item
     )
 {
@@ -549,9 +552,9 @@ MAGNA_API void MAGNA_CALL varray_remove_item
  * @param index Индекс удаляемого элемента.
  * @warning Индекс за пределами массива приводит к неопределенному поведению.
  */
-MAGNA_API void MAGNA_CALL varray_remove_index
+MAGNA_API void MAGNA_CALL array_remove_index
     (
-        ValueArray *array,
+        Array *array,
         size_t index
     )
 {
@@ -560,8 +563,8 @@ MAGNA_API void MAGNA_CALL varray_remove_index
     assert (array != NULL);
     assert (index < array->len);
 
-    item = varray_get (array, index);
-    varray_remove_item (array, item);
+    item = array_get(array, index);
+    array_remove_item(array, item);
 }
 
 static void va_swap
@@ -628,9 +631,9 @@ static void va_qsort
  * @param comparer Функция сравнения.
  * @param data Произвольные пользовательские данные.
  */
-MAGNA_API void MAGNA_CALL varray_sort
+MAGNA_API void MAGNA_CALL array_sort
     (
-        ValueArray *array,
+        Array *array,
         Comparer comparer,
         const void *data
     )
@@ -697,9 +700,9 @@ static void* va_bsearch
  * @param data Произвольные пользовательские данные.
  * @return Указатель на найденный элемент либо `NULL`.
  */
-MAGNA_API void* MAGNA_CALL varray_bsearch
+MAGNA_API void* MAGNA_CALL array_bsearch
     (
-        ValueArray *array,
+        Array *array,
         const void *value,
         Comparer comparer,
         const void *data

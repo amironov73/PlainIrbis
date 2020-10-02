@@ -283,7 +283,7 @@ TESTER(chunked_read_1)
     CHECK (chunked_read (&chunked, &buffer, 10) == 0);
 
     chunked_free (&chunked);
-    buffer_free (&buffer);
+    buffer_destroy(&buffer);
 }
 
 TESTER(chunkd_read_2)
@@ -307,7 +307,7 @@ TESTER(chunkd_read_2)
     CHECK (buffer.position == sizeof (waste) * 2);
 
     chunked_free (&chunked);
-    buffer_free (&buffer);
+    buffer_destroy(&buffer);
 }
 
 TESTER(chunked_read_raw_1)
@@ -351,7 +351,7 @@ TESTER(chunked_read_line_1)
     CHECK (chunked_read_line (&chunked, &buffer) == 0);
 
     chunked_free (&chunked);
-    buffer_free (&buffer);
+    buffer_destroy(&buffer);
 }
 
 TESTER(chunked_read_line_2)
@@ -370,7 +370,7 @@ TESTER(chunked_read_line_2)
     CHECK (chunked_read_line (&chunked, &buffer) == 0);
 
     chunked_free (&chunked);
-    buffer_free (&buffer);
+    buffer_destroy(&buffer);
 }
 
 TESTER(chunked_read_line_3)
@@ -393,7 +393,7 @@ TESTER(chunked_read_line_3)
     CHECK (chunked_read_line (&chunked, &buffer) == 0);
 
     chunked_free (&chunked);
-    buffer_free (&buffer);
+    buffer_destroy(&buffer);
 }
 
 TESTER(chunked_read_line_4)
@@ -415,7 +415,7 @@ TESTER(chunked_read_line_4)
     CHECK (chunked_read_line (&chunked, &buffer) == 0);
 
     chunked_free (&chunked);
-    buffer_free (&buffer);
+    buffer_destroy(&buffer);
 }
 
 TESTER(chunked_remaining_size_1)
@@ -443,7 +443,7 @@ TESTER(chunked_read_remaining_1)
     CHECK (chunked_read_remaining (&chunked, &buffer) == 0);
 
     chunked_free (&chunked);
-    buffer_free (&buffer);
+    buffer_destroy(&buffer);
 }
 
 TESTER(chunked_read_remaining_2)
@@ -466,7 +466,7 @@ TESTER(chunked_read_remaining_2)
     CHECK (chunked_read_remaining (&chunked, &buffer) == strlen (text2));
 
     chunked_free (&chunked);
-    buffer_free (&buffer);
+    buffer_destroy(&buffer);
 }
 
 TESTER(chunked_read_remaining_3)
@@ -487,7 +487,7 @@ TESTER(chunked_read_remaining_3)
     CHECK (chunked_read_remaining (&chunked, &buffer) == sizeof (waste) * 2);
 
     chunked_free (&chunked);
-    buffer_free (&buffer);
+    buffer_destroy(&buffer);
 }
 
 TESTER(chunked_rewind_1)
@@ -650,7 +650,7 @@ TESTER(chunked_all_1)
     CHECK (buffer.position == 0);
 
     chunked_free (&chunked);
-    buffer_free (&buffer);
+    buffer_destroy(&buffer);
 }
 
 TESTER(chunked_all_2)
@@ -668,7 +668,7 @@ TESTER(chunked_all_2)
     CHECK (buffer.position == 3);
 
     chunked_free (&chunked);
-    buffer_free (&buffer);
+    buffer_destroy(&buffer);
 }
 
 TESTER(chunked_all_3)
@@ -691,7 +691,7 @@ TESTER(chunked_all_3)
     CHECK (buffer.position == expected);
 
     chunked_free (&chunked);
-    buffer_free (&buffer);
+    buffer_destroy(&buffer);
 }
 
 TESTER(chunked_grow_1)

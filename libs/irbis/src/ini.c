@@ -46,8 +46,8 @@ MAGNA_API void MAGNA_CALL ini_line_free
 {
     assert (line != NULL);
 
-    buffer_free (&line->key);
-    buffer_free (&line->value);
+    buffer_destroy(&line->key);
+    buffer_destroy(&line->value);
 }
 
 /**
@@ -174,7 +174,7 @@ MAGNA_API void MAGNA_CALL ini_section_free
 
     assert (section != NULL);
 
-    buffer_free (&section->name);
+    buffer_destroy(&section->name);
     for (index = 0; index < section->lines.len; ++index) {
         line = (IniLine*) section->lines.ptr [index];
         ini_line_free (line);

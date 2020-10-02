@@ -223,7 +223,7 @@ TESTER(texter_read_line_1)
     CHECK (texter.eot);
 
     texter_free (&texter);
-    buffer_free (&line);
+    buffer_destroy(&line);
 }
 
 TESTER(texter_read_line_2)
@@ -241,7 +241,7 @@ TESTER(texter_read_line_2)
     CHECK (line.position == length);
 
     texter_free (&texter);
-    buffer_free (&line);
+    buffer_destroy(&line);
 }
 
 TESTER(texter_read_line_3)
@@ -263,7 +263,7 @@ TESTER(texter_read_line_3)
     CHECK (line.position == 6);
 
     texter_free (&texter);
-    buffer_free (&line);
+    buffer_destroy(&line);
 }
 
 TESTER(texter_read_line_4)
@@ -285,7 +285,7 @@ TESTER(texter_read_line_4)
     CHECK (line.position == 6);
 
     texter_free (&texter);
-    buffer_free (&line);
+    buffer_destroy(&line);
 }
 
 TESTER(texter_read_line_5)
@@ -307,7 +307,7 @@ TESTER(texter_read_line_5)
     CHECK (line.position == 6);
 
     texter_free (&texter);
-    buffer_free (&line);
+    buffer_destroy(&line);
 }
 
 TESTER(texter_read_line_6)
@@ -325,5 +325,5 @@ TESTER(texter_read_line_6)
     CHECK (line.position == 5);
 
     texter_free (&texter);
-    buffer_free (&line);
+    buffer_destroy(&line);
 }

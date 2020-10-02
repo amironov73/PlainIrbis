@@ -775,6 +775,231 @@ MAGNA_API am_bool MAGNA_CALL list_extract_front
     return AM_FALSE;
 }
 
+/**
+ * Разворот списка.
+ *
+ * @param list Список.
+ */
+MAGNA_API void MAGNA_CALL list_reverse
+    (
+        LinkedList *list
+    )
+{
+    ListItem *current, *temp;
+
+    assert (list != NULL);
+
+    for (current = list->first; current != NULL; current = current->previous) {
+        temp = current->next;
+        current->next = current->previous;
+        current->previous = temp;
+    }
+
+    temp = list->first;
+    list->first = list->last;
+    list->last = temp;
+}
+
+static void list_qsort
+    (
+        void **array,
+        ssize_t left,
+        ssize_t right,
+        Comparer comparer,
+        void *data
+    )
+{
+    size_t i, j, pivot;
+    void *temp;
+
+    if (left < right) {
+        pivot = left;
+        i = left;
+        j = right;
+
+        while (i < j) {
+            while (comparer (array[i], array[pivot], data) <= 0
+                   && (i < right)) {
+                i++;
+            }
+
+            while (comparer (array[j], array[pivot], data) > 0) {
+                j--;
+            }
+
+            if (i < j) {
+                temp = array[i];
+                array[i] = array[j];
+                array[j] = temp;
+            }
+        }
+
+        temp = array[pivot];
+        array[pivot] = array[j];
+        array[j] = temp;
+        list_qsort (array, left, j - 1, comparer, data);
+        list_qsort (array, j + 1, right, comparer, data);
+    }
+}
+
+/**
+ * Преобразование списка в вектор.
+ *
+ * @param list Список.
+ * @param vector Вектор для размещения результата.
+ * @return Признак успешности завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL list_to_vector
+    (
+        const LinkedList *list,
+        Vector *vector
+    )
+{
+    size_t length;
+    const ListItem *current;
+    void *ptr;
+
+    assert (list != NULL);
+    assert (vector != NULL);
+
+    length = list_length (list);
+    if (length == 0) {
+        return AM_TRUE;
+    }
+
+    if (!vector_grow (vector, vector->len + length)) {
+        return AM_FALSE;
+    }
+
+    for (current = list->first; current; current = current->next) {
+        ptr = ITEM_TO_DATA (current);
+        vector_push_back (vector, ptr);
+    }
+
+    return AM_TRUE;
+}
+
+/**
+ * Сортировка списка.
+ *
+ * @param list Список.
+ * @param comparer Функция сравнения.
+ * @param userData Произвольные пользовательские данные (могут быть NULL).
+ * @return Признак успешности завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL list_sort
+    (
+        LinkedList *list,
+        Comparer comparer,
+        void *userData
+    )
+{
+    size_t index, length;
+    ListItem *current;
+    void **array, *ptr, *newPtr;
+    ListItem *first, *last;
+
+    assert (list != NULL);
+    assert (comparer != NULL);
+
+    length = list_length (list);
+    if (length == 0) {
+        return AM_TRUE;
+    }
+
+    array = (void**) mem_alloc (length * sizeof (void*));
+    if (array == NULL) {
+        return AM_FALSE;
+    }
+
+    current = list->first;
+    for (index = 0; index < length; ++index) {
+        ptr = ITEM_TO_DATA (current);
+        array[index] = ptr;
+        current = current->next;
+    }
+
+    list_qsort (array, 0, length - 1, comparer, userData);
+
+    first = NULL;
+    last = NULL;
+    for (index = 0; index < length; ++index) {
+        current = mem_alloc (DATA_SIZE (list->itemSize));
+        if (current == NULL) {
+            for (current = first; current != NULL; current = current->next) {
+                mem_free (current);
+            }
+
+            mem_free (array);
+
+            return AM_FALSE;
+        }
+
+        current->next = NULL;
+        current->previous = NULL;
+        newPtr = ITEM_TO_DATA (current);
+        ptr = ITEM_TO_DATA (array[index]);
+        mem_copy (newPtr, ptr, list->itemSize);
+        mem_free (array[index]);
+
+        if (first == NULL) {
+            first = current;
+        }
+
+        current->previous = last;
+        if (last != NULL) {
+            last->next = current;
+        }
+        last = current;
+    }
+
+    list->first = first;
+    list->last = last;
+    mem_free (array);
+
+    return AM_TRUE;
+}
+
+/**
+ * Преобразование списка в текст.
+ *
+ * @param list Список.
+ * @param buffer Буфер для размещения результата.
+ * @param outputer Функция форматирования элемента списка.
+ * @param separator Разделитель (может быть `NULL`).
+ * @return Признак успешности завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL list_to_string
+    (
+        const LinkedList *list,
+        Buffer *buffer,
+        Outputer outputer,
+        const char *separator
+    )
+{
+    const ListItem *current;
+    const void *data;
+
+    assert (list != NULL);
+    assert (buffer != NULL);
+    assert (outputer != NULL);
+
+    for (current = list->first; current; current = current->next) {
+        if ((separator != NULL) && (current != list->first)) {
+            if (!buffer_puts (buffer, separator)) {
+                return AM_FALSE;
+            }
+        }
+
+        data = ITEM_TO_DATA (current);
+        if (!outputer (data, buffer)) {
+            return AM_FALSE;
+        }
+    }
+
+    return AM_TRUE;
+}
+
 /*=========================================================*/
 
 #include "warnpop.h"

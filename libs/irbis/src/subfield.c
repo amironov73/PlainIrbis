@@ -187,7 +187,7 @@ MAGNA_API void MAGNA_CALL subfield_free
 {
     assert (subfield != NULL);
 
-    buffer_free (&subfield->value);
+    buffer_destroy(&subfield->value);
 }
 
 /**

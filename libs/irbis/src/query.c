@@ -167,7 +167,7 @@ MAGNA_API void MAGNA_CALL query_free
 {
     assert (query != NULL);
 
-    buffer_free (&query->buffer);
+    buffer_destroy(&query->buffer);
 }
 
 /**

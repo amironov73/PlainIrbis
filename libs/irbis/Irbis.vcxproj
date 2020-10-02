@@ -23,9 +23,11 @@
     <ClCompile Include="src\dll.c" />
     <ClCompile Include="src\ean.c" />
     <ClCompile Include="src\error.c" />
+    <ClCompile Include="src\exemplar.c" />
     <ClCompile Include="src\field.c" />
     <ClCompile Include="src\format.c" />
     <ClCompile Include="src\guard.c" />
+    <ClCompile Include="src\impex.c" />
     <ClCompile Include="src\ini.c" />
     <ClCompile Include="src\isbn.c" />
     <ClCompile Include="src\iso2709.c" />

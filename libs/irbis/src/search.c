@@ -64,11 +64,11 @@ MAGNA_API void MAGNA_CALL search_free
 {
     assert (parameters != NULL);
 
-    buffer_free (&parameters->expression);
-    buffer_free (&parameters->database);
-    buffer_free (&parameters->format);
-    buffer_free (&parameters->sequential);
-    buffer_free (&parameters->filter);
+    buffer_destroy(&parameters->expression);
+    buffer_destroy(&parameters->database);
+    buffer_destroy(&parameters->format);
+    buffer_destroy(&parameters->sequential);
+    buffer_destroy(&parameters->filter);
     memset (parameters, 0, sizeof (SearchParameters));
 }
 
@@ -102,17 +102,17 @@ MAGNA_API void MAGNA_CALL scenario_free
 {
     assert (scenario != NULL);
 
-    buffer_free (&scenario->name);
-    buffer_free (&scenario->prefix);
-    buffer_free (&scenario->menuName);
-    buffer_free (&scenario->oldFormat);
-    buffer_free (&scenario->correction);
-    buffer_free (&scenario->truncation);
-    buffer_free (&scenario->hint);
-    buffer_free (&scenario->modByDicAuto);
-    buffer_free (&scenario->logic);
-    buffer_free (&scenario->advance);
-    buffer_free (&scenario->format);
+    buffer_destroy(&scenario->name);
+    buffer_destroy(&scenario->prefix);
+    buffer_destroy(&scenario->menuName);
+    buffer_destroy(&scenario->oldFormat);
+    buffer_destroy(&scenario->correction);
+    buffer_destroy(&scenario->truncation);
+    buffer_destroy(&scenario->hint);
+    buffer_destroy(&scenario->modByDicAuto);
+    buffer_destroy(&scenario->logic);
+    buffer_destroy(&scenario->advance);
+    buffer_destroy(&scenario->format);
     memset (scenario, 0, sizeof (SearchScenario));
 }
 

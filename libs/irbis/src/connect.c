@@ -1,11 +1,11 @@
-/* This is an open source non-commercial project. Dear PVS-Studio, please check it.
- * PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com */
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include "magna/irbis.h"
 
-/* ReSharper disable StringLiteralTypo */
-/* ReSharper disable IdentifierTypo */
-/* ReSharper disable CommentTypo */
+// ReSharper disable StringLiteralTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable CommentTypo
 
 /*=========================================================*/
 
@@ -64,18 +64,18 @@ MAGNA_API am_bool MAGNA_CALL connection_init
  * @warning После освобождения структура больше непригодна
  * для использования.
  */
-MAGNA_API void MAGNA_CALL connection_free
+MAGNA_API void MAGNA_CALL connection_destroy
     (
         Connection *connection
     )
 {
     assert (connection != NULL);
 
-    buffer_free (&connection->host);
-    buffer_free (&connection->username);
-    buffer_free (&connection->password);
-    buffer_free (&connection->database);
-    buffer_free (&connection->serverVersion);
+    buffer_destroy(&connection->host);
+    buffer_destroy(&connection->username);
+    buffer_destroy(&connection->password);
+    buffer_destroy(&connection->database);
+    buffer_destroy(&connection->serverVersion);
     memset (connection, 0, sizeof (Connection));
 }
 
@@ -391,8 +391,9 @@ MAGNA_API am_bool MAGNA_CALL connection_execute
 
     result = AM_TRUE;
 
-    DONE: buffer_free (&prefix);
-    buffer_free (&answerHeader);
+    DONE:
+    buffer_destroy(&prefix);
+    buffer_destroy(&answerHeader);
 
     return result;
 }

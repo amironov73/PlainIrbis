@@ -2,7 +2,8 @@
 # Common support library
 #
 
-sources = [ 'src/beep.c',
+sources = [ 'src/array.c',
+    'src/beep.c',
     'src/buffer.c',
     'src/chunked.c',
     'src/cp1251.c',
@@ -28,6 +29,7 @@ sources = [ 'src/beep.c',
     'src/number.c',
     'src/object.c',
     'src/path.c',
+    'src/process.c',
     'src/retry.c',
     'src/screen.c',
     'src/sleep.c',
@@ -39,7 +41,6 @@ sources = [ 'src/beep.c',
     'src/thread.c',
     'src/utf8.c',
     'src/utils.c',
-    'src/varray.c',
     'src/vector.c'
     ]
 

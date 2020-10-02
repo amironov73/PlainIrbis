@@ -14,6 +14,7 @@ set(HeaderFiles
 )
 
 set(CFiles
+    src/array.c
     src/beep.c
     src/buffer.c
     src/chunked.c
@@ -40,6 +41,7 @@ set(CFiles
     src/number.c
     src/object.c
     src/path.c
+    src/process.c
     src/retry.c
     src/screen.c
     src/sleep.c
@@ -51,7 +53,6 @@ set(CFiles
     src/thread.c
     src/utf8.c
     src/utils.c
-    src/varray.c
     src/vector.c
 )
 
