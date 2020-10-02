@@ -36,10 +36,10 @@
 /**
  * Инициализация структуры.
  *
- * @param connection Структура, подлежащая
+ * @param connection Структура, подлежащая инициализации.
  * @return Признак успешности завершения операции.
  */
-MAGNA_API am_bool MAGNA_CALL connection_init
+MAGNA_API am_bool MAGNA_CALL connection_create
     (
         Connection *connection
     )
@@ -60,7 +60,7 @@ MAGNA_API am_bool MAGNA_CALL connection_init
 /**
  * Освобождение ресурсов, занятых подключением.
  *
- * @param connection
+ * @param connection Структура, подлежащая очистке.
  * @warning После освобождения структура больше непригодна
  * для использования.
  */
@@ -71,12 +71,97 @@ MAGNA_API void MAGNA_CALL connection_destroy
 {
     assert (connection != NULL);
 
-    buffer_destroy(&connection->host);
-    buffer_destroy(&connection->username);
-    buffer_destroy(&connection->password);
-    buffer_destroy(&connection->database);
-    buffer_destroy(&connection->serverVersion);
+    buffer_destroy (&connection->host);
+    buffer_destroy (&connection->username);
+    buffer_destroy (&connection->password);
+    buffer_destroy (&connection->database);
+    buffer_destroy (&connection->serverVersion);
     memset (connection, 0, sizeof (Connection));
+}
+
+/*=========================================================*/
+
+/**
+ * Настройка подключения: задание имени (или адреса) удаленного хоста.
+ * Выполняется до установки соединения с сервером.
+ *
+ * @param connection Подключение.
+ * @param host Имя или адрес удаленного хоста.
+ * @return Признак успешности завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL connection_set_host
+    (
+        Connection *connection,
+        const char *host
+    )
+{
+    assert (connection != NULL);
+    assert (host != NULL);
+    assert (!connection->connected);
+
+    return buffer_assign_text (&connection->host, host);
+}
+
+/**
+ * Настройка подключения: задание имени (логина) пользователя.
+ * Выполняется до установки соединения с сервером.
+ *
+ * @param connection Подключение.
+ * @param username Имя (логин)  пользователя. Не чувствительно к регистру символов.
+ * @return Признак успешности завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL connection_set_username
+    (
+        Connection *connection,
+        const char *username
+    )
+{
+    assert (connection != NULL);
+    assert (username != NULL);
+    assert (!connection->connected);
+
+    return buffer_assign_text (&connection->username, username);
+}
+
+/**
+ * Настройка подключения: задание пользовательского пароля.
+ * Выполняется до установки соединения с сервером.
+ *
+ * @param connection Подключение.
+ * @param password Пароль пользователя. Чувствителен к регистру символов.
+ * @return Признак успешности завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL connection_set_password
+    (
+        Connection *connection,
+        const char *password
+    )
+{
+    assert (connection != NULL);
+    assert (password != NULL);
+    assert (!connection->connected);
+
+    return buffer_assign_text (&connection->password, password);
+}
+
+/**
+ * Настройка подключения: задания имени текущей базы данных.
+ * Может выполняться как до, так и после установки соединения с сервером.
+ *
+ * @param connection Подключения.
+ * @param database Имя базы данных. Не чувствительно к регистру символов.
+ * @return Признак успешности завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL connection_set_database
+    (
+        Connection *connection,
+        const char *database
+    )
+{
+    assert (connection != NULL);
+    assert (database != NULL);
+
+    return buffer_assign_text (&connection->database, database);
 }
 
 /*=========================================================*/
@@ -380,20 +465,20 @@ MAGNA_API am_bool MAGNA_CALL connection_execute
         goto DONE;
     }
 
-    /* tcp4_connect(); */
+    /* tcp4_connect (); */
     /* tcp4_send_buffer (&prefix); */
     /* tcp4_send_buffer (&query->buffer); */
     /* tcp4_receive (&answerHeader); */
     (void) buffer_swap (&answerHeader, &response->answer);
     /* tcp4_receive (&response->answer); */
-    /* tcp4_disconnect(); */
-    /* initial_parse(); */
+    /* tcp4_disconnect (); */
+    /* initial_parse (); */
 
     result = AM_TRUE;
 
     DONE:
-    buffer_destroy(&prefix);
-    buffer_destroy(&answerHeader);
+    buffer_destroy (&prefix);
+    buffer_destroy (&answerHeader);
 
     return result;
 }
@@ -426,7 +511,7 @@ MAGNA_API am_bool connection_execute_simple
     assert (command != NULL);
 
     if (!connection_check (connection)
-        || !query_create(connection, &query, command)) {
+        || !query_create (connection, &query, command)) {
         goto DONE;
     }
 
@@ -434,7 +519,7 @@ MAGNA_API am_bool connection_execute_simple
         va_start (args, argCount);
         for (i = 0; i < argCount; ++i) {
             line = va_arg (args, const char*);
-            if (!query_add_ansi(&query, line)) {
+            if (!query_add_ansi (&query, line)) {
                 va_end (args);
                 goto DONE;
             }

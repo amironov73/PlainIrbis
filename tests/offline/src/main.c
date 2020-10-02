@@ -53,14 +53,14 @@ am_bool where_test_data
         path->position = directory.len;
     }
 
-    buffer_destroy(&candidate);
+    buffer_destroy (&candidate);
 
     return result;
 }
 
 TESTER(magna_get_version)
 {
-    int version = magna_get_version();
+    int version = magna_get_version ();
     CHECK (version == 0x0001);
 }
 
@@ -71,7 +71,7 @@ TESTER(magna_require_version)
 
 TESTER(magna_on_windows)
 {
-    am_bool rc = magna_on_windows();
+    am_bool rc = magna_on_windows ();
 
 #ifdef MAGNA_WINDOWS
     CHECK (rc);
@@ -85,13 +85,23 @@ TESTER(magna_on_windows)
 int main (int argc, const char **argv)
 {
     Buffer tdp = BUFFER_INIT;
+    Buffer td = BUFFER_INIT;
 
     if (where_test_data (&tdp)) {
         printf ("test data=");
         fwrite (tdp.ptr, 1, tdp.position, stdout);
         printf ("\n");
-        buffer_destroy(&tdp);
+        buffer_destroy (&tdp);
     }
+
+    if (path_get_temporary_directory (&td)) {
+        printf ("temp dir=");
+        fwrite (td.ptr, 1, td.position, stdout);
+        printf ("\n");
+        buffer_destroy (&td);
+    }
+
+    printf ("memory available=%lld\n", mem_avail_physical());
 
     int result = tester_main (argc, argv);
 

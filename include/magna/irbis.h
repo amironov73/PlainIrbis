@@ -554,11 +554,15 @@ MAGNA_API am_bool MAGNA_CALL connection_execute            (Connection *connecti
 MAGNA_API am_bool            connection_execute_simple     (Connection *connection, Response *response, const char *command, int argCount, ...);
 MAGNA_API void    MAGNA_CALL connection_destroy            (Connection *connection);
 MAGNA_API am_mfn  MAGNA_CALL connection_get_max_mfn        (Connection *connection, const char *database);
-MAGNA_API am_bool MAGNA_CALL connection_init               (Connection *connection);
+MAGNA_API am_bool MAGNA_CALL connection_create               (Connection *connection);
 MAGNA_API am_bool MAGNA_CALL connection_no_operation       (Connection *connection);
 MAGNA_API am_bool MAGNA_CALL connection_parse_string       (Connection *connection, Buffer *connectionString);
 MAGNA_API am_bool MAGNA_CALL connection_read_text_file     (Connection *connection, const Specification *specification, Buffer *buffer);
 MAGNA_API am_bool MAGNA_CALL connection_search_ex          (Connection *connection, const SearchParameters *parameters, Response *response);
+MAGNA_API am_bool MAGNA_CALL connection_set_database       (Connection *connection, const char *database);
+MAGNA_API am_bool MAGNA_CALL connection_set_host           (Connection *connection, const char *host);
+MAGNA_API am_bool MAGNA_CALL connection_set_password       (Connection *connection, const char *password);
+MAGNA_API am_bool MAGNA_CALL connection_set_username       (Connection *connection, const char *username);
 
 /*=========================================================*/
 

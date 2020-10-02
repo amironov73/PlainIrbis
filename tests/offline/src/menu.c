@@ -137,7 +137,7 @@ TESTER(menu_parse_1)
     CHECK (menu_parse (&menu, &texter));
     CHECK (menu.entries.len == 0);
 
-    texter_free (&texter);
+    texter_destroy(&texter);
     menu_free (&menu);
 }
 
@@ -177,6 +177,6 @@ TESTER(menu_parse_2)
     comment = menu_get_comment (&menu, span_from_text("?"), defaultValue);
     CHECK (span_compare (comment, defaultValue) == 0);
 
-    texter_free (&texter);
+    texter_destroy(&texter);
     menu_free (&menu);
 }

@@ -146,7 +146,7 @@ TESTER(texter_init_1)
     CHECK (texter.buffer.capacity != 0);
     CHECK (texter.buffer.ptr != NULL);
 
-    texter_free (&texter);
+    texter_destroy(&texter);
 }
 
 TESTER(texter_init_2)
@@ -164,7 +164,7 @@ TESTER(texter_init_2)
     CHECK (texter.buffer.capacity != 0);
     CHECK (texter.buffer.ptr != NULL);
 
-    texter_free (&texter);
+    texter_destroy(&texter);
 }
 
 TESTER(texter_read_byte_1)
@@ -180,7 +180,7 @@ TESTER(texter_read_byte_1)
     CHECK (chr == 0);
     CHECK (texter.eot);
 
-    texter_free (&texter);
+    texter_destroy(&texter);
 }
 
 TESTER(texter_read_byte_2)
@@ -206,7 +206,7 @@ TESTER(texter_read_byte_2)
     CHECK (texter_read_byte (&texter) == 0);
     CHECK (texter.eot);
 
-    texter_free (&texter);
+    texter_destroy(&texter);
 }
 
 TESTER(texter_read_line_1)
@@ -222,7 +222,7 @@ TESTER(texter_read_line_1)
     CHECK (line.position == 0);
     CHECK (texter.eot);
 
-    texter_free (&texter);
+    texter_destroy(&texter);
     buffer_destroy(&line);
 }
 
@@ -240,7 +240,7 @@ TESTER(texter_read_line_2)
     CHECK (texter_read_line (&texter, &line) == length);
     CHECK (line.position == length);
 
-    texter_free (&texter);
+    texter_destroy(&texter);
     buffer_destroy(&line);
 }
 
@@ -262,7 +262,7 @@ TESTER(texter_read_line_3)
     CHECK (texter_read_line (&texter, &line) == 6);
     CHECK (line.position == 6);
 
-    texter_free (&texter);
+    texter_destroy(&texter);
     buffer_destroy(&line);
 }
 
@@ -284,7 +284,7 @@ TESTER(texter_read_line_4)
     CHECK (texter_read_line (&texter, &line) == 6);
     CHECK (line.position == 6);
 
-    texter_free (&texter);
+    texter_destroy(&texter);
     buffer_destroy(&line);
 }
 
@@ -306,7 +306,7 @@ TESTER(texter_read_line_5)
     CHECK (texter_read_line (&texter, &line) == 6);
     CHECK (line.position == 6);
 
-    texter_free (&texter);
+    texter_destroy(&texter);
     buffer_destroy(&line);
 }
 
@@ -324,6 +324,6 @@ TESTER(texter_read_line_6)
     CHECK (texter_read_line (&texter, &line) == 5);
     CHECK (line.position == 5);
 
-    texter_free (&texter);
+    texter_destroy(&texter);
     buffer_destroy(&line);
 }

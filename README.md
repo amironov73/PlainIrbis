@@ -21,7 +21,6 @@ Universal client software for IRBIS64 library automation system (ManagedClient p
 ### Supported compilers
 
 * MSVS 2013/2015/2017/2019 Community Edition on Windows;
-* CMake 2.8 or higher on Linux.
 * GCC 4.8 or higher both on Windows (MinGW) and Linux/OS X;
 * Clang compiler 9 both on Windows and Linux;
 * Intel C compiler 19 on Windows, Linux/OS X.
@@ -39,16 +38,16 @@ int main (int argc, char **argv)
     printf ("Library version: %d\n", magna_version());
 
     connection_init (&connection);
-    CONNECTION_SET_HOST     (connection, "localhost");
-    CONNECTION_SET_USERNAME (connection, "librarian");
-    CONNECTION_SET_PASSWORD (connection, "secret");
-    CONNECTION_SET_DATABASE (connection, "IBIS");
+    connection_set_host     (&connection, "localhost");
+    connection_set_username (&connection, "librarian");
+    connection_set_password (&connection, "secret");
+    connection_set_databasE (&connection, "IBIS");
     connection.workstation = CATALOGER;
     connection.port = 6666;
 
     if (!connection_connect (&connection)) {
         fputs ("Connection failed", stderr);
-        connection_free (&connection);
+        connection_destroy (&connection);
         return 1;
     }
 

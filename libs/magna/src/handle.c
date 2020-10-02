@@ -54,6 +54,29 @@ MAGNA_API MAGNA_INLINE am_bool MAGNA_CALL handle_is_good
 }
 
 /**
+ * Получение заведомо неверного файлового дескриптора.
+ *
+ * @return Файловый дескриптор.
+ */
+MAGNA_API MAGNA_INLINE am_handle handle_get_bad (void)
+{
+    am_handle result;
+
+#ifdef MAGNA_WINDOWS
+
+    result.pointer = AM_BAD_HANDLE;
+
+#else
+
+    result.value = AM_BAD_HANDLE;
+
+#endif
+
+
+    return result;
+}
+
+/**
  * Конструирование дескриптора из целого числа.
  *
  * @param value Целочисленный индекс.

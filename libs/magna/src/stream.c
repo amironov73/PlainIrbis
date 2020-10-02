@@ -634,7 +634,7 @@ MAGNA_API am_bool MAGNA_CALL texter_init
  *
  * @param texter Текстор.
  */
-MAGNA_API void MAGNA_CALL texter_free
+MAGNA_API void MAGNA_CALL texter_destroy
     (
         StreamTexter *texter
     )

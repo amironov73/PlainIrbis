@@ -189,7 +189,7 @@ static size_t parse_value
     result *= multiplier;
 
     buffer_destroy(&line);
-    texter_free (&texter);
+    texter_destroy (&texter);
 
     return result;
 }

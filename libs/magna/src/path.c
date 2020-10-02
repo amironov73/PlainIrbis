@@ -37,13 +37,13 @@
 
 #pragma comment (lib, "ws2_32.lib") // for ntohl/htonl
 
-#elif defined(MAGNA_MSDOS)
+#elif defined (MAGNA_MSDOS)
 
 #include <stdio.h>
 #include <fcntl.h>
 #include <io.h>
 
-#elif defined(MAGNA_APPLE)
+#elif defined (MAGNA_APPLE)
 
 #include <mach-o/dyld.h>
 #include <unistd.h>
@@ -172,15 +172,15 @@ MAGNA_API am_bool MAGNA_CALL path_get_temporary_directory
 
     assert (path != NULL);
 
-    result = getenv("TMPDIR");
+    result = getenv ("TMPDIR");
     if (!result) {
-        result = getenv("TEMPDIR");
+        result = getenv ("TEMPDIR");
     }
     if (!result) {
-        result = getenv("TMP");
+        result = getenv ("TMP");
     }
     if (!result) {
-        result = getenv("TEMP");
+        result = getenv ("TEMP");
     }
     if (!result) {
         /* The Filesystem Hierarchy Standard version 3.0 says:
@@ -297,7 +297,7 @@ MAGNA_API Span MAGNA_CALL path_get_directory
     char c;
     const am_byte *ptr;
 
-    assert(path != NULL);
+    assert (path != NULL);
 
     if (buffer_empty (path)) {
         return buffer_to_span (path);
@@ -354,7 +354,7 @@ MAGNA_API void MAGNA_CALL path_convert_slashes
 
     for (ptr = path->ptr, end = ptr + path->position; ptr < end; ++ptr) {
 
-#if defined(MAGNA_WINDOWS) || defined(MAGNA_MSDOS)
+#if defined (MAGNA_WINDOWS) || defined (MAGNA_MSDOS)
 
         if (*ptr == '/') {
             *ptr = '\\';
@@ -387,7 +387,7 @@ MAGNA_API am_bool path_combine
     Buffer *path;
     am_bool first = AM_TRUE, result = AM_FALSE;
 
-#if defined(MAGNA_WINDOWS) || defined(MAGNA_MSDOS)
+#if defined (MAGNA_WINDOWS) || defined (MAGNA_MSDOS)
     char slash = '\\';
 #else
     char slash = '/';
@@ -427,6 +427,48 @@ MAGNA_API am_bool path_combine
     return result;
 }
 
+MAGNA_API char path_get_slash (void)
+{
+#if defined (MAGNA_WINDOWS) || defined (MAGNA_MSDOS)
+    char slash = '\\';
+#else
+    char slash = '/';
+#endif
+
+    return slash;
+}
+
+MAGNA_API am_bool MAGNA_CALL path_add_trailing_slash
+    (
+        Buffer *path
+    )
+{
+    assert (path != NULL);
+
+    return buffer_putc (path, path_get_slash());
+}
+
+MAGNA_API am_bool MAGNA_CALL path_append
+    (
+        Buffer *path,
+        Span element
+    )
+{
+    assert (path != NULL);
+
+    path_trim_trailing_slashes (path);
+
+    if (!path_add_trailing_slash (path)) {
+        return AM_FALSE;
+    }
+
+    if (!span_is_empty (element)) {
+        return buffer_write (path, element.ptr, element.len);
+    }
+
+    return AM_TRUE;
+}
+
 /**
  * Удаление слэшей в конце пути.
  *
@@ -461,7 +503,7 @@ MAGNA_API am_bool MAGNA_CALL path_get_executable
         Buffer *buffer
     )
 {
-#if defined(MAGNA_WINDOWS)
+#if defined (MAGNA_WINDOWS)
 
     char temp [MAX_PATH];
 
@@ -474,7 +516,7 @@ MAGNA_API am_bool MAGNA_CALL path_get_executable
 
     return buffer_puts (buffer, temp);
 
-#elif defined(MAGNA_LINUX)
+#elif defined (MAGNA_LINUX)
 
     char temp [PATH_MAX], temp2[30], *ptr;
     pid_t pid;
@@ -485,7 +527,7 @@ MAGNA_API am_bool MAGNA_CALL path_get_executable
     memset (temp, 0, sizeof (temp));
     if (readlink ("/proc/self/exe", temp, PATH_MAX) == -1) {
         /* Может, procfs есть, но нет /proc/self */
-        pid = getpid();
+        pid = getpid ();
         sprintf (temp2, "/proc/%ld/exe", (long) pid);
         if (readlink (temp2, temp, PATH_MAX) == -1) {
 
@@ -494,7 +536,7 @@ MAGNA_API am_bool MAGNA_CALL path_get_executable
               of the command and passed to that command
               in its environment.*/
 
-            ptr = getenv("_");
+            ptr = getenv ("_");
             if (!ptr) {
                 return AM_FALSE;
             }
@@ -505,15 +547,15 @@ MAGNA_API am_bool MAGNA_CALL path_get_executable
 
     return buffer_puts (buffer, temp);
 
-#elif defined(MAGNA_SOLARIS)
+#elif defined (MAGNA_SOLARIS)
 
     /* See https://docs.oracle.com/cd/E19253-01/816-5168/6mbb3hrb1/index.html */
 
-    const char *path = getexecname();
+    const char *path = getexecname ();
 
     assert (buffer != NULL);
 
-    /* readlink("/proc/self/path/a.out", buf, bufsize); */
+    /* readlink ("/proc/self/path/a.out", buf, bufsize); */
 
     if (path == NULL) {
         return AM_FALSE;
@@ -521,7 +563,7 @@ MAGNA_API am_bool MAGNA_CALL path_get_executable
 
     return buffer_puts (buffer, path);
 
-#elif defined(MAGNA_FREEBSD)
+#elif defined (MAGNA_FREEBSD)
 
     char temp [PATH_MAX];
 
@@ -535,7 +577,7 @@ MAGNA_API am_bool MAGNA_CALL path_get_executable
 
     return buffer_puts (buffer, temp);
 
-#elif defined(MAGNA_NETBSD)
+#elif defined (MAGNA_NETBSD)
 
     char temp [PATH_MAX];
 
@@ -549,7 +591,7 @@ MAGNA_API am_bool MAGNA_CALL path_get_executable
 
     return buffer_puts (buffer, temp);
 
-#elif defined(MAGNA_APPLE)
+#elif defined (MAGNA_APPLE)
 
     char path[1024];
     uint32_t size = sizeof (path);

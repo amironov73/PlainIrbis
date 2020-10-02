@@ -313,6 +313,7 @@ typedef union {
 extern MAGNA_API MAGNA_INLINE am_bool   MAGNA_CALL handle_is_good      (am_handle handle);
 extern MAGNA_API MAGNA_INLINE am_handle MAGNA_CALL handle_from_pointer (void *pointer);
 extern MAGNA_API MAGNA_INLINE am_handle MAGNA_CALL handle_from_value   (int value);
+extern MAGNA_API MAGNA_INLINE am_handle            handle_get_bad      (void);
 
 /*=========================================================*/
 
@@ -992,7 +993,7 @@ MAGNA_API am_bool    MAGNA_CALL stream_write      (Stream *stream, const am_byte
 MAGNA_API am_bool    MAGNA_CALL stream_write_line (Stream *stream, const char *text);
 
 MAGNA_API am_bool    MAGNA_CALL texter_init      (StreamTexter *texter, Stream *stream, size_t bufsize);
-MAGNA_API void       MAGNA_CALL texter_free      (StreamTexter *texter);
+MAGNA_API void       MAGNA_CALL texter_destroy      (StreamTexter *texter);
 MAGNA_API int        MAGNA_CALL texter_read_byte (StreamTexter *texter);
 MAGNA_API ssize_t    MAGNA_CALL texter_read_line (StreamTexter *texter, Buffer *output);
 
@@ -1014,49 +1015,56 @@ MAGNA_API am_bool    MAGNA_CALL tcp4_stream_create     (Stream *stream, const ch
 
 /* Работа с файлами */
 
-MAGNA_API am_bool    MAGNA_CALL file_close        (am_handle handle);
-MAGNA_API am_bool    MAGNA_CALL file_copy         (const char *targetName, const char *sourceName);
-MAGNA_API am_handle  MAGNA_CALL file_create       (const char *fileName);
-MAGNA_API am_bool    MAGNA_CALL file_delete       (const char *filename);
-MAGNA_API am_bool    MAGNA_CALL file_eof          (am_handle handle);
-MAGNA_API am_bool    MAGNA_CALL file_exist        (const char *filename);
-MAGNA_API am_handle  MAGNA_CALL file_open_read    (const char *fileName);
-MAGNA_API am_handle  MAGNA_CALL file_open_write   (const char *fileName);
-MAGNA_API ssize_t    MAGNA_CALL file_read         (am_handle handle, am_byte *buffer, ssize_t size);
-MAGNA_API am_bool    MAGNA_CALL file_read_all     (const char *fileName, Buffer *buffer);
-MAGNA_API int        MAGNA_CALL file_read_byte    (am_handle handle);
-MAGNA_API am_uint32  MAGNA_CALL file_read_int_32  (am_handle handle);
-MAGNA_API am_uint64  MAGNA_CALL file_read_int_64  (am_handle handle);
-MAGNA_API am_bool    MAGNA_CALL file_read_line    (am_handle handle, Buffer *buffer);
-MAGNA_API am_bool    MAGNA_CALL file_seek         (am_handle handle, am_int64 offset);
-MAGNA_API am_uint64  MAGNA_CALL file_size         (am_handle handle);
-MAGNA_API am_bool    MAGNA_CALL file_sync         (am_handle handle);
-MAGNA_API am_int64   MAGNA_CALL file_tell         (am_handle handle);
-MAGNA_API am_bool    MAGNA_CALL file_texter       (StreamTexter *texter, Stream *stream, const char *filename);
-MAGNA_API am_bool    MAGNA_CALL file_write        (am_handle handle, const am_byte *data, size_t size);
-MAGNA_API am_bool    MAGNA_CALL file_write_buffer (am_handle handle, const Buffer *buffer);
-MAGNA_API am_bool    MAGNA_CALL file_write_byte   (am_handle handle, am_byte value);
-MAGNA_API am_bool    MAGNA_CALL file_write_int_32 (am_handle handle, am_uint32 value);
-MAGNA_API am_bool    MAGNA_CALL file_write_int_64 (am_handle handle, am_uint64 value);
-MAGNA_API am_bool    MAGNA_CALL file_write_span   (am_handle handle, Span span);
-MAGNA_API am_bool    MAGNA_CALL file_write_text   (am_handle handle, const char *text);
+MAGNA_API am_bool    MAGNA_CALL file_close             (am_handle handle);
+MAGNA_API am_bool    MAGNA_CALL file_copy              (const char *targetName, const char *sourceName);
+MAGNA_API am_handle  MAGNA_CALL file_create            (const char *fileName);
+MAGNA_API am_handle  MAGNA_CALL file_create_insist     (const char *fileName, unsigned int delay, unsigned int retryLimit);
+MAGNA_API am_bool    MAGNA_CALL file_delete            (const char *filename);
+MAGNA_API am_bool    MAGNA_CALL file_eof               (am_handle handle);
+MAGNA_API am_bool    MAGNA_CALL file_exist             (const char *filename);
+MAGNA_API am_handle  MAGNA_CALL file_open_read         (const char *fileName);
+MAGNA_API am_handle  MAGNA_CALL file_open_read_insist  (const char *fileName, unsigned int delay, unsigned int retryLimit);
+MAGNA_API am_handle  MAGNA_CALL file_open_write        (const char *fileName);
+MAGNA_API am_handle  MAGNA_CALL file_open_write_insist (const char *fileName, unsigned int delay, unsigned int retryLimit);
+MAGNA_API ssize_t    MAGNA_CALL file_read              (am_handle handle, am_byte *buffer, ssize_t size);
+MAGNA_API am_bool    MAGNA_CALL file_read_all          (const char *fileName, Buffer *buffer);
+MAGNA_API int        MAGNA_CALL file_read_byte         (am_handle handle);
+MAGNA_API am_uint32  MAGNA_CALL file_read_int32        (am_handle handle);
+MAGNA_API am_uint64  MAGNA_CALL file_read_int64        (am_handle handle);
+MAGNA_API am_bool    MAGNA_CALL file_read_line         (am_handle handle, Buffer *buffer);
+MAGNA_API am_bool    MAGNA_CALL file_seek              (am_handle handle, am_int64 offset);
+MAGNA_API am_uint64  MAGNA_CALL file_size              (am_handle handle);
+MAGNA_API am_bool    MAGNA_CALL file_sync              (am_handle handle);
+MAGNA_API am_int64   MAGNA_CALL file_tell              (am_handle handle);
+MAGNA_API am_bool    MAGNA_CALL file_texter            (StreamTexter *texter, Stream *stream, const char *filename);
+MAGNA_API am_bool    MAGNA_CALL file_touch             (const char *filename);
+MAGNA_API am_bool    MAGNA_CALL file_write             (am_handle handle, const am_byte *data, size_t size);
+MAGNA_API am_bool    MAGNA_CALL file_write_buffer      (am_handle handle, const Buffer *buffer);
+MAGNA_API am_bool    MAGNA_CALL file_write_byte        (am_handle handle, am_byte value);
+MAGNA_API am_bool    MAGNA_CALL file_write_int32       (am_handle handle, am_uint32 value);
+MAGNA_API am_bool    MAGNA_CALL file_write_int64       (am_handle handle, am_uint64 value);
+MAGNA_API am_bool    MAGNA_CALL file_write_span        (am_handle handle, Span span);
+MAGNA_API am_bool    MAGNA_CALL file_write_text        (am_handle handle, const char *text);
 
-MAGNA_API am_bool    MAGNA_CALL directory_create  (const char *dirname, am_bool createNew);
-MAGNA_API am_bool    MAGNA_CALL directory_delete  (const char *dirname);
-MAGNA_API am_bool    MAGNA_CALL directory_exist   (const char *dirname);
+MAGNA_API am_bool    MAGNA_CALL directory_create       (const char *dirname, am_bool createNew);
+MAGNA_API am_bool    MAGNA_CALL directory_delete       (const char *dirname);
+MAGNA_API am_bool    MAGNA_CALL directory_exist        (const char *dirname);
 
 /*=========================================================*/
 
 /* Работа с путями */
 
+MAGNA_API am_bool MAGNA_CALL path_add_trailing_slash      (Buffer *path);
+MAGNA_API am_bool MAGNA_CALL path_append                  (Buffer *path, Span element);
 MAGNA_API am_bool            path_combine                 (Buffer *output, ...);
 MAGNA_API void    MAGNA_CALL path_convert_slashes         (Buffer *path);
 MAGNA_API am_bool MAGNA_CALL path_get_current_directory   (Buffer *path);
+MAGNA_API Span    MAGNA_CALL path_get_directory           (const Buffer *path);
 MAGNA_API am_bool MAGNA_CALL path_get_executable          (Buffer *buffer);
 MAGNA_API Span    MAGNA_CALL path_get_extension           (const Buffer *path);
-MAGNA_API Span    MAGNA_CALL path_get_directory           (const Buffer *path);
 MAGNA_API Span    MAGNA_CALL path_get_extension           (const Buffer *path);
 MAGNA_API Span    MAGNA_CALL path_get_filename            (const Buffer *path);
+MAGNA_API char               path_get_slash               (void);
 MAGNA_API am_bool MAGNA_CALL path_get_temporary_directory (Buffer *path);
 MAGNA_API am_bool MAGNA_CALL path_set_current_directory   (const Buffer *path);
 MAGNA_API void    MAGNA_CALL path_trim_trailing_slashes   (Buffer *path);

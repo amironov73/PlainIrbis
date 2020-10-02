@@ -14,6 +14,7 @@ set(CFiles
     src/cp866.c
     src/ean.c
     src/enumertr.c
+    src/file.c
     src/intarray.c
     src/io.c
     src/koi8r.c

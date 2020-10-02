@@ -17,11 +17,11 @@ int main (int argc, char **argv)
     (void) argv;
 
     printf ("Library version: %d\n", magna_get_version());
-    connection_init (&connection);
-    CONNECTION_SET_HOST     (connection, "localhost");
-    CONNECTION_SET_USERNAME (connection, "librarian");
-    CONNECTION_SET_PASSWORD (connection, "secret");
-    CONNECTION_SET_DATABASE (connection, "IBIS");
+    connection_create(&connection);
+    connection_set_host     (&connection, "localhost");
+    connection_set_username (&connection, "librarian");
+    connection_set_password (&connection, "secret");
+    connection_set_database (&connection, "IBIS");
     connection.workstation = CATALOGER;
     connection.port = 6666;
 
