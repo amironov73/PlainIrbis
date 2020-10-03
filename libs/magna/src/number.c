@@ -133,7 +133,7 @@ MAGNA_API am_bool MAGNA_CALL ntc_setup
     else {
         result = AM_TRUE;
         chunk->haveValue = AM_TRUE;
-        chunk->value = span_to_uint_64 (number);
+        chunk->value = span_to_uint64(number);
     }
     chunk->length = 0;
 

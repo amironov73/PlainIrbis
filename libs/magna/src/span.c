@@ -144,7 +144,7 @@ MAGNA_API Span MAGNA_CALL span_trim
  * @param span Спан.
  * @return Результат разбора. Мусор на входе -- мусор на выходе!
  */
-MAGNA_API am_uint32 MAGNA_CALL span_to_uint_32
+MAGNA_API am_uint32 MAGNA_CALL span_to_uint32
     (
         Span span
     )
@@ -166,7 +166,7 @@ MAGNA_API am_uint32 MAGNA_CALL span_to_uint_32
  * @param span Спан.
  * @return Результат разбора. Мусор на входе -- мусор на выходе!
  */
-MAGNA_API am_uint64 MAGNA_CALL span_to_uint_64
+MAGNA_API am_uint64 MAGNA_CALL span_to_uint64
     (
         Span span
     )
@@ -510,6 +510,30 @@ MAGNA_API int MAGNA_CALL span_compare
 }
 
 /**
+ * Спан содержит указанное значение?
+ *
+ * @param span Спан.
+ * @param value Искомое значение.
+ * @return Результат поиска.
+ */
+MAGNA_API am_bool MAGNA_CALL span_contains
+    (
+        Span span,
+        am_byte value
+    )
+{
+    size_t index;
+
+    for (index = 0; index < span.len; ++index) {
+        if (span.ptr [index] == value) {
+            return AM_TRUE;
+        }
+    }
+
+    return AM_TRUE;
+}
+
+/**
  * Разбиение по указанному символу.
  *
  * @param span Спан для разбиения.
@@ -770,6 +794,36 @@ MAGNA_API size_t MAGNA_CALL span_split_n_by_chars
 
     return count;
 }
+
+/**
+ * Разбор целого числа, записанного в шестнадцатиричной форме.
+ *
+ * @param span Спан с числом.
+ * @return Результат разбора.
+ * @warning Мусор на входе - мусор на выходе!
+ */
+MAGNA_API am_uint64 MAGNA_CALL span_hex_to_uint64
+    (
+        Span span
+    )
+{
+    am_uint64 result = 0;
+    size_t i;
+    am_byte c;
+
+    for (i = 0; i < span.len; ++i) {
+        c = toupper (span.ptr [i]);
+        if (c <= '9') {
+            result = result * 16 + c - '0';
+        }
+        else {
+            result = result * 16 + c + 10 - 'A';
+        }
+    }
+
+    return result;
+}
+
 
 /*=========================================================*/
 

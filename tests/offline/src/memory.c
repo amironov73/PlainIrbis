@@ -95,3 +95,29 @@ TESTER(mem_is_small_machine_1)
 
     CHECK (small != huge);
 }
+
+static int dummy_function (int arg1, int arg2)
+{
+    return arg1 + arg2;
+}
+
+TESTER(mem_can_execute_1)
+{
+    CHECK (mem_can_execute (dummy_function));
+}
+
+TESTER(mem_can_read_1)
+{
+    int junk [100];
+
+    CHECK (mem_can_read (junk, sizeof (junk)));
+    CHECK (!mem_can_read (NULL, 1));
+}
+
+TESTER(mem_can_write_1)
+{
+    int junk [100];
+
+    CHECK (mem_can_write (junk, sizeof (junk)));
+    CHECK (!mem_can_write (NULL, 1));
+}

@@ -138,10 +138,10 @@ TESTER(file_read_all_1)
     Buffer all = BUFFER_INIT;
 
     CHECK (where_test_data (&path));
-    CHECK (path_append (&path, span_from_text ("org.mnu")));
+    CHECK (path_append (&path, span_from_text ("TEST1.ISO")));
 
     CHECK (file_read_all (buffer_to_text (&path), &all));
-    CHECK (all.position == 86);
+    CHECK (all.position == 78096);
 
     buffer_destroy (&path);
     buffer_destroy (&all);
@@ -153,11 +153,11 @@ TESTER(file_read_byte_1)
     am_handle handle;
 
     CHECK (where_test_data (&path));
-    CHECK (path_append (&path, span_from_text ("org.mnu")));
+    CHECK (path_append (&path, span_from_text ("TEST1.ISO")));
 
     handle = file_open_read (buffer_to_text (&path));
     CHECK (handle_is_good (handle));
-    CHECK (file_read_byte (handle) == 0x31);
+    CHECK (file_read_byte (handle) == 0x30);
     CHECK (file_close (handle));
 
     buffer_destroy (&path);
@@ -483,13 +483,13 @@ TESTER(file_stream_open_read_1)
     const char *fname;
 
     CHECK (where_test_data (&path));
-    CHECK (path_append (&path, span_from_text ("org.mnu")));
+    CHECK (path_append (&path, span_from_text ("TEST1.ISO")));
 
     fname = buffer_to_text (&path);
     CHECK (fname != NULL);
 
     CHECK (file_stream_open_read (&stream, fname));
-    CHECK (stream_read (&stream, junk, sizeof (junk)) == 86);
+    CHECK (stream_read (&stream, junk, sizeof (junk)) == sizeof (junk));
     CHECK (stream_close (&stream));
 
     buffer_destroy (&path);

@@ -431,6 +431,9 @@ MAGNA_API void*     MAGNA_CALL mem_alloc_ex         (size_t size);
 MAGNA_API void      MAGNA_CALL mem_clear            (void *ptr, size_t size);
 MAGNA_API void      MAGNA_CALL mem_copy             (void *destination, const void *source, size_t size);
 MAGNA_API void      MAGNA_CALL mem_free             (void *ptr);
+MAGNA_API am_bool   MAGNA_CALL mem_can_execute      (const void *ptr);
+MAGNA_API am_bool   MAGNA_CALL mem_can_read         (const void *ptr, size_t count);
+MAGNA_API am_bool   MAGNA_CALL mem_can_write        (void *ptr, size_t count);
 MAGNA_API am_bool              mem_is_small_machine (void);
 MAGNA_API am_bool              mem_is_huge_machine  (void);
 MAGNA_API am_uint64            mem_avail_physical   (void);
@@ -485,10 +488,12 @@ struct MagnaSpan
 #define SPAN_INIT { NULL, 0 }
 
 extern MAGNA_API              int        MAGNA_CALL span_compare          (Span first, Span second);
+extern MAGNA_API              am_bool    MAGNA_CALL span_contains         (Span span, am_byte value);
 extern MAGNA_API              am_bool    MAGNA_CALL span_ends_with        (Span span, Span suffix);
 extern MAGNA_API              Span       MAGNA_CALL span_fill             (Span span, am_byte value);
 extern MAGNA_API              am_byte*   MAGNA_CALL span_find_byte        (Span span, am_byte value);
 extern MAGNA_API MAGNA_INLINE Span       MAGNA_CALL span_from_text        (const char *str);
+extern MAGNA_API              am_uint64  MAGNA_CALL span_hex_to_uint64    (Span span);
 extern MAGNA_API MAGNA_INLINE Span       MAGNA_CALL span_init             (const am_byte *ptr, size_t len);
 extern MAGNA_API              ssize_t    MAGNA_CALL span_index_of         (Span span, am_byte value);
 extern MAGNA_API MAGNA_INLINE am_bool    MAGNA_CALL span_is_empty         (Span span);
@@ -504,8 +509,8 @@ extern MAGNA_API              Span       MAGNA_CALL span_trim_start       (Span 
 extern MAGNA_API              Span       MAGNA_CALL span_trim_end         (Span span);
 extern MAGNA_API              Span       MAGNA_CALL span_trim             (Span span);
 extern MAGNA_API              char*      MAGNA_CALL span_to_string        (Span span);
-extern MAGNA_API              am_uint32  MAGNA_CALL span_to_uint_32       (Span span);
-extern MAGNA_API              am_uint64  MAGNA_CALL span_to_uint_64       (Span span);
+extern MAGNA_API              am_uint32  MAGNA_CALL span_to_uint32        (Span span);
+extern MAGNA_API              am_uint64  MAGNA_CALL span_to_uint64        (Span span);
 extern MAGNA_API              am_byte*   MAGNA_CALL span_to_vector        (Span span);
 extern MAGNA_API              Span       MAGNA_CALL span_toupper          (Span span);
 extern MAGNA_API              Span       MAGNA_CALL span_tolower          (Span span);
@@ -562,7 +567,7 @@ struct MagnaArray
     Liberator liberator;
 };
 
-#define VARRAY_INIT(__itemSize) { NULL, __itemSize, 0, 0, 0, NULL };
+#define ARRAY_INIT(__itemSize) { NULL, __itemSize, 0, 0, 0, NULL };
 
 MAGNA_API              void*   MAGNA_CALL array_bsearch      (Array *array, const void *value, Comparer comparer, const void *data);
 MAGNA_API              void    MAGNA_CALL array_clear        (Array *array);

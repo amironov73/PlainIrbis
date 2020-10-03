@@ -127,7 +127,7 @@ TESTER(span_trim_3)
 TESTER(span_to_uint_32_1)
 {
     Span span = SPAN_INIT;
-    am_uint32 value = span_to_uint_32 (span);
+    am_uint32 value = span_to_uint32(span);
 
     CHECK (value == 0);
 
@@ -137,7 +137,7 @@ TESTER(span_to_uint_32_2)
 {
     const char *text = "123456789";
     Span span = span_from_text (text);
-    am_uint32 value = span_to_uint_32 (span);
+    am_uint32 value = span_to_uint32(span);
 
     CHECK (value == 123456789);
 }
@@ -145,7 +145,7 @@ TESTER(span_to_uint_32_2)
 TESTER(span_to_uint_64_1)
 {
     Span span = SPAN_INIT;
-    am_uint64 value = span_to_uint_64 (span);
+    am_uint64 value = span_to_uint64(span);
 
     CHECK (value == 0);
 
@@ -155,7 +155,7 @@ TESTER(span_to_uint_64_2)
 {
     const char *text = "123456789";
     Span span = span_from_text (text);
-    am_uint64 value = span_to_uint_64 (span);
+    am_uint64 value = span_to_uint64(span);
 
     CHECK (value == 123456789);
 }

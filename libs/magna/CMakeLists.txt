@@ -36,6 +36,7 @@ set(CFiles
     src/list.c
     src/magna.c
     src/map.c
+    src/mapfile.c
     src/memory.c
     src/navigatr.c
     src/number.c

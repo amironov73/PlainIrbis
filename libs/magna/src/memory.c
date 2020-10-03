@@ -32,6 +32,10 @@
 
 #include <sys/time.h>
 #include <sys/resource.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <fcntl.h>
 
 #endif
 
@@ -167,7 +171,7 @@ static size_t parse_value
 
             found = parts[0];
             unit = parts[1];
-            result = (size_t) span_to_uint_64 (found);
+            result = (size_t) span_to_uint64(found);
             break;
         }
     }
@@ -352,6 +356,228 @@ MAGNA_API am_bool mem_is_huge_machine (void)
 
     return mem_avail_physical() > (MAGNA_INT64(2) * MAGNA_INT64 (1024) * MAGNA_INT64 (1024));
 }
+
+/*=========================================================*/
+
+#ifdef MAGNA_LINUX
+
+/*
+   Работа с файлом `/proc/self/maps`, содержащим описание регионов
+   в адресном пространстве процесса.
+
+   Типичная запись выглядит следующим образом:
+
+   address           perms offset  dev   inode   pathname
+   08048000-08056000 r-xp 00000000 03:0c 64593   /usr/sbin/gpm
+
+   Здесь `address` — начало и конец региона адресного пространства,
+   `perms` – флаги доступа: `r` – чтение, `w` – запись,
+   `x` – выполнение кода, `s` – shared-регион, `p` – private-регион,
+   `offset` – если регион проецируется из файла с помощью `mmap`,
+   тут хранится смещение относительно начала файла.
+   Ну и собственно inode файла и путь к нему.
+
+ */
+
+/* Одна запись в файле */
+typedef struct {
+    am_uint64 from, to;
+    am_byte flags[4];
+} MME;
+
+static am_bool read_memory_map
+    (
+        Array *array
+    )
+{
+    am_bool result = AM_FALSE;
+    char line[256];
+    TextNavigator nav;
+    Span from, to, flags;
+    MME *mme;
+    FILE *file = fopen ("/proc/self/maps", "rt");
+
+    if (!file) {
+        return AM_FALSE;
+    }
+
+    mem_clear (line, sizeof (line));
+    while (!feof (file)) {
+        (void) fgets (line, sizeof (line) - 1, file);
+        nav_init (&nav, line, strlen (line));
+        from = nav_read_to (&nav, '-');
+        to = nav_read_to (&nav, ' ');
+        flags = nav_read_to (&nav, ' ');
+        if (span_is_empty (from) || span_is_empty (to) || span_is_empty (flags)) {
+            break;
+        }
+
+        mme = (MME*) array_emplace_back (array);
+        if (!mme) {
+            goto DONE;
+        }
+        mme->from     = span_hex_to_uint64 (from);
+        mme->to       = span_hex_to_uint64 (to);
+        mme->flags[0] = flags.ptr[0];
+        mme->flags[1] = flags.ptr[1];
+        mme->flags[2] = flags.ptr[2];
+        mme->flags[3] = flags.ptr[3];
+    }
+
+    result = AM_TRUE;
+
+    DONE: fclose (file);
+
+    return result;
+}
+
+static const MME* find_address
+    (
+        const Array *array,
+        am_uint64 address
+    )
+{
+    size_t index;
+    const MME *mme;
+
+    for (index = 0; index < array->len; ++index) {
+        mme = (const MME*) array_get (array, index);
+        if (mme->from <= address && mme->to >= address) {
+            return mme;
+        }
+    }
+
+    return NULL;
+}
+
+static am_bool check_memory_map
+    (
+        am_uint64 address,
+        size_t count,
+        am_byte flag
+    )
+{
+    am_bool result;
+    Array memmap = ARRAY_INIT (sizeof (MME));
+    const MME *mme;
+    int i;
+
+    if (address == MAGNA_UINT64 (0)) {
+        return AM_FALSE;
+    }
+
+    if (!read_memory_map (&memmap)) {
+        array_destroy (&memmap);
+        return AM_FALSE;
+    }
+
+    result = AM_FALSE;
+    mme = find_address (&memmap, address);
+    if (mme != NULL) {
+        if ((address + count) < mme->to) {
+          for (i = 0; i < 4; ++i) {
+              if (same_char (flag, mme->flags[i])) {
+                  result = AM_TRUE;
+                  break;
+              }
+          }
+        }
+    }
+
+    array_destroy (&memmap);
+
+    return result;
+}
+
+#endif
+
+/**
+ * Можно ли исполнять код по указанному адресу?
+ *
+ * @param ptr Указатель на начало.
+ * @param count Число байт.
+ * @return Результат проверки.
+ */
+MAGNA_API am_bool MAGNA_CALL mem_can_execute
+    (
+        const void *ptr
+    )
+{
+#ifdef MAGNA_WINDOWS
+
+    return !IsBadCodePtr (ptr);
+
+#else
+
+    return check_memory_map ((am_uint64) ptr, 4, 'x');
+
+#endif
+}
+
+/**
+ * Можно ли читать память по указанному адресу?
+ *
+ * @param ptr Указатель на начало.
+ * @param count Число байт.
+ * @return Результат проверки.
+ */
+MAGNA_API am_bool MAGNA_CALL mem_can_read
+    (
+        const void *ptr,
+        size_t count
+    )
+{
+#ifdef MAGNA_WINDOWS
+
+    return !IsBadReadPtr (ptr, count);
+
+#elif defined(MAGNA_LINUX)
+
+    return check_memory_map ((am_uint64) ptr, count, 'r');
+
+#else
+
+    if (ptr == NULL) {
+        return AM_FALSE;
+    }
+
+    return AM_TRUE;
+
+#endif
+}
+
+/**
+ * Можно ли писать в память по указанному адресу?
+ *
+ * @param ptr Указатель на начало.
+ * @param count Число байт.
+ * @return Результат проверки.
+ */
+MAGNA_API am_bool MAGNA_CALL mem_can_write
+    (
+        void *ptr,
+        size_t count
+    )
+{
+#ifdef MAGNA_WINDOWS
+
+    return !IsBadWritePtr (ptr, count);
+
+#elif defined(MAGNA_LINUX)
+
+    return check_memory_map ((am_uint64) ptr, count, 'w');
+
+#else
+
+    if (ptr == NULL) {
+        return AM_FALSE;
+    }
+
+    return AM_TRUE;
+
+#endif
+}
+
 
 /*=========================================================*/
 
