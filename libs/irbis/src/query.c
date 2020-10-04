@@ -16,16 +16,13 @@
 MAGNA_API am_bool MAGNA_CALL query_add_ansi
     (
         Query *query,
-        const char *text
+        const am_byte *text
     )
 {
-    Buffer temp;
-
     assert (query != NULL);
     assert (text != NULL);
 
-    buffer_from_text (&temp, text);
-    if (!buffer_ansi_to_utf8 (&query->buffer, &temp)
+    if (!utf2ansi (&query->buffer, span_from_text (text))
         || !buffer_putc (&query->buffer, 0x0A)) {
         return AM_FALSE;
     }
@@ -44,7 +41,7 @@ MAGNA_API am_bool MAGNA_CALL query_add_ansi
 MAGNA_API am_bool MAGNA_CALL query_add_format
     (
         Query *query,
-        const char *text
+        const am_byte *text
     )
 {
     assert (query != NULL);
@@ -72,7 +69,7 @@ MAGNA_API am_bool MAGNA_CALL query_add_int_32
 
     assert (query != NULL);
 
-    sprintf (temp, "%u", value);
+    sprintf ((char*) temp, "%u", value);
 
     return query_add_utf (query, temp);
 }
@@ -87,7 +84,7 @@ MAGNA_API am_bool MAGNA_CALL query_add_int_32
 MAGNA_API am_bool MAGNA_CALL query_add_utf
     (
         Query *query,
-        const char *text
+        const am_byte *text
     )
 {
     assert (query != NULL);
@@ -121,24 +118,25 @@ MAGNA_API am_bool MAGNA_CALL query_new_line
 /**
  * Создание пользовательского запроса.
  *
- * @param connection Подключение.
  * @param query Создаваемый запрос.
+ * @param connection Подключение.
  * @param command Код команды (в кодировке UTF-8).
  */
 MAGNA_API am_bool MAGNA_CALL query_create
     (
-        struct IrbisConnection *connection,
         Query *query,
-        const char *command
+        struct IrbisConnection *connection,
+        const am_byte *command
     )
 {
     assert (connection != NULL);
     assert (query != NULL);
-    assert (strlen (command) != 0);
+    assert (strlen ((const char*) command) != 0);
 
     if (!buffer_create (&query->buffer, NULL, 16)
         || !query_add_ansi (query, command)
         || !buffer_putc (&query->buffer, connection->workstation)
+        || !query_new_line (query)
         || !query_add_ansi (query, command)
         || !query_add_int_32 (query, connection->clientId)
         || !query_add_int_32 (query, connection->queryId)
@@ -160,7 +158,7 @@ MAGNA_API am_bool MAGNA_CALL query_create
  *
  * @param query Клиентский запрос.
  */
-MAGNA_API void MAGNA_CALL query_free
+MAGNA_API void MAGNA_CALL query_destroy
     (
         Query *query
     )
@@ -183,12 +181,12 @@ MAGNA_API am_bool MAGNA_CALL query_encode
         Buffer *prefix
     )
 {
-    char temp[16];
+    am_byte temp[16];
 
     assert (query != NULL);
     assert (prefix != NULL);
 
-    sprintf (temp, "%u\n", (unsigned int) query->buffer.position);
+    sprintf ((char*) temp, "%u\n", (unsigned int) query->buffer.position);
 
     return buffer_puts (prefix, temp);
 }

@@ -30,7 +30,7 @@ TESTER(span_init_3)
 
 TESTER(span_from_text_1)
 {
-    const char *text = "Hello";
+    const am_byte *text = "Hello";
     Span span = span_from_text (text);
 
     CHECK (span.ptr == text);
@@ -48,7 +48,7 @@ TESTER(span_trim_start_1)
 
 TESTER(span_trim_start_2)
 {
-    const char *text = "Hello";
+    const am_byte *text = "Hello";
     Span span1 = span_from_text (text);
     Span span2 = span_trim_start (span1);
 
@@ -58,7 +58,7 @@ TESTER(span_trim_start_2)
 
 TESTER(span_trim_start_3)
 {
-    const char *text = "  Hello";
+    const am_byte *text = "  Hello";
     Span span1 = span_from_text (text);
     Span span2 = span_trim_start (span1);
 
@@ -77,7 +77,7 @@ TESTER(span_trim_end_1)
 
 TESTER(span_trim_end_2)
 {
-    const char *text = "Hello";
+    const am_byte *text = "Hello";
     Span span1 = span_from_text (text);
     Span span2 = span_trim_end (span1);
 
@@ -87,7 +87,7 @@ TESTER(span_trim_end_2)
 
 TESTER(span_trim_end_3)
 {
-    const char *text = "Hello  ";
+    const am_byte *text = "Hello  ";
     Span span1 = span_from_text (text);
     Span span2 = span_trim_end (span1);
 
@@ -106,7 +106,7 @@ TESTER(span_trim_1)
 
 TESTER(span_trim_2)
 {
-    const char *text = "Hello";
+    const am_byte *text = "Hello";
     Span span1 = span_from_text (text);
     Span span2 = span_trim (span1);
 
@@ -116,7 +116,7 @@ TESTER(span_trim_2)
 
 TESTER(span_trim_3)
 {
-    const char *text = "  Hello  ";
+    const am_byte *text = "  Hello  ";
     Span span1 = span_from_text (text);
     Span span2 = span_trim (span1);
 
@@ -135,7 +135,7 @@ TESTER(span_to_uint_32_1)
 
 TESTER(span_to_uint_32_2)
 {
-    const char *text = "123456789";
+    const am_byte *text = "123456789";
     Span span = span_from_text (text);
     am_uint32 value = span_to_uint32(span);
 
@@ -148,12 +148,11 @@ TESTER(span_to_uint_64_1)
     am_uint64 value = span_to_uint64(span);
 
     CHECK (value == 0);
-
 }
 
 TESTER(span_to_uint_64_2)
 {
-    const char *text = "123456789";
+    const am_byte *text = "123456789";
     Span span = span_from_text (text);
     am_uint64 value = span_to_uint64(span);
 
@@ -162,18 +161,18 @@ TESTER(span_to_uint_64_2)
 
 TESTER(span_toupper_1)
 {
-    char *hello = str_dup ("Hello");
+    am_byte *hello = str_dup ("Hello");
     Span span = span_from_text (hello);
     span_toupper (span);
 
     CHECK (strcmp (hello, "HELLO") == 0);
 
-    free (hello);
+    mem_free (hello);
 }
 
 TESTER(span_tolower_1)
 {
-    char *hello = str_dup ("Hello");
+    am_byte *hello = str_dup ("Hello");
     Span span = span_from_text (hello);
     span_tolower (span);
 
@@ -191,7 +190,7 @@ TESTER(span_is_empty_1)
 
 TESTER(span_is_empty_2)
 {
-    const char *text = "123456789";
+    const am_byte *text = "123456789";
     Span span = span_from_text (text);
 
     CHECK (!span_is_empty (span));
@@ -199,7 +198,7 @@ TESTER(span_is_empty_2)
 
 TESTER(span_find_byte_1)
 {
-    const char *text = "123456789";
+    const am_byte *text = "123456789";
     Span span = span_from_text (text);
     am_byte *found = span_find_byte (span, '?');
 
@@ -211,7 +210,7 @@ TESTER(span_find_byte_1)
 
 TESTER(span_fill_1)
 {
-    char *hello = str_dup ("Hello");
+    am_byte *hello = str_dup ("Hello");
     Span span = span_from_text (hello);
     span_fill (span, '0');
 
@@ -222,7 +221,7 @@ TESTER(span_fill_1)
 
 TESTER(span_index_of_1)
 {
-    const char *text = "123456789";
+    const am_byte *text = "123456789";
     Span span = span_from_text (text);
     ssize_t found = span_index_of (span, '?');
 
@@ -235,14 +234,13 @@ TESTER(span_index_of_1)
 
 TESTER(span_last_index_of_1)
 {
-    const char *text = "123456789";
+    const am_byte *text = "123456789";
     Span span = span_from_text (text);
     ssize_t found = span_last_index_of (span, '?');
 
     CHECK (found < 0);
 
     found = span_last_index_of (span, '5');
-
     CHECK (found == 4);
 }
 
@@ -256,7 +254,7 @@ TESTER(span_slice_1)
 
 TESTER(span_slice_2)
 {
-    const char *text = "123456789";
+    const am_byte *text = "123456789";
     Span span1 = span_from_text (text);
     Span span2 = span_slice (span1, 2, 2);
 
@@ -356,7 +354,7 @@ TESTER(span_split_by_char_1)
 
 TESTER(span_split_by_char_2)
 {
-    const char *text = "123456789";
+    const am_byte *text = "123456789";
     Span span = span_from_text (text);
     SpanArray parts = SPAN_ARRAY_INIT;
     am_bool rc = span_split_by_char (span, &parts, '?');
@@ -371,7 +369,7 @@ TESTER(span_split_by_char_2)
 
 TESTER(span_split_by_char_3)
 {
-    const char *text = "123456789";
+    const am_byte *text = "123456789";
     Span span = span_from_text (text);
     SpanArray parts = SPAN_ARRAY_INIT;
     am_bool rc = span_split_by_char (span, &parts, '5');
@@ -388,7 +386,7 @@ TESTER(span_split_by_char_3)
 
 TESTER(span_split_by_char_4)
 {
-    const char *text = "123,567,9";
+    const am_byte *text = "123,567,9";
     Span span = span_from_text (text);
     SpanArray parts = SPAN_ARRAY_INIT;
     am_bool rc = span_split_by_char (span, &parts, ',');
@@ -407,7 +405,7 @@ TESTER(span_split_by_char_4)
 
 TESTER(span_split_by_char_5)
 {
-    const char *text = ",123,,567,9";
+    const am_byte *text = ",123,,567,9";
     Span span = span_from_text (text);
     SpanArray parts = SPAN_ARRAY_INIT;
     am_bool rc = span_split_by_char (span, &parts, ',');
@@ -438,7 +436,7 @@ TESTER(span_split_by_chars_1)
 
 TESTER(span_split_by_chars_2)
 {
-    const char *text = "123456789";
+    const am_byte *text = "123456789";
     Span span = span_from_text (text);
     SpanArray parts = SPAN_ARRAY_INIT;
     am_bool rc = span_split_by_chars (span, &parts, "!?", 2);
@@ -453,7 +451,7 @@ TESTER(span_split_by_chars_2)
 
 TESTER(span_split_by_chars_3)
 {
-    const char *text = "123456789";
+    const am_byte *text = "123456789";
     Span span = span_from_text (text);
     SpanArray parts = SPAN_ARRAY_INIT;
     am_bool rc = span_split_by_chars (span, &parts, "5?", 2);
@@ -470,7 +468,7 @@ TESTER(span_split_by_chars_3)
 
 TESTER(span_split_by_chars_4)
 {
-    const char *text = "123.567,9";
+    const am_byte *text = "123.567,9";
     Span span = span_from_text (text);
     SpanArray parts = SPAN_ARRAY_INIT;
     am_bool rc = span_split_by_chars (span, &parts,",.", 2);
@@ -489,7 +487,7 @@ TESTER(span_split_by_chars_4)
 
 TESTER(span_split_by_chars_5)
 {
-    const char *text = ",123,.567.9";
+    const am_byte *text = ",123,.567.9";
     Span span = span_from_text (text);
     SpanArray parts = SPAN_ARRAY_INIT;
     am_bool rc = span_split_by_chars (span, &parts, ",.", 2);
@@ -517,7 +515,7 @@ TESTER(span_split_n_by_char_1)
 
 TESTER(span_split_n_by_char_2)
 {
-    const char *text = "123456789";
+    const am_byte *text = "123456789";
     Span span = span_from_text (text);
     Span parts [2];
     size_t count = span_split_n_by_char (span, parts, 2, '?');
@@ -529,7 +527,7 @@ TESTER(span_split_n_by_char_2)
 
 TESTER(span_split_n_by_char_3)
 {
-    const char *text = "123456789";
+    const am_byte *text = "123456789";
     Span span = span_from_text (text);
     Span parts [2];
     size_t count = span_split_n_by_char (span, parts, 2, '5');
@@ -543,7 +541,7 @@ TESTER(span_split_n_by_char_3)
 
 TESTER(span_split_n_by_char_4)
 {
-    const char *text = "123,567,9";
+    const am_byte *text = "123,567,9";
     Span span = span_from_text (text);
     Span parts [2];
     size_t count = span_split_n_by_char (span, parts, 2, ',');
@@ -557,7 +555,7 @@ TESTER(span_split_n_by_char_4)
 
 TESTER(span_split_n_by_char_5)
 {
-    const char *text = ",123,,567,9";
+    const am_byte *text = ",123,,567,9";
     Span span = span_from_text (text);
     Span parts [3];
     size_t count = span_split_n_by_char (span, parts, 3, ',');
@@ -582,7 +580,7 @@ TESTER(span_split_n_by_chars_1)
 
 TESTER(span_split_n_by_chars_2)
 {
-    const char *text = "123456789";
+    const am_byte *text = "123456789";
     Span span = span_from_text (text);
     Span parts [2];
     size_t count = span_split_n_by_chars (span, parts, 2, "!?", 2);
@@ -594,7 +592,7 @@ TESTER(span_split_n_by_chars_2)
 
 TESTER(span_split_n_by_chars_3)
 {
-    const char *text = "123456789";
+    const am_byte *text = "123456789";
     Span span = span_from_text (text);
     Span parts [2];
     size_t count = span_split_n_by_chars (span, parts, 2, "5?", 2);
@@ -608,7 +606,7 @@ TESTER(span_split_n_by_chars_3)
 
 TESTER(span_split_n_by_chars_4)
 {
-    const char *text = "123.567,9";
+    const am_byte *text = "123.567,9";
     Span span = span_from_text (text);
     Span parts [2];
     size_t count = span_split_n_by_chars (span, parts, 2, ",.", 2);
@@ -622,7 +620,7 @@ TESTER(span_split_n_by_chars_4)
 
 TESTER(span_split_n_by_chars_5)
 {
-    const char *text = ",123,.567.9";
+    const am_byte *text = ",123,.567.9";
     Span span = span_from_text (text);
     Span parts [3];
     size_t count = span_split_n_by_chars (span, parts, 3, ",.", 2);

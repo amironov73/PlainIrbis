@@ -43,19 +43,19 @@ Encoding koi8r_encoding = {
     koi8r_unicode_to_char
 };
 
-static Encoding* _builtin_encodings[] = { &cp1251_encoding, &cp866_encoding, &koi8r_encoding };
+static Encoding* builtinEncodings[] = {&cp1251_encoding, &cp866_encoding, &koi8r_encoding };
 
-static Vector _registered_encodings = VECTOR_INIT;
+static Vector registeredEncodings = VECTOR_INIT;
 
-static void _register_builtin_encodings()
+static void register_builtin_encodings()
 {
     size_t index, count;
 
-    if (_registered_encodings.ptr == NULL) {
-        count = sizeof (_builtin_encodings) / sizeof (_builtin_encodings[0]);
-        vector_create(&_registered_encodings, count);
+    if (registeredEncodings.ptr == NULL) {
+        count = sizeof (builtinEncodings) / sizeof (Encoding);
+        vector_create (&registeredEncodings, count);
         for (index = 0; index < count; ++index) {
-            vector_push_back(&_registered_encodings, _builtin_encodings[index]);
+            vector_push_back(&registeredEncodings, builtinEncodings[index]);
         }
     }
 }
@@ -74,13 +74,13 @@ MAGNA_API am_bool MAGNA_CALL encoding_register
     assert (encoding != NULL);
     assert (encoding->name != NULL);
 
-    _register_builtin_encodings();
+    register_builtin_encodings();
 
     if (encoding_get (encoding->name) != NULL) {
         return AM_TRUE;
     }
 
-    return vector_push_back(&_registered_encodings, (void *) encoding);
+    return vector_push_back(&registeredEncodings, (void *) encoding);
 }
 
 /**
@@ -99,8 +99,8 @@ MAGNA_API Encoding* MAGNA_CALL encoding_get
 
     assert (name != NULL);
 
-    for (index = 0; index < _registered_encodings.len; ++index) {
-        encoding = (Encoding*) vector_get(&_registered_encodings, index);
+    for (index = 0; index < registeredEncodings.len; ++index) {
+        encoding = (Encoding*) vector_get(&registeredEncodings, index);
         if (same_text(encoding->name, name)) {
             return encoding;
         }
@@ -131,7 +131,7 @@ MAGNA_API Encoding* encoding_ansi (void)
  */
 MAGNA_API ssize_t MAGNA_CALL search_for_unicode
     (
-        am_wchar *array,
+        const am_wchar *array,
         ssize_t left,
         ssize_t right,
         am_wchar value
@@ -164,6 +164,75 @@ MAGNA_API ssize_t MAGNA_CALL search_for_unicode
 
     /* We reach here when element is not present in array */
     return -1;
+}
+
+/**
+ * Преобразование текста из кодировки ANSI в UTF-8.
+ *
+ * @param output Буфер для размещения результата.
+ * @param input Исходный текст.
+ * @return Признак успешности завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL ansi2utf
+    (
+        Buffer *output,
+        Span input
+    )
+{
+    const Encoding *ansi;
+    size_t index;
+    unsigned int chr;
+
+    assert (output != NULL);
+
+    ansi = encoding_ansi();
+    assert (ansi != NULL);
+
+    for (index = 0; index < input.len; ++index) {
+        chr = ansi->char_to_unicode (input.ptr[index]);
+        if (!buffer_putc_utf8 (output, chr)) {
+            return AM_FALSE;
+        }
+    }
+
+    return AM_TRUE;
+}
+
+/**
+ * Преобразование текста из кодировки UTF-8 в UTF-8.
+ *
+ * @param output Буфер для размещения результата.
+ * @param input Исходный текст.
+ * @return Признак успешности завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL utf2ansi
+    (
+        Buffer *output,
+        Span input
+    )
+{
+    const Encoding *ansi;
+    const am_byte *text, *stop;
+    UtfHelper rc;
+    am_byte chr;
+
+    assert (output != NULL);
+
+    ansi = encoding_ansi();
+    assert (ansi != NULL);
+
+    stop = (text = input.ptr) + input.len;
+    while (text < stop) {
+        rc = utf8_read (text);
+        chr = ansi->unicode_to_char (rc.value);
+        if (!buffer_putc (output, chr)) {
+            return AM_FALSE;
+        }
+
+        text = rc.position;
+    }
+
+    return AM_TRUE;
 }
 
 /*=========================================================*/

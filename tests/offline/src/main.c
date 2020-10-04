@@ -30,7 +30,7 @@ am_bool where_test_data
     appendix.position = appendix.capacity;
 
     while (AM_TRUE) {
-        if (buffer_empty (path)) {
+        if (buffer_is_empty(path)) {
             break;
         }
 

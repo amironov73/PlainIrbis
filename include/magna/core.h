@@ -257,7 +257,7 @@
  */
 
 typedef          int       am_bool;
-typedef          char      am_byte;
+typedef unsigned char      am_byte;
 typedef          short     am_int16;
 typedef unsigned short     am_uint16;
 typedef          int       am_int32;
@@ -426,20 +426,24 @@ extern MAGNA_API              void      MAGNA_CALL irbis_encode_64 (am_uint32 *b
 
 /* Работа с памятью */
 
-MAGNA_API void*     MAGNA_CALL mem_alloc            (size_t size);
-MAGNA_API void*     MAGNA_CALL mem_alloc_ex         (size_t size);
-MAGNA_API void      MAGNA_CALL mem_clear            (void *ptr, size_t size);
-MAGNA_API void      MAGNA_CALL mem_copy             (void *destination, const void *source, size_t size);
-MAGNA_API void      MAGNA_CALL mem_free             (void *ptr);
-MAGNA_API am_bool   MAGNA_CALL mem_can_execute      (const void *ptr);
-MAGNA_API am_bool   MAGNA_CALL mem_can_read         (const void *ptr, size_t count);
-MAGNA_API am_bool   MAGNA_CALL mem_can_write        (void *ptr, size_t count);
-MAGNA_API am_bool              mem_is_small_machine (void);
-MAGNA_API am_bool              mem_is_huge_machine  (void);
-MAGNA_API am_uint64            mem_avail_physical   (void);
-MAGNA_API am_uint64            mem_avail_virtual    (void);
-MAGNA_API am_uint64            mem_total_installed  (void);
-MAGNA_API am_uint64            mem_total_virtual    (void);
+typedef void* (*AllocationHandler) (size_t size);
+
+MAGNA_API void*             MAGNA_CALL mem_alloc            (size_t size);
+MAGNA_API void*             MAGNA_CALL mem_alloc_ex         (size_t size);
+MAGNA_API void              MAGNA_CALL mem_clear            (void *ptr, size_t size);
+MAGNA_API void              MAGNA_CALL mem_copy             (void *destination, const void *source, size_t size);
+MAGNA_API void              MAGNA_CALL mem_free             (void *ptr);
+MAGNA_API void*             MAGNA_CALL mem_realloc          (void *ptr, size_t newSize);
+MAGNA_API AllocationHandler MAGNA_CALL mem_set_handler      (AllocationHandler newHandler);
+MAGNA_API am_bool           MAGNA_CALL mem_can_execute      (const void *ptr);
+MAGNA_API am_bool           MAGNA_CALL mem_can_read         (const void *ptr, size_t count);
+MAGNA_API am_bool           MAGNA_CALL mem_can_write        (void *ptr, size_t count);
+MAGNA_API am_bool                      mem_is_small_machine (void);
+MAGNA_API am_bool                      mem_is_huge_machine  (void);
+MAGNA_API am_uint64                    mem_avail_physical   (void);
+MAGNA_API am_uint64                    mem_avail_virtual    (void);
+MAGNA_API am_uint64                    mem_total_installed  (void);
+MAGNA_API am_uint64                    mem_total_virtual    (void);
 
 /* Супер-пупер-простой аллокатор */
 
@@ -492,7 +496,7 @@ extern MAGNA_API              am_bool    MAGNA_CALL span_contains         (Span 
 extern MAGNA_API              am_bool    MAGNA_CALL span_ends_with        (Span span, Span suffix);
 extern MAGNA_API              Span       MAGNA_CALL span_fill             (Span span, am_byte value);
 extern MAGNA_API              am_byte*   MAGNA_CALL span_find_byte        (Span span, am_byte value);
-extern MAGNA_API MAGNA_INLINE Span       MAGNA_CALL span_from_text        (const char *str);
+extern MAGNA_API MAGNA_INLINE Span       MAGNA_CALL span_from_text        (const am_byte *str);
 extern MAGNA_API              am_uint64  MAGNA_CALL span_hex_to_uint64    (Span span);
 extern MAGNA_API MAGNA_INLINE Span       MAGNA_CALL span_init             (const am_byte *ptr, size_t len);
 extern MAGNA_API              ssize_t    MAGNA_CALL span_index_of         (Span span, am_byte value);
@@ -767,19 +771,19 @@ MAGNA_API int            MAGNA_CALL buffer_compare_text_ignore_case  (const Buff
 MAGNA_API am_bool        MAGNA_CALL buffer_concat                    (Buffer *target, const Buffer *source);
 MAGNA_API am_bool        MAGNA_CALL buffer_copy                      (Buffer *target, const Buffer *source);
 MAGNA_API am_bool        MAGNA_CALL buffer_create                    (Buffer *buffer, const am_byte *data, size_t length);
-MAGNA_API am_bool        MAGNA_CALL buffer_empty                     (const Buffer *buffer);
+MAGNA_API am_bool        MAGNA_CALL buffer_is_empty                  (const Buffer *buffer);
 MAGNA_API am_byte*       MAGNA_CALL buffer_find_text                 (const Buffer *buffer, const am_byte *text);
-MAGNA_API void           MAGNA_CALL buffer_destroy                      (Buffer *buffer);
+MAGNA_API void           MAGNA_CALL buffer_destroy                   (Buffer *buffer);
 MAGNA_API Buffer*        MAGNA_CALL buffer_from_span                 (Buffer *buffer, Span span);
-MAGNA_API Buffer*        MAGNA_CALL buffer_from_text                 (Buffer *buffer, const char *text);
+MAGNA_API Buffer*        MAGNA_CALL buffer_from_text                 (Buffer *buffer, const am_byte *text);
 MAGNA_API am_bool        MAGNA_CALL buffer_grow                      (Buffer *buffer, size_t newSize);
 MAGNA_API Buffer*        MAGNA_CALL buffer_init                      (Buffer *buffer);
 MAGNA_API am_bool        MAGNA_CALL buffer_new_line                  (Buffer *buffer);
 MAGNA_API Buffer*        MAGNA_CALL buffer_null                      (Buffer *buffer);
-MAGNA_API am_bool        MAGNA_CALL buffer_put_uint_32               (Buffer *buffer, am_uint32 value);
-MAGNA_API am_bool        MAGNA_CALL buffer_put_uint_64               (Buffer *buffer, am_uint64 value);
-MAGNA_API am_bool        MAGNA_CALL buffer_putc                      (Buffer *buffer, char c);
-MAGNA_API am_bool        MAGNA_CALL buffer_puts                      (Buffer *buffer, const char *str);
+MAGNA_API am_bool        MAGNA_CALL buffer_put_uint32                (Buffer *buffer, am_uint32 value);
+MAGNA_API am_bool        MAGNA_CALL buffer_put_uint64                (Buffer *buffer, am_uint64 value);
+MAGNA_API am_bool        MAGNA_CALL buffer_putc                      (Buffer *buffer, am_byte c);
+MAGNA_API am_bool        MAGNA_CALL buffer_puts                      (Buffer *buffer, const am_byte *str);
 MAGNA_API size_t         MAGNA_CALL buffer_read                      (Buffer *buffer, am_byte *data, size_t length);
 MAGNA_API am_bool        MAGNA_CALL buffer_replace_text              (Buffer *buffer, const am_byte *from, const am_byte *to);
 MAGNA_API Buffer*        MAGNA_CALL buffer_static                    (Buffer *buffer, const am_byte *data, size_t length);
@@ -889,7 +893,7 @@ extern MAGNA_API MAGNA_INLINE am_bool        MAGNA_CALL nav_eot              (co
 extern MAGNA_API              Span           MAGNA_CALL nav_extract_integer  (TextNavigator *nav);
 extern MAGNA_API MAGNA_INLINE TextNavigator* MAGNA_CALL nav_from_buffer      (TextNavigator *nav, const Buffer *buffer);
 extern MAGNA_API MAGNA_INLINE TextNavigator* MAGNA_CALL nav_from_span        (TextNavigator *nav, Span span);
-extern MAGNA_API MAGNA_INLINE TextNavigator* MAGNA_CALL nav_from_text        (TextNavigator *nav, const char *text);
+extern MAGNA_API MAGNA_INLINE TextNavigator* MAGNA_CALL nav_from_text        (TextNavigator *nav, const am_byte *text);
 extern MAGNA_API MAGNA_INLINE int            MAGNA_CALL nav_front            (const TextNavigator *nav);
 extern MAGNA_API              TextNavigator* MAGNA_CALL nav_init             (TextNavigator* nav, const am_byte *data, size_t dataSize);
 extern MAGNA_API              am_bool        MAGNA_CALL nav_is_control       (const TextNavigator *nav);
@@ -1111,6 +1115,9 @@ MAGNA_API void*   MAGNA_CALL enum_next    (Enumerator *enumerator);
 
 /* Работа с кодировками */
 
+/**
+ * Кодировка символов.
+ */
 typedef struct
 {
     const char *name;
@@ -1119,15 +1126,28 @@ typedef struct
 
 } Encoding;
 
+/**
+ * Хелпер для чтения UTF-8.
+ */
+typedef struct
+{
+    const am_byte *position;
+    unsigned int value;
+
+} UtfHelper;
+
 extern Encoding cp1251_encoding, cp866_encoding, koi8r_encoding;
 
-MAGNA_API am_bool   MAGNA_CALL encoding_register (const Encoding *encoding);
-MAGNA_API Encoding* MAGNA_CALL encoding_get      (const char *name);
-MAGNA_API Encoding*            encoding_ansi     (void);
+MAGNA_API am_bool   MAGNA_CALL encoding_register  (const Encoding *encoding);
+MAGNA_API Encoding* MAGNA_CALL encoding_get       (const char *name);
+MAGNA_API Encoding*            encoding_ansi      (void);
 
-MAGNA_API am_bool    MAGNA_CALL buffer_putc_utf8 (Buffer *buffer, unsigned chr);
-MAGNA_API size_t  MAGNA_CALL utf8_code_points (const am_byte *data, size_t dataLength);
-MAGNA_API ssize_t MAGNA_CALL search_for_unicode (am_wchar *array, ssize_t left, ssize_t right, am_wchar value);
+MAGNA_API am_bool   MAGNA_CALL buffer_putc_utf8   (Buffer *buffer, unsigned int chr);
+MAGNA_API size_t    MAGNA_CALL utf8_code_points   (const am_byte *data, size_t dataLength);
+MAGNA_API ssize_t   MAGNA_CALL search_for_unicode (const am_wchar *array, ssize_t left, ssize_t right, am_wchar value);
+MAGNA_API UtfHelper MAGNA_CALL utf8_read          (const am_byte *text);
+MAGNA_API am_bool   MAGNA_CALL ansi2utf           (Buffer *output, Span input);
+MAGNA_API am_bool   MAGNA_CALL utf2ansi           (Buffer *output, Span input);
 
 MAGNA_API unsigned MAGNA_CALL cp1251_char_to_unicode  (am_byte chr);
 MAGNA_API am_bool  MAGNA_CALL cp1251_char_to_utf8     (Buffer *buffer, am_byte chr);
@@ -1149,14 +1169,23 @@ MAGNA_API am_bool  MAGNA_CALL koi8r_buffer_from_utf8 (Buffer *target, const Buff
 
 /*=========================================================*/
 
+/* Форматированный вывод текста */
+
+typedef am_bool (*OutputFunction) (void *output, void *data, size_t size);
+
+MAGNA_API am_bool MAGNA_CALL format_generic (void *output, OutputFunction handler, Span format, va_list args);
+
+/*=========================================================*/
+
 /* Работа с сетью */
 
-MAGNA_API am_int32   MAGNA_CALL tcp4_connect            (const char *hostname, am_uint16 port);
+MAGNA_API am_int32   MAGNA_CALL tcp4_connect            (const am_byte *hostname, am_uint16 port);
 MAGNA_API am_bool    MAGNA_CALL tcp4_disconnect         (am_int32 handle);
 MAGNA_API am_bool               tcp4_initialize         (void);
-MAGNA_API ssize_t MAGNA_CALL tcp4_receive_all        (am_int32 handle, Buffer *buffer);
-MAGNA_API ssize_t MAGNA_CALL tcp4_receive_with_limit (am_int32 handle, Buffer *buffer, ssize_t limit);
-MAGNA_API ssize_t MAGNA_CALL tcp4_send               (am_int32 handle, const am_byte *data, ssize_t dataLength);
+MAGNA_API ssize_t    MAGNA_CALL tcp4_receive_all        (am_int32 handle, Buffer *buffer);
+MAGNA_API ssize_t    MAGNA_CALL tcp4_receive_with_limit (am_int32 handle, Buffer *buffer, ssize_t limit);
+MAGNA_API ssize_t    MAGNA_CALL tcp4_send               (am_int32 handle, const am_byte *data, ssize_t dataLength);
+MAGNA_API am_bool    MAGNA_CALL tcp4_send_buffer        (am_int32 handle, const Buffer *buffer);
 
 /*=========================================================*/
 

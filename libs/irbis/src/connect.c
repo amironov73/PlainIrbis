@@ -46,7 +46,7 @@ MAGNA_API am_bool MAGNA_CALL connection_create
 {
     assert (connection != NULL);
 
-    memset (connection, 0, sizeof (Connection));
+    mem_clear (connection, sizeof (Connection));
     buffer_assign_text (&connection->host, "127.0.0.1");
     buffer_assign_text (&connection->host, "IBIS");
     connection->port = 6666;
@@ -76,7 +76,7 @@ MAGNA_API void MAGNA_CALL connection_destroy
     buffer_destroy (&connection->password);
     buffer_destroy (&connection->database);
     buffer_destroy (&connection->serverVersion);
-    memset (connection, 0, sizeof (Connection));
+    mem_clear (connection, sizeof (Connection));
 }
 
 /*=========================================================*/
@@ -240,13 +240,58 @@ MAGNA_API am_bool MAGNA_CALL connection_connect
         Connection *connection
     )
 {
+    Query query;
+    Response response;
+    am_bool result = AM_FALSE;
+
     assert (connection != NULL);
 
     if (connection->connected) {
         return AM_TRUE;
     }
 
-    return AM_FALSE;
+    AGAIN:
+    connection->clientId = 100000 + (rand() % 900000);
+    connection->queryId = 1;
+    response_null (&response);
+
+    if (!query_create (&query, connection, (const am_byte*) "A")) {
+        return AM_FALSE;
+    }
+
+    if (!query_add_ansi_buffer (&query, &connection->username)
+        || !query_add_ansi_buffer (&query, &connection->password)) {
+        goto DONE;
+    }
+
+    if (!connection_execute (connection, &query, &response)) {
+        goto DONE;
+    }
+
+    if (response_get_return_code (&response) == -3337) {
+        /* Клиент с данным идентификатором уже зарегистрирован */
+        /* Повторяем регистрацию с новым идентификатором */
+        query_destroy (&query);
+        response_destroy (&response);
+        goto AGAIN;
+    }
+
+    if (response.returnCode < 0) {
+        /* Нам вернули код ошибки */
+        goto DONE;
+    }
+
+    connection->connected;
+    connection->interval = response_read_int32 (&response);
+    connection->connected = AM_TRUE;
+
+    result = AM_TRUE;
+
+    DONE:
+    query_destroy (&query);
+    response_destroy (&response);
+
+    return result;
 }
 
 /**
@@ -391,7 +436,7 @@ MAGNA_API am_bool MAGNA_CALL connection_disconnect
             0
         );
 
-    response_free (&response);
+    response_destroy(&response);
 
     return result;
 }
@@ -427,7 +472,7 @@ MAGNA_API am_mfn MAGNA_CALL connection_get_max_mfn
         result = response.returnCode;
     }
 
-    response_free (&response);
+    response_destroy(&response);
 
     return result;
 }
@@ -450,7 +495,8 @@ MAGNA_API am_bool MAGNA_CALL connection_execute
 {
     am_bool result = 0;
     Buffer prefix = BUFFER_INIT;
-    Buffer answerHeader = BUFFER_INIT;
+    const am_byte *hostname;
+    am_int32 sockfd = -1;
 
     assert (connection != NULL);
     assert (query != NULL);
@@ -460,25 +506,53 @@ MAGNA_API am_bool MAGNA_CALL connection_execute
         goto DONE;
     }
 
+    hostname = buffer_to_text (&connection->host);
+    if (hostname == NULL) {
+        goto DONE;
+    }
+
     connection->lastError = 0;
     if (!query_encode (query, &prefix)) {
         goto DONE;
     }
 
-    /* tcp4_connect (); */
-    /* tcp4_send_buffer (&prefix); */
-    /* tcp4_send_buffer (&query->buffer); */
-    /* tcp4_receive (&answerHeader); */
-    (void) buffer_swap (&answerHeader, &response->answer);
-    /* tcp4_receive (&response->answer); */
-    /* tcp4_disconnect (); */
-    /* initial_parse (); */
+    sockfd = tcp4_connect (hostname, connection->port);
+    if (sockfd == -1) {
+        goto DONE;
+    }
+
+    if (!tcp4_send_buffer (sockfd, &prefix)
+        || !tcp4_send_buffer (sockfd, &query->buffer)) {
+        goto DONE;
+    }
+
+    if (!tcp4_receive_all (sockfd, &response->answer)) {
+        goto DONE;
+    }
+
+    tcp4_disconnect (sockfd);
+    sockfd = -1;
+    nav_from_buffer (&response->navigator, &response->answer);
+
+    response->command = response_read_ansi (response);
+    response->clientId = response_read_int32 (response);
+    response->queryId = response_read_int32 (response);
+    response->answerSize = response_read_int32 (response);
+    response->serverVersion = response_read_ansi(response);
+    response_get_line (response);
+    response_get_line (response);
+    response_get_line (response);
+    response_get_line (response);
+    response_get_line (response);
 
     result = AM_TRUE;
 
     DONE:
+    if (sockfd != -1) {
+        tcp4_disconnect (sockfd);
+    }
+
     buffer_destroy (&prefix);
-    buffer_destroy (&answerHeader);
 
     return result;
 }
@@ -495,14 +569,14 @@ MAGNA_API am_bool connection_execute_simple
     (
         Connection *connection,
         Response *response,
-        const char *command,
+        const am_byte *command,
         int argCount,
         ...
     )
 {
     int i;
     va_list args;
-    const char *line;
+    const am_byte *line;
     am_bool result = AM_FALSE;
     Query query;
 
@@ -511,14 +585,14 @@ MAGNA_API am_bool connection_execute_simple
     assert (command != NULL);
 
     if (!connection_check (connection)
-        || !query_create (connection, &query, command)) {
-        goto DONE;
+        || !query_create (&query, connection, command)) {
+        return AM_FALSE;
     }
 
     if (argCount != 0) {
         va_start (args, argCount);
         for (i = 0; i < argCount; ++i) {
-            line = va_arg (args, const char*);
+            line = va_arg (args, const am_byte*);
             if (!query_add_ansi (&query, line)) {
                 va_end (args);
                 goto DONE;
@@ -531,9 +605,12 @@ MAGNA_API am_bool connection_execute_simple
         goto DONE;
     }
 
-    result = AM_TRUE;
+    if (response_get_return_code (response) >= 0) {
+        result = AM_TRUE;
+    }
 
-    DONE: query_free (&query);
+    DONE:
+    query_destroy (&query);
 
     return result;
 }
@@ -563,7 +640,7 @@ MAGNA_API am_bool MAGNA_CALL connection_no_operation
             0
         );
 
-    response_free (&response);
+    response_destroy (&response);
 
     return result;
 }

@@ -103,7 +103,7 @@ MAGNA_API TextNavigator* MAGNA_CALL nav_from_buffer
 MAGNA_API TextNavigator* MAGNA_CALL nav_from_text
     (
         TextNavigator *nav,
-        const char *text
+        const am_byte *text
     )
 {
     assert (nav != NULL);

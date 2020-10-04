@@ -14,6 +14,7 @@ libmagna_a_SOURCES = \
     src/error.c      \
     src/fastbuf.c    \
     src/file.c       \
+    src/format.c     \
     src/handle.c     \
     src/intarray.c   \
     src/io.c         \

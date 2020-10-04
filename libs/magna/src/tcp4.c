@@ -86,7 +86,7 @@ MAGNA_API am_bool tcp4_initialize (void)
  */
 MAGNA_API am_int32 MAGNA_CALL tcp4_connect
     (
-        const char *hostname,
+        const am_byte *hostname,
         am_uint16 port
     )
 {
@@ -119,12 +119,12 @@ MAGNA_API am_int32 MAGNA_CALL tcp4_connect
     memset (&destinationAddress, 0, sizeof (destinationAddress));
     destinationAddress.sin_family = AF_INET;
     destinationAddress.sin_port = htons (port);
-    inaddr = inet_addr (hostname);
+    inaddr = inet_addr ((const char*) hostname);
     if (inaddr != INADDR_NONE) {
         destinationAddress.sin_addr.s_addr = inaddr;
     }
     else {
-        hostentry = gethostbyname (hostname);
+        hostentry = gethostbyname ((const char*) hostname);
         if (hostentry) {
             ((unsigned long*)&destinationAddress.sin_addr)[0] =
                     ((unsigned long **)hostentry->h_addr_list)[0][0];
@@ -186,10 +186,14 @@ MAGNA_API ssize_t MAGNA_CALL tcp4_send
         ssize_t dataLength
     )
 {
+    ssize_t result;
+
     assert (handle >= 0);
     assert (data != NULL);
 
-    return send (handle, data, dataLength, 0);
+    result = send (handle, (const char*) data, dataLength, 0);
+
+    return result;
 }
 
 /**
@@ -216,7 +220,7 @@ MAGNA_API ssize_t MAGNA_CALL tcp4_receive_with_limit
         return -1;
     }
 
-    result = recv (handle, buffer->ptr + buffer->position, limit, 0);
+    result = recv (handle, (char*) (buffer->ptr + buffer->position), limit, 0);
     if (result > 0) {
         buffer->position += result;
     }
@@ -243,7 +247,7 @@ MAGNA_API ssize_t MAGNA_CALL tcp4_receive_all
     assert (buffer != NULL);
 
     while (AM_TRUE) {
-        rc = recv (handle, temp, sizeof (temp), 0);
+        rc = recv (handle, (char*) temp, sizeof (temp), 0);
         if (rc < 0) {
             return -1;
         }
@@ -260,6 +264,25 @@ MAGNA_API ssize_t MAGNA_CALL tcp4_receive_all
     }
 
     return result;
+}
+
+MAGNA_API am_bool MAGNA_CALL tcp4_send_buffer
+    (
+        am_int32 handle,
+        const Buffer *buffer
+    )
+{
+    ssize_t result;
+
+    assert (buffer != NULL);
+
+    if (buffer->position == 0) {
+        return AM_TRUE;
+    }
+
+    result = tcp4_send (handle, buffer->ptr, buffer->position);
+
+    return result == buffer->position;
 }
 
 /*=========================================================*/
@@ -281,7 +304,7 @@ MAGNA_API ssize_t MAGNA_CALL tcp4_read_function
     handle = *(am_int32*) &stream->data;
     assert (handle != -1);
 
-    return recv (handle, data, length, 0);
+    return recv (handle, (char*) data, length, 0);
 }
 
 MAGNA_API ssize_t MAGNA_CALL tcp4_write_function
@@ -299,7 +322,7 @@ MAGNA_API ssize_t MAGNA_CALL tcp4_write_function
     handle = *(am_int32*) &stream->data;
     assert (handle != -1);
 
-    return send (handle, data, length, 0);
+    return send (handle, (const char*) data, length, 0);
 }
 
 

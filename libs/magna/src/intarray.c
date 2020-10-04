@@ -429,7 +429,7 @@ MAGNA_API am_bool MAGNA_CALL int32_array_to_text
 
     item = array->ptr;
     for (index = 0; index < array->len; ++index, ++item) {
-        if (!buffer_put_uint_32(buffer, *item)) {
+        if (!buffer_put_uint32(buffer, *item)) {
             return AM_FALSE;
         }
 
@@ -451,18 +451,18 @@ static am_bool format_range
     )
 {
     if (first == last) {
-        return buffer_put_uint_32 (buffer, first);
+        return buffer_put_uint32(buffer, first);
     }
 
     if (first == last - 1) {
-        return buffer_put_uint_32 (buffer, first)
-            && buffer_puts (buffer, ", ")
-            && buffer_put_uint_32 (buffer, last);
+        return buffer_put_uint32(buffer, first)
+               && buffer_puts (buffer, ", ")
+               && buffer_put_uint32(buffer, last);
     }
 
-    return buffer_put_uint_32 (buffer, first)
-        && buffer_putc (buffer, '-')
-        && buffer_put_uint_32 (buffer, last);
+    return buffer_put_uint32(buffer, first)
+           && buffer_putc (buffer, '-')
+           && buffer_put_uint32(buffer, last);
 }
 
 MAGNA_API am_bool MAGNA_CALL int32_array_compress

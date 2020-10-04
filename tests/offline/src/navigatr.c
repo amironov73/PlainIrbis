@@ -49,7 +49,7 @@ TESTER(nav_from_buffer_1)
 
 TESTER(nav_from_text_1)
 {
-    char *text = "Hello, world";
+    am_byte *text = "Hello, world";
     TextNavigator nav;
 
     CHECK (nav_from_text (&nav, text) == &nav);
@@ -62,7 +62,7 @@ TESTER(nav_from_text_1)
 
 TESTER(nav_end_1)
 {
-    char *text = "Hello, world";
+    am_byte *text = "Hello, world";
     TextNavigator nav;
 
     CHECK (nav_from_text (&nav, text) == &nav);
@@ -361,7 +361,7 @@ TESTER(nav_read_no_crlf_3)
 
 TESTER(nav_peek_string_1)
 {
-    char *text = "Hello, world";
+    am_byte *text = "Hello, world";
     TextNavigator nav;
     Span span;
 
@@ -379,7 +379,7 @@ TESTER(nav_peek_string_1)
 
 TESTER(nav_peek_string_2)
 {
-    char *text = "He\r\nllo, world";
+    am_byte *text = "He\r\nllo, world";
     TextNavigator nav;
     Span span;
 
@@ -396,7 +396,7 @@ TESTER(nav_peek_string_2)
 
 TESTER(nav_peek_string_3)
 {
-    char *text = "He";
+    am_byte *text = "He";
     TextNavigator nav;
     Span span;
 
@@ -413,7 +413,7 @@ TESTER(nav_peek_string_3)
 
 TESTER(nav_peek_string_4)
 {
-    char *text = "";
+    am_byte *text = "";
     TextNavigator nav;
     Span span;
 
@@ -430,7 +430,7 @@ TESTER(nav_peek_string_4)
 
 TESTER(nav_peek_to_1)
 {
-    char *text = "Hello, world";
+    am_byte *text = "Hello, world";
     TextNavigator nav;
     Span span;
 
@@ -447,7 +447,7 @@ TESTER(nav_peek_to_1)
 
 TESTER(nav_peek_to_2)
 {
-    char *text = "Hello, world";
+    am_byte *text = "Hello, world";
     TextNavigator nav;
     Span span;
 
@@ -464,7 +464,7 @@ TESTER(nav_peek_to_2)
 
 TESTER(nav_peek_to_3)
 {
-    char *text = "";
+    am_byte *text = "";
     TextNavigator nav;
     Span span;
 
@@ -481,7 +481,7 @@ TESTER(nav_peek_to_3)
 
 TESTER(nav_until_to_1)
 {
-    char *text = "Hello, world";
+    am_byte *text = "Hello, world";
     TextNavigator nav;
     Span span;
 
@@ -498,7 +498,7 @@ TESTER(nav_until_to_1)
 
 TESTER(nav_until_to_2)
 {
-    char *text = "Hello, world";
+    am_byte *text = "Hello, world";
     TextNavigator nav;
     Span span;
 
@@ -515,7 +515,7 @@ TESTER(nav_until_to_2)
 
 TESTER(nav_until_to_3)
 {
-    char *text = "";
+    am_byte *text = "";
     TextNavigator nav;
     Span span;
 
@@ -532,7 +532,7 @@ TESTER(nav_until_to_3)
 
 TESTER(nav_read_line_1)
 {
-    char *text = "";
+    am_byte *text = "";
     TextNavigator nav;
     Span span;
 
@@ -549,7 +549,7 @@ TESTER(nav_read_line_1)
 
 TESTER(nav_read_line_2)
 {
-    char *text = "Hello, world";
+    am_byte *text = "Hello, world";
     TextNavigator nav;
     Span span;
 
@@ -566,7 +566,7 @@ TESTER(nav_read_line_2)
 
 TESTER(nav_read_line_3)
 {
-    char *text = "Hello\r\nworld";
+    am_byte *text = "Hello\r\nworld";
     TextNavigator nav;
     Span span;
 
@@ -583,7 +583,7 @@ TESTER(nav_read_line_3)
 
 TESTER(nav_is_control_1)
 {
-    char *text = "H\te\r\nworld";
+    am_byte *text = "H\te\r\nworld";
     TextNavigator nav;
 
     CHECK (nav_from_text (&nav, text) == &nav);
@@ -601,7 +601,7 @@ TESTER(nav_is_control_1)
 
 TESTER(nav_is_control_2)
 {
-    char *text = "";
+    am_byte *text = "";
     TextNavigator nav;
 
     CHECK (nav_from_text (&nav, text) == &nav);
@@ -613,7 +613,7 @@ TESTER(nav_is_control_2)
 
 TESTER(nav_is_digit_1)
 {
-    char *text = "H1e23world";
+    am_byte *text = "H1e23world";
     TextNavigator nav;
 
     CHECK (nav_from_text (&nav, text) == &nav);
@@ -631,7 +631,7 @@ TESTER(nav_is_digit_1)
 
 TESTER(nav_is_digit_2)
 {
-    char *text = "";
+    am_byte *text = "";
     TextNavigator nav;
 
     CHECK (nav_from_text (&nav, text) == &nav);
@@ -643,7 +643,7 @@ TESTER(nav_is_digit_2)
 
 TESTER(nav_is_letter_1)
 {
-    char *text = "H1e23world";
+    am_byte *text = "H1e23world";
     TextNavigator nav;
 
     CHECK (nav_from_text (&nav, text) == &nav);
@@ -661,7 +661,7 @@ TESTER(nav_is_letter_1)
 
 TESTER(nav_is_letter_2)
 {
-    char *text = "";
+    am_byte *text = "";
     TextNavigator nav;
 
     CHECK (nav_from_text (&nav, text) == &nav);
@@ -673,7 +673,7 @@ TESTER(nav_is_letter_2)
 
 TESTER(nav_is_whitespace_1)
 {
-    char *text = "H e\t\vworld";
+    am_byte *text = "H e\t\vworld";
     TextNavigator nav;
 
     CHECK (nav_from_text (&nav, text) == &nav);
@@ -691,7 +691,7 @@ TESTER(nav_is_whitespace_1)
 
 TESTER(nav_is_whitespace_2)
 {
-    char *text = "";
+    am_byte *text = "";
     TextNavigator nav;
 
     CHECK (nav_from_text (&nav, text) == &nav);
@@ -703,7 +703,7 @@ TESTER(nav_is_whitespace_2)
 
 TESTER(nav_read_integer_1)
 {
-    char *text = "";
+    am_byte *text = "";
     TextNavigator nav;
     Span span;
 
@@ -720,7 +720,7 @@ TESTER(nav_read_integer_1)
 
 TESTER(nav_read_integer_2)
 {
-    char *text = "123";
+    am_byte *text = "123";
     TextNavigator nav;
     Span span;
 
@@ -737,7 +737,7 @@ TESTER(nav_read_integer_2)
 
 TESTER(nav_read_integer_3)
 {
-    char *text = "123?";
+    am_byte *text = "123?";
     TextNavigator nav;
     Span span;
 
@@ -754,7 +754,7 @@ TESTER(nav_read_integer_3)
 
 TESTER(nav_read_integer_4)
 {
-    char *text = "123?456!";
+    am_byte *text = "123?456!";
     TextNavigator nav;
     Span span;
 
@@ -772,7 +772,7 @@ TESTER(nav_read_integer_4)
 
 TESTER(nav_extract_integer_1)
 {
-    char *text = "";
+    am_byte *text = "";
     TextNavigator nav;
     Span span;
 
@@ -789,7 +789,7 @@ TESTER(nav_extract_integer_1)
 
 TESTER(nav_extract_integer_2)
 {
-    char *text = "123";
+    am_byte *text = "123";
     TextNavigator nav;
     Span span;
 
@@ -806,7 +806,7 @@ TESTER(nav_extract_integer_2)
 
 TESTER(nav_extract_integer_3)
 {
-    char *text = "?123!";
+    am_byte *text = "?123!";
     TextNavigator nav;
     Span span;
 
@@ -823,7 +823,7 @@ TESTER(nav_extract_integer_3)
 
 TESTER(nav_extract_integer_4)
 {
-    char *text = "123?456!";
+    am_byte *text = "123?456!";
     TextNavigator nav;
     Span span;
 
@@ -840,7 +840,7 @@ TESTER(nav_extract_integer_4)
 
 TESTER(nav_read_string_1)
 {
-    char *text = "";
+    am_byte *text = "";
     TextNavigator nav;
     Span span;
 
@@ -857,7 +857,7 @@ TESTER(nav_read_string_1)
 
 TESTER(nav_read_string_2)
 {
-    char *text = "1234567890";
+    am_byte *text = "1234567890";
     TextNavigator nav;
     Span span;
 

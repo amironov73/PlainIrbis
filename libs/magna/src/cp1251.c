@@ -95,7 +95,7 @@ MAGNA_API unsigned MAGNA_CALL cp1251_char_to_unicode
         am_byte chr
     )
 {
-    return _cp1251_to_unicode [chr];
+    return _cp1251_to_unicode [(unsigned int) chr];
 }
 
 /**

@@ -44,6 +44,8 @@
 
 /*=========================================================*/
 
+static AllocationHandler allocationHandler;
+
 /**
  * Запрос блока памяти.
  *
@@ -55,7 +57,60 @@ MAGNA_API void* MAGNA_CALL mem_alloc
         size_t size
     )
 {
-    return calloc (1, size);
+    void *result = calloc (1, size);
+
+    if ((result == NULL) && (allocationHandler != NULL)) {
+        result = allocationHandler (size);
+    }
+
+    return result;
+}
+
+/**
+ * Запрос изменения размера блока памяти.
+ *
+ * @param ptr Указатель на ранее выделенный блок либо `NULL`.
+ * @param newSize Запрашиваемый размер блока либо 0 (освобождение).
+ * @return Указатель на блок либо `NULL` в случае неудачи.
+ */
+MAGNA_API void* MAGNA_CALL mem_realloc
+    (
+        void *ptr,
+        size_t newSize
+    )
+{
+    void *result;
+
+    if (newSize == 0) {
+        mem_free (ptr);
+
+        return ptr;
+    }
+
+    result = realloc (ptr, newSize);
+    if ((result == NULL) && (allocationHandler != NULL)) {
+        result = allocationHandler (newSize);
+    }
+
+    return result;
+}
+
+/**
+ * Установка обработчика нехватки памяти.
+ *
+ * @param newHandler Новый обработчик.
+ * @return Предыдущий обработчик.
+ */
+MAGNA_API AllocationHandler MAGNA_CALL mem_set_handler
+    (
+        AllocationHandler newHandler
+    )
+{
+    AllocationHandler oldHandler = allocationHandler;
+
+    allocationHandler = newHandler;
+
+    return oldHandler;
 }
 
 /**

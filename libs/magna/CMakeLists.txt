@@ -28,6 +28,7 @@ set(CFiles
     src/error.c
     src/fastbuf.c
     src/file.c
+    src/format.c
     src/handle.c
     src/intarray.c
     src/io.c
@@ -72,5 +73,9 @@ target_compile_definitions(${PROJECT_NAME}
     PRIVATE
     -DMAGNA_LIBRARY
 )
+
+if(MINGW)
+    target_link_libraries(${PROJECT_NAME} libws2_32.a)
+endif(MINGW)
 
 install(TARGETS ${PROJECT_NAME} DESTINATION ${ARTIFACTS})

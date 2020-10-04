@@ -33,6 +33,7 @@
     <ClCompile Include="src\error.c" />
     <ClCompile Include="src\fastbuf.c" />
     <ClCompile Include="src\file.c" />
+    <ClCompile Include="src\format.c" />
     <ClCompile Include="src\handle.c" />
     <ClCompile Include="src\intarray.c" />
     <ClCompile Include="src\io.c" />

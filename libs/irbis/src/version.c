@@ -105,13 +105,13 @@ MAGNA_API am_bool MAGNA_CALL version_to_string
     assert (buffer != NULL);
 
     return buffer_puts (buffer, "organization=")
-        && buffer_concat (buffer, &version->organization)
-        && buffer_puts (buffer, ", version=")
-        && buffer_concat (buffer, &version->version)
-        && buffer_puts (buffer, ", maxClients=")
-        && buffer_put_uint_32 (buffer, version->maxClients)
-        && buffer_puts (buffer, ", connected=")
-        && buffer_put_uint_32 (buffer, version->connected);
+           && buffer_concat (buffer, &version->organization)
+           && buffer_puts (buffer, ", version=")
+           && buffer_concat (buffer, &version->version)
+           && buffer_puts (buffer, ", maxClients=")
+           && buffer_put_uint32(buffer, version->maxClients)
+           && buffer_puts (buffer, ", connected=")
+           && buffer_put_uint32(buffer, version->connected);
 }
 
 /*=========================================================*/

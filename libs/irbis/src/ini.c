@@ -136,7 +136,7 @@ MAGNA_API am_bool MAGNA_CALL ini_line_verify
 {
     assert (line != NULL);
 
-    return !buffer_empty (&line->key);
+    return !buffer_is_empty(&line->key);
 }
 
 /*=========================================================*/

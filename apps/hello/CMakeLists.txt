@@ -16,6 +16,10 @@ add_executable(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME} magna irbis)
 
+if(MSVC)
+    target_link_libraries(${PROJECT_NAME} Ws2_32.lib)
+endif()
+
 if(MINGW)
     target_link_libraries(${PROJECT_NAME} libws2_32.a)
 endif(MINGW)

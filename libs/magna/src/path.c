@@ -299,7 +299,7 @@ MAGNA_API Span MAGNA_CALL path_get_directory
 
     assert (path != NULL);
 
-    if (buffer_empty (path)) {
+    if (buffer_is_empty(path)) {
         return buffer_to_span (path);
     }
 
@@ -403,7 +403,7 @@ MAGNA_API am_bool path_combine
             break;
         }
 
-        if (buffer_empty (path)) {
+        if (buffer_is_empty(path)) {
             continue;
         }
 

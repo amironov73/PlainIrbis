@@ -57,4 +57,8 @@ target_compile_definitions(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME} magna)
 
+if(MINGW)
+    target_link_libraries(${PROJECT_NAME} libws2_32.a)
+endif(MINGW)
+
 install(TARGETS ${PROJECT_NAME} DESTINATION ${ARTIFACTS})

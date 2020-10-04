@@ -1,5 +1,5 @@
-/* This is an open source non-commercial project. Dear PVS-Studio, please check it.
- * PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com */
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include "magna/irbis.h"
 
@@ -16,8 +16,10 @@ int main (int argc, char **argv)
     (void) argc;
     (void) argv;
 
+    srand (time (NULL));
+
     printf ("Library version: %d\n", magna_get_version());
-    connection_create(&connection);
+    connection_create       (&connection);
     connection_set_host     (&connection, "localhost");
     connection_set_username (&connection, "librarian");
     connection_set_password (&connection, "secret");
@@ -35,7 +37,6 @@ int main (int argc, char **argv)
     printf ("Max MFN=%u\n", maxMfn);
 
     connection_disconnect (&connection);
-
     connection_destroy (&connection);
 
 /*

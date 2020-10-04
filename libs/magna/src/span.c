@@ -61,7 +61,7 @@ MAGNA_API MAGNA_INLINE Span span_null (void)
  */
 MAGNA_API Span MAGNA_CALL span_from_text
     (
-        const char *str
+        const am_byte *str
     )
 {
     Span result;

@@ -224,7 +224,7 @@ MAGNA_API MarcField* MAGNA_CALL field_clone                    (MarcField *targe
 MAGNA_API SubField*  MAGNA_CALL subfield_create                (SubField *subfield, char code, Span value);
 MAGNA_API MarcField* MAGNA_CALL field_decode                   (MarcField *field, Span span);
 MAGNA_API am_bool    MAGNA_CALL field_empty                    (const MarcField *field);
-MAGNA_API Vector*     MAGNA_CALL field_get_embedded_fields      (const MarcField *field, Vector *array);
+MAGNA_API Vector*    MAGNA_CALL field_get_embedded_fields      (const MarcField *field, Vector *array);
 MAGNA_API SubField*  MAGNA_CALL field_get_first_subfield       (const MarcField *field, char code);
 MAGNA_API Span       MAGNA_CALL field_get_first_subfield_value (const MarcField *field, char code);
 MAGNA_API MarcField* MAGNA_CALL field_init                     (MarcField *field, am_uint32 tag);
@@ -304,15 +304,15 @@ typedef struct
     Buffer buffer;
 } Query;
 
-MAGNA_API am_bool MAGNA_CALL query_add_ansi        (Query *query, const char *text);
+MAGNA_API am_bool MAGNA_CALL query_add_ansi        (Query *query, const am_byte *text);
 MAGNA_API am_bool MAGNA_CALL query_add_ansi_buffer (Query *query, const Buffer *text);
-MAGNA_API am_bool MAGNA_CALL query_add_format      (Query *query, const char *text);
+MAGNA_API am_bool MAGNA_CALL query_add_format      (Query *query, const am_byte *text);
 MAGNA_API am_bool MAGNA_CALL query_add_int_32      (Query *query, am_int32 value);
-MAGNA_API am_bool MAGNA_CALL query_add_utf         (Query *query, const char *text);
+MAGNA_API am_bool MAGNA_CALL query_add_utf         (Query *query, const am_byte *text);
 MAGNA_API am_bool MAGNA_CALL query_add_utf_buffer  (Query *query, const Buffer *text);
-MAGNA_API am_bool MAGNA_CALL query_create          (Connection *connection, Query *query, const char *command);
+MAGNA_API am_bool MAGNA_CALL query_create          (Query *query, Connection *connection, const am_byte *command);
+MAGNA_API void    MAGNA_CALL query_destroy         (Query *query);
 MAGNA_API am_bool MAGNA_CALL query_encode          (const Query *query, Buffer *prefix);
-MAGNA_API void    MAGNA_CALL query_free            (Query *query);
 MAGNA_API am_bool MAGNA_CALL query_new_line        (Query *query);
 
 /*=========================================================*/
@@ -329,14 +329,16 @@ typedef struct
     am_int32 answerSize;
     Span serverVersion;
     struct IrbisConnection *connection;
+    TextNavigator navigator;
 
 } Response;
 
 MAGNA_API am_bool  MAGNA_CALL response_create                (struct IrbisConnection *connection, Response *response);
 MAGNA_API am_bool             response_check                 (Response *response, ...);
-MAGNA_API void     MAGNA_CALL response_free                  (Response *response);
+MAGNA_API void     MAGNA_CALL response_destroy               (Response *response);
 MAGNA_API Span     MAGNA_CALL response_get_line              (Response *response);
 MAGNA_API am_int32 MAGNA_CALL response_get_return_code       (Response *response);
+MAGNA_API void     MAGNA_CALL response_null                  (Response *response);
 MAGNA_API Span     MAGNA_CALL response_read_ansi             (Response *response);
 MAGNA_API am_int32 MAGNA_CALL response_read_int32            (Response *response);
 MAGNA_API Span     MAGNA_CALL response_read_utf              (Response *response);
@@ -551,7 +553,7 @@ MAGNA_API am_bool MAGNA_CALL connection_delete_file        (Connection *connecti
 MAGNA_API am_bool MAGNA_CALL connection_delete_record      (Connection *connection, am_mfn mfn);
 MAGNA_API am_bool MAGNA_CALL connection_disconnect         (Connection *connection);
 MAGNA_API am_bool MAGNA_CALL connection_execute            (Connection *connection, Query *query, Response *response);
-MAGNA_API am_bool            connection_execute_simple     (Connection *connection, Response *response, const char *command, int argCount, ...);
+MAGNA_API am_bool            connection_execute_simple     (Connection *connection, Response *response, const am_byte *command, int argCount, ...);
 MAGNA_API void    MAGNA_CALL connection_destroy            (Connection *connection);
 MAGNA_API am_mfn  MAGNA_CALL connection_get_max_mfn        (Connection *connection, const char *database);
 MAGNA_API am_bool MAGNA_CALL connection_create               (Connection *connection);

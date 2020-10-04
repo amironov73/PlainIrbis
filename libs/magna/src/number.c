@@ -161,7 +161,7 @@ MAGNA_API am_bool MAGNA_CALL ntc_to_string
     result = buffer_concat (output, &chunk->prefix);
     if (result && chunk->haveValue) {
         /* TODO: implement length */
-        result = buffer_put_uint_64 (output, chunk->value);
+        result = buffer_put_uint64(output, chunk->value);
     }
 
     return result;

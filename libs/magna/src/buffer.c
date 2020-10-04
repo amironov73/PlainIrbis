@@ -260,8 +260,8 @@ MAGNA_API void MAGNA_CALL buffer_destroy
  */
 MAGNA_API am_bool MAGNA_CALL buffer_grow
     (
-            Buffer *buffer,
-            size_t newSize
+        Buffer *buffer,
+         size_t newSize
     )
 {
     am_byte *newPtr;
@@ -270,14 +270,9 @@ MAGNA_API am_bool MAGNA_CALL buffer_grow
 
     if (newSize > buffer->capacity) {
         newSize = buffer_calculate_size (newSize);
-        newPtr = malloc (newSize);
+        newPtr = mem_realloc (buffer->ptr, newSize);
         if (!newPtr) {
             return AM_FALSE;
-        }
-
-        if (buffer->ptr != NULL) {
-            memcpy(newPtr, buffer->ptr, buffer->position);
-            free (buffer->ptr);
         }
 
         buffer->ptr = newPtr;
@@ -320,7 +315,7 @@ MAGNA_API am_bool MAGNA_CALL buffer_putc
 MAGNA_API am_bool MAGNA_CALL buffer_puts
     (
         Buffer *buffer,
-        const char *str
+        const am_byte *str
     )
 {
     size_t delta;
@@ -473,7 +468,7 @@ MAGNA_API am_bool MAGNA_CALL buffer_assign_text
 MAGNA_API Buffer* MAGNA_CALL buffer_from_text
     (
         Buffer *buffer,
-        const char *text
+        const am_byte *text
     )
 {
     size_t len;
@@ -894,19 +889,17 @@ MAGNA_API am_bool MAGNA_CALL buffer_utf8_to_ansi
         const Buffer *source
     )
 {
-    size_t delta;
+    /* size_t delta; */
 
     assert (target != NULL);
     assert (source != NULL);
 
-    delta = utf8_code_points (source->ptr, source->position);
+    /* delta = utf8_code_points (source->ptr, source->position);
     if (!buffer_grow (target, delta)) {
         return AM_FALSE;
-    }
+    } */
 
-    /* TODO: сделать собственно преобразование */
-
-    return AM_FALSE;
+    return utf2ansi (target, buffer_to_span (source));
 }
 
 /**
@@ -922,19 +915,17 @@ MAGNA_API am_bool MAGNA_CALL buffer_ansi_to_utf8
         const Buffer *source
     )
 {
-    size_t delta;
+    /* size_t delta; */
 
     assert (target != NULL);
     assert (source != NULL);
 
-    delta = utf8_code_points (source->ptr, source->position);
+    /* delta = utf8_code_points (source->ptr, source->position);
     if (!buffer_grow (target, delta)) {
         return AM_FALSE;
-    }
+    } */
 
-    /* TODO: собственно преобразование */
-
-    return AM_FALSE;
+    return ansi2utf (target, buffer_to_span (source));
 }
 
 /**
@@ -1039,7 +1030,7 @@ MAGNA_API am_bool MAGNA_CALL buffer_new_line
  * @param value Целое число.
  * @return Признак успешности завершения операции.
  */
-MAGNA_API am_bool MAGNA_CALL buffer_put_uint_32
+MAGNA_API am_bool MAGNA_CALL buffer_put_uint32
     (
         Buffer *buffer,
         am_uint32 value
@@ -1061,7 +1052,7 @@ MAGNA_API am_bool MAGNA_CALL buffer_put_uint_32
  * @param value Целое число.
  * @return Признак успешности завершения операции.
  */
-MAGNA_API am_bool MAGNA_CALL buffer_put_uint_64
+MAGNA_API am_bool MAGNA_CALL buffer_put_uint64
     (
         Buffer *buffer,
         am_uint64 value
@@ -1100,7 +1091,7 @@ MAGNA_API Buffer* MAGNA_CALL buffer_clear
  * @param buffer Проверяемый буфер.
  * @return Резульат проверки.
  */
-MAGNA_API am_bool MAGNA_CALL buffer_empty
+MAGNA_API am_bool MAGNA_CALL buffer_is_empty
     (
         const Buffer *buffer
     )
@@ -1110,8 +1101,24 @@ MAGNA_API am_bool MAGNA_CALL buffer_empty
     return buffer->position == 0;
 }
 
+/* Функция-прокладка для вывода форматированного текста */
+static am_bool output_function
+    (
+        void *output,
+        void *data,
+        size_t size
+    )
+{
+    return buffer_write
+        (
+            (Buffer*)output,
+            data,
+            size
+        );
+}
+
 /**
- * Аналог printf.
+ * Аналог printf для буфера.
  *
  * @param buffer Буфер для вывода.
  * @param format Строка формата.
@@ -1125,15 +1132,16 @@ MAGNA_API am_bool buffer_format
         ...
     )
 {
+    am_bool result;
     va_list args;
 
     assert (buffer != NULL);
 
     va_start (args, format);
-
+    result = format_generic (buffer, output_function, format, args);
     va_end (args);
 
-    return AM_FALSE;
+    return result;
 }
 
 /*=========================================================*/

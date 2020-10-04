@@ -24,7 +24,7 @@ TESTER(menu_entry_to_string_1)
     menu_entry_init (&entry);
 
     CHECK (menu_entry_to_string (&entry, &text));
-    CHECK (buffer_empty (&text));
+    CHECK (buffer_is_empty(&text));
 
     menu_entry_free (&entry);
     buffer_destroy(&text);
@@ -109,7 +109,7 @@ TESTER(menu_get_comment_1)
 {
     MenuFile menu;
     Span comment;
-    const char *defaultValue = "default";
+    const am_byte *defaultValue = "default";
 
     CHECK (menu_init (&menu));
 
