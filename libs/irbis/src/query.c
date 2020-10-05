@@ -59,7 +59,7 @@ MAGNA_API am_bool MAGNA_CALL query_add_format
  * @param value Целое число.
  * @return Признак успешности завершения операции.
  */
-MAGNA_API am_bool MAGNA_CALL query_add_int_32
+MAGNA_API am_bool MAGNA_CALL query_add_int32
     (
         Query *query,
         am_int32 value
@@ -138,8 +138,8 @@ MAGNA_API am_bool MAGNA_CALL query_create
         || !buffer_putc (&query->buffer, connection->workstation)
         || !query_new_line (query)
         || !query_add_ansi (query, command)
-        || !query_add_int_32 (query, connection->clientId)
-        || !query_add_int_32 (query, connection->queryId)
+        || !query_add_int32(query, connection->clientId)
+        || !query_add_int32(query, connection->queryId)
         || !query_add_ansi_buffer (query, &connection->password)
         || !query_add_ansi_buffer (query, &connection->username)
         || !query_new_line (query)
@@ -207,7 +207,7 @@ MAGNA_API am_bool MAGNA_CALL query_add_ansi_buffer
     assert (query != NULL);
     assert (text != NULL);
 
-    if (!buffer_ansi_to_utf8 (&query->buffer, text)
+    if (!buffer_utf8_to_ansi (&query->buffer, text)
         || !buffer_putc (&query->buffer, 0x0A)) {
         return AM_FALSE;
     }
@@ -231,10 +231,21 @@ MAGNA_API am_bool MAGNA_CALL query_add_utf_buffer
     assert (query != NULL);
     assert (text != NULL);
 
-    if (!buffer_concat (&query->buffer, text)
-        || !buffer_putc (&query->buffer, 0x0A)) {
-        return AM_FALSE;
-    }
+    return buffer_concat (&query->buffer, text)
+        && buffer_putc (&query->buffer, 0x0A);
+}
 
-    return AM_TRUE;
+MAGNA_API am_bool MAGNA_CALL query_add_specification
+    (
+        Query *query,
+        const Specification *specification
+    )
+{
+    assert (query != NULL);
+    assert (specification != NULL);
+
+    /* TODO: UTF->ANSI conversion */
+
+    return spec_to_string (specification, &query->buffer)
+        && buffer_putc (&query->buffer, 0x0A);
 }

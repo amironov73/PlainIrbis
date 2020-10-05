@@ -15,11 +15,11 @@ TESTER(file_create_1)
     am_uint64 fileSize, readSize;
 
     CHECK (path_get_temporary_directory (&tempDirectory));
-    CHECK (directory_exist (buffer_to_text (&tempDirectory)));
-    CHECK (buffer_from_text (&fileName, "magna.tmp") != NULL);
+    CHECK (directory_exist (B2T (&tempDirectory)));
+    CHECK (buffer_from_text (&fileName, CBTEXT ("magna.tmp")) != NULL);
     CHECK (path_combine (&tempFile, &tempDirectory, &fileName, NULL));
 
-    fname = buffer_to_text (&tempFile);
+    fname = B2T (&tempFile);
     CHECK (fname != NULL);
     if (file_exist (fname)) {
         CHECK (file_delete (fname));
@@ -58,11 +58,11 @@ TESTER(file_create_insist_1)
     am_uint64 fileSize, readSize;
 
     CHECK (path_get_temporary_directory (&tempDirectory));
-    CHECK (directory_exist (buffer_to_text (&tempDirectory)));
-    CHECK (buffer_from_text (&fileName, "magna.tmp") != NULL);
+    CHECK (directory_exist (B2T (&tempDirectory)));
+    CHECK (buffer_from_text (&fileName, CBTEXT ("magna.tmp")) != NULL);
     CHECK (path_combine (&tempFile, &tempDirectory, &fileName, NULL));
 
-    fname = buffer_to_text (&tempFile);
+    fname = B2T (&tempFile);
     CHECK (fname != NULL);
     if (file_exist (fname)) {
         CHECK (file_delete (fname));
@@ -97,9 +97,9 @@ TESTER(file_open_read_1)
     am_handle handle;
 
     CHECK (where_test_data (&path));
-    CHECK (path_append (&path, span_from_text ("TEST1.ISO")));
+    CHECK (path_append (&path, TEXT_SPAN ("TEST1.ISO")));
 
-    handle = file_open_read (buffer_to_text (&path));
+    handle = file_open_read (B2T (&path));
     CHECK (handle_is_good (handle));
     CHECK (file_tell (handle) == MAGNA_INT64 (0));
     CHECK (file_read (handle, junk, sizeof (junk)) == sizeof (junk));
@@ -121,9 +121,9 @@ TESTER(file_size_1)
     am_handle handle;
 
     CHECK (where_test_data (&path));
-    CHECK (path_append (&path, span_from_text ("TEST1.ISO")));
+    CHECK (path_append (&path, TEXT_SPAN ("TEST1.ISO")));
 
-    handle = file_open_read (buffer_to_text (&path));
+    handle = file_open_read (B2T (&path));
     CHECK (handle_is_good (handle));
     CHECK (!file_eof (handle));
     CHECK (file_size (handle) == MAGNA_INT64 (78096));
@@ -138,9 +138,9 @@ TESTER(file_read_all_1)
     Buffer all = BUFFER_INIT;
 
     CHECK (where_test_data (&path));
-    CHECK (path_append (&path, span_from_text ("TEST1.ISO")));
+    CHECK (path_append (&path, TEXT_SPAN ("TEST1.ISO")));
 
-    CHECK (file_read_all (buffer_to_text (&path), &all));
+    CHECK (file_read_all (B2T (&path), &all));
     CHECK (all.position == 78096);
 
     buffer_destroy (&path);
@@ -153,9 +153,9 @@ TESTER(file_read_byte_1)
     am_handle handle;
 
     CHECK (where_test_data (&path));
-    CHECK (path_append (&path, span_from_text ("TEST1.ISO")));
+    CHECK (path_append (&path, TEXT_SPAN ("TEST1.ISO")));
 
-    handle = file_open_read (buffer_to_text (&path));
+    handle = file_open_read (B2T (&path));
     CHECK (handle_is_good (handle));
     CHECK (file_read_byte (handle) == 0x30);
     CHECK (file_close (handle));
@@ -169,9 +169,9 @@ TESTER(file_read_int32_1)
     am_handle handle;
 
     CHECK (where_test_data (&path));
-    CHECK (path_append (&path, span_from_text ("Irbis64/Datai/IBIS/ibis.xrf")));
+    CHECK (path_append (&path, TEXT_SPAN ("Irbis64/Datai/IBIS/ibis.xrf")));
 
-    handle = file_open_read (buffer_to_text (&path));
+    handle = file_open_read (B2T (&path));
     CHECK (handle_is_good (handle));
     CHECK (file_read_int32 (handle) == 0x015E34BCu);
     CHECK (file_close (handle));
@@ -185,9 +185,9 @@ TESTER(file_read_int64_1)
     am_handle handle;
 
     CHECK (where_test_data (&path));
-    CHECK (path_append (&path, span_from_text ("Irbis64/Datai/IBIS/ibis.xrf")));
+    CHECK (path_append (&path, TEXT_SPAN ("Irbis64/Datai/IBIS/ibis.xrf")));
 
-    handle = file_open_read (buffer_to_text (&path));
+    handle = file_open_read (B2T (&path));
     CHECK (handle_is_good (handle));
     CHECK (file_read_int64 (handle) == MAGNA_UINT64 (0x00000000015E34BC));
     CHECK (file_close (handle));
@@ -202,15 +202,15 @@ TESTER(file_read_line_1)
     am_handle handle;
 
     CHECK (where_test_data (&path));
-    CHECK (path_append (&path, span_from_text ("org.mnu")));
+    CHECK (path_append (&path, TEXT_SPAN ("org.mnu")));
 
-    handle = file_open_read (buffer_to_text (&path));
+    handle = file_open_read (B2T (&path));
     CHECK (handle_is_good (handle));
     CHECK (file_read_line (handle, &line));
-    CHECK (buffer_compare_text (&line, "1") == 0);
+    CHECK (buffer_compare_text (&line, CBTEXT ("1")) == 0);
     buffer_clear (&line);
     CHECK (file_read_line (handle, &line));
-    CHECK (buffer_compare_text (&line, "RU") == 0);
+    CHECK (buffer_compare_text (&line, CBTEXT ("RU")) == 0);
     CHECK (file_close (handle));
 
     buffer_destroy (&path);
@@ -224,9 +224,9 @@ TESTER(file_write_byte_1)
     am_handle handle;
 
     CHECK (path_get_temporary_directory (&path));
-    CHECK (path_append (&path, span_from_text ("writebuf.tmp")));
+    CHECK (path_append (&path, TEXT_SPAN ("writebuf.tmp")));
 
-    fname = buffer_to_text (&path);
+    fname = B2T (&path);
     CHECK (fname != NULL);
     if (file_exist (fname)) {
         CHECK (file_delete (fname));
@@ -259,9 +259,9 @@ TESTER(file_write_int32_1)
     am_handle handle;
 
     CHECK (path_get_temporary_directory (&path));
-    CHECK (path_append (&path, span_from_text ("writebuf.tmp")));
+    CHECK (path_append (&path, TEXT_SPAN ("writebuf.tmp")));
 
-    fname = buffer_to_text (&path);
+    fname = B2T (&path);
     CHECK (fname != NULL);
     if (file_exist (fname)) {
         CHECK (file_delete (fname));
@@ -294,9 +294,9 @@ TESTER(file_write_int64_1)
     am_handle handle;
 
     CHECK (path_get_temporary_directory (&path));
-    CHECK (path_append (&path, span_from_text ("writebuf.tmp")));
+    CHECK (path_append (&path, TEXT_SPAN ("writebuf.tmp")));
 
-    fname = buffer_to_text (&path);
+    fname = B2T (&path);
     CHECK (fname != NULL);
     if (file_exist (fname)) {
         CHECK (file_delete (fname));
@@ -323,14 +323,14 @@ TESTER(file_write_int64_1)
 TESTER(file_write_buffer_1)
 {
     Buffer path = BUFFER_INIT;
-    Buffer output = { "Hello, world!", 13, 13 };
+    Buffer output = { BTEXT ("Hello, world!"), 13, 13 };
     const char *fname;
     am_handle handle;
 
     CHECK (path_get_temporary_directory (&path));
-    CHECK (path_append (&path, span_from_text ("writebuf.tmp")));
+    CHECK (path_append (&path, TEXT_SPAN ("writebuf.tmp")));
 
-    fname = buffer_to_text (&path);
+    fname = B2T (&path);
     CHECK (fname != NULL);
     if (file_exist (fname)) {
         CHECK (file_delete (fname));
@@ -349,14 +349,14 @@ TESTER(file_write_buffer_1)
 TESTER(file_write_span_1)
 {
     Buffer path = BUFFER_INIT;
-    Span output = span_init ("Hello, world!", 13);
+    Span output = span_init (CBTEXT ("Hello, world!"), 13);
     const char *fname;
     am_handle handle;
 
     CHECK (path_get_temporary_directory (&path));
-    CHECK (path_append (&path, span_from_text ("writebuf.tmp")));
+    CHECK (path_append (&path, TEXT_SPAN ("writebuf.tmp")));
 
-    fname = buffer_to_text (&path);
+    fname = B2T (&path);
     CHECK (fname != NULL);
     if (file_exist (fname)) {
         CHECK (file_delete (fname));
@@ -380,9 +380,9 @@ TESTER(file_write_text_1)
     am_handle handle;
 
     CHECK (path_get_temporary_directory (&path));
-    CHECK (path_append (&path, span_from_text ("writebuf.tmp")));
+    CHECK (path_append (&path, TEXT_SPAN ("writebuf.tmp")));
 
-    fname = buffer_to_text (&path);
+    fname = B2T (&path);
     CHECK (fname != NULL);
     if (file_exist (fname)) {
         CHECK (file_delete (fname));
@@ -405,9 +405,9 @@ TESTER(directory_create_1)
     const char *name;
 
     CHECK (path_get_temporary_directory (&path));
-    CHECK (path_append (&path, span_from_text ("magnadir")));
+    CHECK (path_append (&path, TEXT_SPAN ("magnadir")));
 
-    name = buffer_to_text (&path);
+    name = B2T (&path);
     CHECK (name != NULL);
 
     if (directory_exist (name)) {
@@ -429,14 +429,14 @@ TESTER(file_copy_1)
     const char *sname, *tname;
 
     CHECK (where_test_data (&spath));
-    CHECK (path_append (&spath, span_from_text ("org.mnu")));
+    CHECK (path_append (&spath, TEXT_SPAN ("org.mnu")));
     CHECK (path_get_temporary_directory (&tpath));
-    CHECK (path_append (&tpath, span_from_text ("org.mnu")));
+    CHECK (path_append (&tpath, TEXT_SPAN ("org.mnu")));
 
-    sname = buffer_to_text (&spath);
+    sname = B2T (&spath);
     CHECK (sname != NULL);
     CHECK (file_exist (sname));
-    tname = buffer_to_text (&tpath);
+    tname = B2T (&tpath);
     CHECK (tname != NULL);
     if (file_exist (tname)) {
         CHECK (file_delete (tname));
@@ -457,9 +457,9 @@ TESTER(file_stream_create_1)
     const char *fname;
 
     CHECK (path_get_temporary_directory (&path));
-    CHECK (path_append (&path, span_from_text ("stream.tmp")));
+    CHECK (path_append (&path, TEXT_SPAN ("stream.tmp")));
 
-    fname = buffer_to_text (&path);
+    fname = B2T (&path);
     CHECK (fname != NULL);
 
     if (file_exist (fname)) {
@@ -483,9 +483,9 @@ TESTER(file_stream_open_read_1)
     const char *fname;
 
     CHECK (where_test_data (&path));
-    CHECK (path_append (&path, span_from_text ("TEST1.ISO")));
+    CHECK (path_append (&path, TEXT_SPAN ("TEST1.ISO")));
 
-    fname = buffer_to_text (&path);
+    fname = B2T (&path);
     CHECK (fname != NULL);
 
     CHECK (file_stream_open_read (&stream, fname));
@@ -502,9 +502,9 @@ TESTER(file_stream_open_write_1)
     const char *fname;
 
     CHECK (path_get_temporary_directory (&path));
-    CHECK (path_append (&path, span_from_text ("stream.tmp")));
+    CHECK (path_append (&path, TEXT_SPAN ("stream.tmp")));
 
-    fname = buffer_to_text (&path);
+    fname = B2T (&path);
     CHECK (fname != NULL);
 
     CHECK (file_touch (fname));
@@ -526,9 +526,9 @@ TESTER(file_texter_1)
     const char *fname;
 
     CHECK (where_test_data (&path));
-    CHECK (path_append (&path, span_from_text ("org.mnu")));
+    CHECK (path_append (&path, TEXT_SPAN ("org.mnu")));
 
-    fname = buffer_to_text (&path);
+    fname = B2T (&path);
     CHECK (fname != NULL);
 
     CHECK (file_texter (&texter, &stream, fname));

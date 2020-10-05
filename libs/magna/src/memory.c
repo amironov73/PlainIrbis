@@ -63,6 +63,8 @@ MAGNA_API void* MAGNA_CALL mem_alloc
         result = allocationHandler (size);
     }
 
+    LOG_TRACE ("failed to allocate memory");
+
     return result;
 }
 
@@ -91,6 +93,8 @@ MAGNA_API void* MAGNA_CALL mem_realloc
     if ((result == NULL) && (allocationHandler != NULL)) {
         result = allocationHandler (newSize);
     }
+
+    LOG_TRACE ("failed to reallocate memory");
 
     return result;
 }
@@ -458,7 +462,10 @@ static am_bool read_memory_map
 
     mem_clear (line, sizeof (line));
     while (!feof (file)) {
-        (void) fgets (line, sizeof (line) - 1, file);
+        if (!fgets (line, sizeof (line) - 1, file)) {
+            break;
+        }
+
         nav_init (&nav, line, strlen (line));
         from = nav_read_to (&nav, '-');
         to = nav_read_to (&nav, ' ');

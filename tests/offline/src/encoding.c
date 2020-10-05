@@ -66,7 +66,6 @@ TESTER(encoding_ansi_1)
     CHECK (sizeof (source) == sizeof (destination) / sizeof (destination[0]));
 
     for (p1 = source, p2 = destination; *p1; ++p1, ++p2) {
-        printf("%c", *p1);
         CHECK (ansi->char_to_unicode (*p1) == *p2);
         CHECK (ansi->unicode_to_char (*p2) == *p1);
     }

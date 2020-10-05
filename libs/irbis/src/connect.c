@@ -15,6 +15,7 @@
 
 #include <assert.h>
 #include <stdarg.h>
+#include <ctype.h>
 
 /*=========================================================*/
 
@@ -44,15 +45,17 @@ MAGNA_API am_bool MAGNA_CALL connection_create
         Connection *connection
     )
 {
+    am_bool result;
+
     assert (connection != NULL);
 
     mem_clear (connection, sizeof (Connection));
-    buffer_assign_text (&connection->host, "127.0.0.1");
-    buffer_assign_text (&connection->host, "IBIS");
+    result = buffer_assign_text (&connection->host, "127.0.0.1")
+        && buffer_assign_text (&connection->database, "IBIS");
     connection->port = 6666;
     connection->workstation = CATALOGER;
 
-    return AM_FALSE;
+    return result;
 }
 
 /*=========================================================*/
@@ -230,10 +233,27 @@ MAGNA_API am_bool MAGNA_CALL connection_check
 }
 
 /**
+ * Синоним для функции `connection_connect`.
+ *
+ * @param connection Неактивное подключение.
+ * @return Признак успешности подключения.
+ */
+MAGNA_API am_bool MAGNA_CALL irbis_connect
+    (
+        Connection *connection
+    )
+{
+    return connection_connect (connection);
+}
+
+/**
  * Подключение к серверу ИРБИС64.
+ * Если подключене уже было установлено, функция ничего не делает.
  *
  * @param connection Неактивное подключение.
  * @return Признак успешности завершения операции.
+ * Если подключение не удалось, код ошибки можно
+ * посмотреть в `connection-&gt;lastError`.
  */
 MAGNA_API am_bool MAGNA_CALL connection_connect
     (
@@ -244,9 +264,11 @@ MAGNA_API am_bool MAGNA_CALL connection_connect
     Response response;
     am_bool result = AM_FALSE;
 
+    LOG_ENTER;
     assert (connection != NULL);
 
     if (connection->connected) {
+        LOG_LEAVE;
         return AM_TRUE;
     }
 
@@ -255,7 +277,8 @@ MAGNA_API am_bool MAGNA_CALL connection_connect
     connection->queryId = 1;
     response_null (&response);
 
-    if (!query_create (&query, connection, (const am_byte*) "A")) {
+    if (!query_create (&query, connection, CBTEXT(REGISTER_CLIENT))) {
+        LOG_LEAVE;
         return AM_FALSE;
     }
 
@@ -281,7 +304,6 @@ MAGNA_API am_bool MAGNA_CALL connection_connect
         goto DONE;
     }
 
-    connection->connected;
     connection->interval = response_read_int32 (&response);
     connection->connected = AM_TRUE;
 
@@ -290,6 +312,7 @@ MAGNA_API am_bool MAGNA_CALL connection_connect
     DONE:
     query_destroy (&query);
     response_destroy (&response);
+    LOG_LEAVE;
 
     return result;
 }
@@ -409,7 +432,26 @@ MAGNA_API am_bool MAGNA_CALL connection_delete_record
 }
 
 /**
+ * Синоним для `connection_disconnect`.
+ *
+ * @param connection Активное подключение.
+ * @return Признак успешности завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL irbis_disconnect
+    (
+        Connection *connection
+    )
+{
+    return connection_disconnect (connection);
+}
+
+/**
  * Отключение от сервера ИРБИС64.
+ * Повторные попытки отключения уже отключенного
+ * экземпляра клиента игнорируются.
+ * Если при отключении был увеличен счетчик
+ * использования лицензий, он соответственно
+ * уменьшается.
  *
  * @param connection Активное подключение.
  * @return Признак успешности завершения операции.
@@ -422,6 +464,7 @@ MAGNA_API am_bool MAGNA_CALL connection_disconnect
     am_bool result;
     Response response;
 
+    LOG_ENTER;
     assert (connection != NULL);
 
     if (!connection->connected) {
@@ -432,11 +475,14 @@ MAGNA_API am_bool MAGNA_CALL connection_disconnect
         (
             connection,
             &response,
-            UNREGISTER_CLIENT,
-            0
+            CBTEXT (UNREGISTER_CLIENT),
+            1,
+            B2T (&connection->username)
         );
 
+    connection->connected = AM_FALSE;
     response_destroy(&response);
+    LOG_LEAVE;
 
     return result;
 }
@@ -458,14 +504,14 @@ MAGNA_API am_mfn MAGNA_CALL connection_get_max_mfn
     Response response;
 
     if (!database) {
-        database = buffer_to_text (&connection->database);
+        database = B2T (&connection->database);
     }
 
     if (connection_execute_simple
         (
             connection,
             &response,
-            GET_MAX_MFN,
+            CBTEXT (GET_MAX_MFN),
             1,
             database
         )) {
@@ -508,6 +554,8 @@ MAGNA_API am_bool MAGNA_CALL connection_execute
 
     hostname = buffer_to_text (&connection->host);
     if (hostname == NULL) {
+        /* TODO: document the code */
+        connection->lastError = 100501;
         goto DONE;
     }
 
@@ -560,10 +608,10 @@ MAGNA_API am_bool MAGNA_CALL connection_execute
 /**
  * Упрощенное исполнение запроса к серверу.
  *
- * @param connection
- * @param command
- * @param ...
- * @return
+ * @param connection Активное подключение.
+ * @param command Код команды, посылаемой на сервер.
+ * @param ... Строки запроса (будут закодированы в ANSI).
+ * @return Признак успешности выполнения операции.
  */
 MAGNA_API am_bool connection_execute_simple
     (
@@ -636,7 +684,7 @@ MAGNA_API am_bool MAGNA_CALL connection_no_operation
         (
             connection,
             &response,
-            NOP,
+            CBTEXT (NOP),
             0
         );
 
@@ -655,13 +703,74 @@ MAGNA_API am_bool MAGNA_CALL connection_no_operation
 MAGNA_API am_bool MAGNA_CALL connection_parse_string
     (
         Connection *connection,
-        Buffer *connectionString
+        Span connectionString
     )
 {
+    TextNavigator navigator;
+    Span item, parts[2], key, value;
+
     assert (connection != NULL);
     assert (connection != NULL);
 
-    return AM_FALSE;
+    nav_from_span (&navigator, connectionString);
+    while (AM_TRUE) {
+        item = span_trim (nav_read_to (&navigator, ';'));
+        if (span_is_empty (item)) {
+            break;
+        }
+
+        if (span_split_n_by_char (item, parts, 2, '=') != 2) {
+            return AM_FALSE;
+        }
+
+        key = span_trim (parts[0]);
+        value = span_trim (parts[1]);
+        if (span_is_empty (key) || span_is_empty (value)) {
+            return AM_FALSE;
+        }
+
+        if (span_compare_ignore_case (key, TEXT_SPAN ("host")) == 0
+            || span_compare_ignore_case (key, TEXT_SPAN ("server")) == 0
+            || span_compare_ignore_case (key, TEXT_SPAN ("address")) == 0) {
+            if (!buffer_assign_span (&connection->host, value)) {
+                return AM_FALSE;
+            }
+        }
+        else if (span_compare_ignore_case (key, TEXT_SPAN ("port")) == 0) {
+            connection->port = (am_int16) span_to_int32 (value);
+        }
+        else if (span_compare_ignore_case (key, TEXT_SPAN ("user")) == 0
+            || span_compare_ignore_case (key, TEXT_SPAN ("username")) == 0
+            || span_compare_ignore_case (key, TEXT_SPAN ("name")) == 0
+            || span_compare_ignore_case (key, TEXT_SPAN ("login")) == 0) {
+            if (!buffer_assign_span (&connection->username, value)) {
+                return AM_FALSE;
+            }
+        }
+        else if (span_compare_ignore_case (key, TEXT_SPAN ("password")) == 0
+            || span_compare_ignore_case (key, TEXT_SPAN ("pwd")) == 0) {
+            if (!buffer_assign_span (&connection->password, value)) {
+                return AM_FALSE;
+            }
+        }
+        else if (span_compare_ignore_case (key, TEXT_SPAN ("database")) == 0
+                 || span_compare_ignore_case (key, TEXT_SPAN ("db")) == 0
+                 || span_compare_ignore_case (key, TEXT_SPAN ("catalog")) == 0) {
+            if (!buffer_assign_span (&connection->database, value)) {
+                return AM_FALSE;
+            }
+        }
+        else if (span_compare_ignore_case (key, TEXT_SPAN ("arm")) == 0
+                 || span_compare_ignore_case (key, TEXT_SPAN ("workstation")) == 0) {
+            connection->workstation = toupper (value.ptr[0]);
+        }
+        else {
+            /* Неизвестный ключ */
+            return AM_FALSE;
+        }
+    }
+
+    return AM_TRUE;
 }
 
 /**
@@ -669,7 +778,7 @@ MAGNA_API am_bool MAGNA_CALL connection_parse_string
  *
  * @param connection Активное подключение.
  * @param specification Спецификация.
- * @param buffer Инициализированный буфер для результата.
+ * @param buffer Инициализированный буфер для размещения результата.
  * @return Признак успешности выполнения операции.
  */
 MAGNA_API am_bool MAGNA_CALL connection_read_text_file
@@ -679,6 +788,11 @@ MAGNA_API am_bool MAGNA_CALL connection_read_text_file
         Buffer *buffer
     )
 {
+    Query query;
+    Response response;
+    am_bool result = AM_FALSE;
+    Span line;
+
     assert (specification != NULL);
     assert (buffer != NULL);
 
@@ -686,7 +800,35 @@ MAGNA_API am_bool MAGNA_CALL connection_read_text_file
         return AM_FALSE;
     }
 
-    return AM_FALSE;
+    response_null (&response);
+    if (!query_create (&query, connection, CBTEXT (READ_DOCUMENT))) {
+        return AM_FALSE;
+    }
+
+    if (!query_add_specification (&query, specification)) {
+        goto DONE;
+    }
+
+    if (!connection_execute (connection, &query, &response)) {
+        goto DONE;
+    }
+
+    line = response_get_line (&response);
+    if (span_is_empty (line)) {
+        goto DONE;
+    }
+
+    if (!irbis_to_client (buffer, line)) {
+        goto DONE;
+    }
+
+    result = AM_TRUE;
+
+    DONE:
+    query_destroy (&query);
+    response_destroy (&response);
+
+    return result;
 }
 
 /**
@@ -728,6 +870,93 @@ MAGNA_API am_bool MAGNA_CALL connection_search_ex
     assert (response != NULL);
 
     return AM_FALSE;
+}
+
+/**
+ * Формирование строки подключения по текущим настройкам.
+ *
+ * @param connection Подключение (не обязательно активное).
+ * @param output Буфер для размещения результата.
+ * @return Признак успешности завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL connection_to_string
+    (
+        const Connection *connection,
+        Buffer *output
+    )
+{
+    assert (connection != NULL);
+    assert (output != NULL);
+
+    return buffer_puts (output, CBTEXT ("host="))
+        && buffer_concat (output, &connection->host)
+        && buffer_putc (output, ';')
+        && buffer_puts (output, CBTEXT ("port="))
+        && buffer_put_uint32 (output, connection->port)
+        && buffer_putc (output, ';')
+        && buffer_puts (output, CBTEXT ("username="))
+        && buffer_concat (output, &connection->username)
+        && buffer_putc (output, ';')
+        && buffer_puts (output, CBTEXT ("password="))
+        && buffer_concat (output, &connection->password)
+        && buffer_putc (output, ';')
+        && buffer_puts (output, CBTEXT ("database="))
+        && buffer_concat (output, &connection->database)
+        && buffer_putc (output, ';')
+        && buffer_puts (output, CBTEXT ("workstation="))
+        && buffer_putc (output, connection->workstation)
+        && buffer_putc (output, ';');
+}
+
+MAGNA_API am_bool MAGNA_CALL connection_read_raw_record
+    (
+        Connection *connection,
+        am_mfn mfn,
+        Buffer *buffer
+    )
+{
+    Query query;
+    Response response;
+    am_bool result = AM_FALSE;
+    Span line;
+
+    assert (connection != NULL);
+    assert (mfn > 0);
+
+    if (!connection_check (connection)) {
+        return AM_FALSE;
+    }
+
+    response_null (&response);
+    if (!query_create (&query, connection, CBTEXT (READ_RECORD))) {
+        return AM_FALSE;
+    }
+
+    if (!query_add_ansi_buffer (&query, &connection->database)
+        || !query_add_int32 (&query, mfn)) {
+        goto DONE;
+    }
+
+    if (!connection_execute (connection, &query, &response)) {
+        goto DONE;
+    }
+
+    line = response_remaining_utf_text (&response);
+    if (span_is_empty (line)) {
+        goto DONE;
+    }
+
+    if (!buffer_write (buffer, line.ptr, line.len)) {
+        goto DONE;
+    }
+
+    result = AM_TRUE;
+
+    DONE:
+    query_destroy (&query);
+    response_destroy (&response);
+
+    return result;
 }
 
 /*=========================================================*/

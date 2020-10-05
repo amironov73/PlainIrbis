@@ -11,6 +11,9 @@ int main (int argc, char **argv)
     int bufSize = sizeof (buffer);
     void *space;*/
     Connection connection;
+    Specification spec;
+    Buffer fileContent = BUFFER_INIT;
+    Buffer rawRecord = BUFFER_INIT;
     am_mfn maxMfn;
 
     (void) argc;
@@ -27,7 +30,7 @@ int main (int argc, char **argv)
     connection.workstation = CATALOGER;
     connection.port = 6666;
 
-    if (!connection_connect (&connection)) {
+    if (!irbis_connect (&connection)) {
         fputs ("Connection failed", stderr);
         connection_destroy (&connection);
         return 1;
@@ -36,7 +39,19 @@ int main (int argc, char **argv)
     maxMfn = connection_get_max_mfn (&connection, NULL);
     printf ("Max MFN=%u\n", maxMfn);
 
-    connection_disconnect (&connection);
+    connection_no_operation (&connection);
+    printf ("NOP\n");
+
+    printf ("\n\nbrief.pft:\n\n");
+    spec_init (&spec, PATH_MASTER, "IBIS", "brief.pft");
+    connection_read_text_file (&connection, &spec, &fileContent);
+    buffer_to_console (&fileContent);
+
+    printf ("\n\nMFN=1:\n\n");
+    connection_read_raw_record(&connection, 1, &rawRecord);
+    buffer_to_console (&rawRecord);
+
+    irbis_disconnect (&connection);
     connection_destroy (&connection);
 
 /*

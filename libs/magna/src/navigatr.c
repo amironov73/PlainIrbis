@@ -531,6 +531,54 @@ MAGNA_API Span MAGNA_CALL nav_read_line
 }
 
 /**
+ * Считывание ИРБИСной "строки" (вплоть до символа перевода строки).
+ * Символ перевода строки считывается, но в результат не помещается.
+ * Происходит движение вперед по тексту.
+ *
+ * @param nav Навигатор.
+ * @return Прочитанная строка (возможно, пустая).
+ */
+MAGNA_API Span MAGNA_CALL nav_read_irbis
+    (
+        TextNavigator *nav
+    )
+{
+    am_byte c;
+    size_t start;
+    Span result;
+
+    assert (nav != NULL);
+
+    result.ptr = (am_byte*) nav->data + nav->position;
+    result.len = 0;
+    start = nav->position;
+    while (nav->position < nav->length) {
+        c = nav->data[nav->position];
+        if (c == '\x1F' || c == '\x1E') {
+            break;
+        }
+        (void) nav_read (nav);
+    }
+
+    result.len = nav->position - start;
+
+    /* Проглатываем перевод строки */
+    if (nav->position < nav->length) {
+        c = nav->data[nav->position];
+        if (c == '\x1F') {
+            (void) nav_read (nav);
+            c = nav->data[nav->position];
+        }
+
+        if (c == '\x1E') {
+            (void) nav_read (nav);
+        }
+    }
+
+    return result;
+}
+
+/**
  * Текущий символ -- управляющий?
  * Движения по тексту не происходит.
  *

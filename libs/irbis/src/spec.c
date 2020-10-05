@@ -43,7 +43,16 @@
 
 /*=========================================================*/
 
-MAGNA_API Specification* MAGNA_CALL spec_init
+/**
+ * Инициализация.
+ *
+ * @param spec
+ * @param path
+ * @param database
+ * @param filename
+ * @return
+ */
+MAGNA_API am_bool MAGNA_CALL spec_init
     (
         Specification *spec,
         int path,
@@ -52,16 +61,21 @@ MAGNA_API Specification* MAGNA_CALL spec_init
     )
 {
     assert (spec != NULL);
+    assert (filename != NULL);
 
-    memset (spec, 0, sizeof (Specification));
-
+    mem_clear (spec, sizeof (Specification));
+    spec->path = path;
     if (database != NULL) {
-        buffer_from_text (&spec->database, database);
+        if (!buffer_from_text (&spec->database, CBTEXT (database))) {
+            return AM_FALSE;
+        }
     }
 
-    buffer_from_text (&spec->filename, filename);
+    if (!buffer_from_text (&spec->filename, CBTEXT (filename))) {
+        return AM_FALSE;
+    }
 
-    return spec;
+    return AM_TRUE;
 }
 
 MAGNA_API am_bool MAGNA_CALL spec_parse
@@ -76,16 +90,55 @@ MAGNA_API am_bool MAGNA_CALL spec_parse
     return AM_FALSE;
 }
 
-MAGNA_API Buffer* MAGNA_CALL spec_to_string
+/**
+ * Текстовое представление спецификации файла.
+ *
+ * @param spec Спецификация.
+ * @param output Буфер для размещения результата.
+ * @return Признак успешности завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL spec_to_string
     (
         const Specification *spec,
-        Buffer *buffer
+        Buffer *output
     )
 {
     assert (spec != NULL);
-    assert (buffer != NULL);
+    assert (output != NULL);
 
-    return buffer;
+    if (!buffer_put_uint32 (output, spec->path)
+        || !buffer_putc (output, '.')) {
+        return AM_FALSE;
+    }
+
+    if (spec->path > 1) {
+        if (!buffer_concat (output, &spec->database)) {
+            return AM_FALSE;
+        }
+    }
+
+    if (!buffer_putc (output, '.')) {
+        return AM_FALSE;
+    }
+
+    if (spec->binary) {
+        if (!buffer_putc (output, '@')) {
+            return AM_FALSE;
+        }
+    }
+
+    if (!buffer_concat (output, &spec->filename)) {
+        return AM_FALSE;
+    }
+
+    if (!buffer_is_empty (&spec->content)) {
+        if (!buffer_putc (output, '&')
+            || !buffer_concat (output, &spec->content)) {
+            return AM_FALSE;
+        }
+    }
+
+    return AM_TRUE;
 }
 
 MAGNA_API am_bool MAGNA_CALL spec_verify

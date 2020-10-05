@@ -5,6 +5,7 @@
 sources = [ 'src/varray.c',
     'src/buffer.c',
     'src/chunked.c',
+    'src/connect.c',
     'src/cp1251.c',
     'src/cp866.c',
     'src/ean.c',

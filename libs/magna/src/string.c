@@ -323,6 +323,44 @@ MAGNA_API const char* MAGNA_CALL str_to_visible
     return text;
 }
 
+/**
+ * Переводим текст из ИРБИСного представления в клиентское:
+ * 1) переводим из кодировки ANSI в UTF-8,
+ * 2) заменяем ИРБИСные переводы строки на нормальные.
+ *
+ * @param output
+ * @param input
+ * @return
+ */
+MAGNA_API am_bool MAGNA_CALL irbis_to_client
+    (
+        Buffer *output,
+        Span input
+    )
+{
+    TextNavigator navigator;
+    Span line;
+    am_bool first = AM_TRUE;
+
+    assert (output != NULL);
+
+    nav_from_span (&navigator, input);
+    while (!nav_eot(&navigator)) {
+        if (!first) {
+            if (!buffer_new_line (output)) {
+                return AM_FALSE;
+            }
+        }
+        line = nav_read_irbis (&navigator);
+        if (!ansi2utf (output, line)) {
+            return AM_FALSE;
+        }
+
+        first = AM_FALSE;
+    }
+}
+
+
 /*=========================================================*/
 
 #ifdef _MSC_VER

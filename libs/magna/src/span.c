@@ -24,10 +24,10 @@
 /*=========================================================*/
 
 /**
- * Простая инициализация.
+ * Простая инициализация спана.
  *
- * @param ptr Указатель на начало.
- * @param len Длина участка памяти.
+ * @param ptr Указатель на начало фрагмента памяти.
+ * @param len Длина фрагмента памяти.
  * @return Инициализированный спан.
  */
 MAGNA_API Span MAGNA_CALL span_init
@@ -42,7 +42,7 @@ MAGNA_API Span MAGNA_CALL span_init
 }
 
 /**
- * Сверхпростая инициализация.
+ * Сверхпростая инициализация -- создает пустой спан.
  *
  * @return Пустой спан.
  */
@@ -69,7 +69,7 @@ MAGNA_API Span MAGNA_CALL span_from_text
     assert (str != NULL);
 
     result.ptr = (am_byte*) str;
-    result.len = strlen (str);
+    result.len = strlen (CCTEXT (str));
 
     return result;
 }
@@ -136,6 +136,84 @@ MAGNA_API Span MAGNA_CALL span_trim
         (
             span_trim_start (span)
         );
+}
+
+/**
+ * Преобразование спана в целое число со знаком.
+ *
+ * @param span Спан.
+ * @return Результат разбора. Мусор на входе -- мусор на выходе!
+ */
+MAGNA_API am_int32 MAGNA_CALL span_to_int32
+    (
+        Span span
+    )
+{
+    am_uint32 result = 0;
+    am_byte *ptr = span.ptr;
+    size_t len = span.len;
+    am_bool sign = AM_FALSE;
+
+    while (len) {
+        if (*ptr == '+') {
+            --len;
+            ++ptr;
+            continue;
+        }
+
+        if (*ptr != '-') {
+            break;
+        }
+
+        sign = !sign;
+        --len;
+        ++ptr;
+    }
+
+    while (len--) {
+        result = result * 10 + (*ptr++ - '0');
+    }
+
+    return sign ? -result : result;
+}
+
+/**
+ * Преобразование спана в целое число со знаком.
+ *
+ * @param span Спан.
+ * @return Результат разбора. Мусор на входе -- мусор на выходе!
+ */
+MAGNA_API am_int64 MAGNA_CALL span_to_int64
+    (
+        Span span
+    )
+{
+    am_uint64 result = 0;
+    am_byte *ptr = span.ptr;
+    size_t len = span.len;
+    am_bool sign = AM_FALSE;
+
+    while (len) {
+        if (*ptr == '+') {
+            --len;
+            ++ptr;
+            continue;
+        }
+
+        if (*ptr != '-') {
+            break;
+        }
+
+        sign = !sign;
+        --len;
+        ++ptr;
+    }
+
+    while (len--) {
+        result = result * 10 + (*ptr++ - '0');
+    }
+
+    return sign ? -result : result;
 }
 
 /**
@@ -384,6 +462,7 @@ MAGNA_API char* MAGNA_CALL span_to_string
     )
 {
     char *result = mem_alloc (span.len + 1);
+
     if (!result) {
         return result;
     }
@@ -510,6 +589,43 @@ MAGNA_API int MAGNA_CALL span_compare
 }
 
 /**
+ * Побайтовое сравнение двух спанов без учета регистра символов.
+ *
+ * @param first Первый спан.
+ * @param second Второй спан.
+ * @return Результат сравнения: < 0, если первый спан меньше,
+ * > 0, если первый спан больше и = 0, если содержимое спанов совпадает.
+ */
+MAGNA_API int MAGNA_CALL span_compare_ignore_case
+    (
+        Span first,
+        Span second
+    )
+{
+    int result;
+    size_t i;
+
+    for (i = 0; ; ++i) {
+        if (i == first.len) {
+            if (i == second.len) {
+                return 0;
+            }
+
+            return -1;
+        }
+
+        if (i == second.len) {
+            return 1;
+        }
+
+        result = toupper (first.ptr[i]) - toupper (second.ptr[i]);
+        if (result) {
+            return result;
+        }
+    }
+}
+
+/**
  * Спан содержит указанное значение?
  *
  * @param span Спан.
@@ -530,7 +646,7 @@ MAGNA_API am_bool MAGNA_CALL span_contains
         }
     }
 
-    return AM_TRUE;
+    return AM_FALSE;
 }
 
 /**

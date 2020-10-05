@@ -45,7 +45,7 @@ int main (int argc, char **argv)
     connection.workstation = CATALOGER;
     connection.port = 6666;
 
-    if (!connection_connect (&connection)) {
+    if (!irbis_connect (&connection)) {
         fputs ("Connection failed", stderr);
         connection_destroy (&connection);
         return 1;
@@ -54,7 +54,7 @@ int main (int argc, char **argv)
     maxMfn = connection_get_max_mfn (&connection, NULL);
     printf ("Max MFN=%u\n", maxMfn);
 
-    connection_disconnect (&connection);
+    irbis_disconnect (&connection);
     connection_destroy (&connection);
 
     return 0;

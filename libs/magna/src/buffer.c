@@ -413,7 +413,7 @@ MAGNA_API am_bool MAGNA_CALL buffer_assign
             return AM_FALSE;
         }
 
-        memcpy (buffer->ptr, data, length);
+        mem_copy (buffer->ptr, data, length);
         buffer->position = length;
     }
 
@@ -1142,6 +1142,31 @@ MAGNA_API am_bool buffer_format
     va_end (args);
 
     return result;
+}
+
+MAGNA_API void MAGNA_CALL buffer_to_file
+    (
+        const Buffer *buffer,
+        am_handle handle
+    )
+{
+    assert (buffer != NULL);
+
+    if (!buffer_is_empty (buffer)) {
+        file_write (handle, buffer->ptr, buffer->position);
+    }
+}
+
+MAGNA_API void MAGNA_CALL buffer_to_console
+    (
+        const Buffer *buffer
+    )
+{
+    assert (buffer != NULL);
+
+    if (!buffer_is_empty (buffer)) {
+        fwrite (buffer->ptr, 1, buffer->position, stdout);
+    }
 }
 
 /*=========================================================*/

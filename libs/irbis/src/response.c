@@ -160,9 +160,11 @@ MAGNA_API Span MAGNA_CALL response_remaining_utf_text
         Response *response
     )
 {
-    Span result = { NULL, 0 };
+    Span result;
 
     assert (response != NULL);
+
+    result = nav_remaining (&response->navigator);
 
     return result;
 }

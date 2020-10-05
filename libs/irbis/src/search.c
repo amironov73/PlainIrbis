@@ -57,7 +57,7 @@ MAGNA_API am_bool MAGNA_CALL search_init
  *
  * @param parameters Параметры поиска.
  */
-MAGNA_API void MAGNA_CALL search_free
+MAGNA_API void MAGNA_CALL search_destroy
     (
         SearchParameters *parameters
     )
@@ -95,7 +95,7 @@ MAGNA_API am_bool MAGNA_CALL scenario_init
  *
  * @param scenario Сценарий поиска.
  */
-MAGNA_API void MAGNA_CALL scenario_free
+MAGNA_API void MAGNA_CALL scenario_destroy
     (
         SearchScenario *scenario
     )

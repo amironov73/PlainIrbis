@@ -58,6 +58,45 @@ typdef unsigned mode_t;
 
 /*=========================================================*/
 
+MAGNA_API MAGNA_INLINE am_handle file_stdin (void)
+{
+#ifdef MAGNA_WINDOWS
+
+    //return handle_from_pointer (GetStdHandle (STD_INPUT_HANDLE));
+
+#else
+
+    return handle_from_value (0);
+
+#endif
+}
+
+MAGNA_API MAGNA_INLINE am_handle file_stdout (void)
+{
+#ifdef MAGNA_WINDOWS
+
+    return handle_from_pointer (GetStdHandle (STD_OUTPUT_HANDLE));
+
+#else
+
+    return handle_from_value (1);
+
+#endif
+}
+
+MAGNA_API MAGNA_INLINE am_handle file_stderr (void)
+{
+#ifdef MAGNA_WINDOWS
+
+    return handle_from_pointer (GetStdHandle (STD_ERROR_HANDLE));
+
+#else
+
+    return handle_from_value (2);
+
+#endif
+}
+
 /**
  * Создание файла с указанным именем.
  * Если файл с таким именем уже существует, он затирается.
@@ -913,7 +952,7 @@ MAGNA_API am_bool MAGNA_CALL file_write_span
 MAGNA_API am_bool MAGNA_CALL file_write_text
     (
         am_handle handle,
-        const char *text
+        const am_byte *text
     )
 {
     am_bool result;
@@ -924,7 +963,7 @@ MAGNA_API am_bool MAGNA_CALL file_write_text
         (
             handle,
             text,
-            strlen (text)
+            strlen (CCTEXT (text))
         );
 
     return result;
