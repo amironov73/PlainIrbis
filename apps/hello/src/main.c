@@ -14,6 +14,7 @@ int main (int argc, char **argv)
     Specification spec;
     Buffer fileContent = BUFFER_INIT;
     Buffer rawRecord = BUFFER_INIT;
+    Buffer formatted = BUFFER_INIT;
     am_mfn maxMfn;
 
     (void) argc;
@@ -46,10 +47,17 @@ int main (int argc, char **argv)
     spec_init (&spec, PATH_MASTER, "IBIS", "brief.pft");
     connection_read_text_file (&connection, &spec, &fileContent);
     buffer_to_console (&fileContent);
+    buffer_destroy (&fileContent);
 
     printf ("\n\nMFN=1:\n\n");
-    connection_read_raw_record(&connection, 1, &rawRecord);
+    connection_read_raw_record (&connection, 1, &rawRecord);
     buffer_to_console (&rawRecord);
+    buffer_destroy (&rawRecord);
+
+    printf ("\n\nFormatted:\n\n");
+    connection_format_mfn (&connection, "@brief", 1, &formatted);
+    buffer_to_console (&formatted);
+    buffer_destroy (&formatted);
 
     irbis_disconnect (&connection);
     connection_destroy (&connection);

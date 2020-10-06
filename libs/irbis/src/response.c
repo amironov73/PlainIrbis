@@ -68,7 +68,8 @@ MAGNA_API am_int32 MAGNA_CALL response_get_return_code
 {
     assert (response != NULL);
 
-    response->returnCode = response_read_int32 (response);
+    response->connection->lastError
+        = response->returnCode = response_read_int32 (response);
 
     return response->returnCode;
 }

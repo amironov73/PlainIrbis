@@ -550,6 +550,7 @@ struct IrbisConnection
 MAGNA_API am_bool MAGNA_CALL connection_actualize_database (Connection *connection, const char *database);
 MAGNA_API am_bool MAGNA_CALL connection_actualize_record   (Connection *connection, const char *database, am_mfn mfn);
 MAGNA_API am_bool MAGNA_CALL connection_check              (Connection *connection);
+MAGNA_API am_bool MAGNA_CALL connection_create             (Connection *connection);
 MAGNA_API am_bool MAGNA_CALL connection_connect            (Connection *connection);
 MAGNA_API am_bool MAGNA_CALL connection_create_database    (Connection *connection, const char *database, const char *description, am_bool readerAccess);
 MAGNA_API am_bool MAGNA_CALL connection_create_dictionary  (Connection *connection, const char *database);
@@ -560,8 +561,8 @@ MAGNA_API am_bool MAGNA_CALL connection_disconnect         (Connection *connecti
 MAGNA_API am_bool MAGNA_CALL connection_execute            (Connection *connection, Query *query, Response *response);
 MAGNA_API am_bool            connection_execute_simple     (Connection *connection, Response *response, const am_byte *command, int argCount, ...);
 MAGNA_API void    MAGNA_CALL connection_destroy            (Connection *connection);
+MAGNA_API am_bool MAGNA_CALL connection_format_mfn         (Connection *connection, const char *format, am_mfn mfn, Buffer *output);
 MAGNA_API am_mfn  MAGNA_CALL connection_get_max_mfn        (Connection *connection, const char *database);
-MAGNA_API am_bool MAGNA_CALL connection_create             (Connection *connection);
 MAGNA_API am_bool MAGNA_CALL connection_no_operation       (Connection *connection);
 MAGNA_API am_bool MAGNA_CALL connection_parse_string       (Connection *connection, Span connectionString);
 MAGNA_API am_bool MAGNA_CALL connection_read_raw_record    (Connection *connection, am_mfn mfn, Buffer *buffer);

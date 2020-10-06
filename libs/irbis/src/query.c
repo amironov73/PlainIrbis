@@ -49,6 +49,11 @@ MAGNA_API am_bool MAGNA_CALL query_add_format
 
     /* TODO: implement */
 
+    if (!utf2ansi (&query->buffer, span_from_text (text))
+        || !buffer_putc (&query->buffer, 0x0A)) {
+        return AM_FALSE;
+    }
+
     return AM_TRUE;
 }
 
@@ -69,7 +74,7 @@ MAGNA_API am_bool MAGNA_CALL query_add_int32
 
     assert (query != NULL);
 
-    sprintf ((char*) temp, "%u", value);
+    sprintf (CTEXT (temp), "%u", value);
 
     return query_add_utf (query, temp);
 }

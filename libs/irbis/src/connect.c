@@ -182,11 +182,10 @@ MAGNA_API am_bool MAGNA_CALL connection_actualize_database
         const char *database
     )
 {
-    if (!connection_check (connection)) {
-        return AM_FALSE;
-    }
+    assert (connection != NULL);
+    assert (database != NULL);
 
-    return AM_FALSE;
+    return connection_actualize_record (connection, database, 0);
 }
 
 /**
@@ -204,11 +203,38 @@ MAGNA_API am_bool MAGNA_CALL connection_actualize_record
         am_mfn mfn
     )
 {
+    Query query;
+    Response response;
+    am_bool result = AM_FALSE;
+
+    assert (connection != NULL);
+    assert (database != NULL);
+
     if (!connection_check (connection)) {
         return AM_FALSE;
     }
 
-    return AM_FALSE;
+    response_null (&response);
+    if (!query_create (&query, connection, CBTEXT (ACTUALIZE_RECORD))) {
+        return AM_FALSE;
+    }
+
+    if (!query_add_ansi (&query, CBTEXT (database))
+        || !query_add_int32 (&query, mfn)) {
+        goto DONE;
+    }
+
+    if (!connection_execute (connection, &query, &response)) {
+        goto DONE;
+    }
+
+    result = response_get_return_code (&response) >= 0;
+
+    DONE:
+    query_destroy (&query);
+    response_destroy (&response);
+
+    return result;
 }
 
 /**
@@ -653,14 +679,78 @@ MAGNA_API am_bool connection_execute_simple
         goto DONE;
     }
 
-    if (response_get_return_code (response) >= 0) {
-        result = AM_TRUE;
-    }
+    result = response_get_return_code (response) >= 0;
 
     DONE:
     query_destroy (&query);
 
     return result;
+}
+
+MAGNA_API am_bool MAGNA_CALL connection_format_mfn
+    (
+        Connection *connection,
+        const char *format,
+        am_mfn mfn,
+        Buffer *output
+    )
+{
+    Query query;
+    Response response;
+    const char *database;
+    Span text;
+    am_bool result = AM_FALSE;
+
+    assert (connection != NULL);
+    assert (format != NULL);
+    assert (mfn > 0);
+    assert (output != NULL);
+
+    if (!connection_check (connection)) {
+        return AM_FALSE;
+    }
+
+    response_null (&response);
+    if (!query_create (&query, connection, CBTEXT (FORMAT_RECORD))) {
+        return AM_FALSE;
+    }
+
+    database = CCTEXT (buffer_to_text (&connection->database));
+    if (database == NULL) {
+        goto DONE;
+    }
+
+    if (!query_add_ansi (&query, CBTEXT (database))
+        || !query_add_format (&query, CBTEXT (format))
+        || !query_add_int32 (&query, 1)
+        || !query_add_int32 (&query, mfn)) {
+        goto DONE;
+    }
+
+    if (!connection_execute (connection, &query, &response)) {
+        goto DONE;
+    }
+
+    result = response_get_return_code (&response) >= 0;
+
+    if (result) {
+        text = response_remaining_utf_text (&response);
+        if (span_is_empty (text)) {
+            result = AM_FALSE;
+        }
+        else {
+            if (!buffer_write (output, text.ptr, text.len)) {
+                result = AM_FALSE;
+            }
+        }
+    }
+
+    DONE:
+    query_destroy (&query);
+    response_destroy (&response);
+
+    return result;
+
 }
 
 /**
