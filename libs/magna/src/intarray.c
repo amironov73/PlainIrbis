@@ -456,7 +456,7 @@ static am_bool format_range
 
     if (first == last - 1) {
         return buffer_put_uint32(buffer, first)
-               && buffer_puts (buffer, ", ")
+               && buffer_puts (buffer, CBTEXT (", "))
                && buffer_put_uint32(buffer, last);
     }
 
@@ -487,7 +487,7 @@ MAGNA_API am_bool MAGNA_CALL int32_array_compress
         current = array->ptr[index];
         if (current != last + 1) {
             if (!first) {
-                if (!buffer_puts (buffer, ", ")) {
+                if (!buffer_puts (buffer, CBTEXT (", "))) {
                     return AM_FALSE;
                 }
             }
@@ -505,7 +505,7 @@ MAGNA_API am_bool MAGNA_CALL int32_array_compress
     }
 
     if (!first) {
-        if (!buffer_puts (buffer, ", ")) {
+        if (!buffer_puts (buffer, CBTEXT (", "))) {
             return AM_FALSE;
         }
     }

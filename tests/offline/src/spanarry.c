@@ -26,7 +26,7 @@ TESTER(span_array_create_1)
 TESTER(span_array_push_back_1)
 {
     SpanArray a1;
-    Span c1 = { "Hello", 5 }, c2 = { "world", 5 };
+    Span c1 = { BTEXT ("Hello"), 5 }, c2 = { BTEXT ("world"), 5 };
     Span g1, g2;
 
     span_array_create (&a1, 10);
@@ -46,7 +46,7 @@ TESTER(span_array_push_back_1)
 TESTER(span_array_push_front_1)
 {
     SpanArray a1;
-    Span c1 = { "Hello", 5 }, c2 = { "world", 5 };
+    Span c1 = { BTEXT ("Hello"), 5 }, c2 = { BTEXT ("world"), 5 };
     Span g1, g2;
 
     span_array_create (&a1, 10);
@@ -64,7 +64,7 @@ TESTER(span_array_push_front_1)
 TESTER(span_array_pop_back_1)
 {
     SpanArray a1;
-    Span c1 = { "Hello", 5 }, c2 = { "world", 5 };
+    Span c1 = { BTEXT ("Hello"), 5 }, c2 = { BTEXT ("world"), 5 };
     Span g1, g2;
 
     span_array_create (&a1, 10);
@@ -85,7 +85,7 @@ TESTER(span_array_pop_back_1)
 TESTER(span_array_pop_front_1)
 {
     SpanArray a1;
-    Span c1 = { "Hello", 5 }, c2 = { "world", 5 };
+    Span c1 = { BTEXT ("Hello"), 5 }, c2 = { BTEXT ("world"), 5 };
     Span g1, g2;
 
     span_array_create (&a1, 10);
@@ -106,7 +106,7 @@ TESTER(span_array_pop_front_1)
 TESTER(span_array_set_1)
 {
     SpanArray  a1;
-    Span c1 = { "Hello", 5 }, c2 = { "world", 5 }, c3 = { "!", 1 };
+    Span c1 = { BTEXT ("Hello"), 5 }, c2 = { BTEXT ("world"), 5 }, c3 = { BTEXT ("!"), 1 };
     Span g1, g2;
 
     span_array_create (&a1, 10);
@@ -126,7 +126,7 @@ TESTER(span_array_set_1)
 TESTER(span_array_clone_1)
 {
     SpanArray a1, a2;
-    Span c1 = { "Hello", 5 }, c2 = { "world", 5 };
+    Span c1 = { BTEXT ("Hello"), 5 }, c2 = { BTEXT ("world"), 5 };
     Span g1, g2;
 
     span_array_create (&a1, 10);
@@ -160,7 +160,7 @@ TESTER(span_array_clone_2)
 TESTER(span_array_copy_1)
 {
     SpanArray a1, a2;
-    Span c1 = { "Hello", 5 }, c2 = { "world", 5 };
+    Span c1 = { BTEXT ("Hello"), 5 }, c2 = { BTEXT ("world"), 5 };
     Span g1, g2;
 
     span_array_create (&a1, 10);
@@ -184,7 +184,7 @@ TESTER(span_array_copy_1)
 TESTER(span_array_concat_1)
 {
     SpanArray a1, a2;
-    Span c1 = { "Hello", 5 }, c2 = { "world", 5 };
+    Span c1 = { BTEXT ("Hello"), 5 }, c2 = { BTEXT ("world"), 5 };
     Span g1, g2;
 
     span_array_create (&a1, 10);
@@ -209,7 +209,7 @@ TESTER(span_array_concat_1)
 TESTER(span_array_shrink_1)
 {
     SpanArray a1;
-    Span c1 = { "Hello", 5 }, c2 = { "world", 5 };
+    Span c1 = { BTEXT ("Hello"), 5 }, c2 = { BTEXT ("world"), 5 };
     Span g1, g2;
 
     span_array_create (&a1, 10);
@@ -240,7 +240,7 @@ TESTER(span_array_shrink_2)
 TESTER(span_array_truncate_1)
 {
     SpanArray a1;
-    Span c1 = { "Hello", 5 }, c2 = { "world", 5 };
+    Span c1 = { BTEXT ("Hello"), 5 }, c2 = { BTEXT ("world"), 5 };
     Span g1;
 
     span_array_create (&a1, 10);
@@ -283,7 +283,7 @@ TESTER(span_array_grow_2)
 TESTER(span_array_grow_3)
 {
     SpanArray a1;
-    Span c1 = { "Hello", 5 }, c2 = { "world", 5 };
+    Span c1 = { BTEXT ("Hello"), 5 }, c2 = { BTEXT ("world"), 5 };
 
     span_array_create (&a1, 10);
     CHECK (a1.capacity == 10);
@@ -294,4 +294,3 @@ TESTER(span_array_grow_3)
     CHECK (a1.len == 2);
     span_array_free (&a1);
 }
-

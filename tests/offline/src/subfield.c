@@ -7,7 +7,7 @@
 TESTER(subfield_init_1)
 {
     SubField subfield;
-    Span text = span_from_text ("Hello, world");
+    Span text = TEXT_SPAN ("Hello, world");
 
     subfield_init (&subfield, 'a', text);
 
@@ -20,7 +20,7 @@ TESTER(subfield_init_1)
 TESTER(subfield_create_1)
 {
     SubField subfield;
-    Span text = span_from_text ("Hello, world");
+    Span text = TEXT_SPAN ("Hello, world");
 
     subfield_create (&subfield, 'a', text);
 

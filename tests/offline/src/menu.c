@@ -40,7 +40,7 @@ TESTER(menu_entry_to_string_2)
     buffer_assign_text (&entry.code, "A");
 
     CHECK (menu_entry_to_string (&entry, &text));
-    CHECK (buffer_compare_text (&text, "A") == 0);
+    CHECK (buffer_compare_text (&text, CBTEXT ("A")) == 0);
 
     menu_entry_free (&entry);
     buffer_destroy(&text);
@@ -57,7 +57,7 @@ TESTER(menu_entry_to_string_3)
     buffer_assign_text (&entry.comment, "first letter");
 
     CHECK (menu_entry_to_string (&entry, &text));
-    CHECK (buffer_compare_text (&text, "A - first letter") == 0);
+    CHECK (buffer_compare_text (&text, CBTEXT ("A - first letter")) == 0);
 
     menu_entry_free (&entry);
     buffer_destroy(&text);
@@ -98,7 +98,7 @@ TESTER(menu_get_entry_1)
     entry = menu_get_entry
         (
             &menu,
-            span_from_text ("first")
+            TEXT_SPAN ("first")
         );
     CHECK (entry == NULL);
 
@@ -109,14 +109,14 @@ TESTER(menu_get_comment_1)
 {
     MenuFile menu;
     Span comment;
-    const am_byte *defaultValue = "default";
+    const am_byte *defaultValue = CBTEXT ("default");
 
     CHECK (menu_init (&menu));
 
     comment = menu_get_comment
         (
             &menu,
-            span_from_text ("first"),
+            TEXT_SPAN ("first"),
             span_from_text (defaultValue)
         );
     CHECK (comment.ptr == defaultValue);
@@ -146,35 +146,35 @@ TESTER(menu_parse_2)
     Stream memory;
     StreamTexter texter;
     MenuFile menu;
-    am_byte *text = "A\r\nfirst letter\r\nB\r\nsecond letter\r\n*****\r\n\r\n";
+    am_byte *text = BTEXT ("A\r\nfirst letter\r\nB\r\nsecond letter\r\n*****\r\n\r\n");
     const MenuEntry *entry;
-    Span comment, defaultValue = span_from_text ("default");
+    Span comment, defaultValue = TEXT_SPAN ("default");
 
     CHECK (menu_init (&menu));
-    CHECK (memory_stream_open (&memory, text, strlen (text)));
+    CHECK (memory_stream_open (&memory, text, strlen (CCTEXT (text))));
     CHECK (texter_init (&texter, &memory, 0));
 
     CHECK (menu_parse (&menu, &texter));
     CHECK (menu.entries.len == 2);
 
-    entry = menu_get_entry (&menu, span_from_text ("A"));
+    entry = menu_get_entry (&menu, TEXT_SPAN ("A"));
     CHECK (entry != NULL);
-    CHECK (buffer_compare_text (&entry->code, "A") == 0);
+    CHECK (buffer_compare_text (&entry->code, CBTEXT ("A")) == 0);
 
-    entry = menu_get_entry (&menu, span_from_text ("b"));
+    entry = menu_get_entry (&menu, TEXT_SPAN ("b"));
     CHECK (entry != NULL);
-    CHECK (buffer_compare_text (&entry->code, "B") == 0);
+    CHECK (buffer_compare_text (&entry->code, CBTEXT ("B")) == 0);
 
-    entry = menu_get_entry (&menu, span_from_text ("?"));
+    entry = menu_get_entry (&menu, TEXT_SPAN ("?"));
     CHECK (entry == NULL);
 
-    comment = menu_get_comment (&menu, span_from_text("A"), defaultValue);
-    CHECK (span_compare (comment, span_from_text ("first letter")) == 0);
+    comment = menu_get_comment (&menu, TEXT_SPAN("A"), defaultValue);
+    CHECK (span_compare (comment, TEXT_SPAN ("first letter")) == 0);
 
-    comment = menu_get_comment (&menu, span_from_text("b"), defaultValue);
-    CHECK (span_compare (comment, span_from_text ("second letter")) == 0);
+    comment = menu_get_comment (&menu, TEXT_SPAN ("b"), defaultValue);
+    CHECK (span_compare (comment, TEXT_SPAN ("second letter")) == 0);
 
-    comment = menu_get_comment (&menu, span_from_text("?"), defaultValue);
+    comment = menu_get_comment (&menu, TEXT_SPAN ("?"), defaultValue);
     CHECK (span_compare (comment, defaultValue) == 0);
 
     texter_destroy(&texter);

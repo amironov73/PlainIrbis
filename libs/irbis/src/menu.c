@@ -103,7 +103,7 @@ MAGNA_API am_bool MAGNA_CALL menu_entry_to_string
     }
 
     if (entry->comment.position != 0) {
-        return buffer_puts(output, " - ")
+        return buffer_puts(output, CBTEXT (" - "))
            && buffer_concat(output, &entry->comment);
     }
 

@@ -115,7 +115,7 @@ MAGNA_API am_bool MAGNA_CALL object_to_string
             return type->to_string (object, buffer);
         }
 
-        return buffer_puts (buffer, type->name);
+        return buffer_puts (buffer, CBTEXT (type->name));
     }
 
     return AM_TRUE;

@@ -26,7 +26,7 @@ am_bool where_test_data
         return AM_FALSE;
     }
 
-    buffer_static (&appendix, testData, strlen (testData));
+    buffer_static (&appendix, CBTEXT (testData), strlen (testData));
     appendix.position = appendix.capacity;
 
     while (AM_TRUE) {
@@ -39,7 +39,7 @@ am_bool where_test_data
             break;
         }
 
-        text = buffer_to_text (&candidate);
+        text = (char*) buffer_to_text (&candidate);
         if (text == NULL) {
             break;
         }

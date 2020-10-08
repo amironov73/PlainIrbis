@@ -155,7 +155,7 @@ MAGNA_API am_byte* MAGNA_CALL date_to_text
         return NULL;
     }
 
-    sprintf (buffer, "%04u%02u%02u", year, month, day);
+    sprintf ((char*) buffer, "%04u%02u%02u", year, month, day);
 
     return buffer;
 }

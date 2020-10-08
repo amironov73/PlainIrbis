@@ -367,7 +367,7 @@ MAGNA_API am_bool MAGNA_CALL tcp4_stream_create
         return AM_FALSE;
     }
 
-    handle = tcp4_connect (hostname, port);
+    handle = tcp4_connect (CBTEXT (hostname), port);
     if (handle == -1) {
         return AM_FALSE;
     }

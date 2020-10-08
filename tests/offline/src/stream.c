@@ -19,7 +19,6 @@ TESTER(null_stream_open_1)
 TESTER(null_stream_open_2)
 {
     Stream stream;
-    am_byte data[16];
 
     CHECK (null_stream_open (&stream));
     stream.closeFunction = NULL;
@@ -123,13 +122,13 @@ TESTER(memory_stream_to_text_1)
     am_byte *data;
 
     CHECK (memory_stream_create (&memory));
-    CHECK (stream_write (&memory, text, length));
+    CHECK (stream_write (&memory, CBTEXT (text), length));
 
     data = memory_stream_to_text (&memory);
 
     CHECK (data != NULL);
-    CHECK (strlen (data) == length);
-    CHECK (strcmp (data, text) == 0);
+    CHECK (strlen (CCTEXT (data)) == length);
+    CHECK (strcmp (CCTEXT (data), text) == 0);
     CHECK (stream_close (&memory));
 }
 
@@ -153,10 +152,10 @@ TESTER(texter_init_2)
 {
     Stream memory;
     StreamTexter texter;
-    am_byte *text = "Hello World";
-    ssize_t length = strlen (text);
+    am_byte *text = BTEXT ("Hello World");
+    ssize_t length = strlen (CCTEXT (text));
 
-    CHECK (memory_stream_open (&memory, text, strlen (text)));
+    CHECK (memory_stream_open (&memory, text, length));
     CHECK (texter_init (&texter, &memory, 0));
     CHECK (texter.stream == &memory);
     CHECK (texter.position == 0);
@@ -187,9 +186,9 @@ TESTER(texter_read_byte_2)
 {
     Stream memory;
     StreamTexter texter;
-    am_byte *text = "Hello World";
+    am_byte *text = BTEXT ("Hello World");
 
-    CHECK (memory_stream_open (&memory, text, strlen (text)));
+    CHECK (memory_stream_open (&memory, text, strlen (CCTEXT (text))));
     CHECK (texter_init (&texter, &memory, 0));
 
     CHECK (texter_read_byte (&texter) == 'H');
@@ -230,9 +229,9 @@ TESTER(texter_read_line_2)
 {
     Stream memory;
     StreamTexter texter;
-    am_byte *text = "Hello World";
+    am_byte *text = BTEXT ("Hello World");
     Buffer line = BUFFER_INIT;
-    size_t length = strlen (text);
+    size_t length = strlen (CCTEXT (text));
 
     CHECK (memory_stream_open (&memory, text, length));
     CHECK (texter_init (&texter, &memory, 0));
@@ -248,9 +247,9 @@ TESTER(texter_read_line_3)
 {
     Stream memory;
     StreamTexter texter;
-    am_byte *text = "Hello\r\nWorld!";
+    am_byte *text = BTEXT ("Hello\r\nWorld!");
     Buffer line = BUFFER_INIT;
-    size_t length = strlen (text);
+    size_t length = strlen (CCTEXT (text));
 
     CHECK (memory_stream_open (&memory, text, length));
     CHECK (texter_init (&texter, &memory, 0));
@@ -270,9 +269,9 @@ TESTER(texter_read_line_4)
 {
     Stream memory;
     StreamTexter texter;
-    am_byte *text = "Hello\nWorld!";
+    am_byte *text = BTEXT ("Hello\nWorld!");
     Buffer line = BUFFER_INIT;
-    size_t length = strlen (text);
+    size_t length = strlen (CCTEXT (text));
 
     CHECK (memory_stream_open (&memory, text, length));
     CHECK (texter_init (&texter, &memory, 0));
@@ -292,9 +291,9 @@ TESTER(texter_read_line_5)
 {
     Stream memory;
     StreamTexter texter;
-    am_byte *text = "Hello\rWorld!";
+    am_byte *text = BTEXT ("Hello\rWorld!");
     Buffer line = BUFFER_INIT;
-    size_t length = strlen (text);
+    size_t length = strlen (CCTEXT (text));
 
     CHECK (memory_stream_open (&memory, text, length));
     CHECK (texter_init (&texter, &memory, 0));
@@ -314,9 +313,9 @@ TESTER(texter_read_line_6)
 {
     Stream memory;
     StreamTexter texter;
-    am_byte *text = "Hello\r";
+    am_byte *text = BTEXT ("Hello\r");
     Buffer line = BUFFER_INIT;
-    size_t length = strlen (text);
+    size_t length = strlen (CCTEXT (text));
 
     CHECK (memory_stream_open (&memory, text, length));
     CHECK (texter_init (&texter, &memory, 0));

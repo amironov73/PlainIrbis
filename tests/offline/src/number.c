@@ -85,9 +85,7 @@ TESTER(ntc_setup_1)
 
     ntc_init (&chunk);
 
-    CHECK (ntc_setup (&chunk,
-                      span_from_text(prefix),
-                      span_from_text(number)));
+    CHECK (ntc_setup (&chunk, TEXT_SPAN (prefix), TEXT_SPAN (number)));
 
     ntc_free (&chunk);
 }
@@ -99,9 +97,7 @@ TESTER(ntc_setup_2)
 
     ntc_init (&chunk);
 
-    CHECK (ntc_setup (&chunk,
-                      span_from_text(prefix),
-                      span_from_text(number)));
+    CHECK (ntc_setup (&chunk, TEXT_SPAN (prefix), TEXT_SPAN (number)));
 
     ntc_free (&chunk);
 }
@@ -113,9 +109,7 @@ TESTER(ntc_setup_3)
 
     ntc_init (&chunk);
 
-    CHECK (!ntc_setup (&chunk,
-                      span_from_text(prefix),
-                      span_from_text(number)));
+    CHECK (!ntc_setup (&chunk, TEXT_SPAN (prefix), TEXT_SPAN (number)));
 
     ntc_free (&chunk);
 }
@@ -132,7 +126,7 @@ TESTER(ntc_to_string_1)
     CHECK (buffer.position == 0);
 
     ntc_free (&chunk);
-    buffer_destroy(&buffer);
+    buffer_destroy (&buffer);
 }
 
 TESTER(ntc_to_string_2)
@@ -148,10 +142,10 @@ TESTER(ntc_to_string_2)
 
     CHECK (ntc_to_string (&chunk, &buffer));
     CHECK (buffer.position == 8);
-    CHECK (buffer_compare_text (&buffer, "Hello123") == 0);
+    CHECK (buffer_compare_text (&buffer, CBTEXT ("Hello123")) == 0);
 
     ntc_free (&chunk);
-    buffer_destroy(&buffer);
+    buffer_destroy (&buffer);
 }
 
 TESTER(ntc_to_string_3)
@@ -165,10 +159,10 @@ TESTER(ntc_to_string_3)
 
     CHECK (ntc_to_string (&chunk, &buffer));
     CHECK (buffer.position == 5);
-    CHECK (buffer_compare_text (&buffer, "Hello") == 0);
+    CHECK (buffer_compare_text (&buffer, CBTEXT ("Hello")) == 0);
 
     ntc_free (&chunk);
-    buffer_destroy(&buffer);
+    buffer_destroy (&buffer);
 }
 
 TESTER(ntc_to_string_4)
@@ -183,10 +177,10 @@ TESTER(ntc_to_string_4)
 
     CHECK (ntc_to_string (&chunk, &buffer));
     CHECK (buffer.position == 3);
-    CHECK (buffer_compare_text (&buffer, "123") == 0);
+    CHECK (buffer_compare_text (&buffer, CBTEXT ("123")) == 0);
 
     ntc_free (&chunk);
-    buffer_destroy(&buffer);
+    buffer_destroy (&buffer);
 }
 
 TESTER(number_get_chunk_1)

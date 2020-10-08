@@ -569,9 +569,13 @@ MAGNA_API am_bool MAGNA_CALL mem_can_execute
 
     return !IsBadCodePtr (ptr);
 
-#else
+#elif defined(MAGNA_LINUX)
 
     return check_memory_map ((am_uint64) ptr, 4, 'x');
+
+#else
+
+    return AM_TRUE;
 
 #endif
 }

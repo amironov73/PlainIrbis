@@ -157,7 +157,7 @@ MAGNA_API am_bool MAGNA_CALL stream_write_line
     assert (stream != NULL);
     assert (text != NULL);
 
-    return stream_write (stream, text, strlen (text));
+    return stream_write (stream, CBTEXT (text), strlen (text));
 }
 
 /**

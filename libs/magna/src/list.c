@@ -986,7 +986,7 @@ MAGNA_API am_bool MAGNA_CALL list_to_string
 
     for (current = list->first; current; current = current->next) {
         if ((separator != NULL) && (current != list->first)) {
-            if (!buffer_puts (buffer, separator)) {
+            if (!buffer_puts (buffer, CBTEXT (separator))) {
                 return AM_FALSE;
             }
         }

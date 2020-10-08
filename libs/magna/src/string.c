@@ -358,6 +358,8 @@ MAGNA_API am_bool MAGNA_CALL irbis_to_client
 
         first = AM_FALSE;
     }
+
+    return AM_TRUE;
 }
 
 

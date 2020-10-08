@@ -176,12 +176,15 @@ MAGNA_API am_bool MAGNA_CALL path_get_temporary_directory
     if (!result) {
         result = getenv ("TEMPDIR");
     }
+
     if (!result) {
         result = getenv ("TMP");
     }
+
     if (!result) {
         result = getenv ("TEMP");
     }
+
     if (!result) {
         /* The Filesystem Hierarchy Standard version 3.0 says:
            The /tmp directory must be made available for programs
@@ -189,7 +192,7 @@ MAGNA_API am_bool MAGNA_CALL path_get_temporary_directory
         result = "/tmp";
     }
 
-    return buffer_puts (path, result);
+    return buffer_puts (path, CBTEXT (result));
 
 #else
 
@@ -602,7 +605,7 @@ MAGNA_API am_bool MAGNA_CALL path_get_executable
         return AM_FALSE;
     }
 
-    return buffer_puts (buffer, path);
+    return buffer_puts (buffer, CBTEXT (path));
 
 #else
 

@@ -469,7 +469,7 @@ MAGNA_API am_bool MAGNA_CALL span_array_from_text
 
     span = array->ptr;
     for (index = 0; index < count; ++index, ++span) {
-        *span = span_from_text (text [index]);
+        *span = TEXT_SPAN( text [index]);
     }
 
     return AM_TRUE;

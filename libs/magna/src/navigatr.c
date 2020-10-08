@@ -109,7 +109,7 @@ MAGNA_API TextNavigator* MAGNA_CALL nav_from_text
     assert (nav != NULL);
     assert (text != NULL);
 
-    return nav_init (nav, (am_byte*) text, (size_t) strlen (text));
+    return nav_init (nav, CBTEXT (text), (size_t) strlen (CCTEXT (text)));
 }
 
 /**

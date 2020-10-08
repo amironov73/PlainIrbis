@@ -65,7 +65,7 @@ MAGNA_API MarcField* MAGNA_CALL record_add
 
     field = calloc (1, sizeof (MarcField));
     field->tag = tag;
-    buffer_from_text (&field->value, value);
+    buffer_from_text (&field->value, CBTEXT (value));
     vector_push_back(&record->fields, field);
 
     return field;

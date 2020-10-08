@@ -390,7 +390,7 @@ TESTER(file_write_text_1)
 
     handle = file_create (fname);
     CHECK (handle_is_good (handle));
-    CHECK (file_write_text (handle, output));
+    CHECK (file_write_text (handle, CBTEXT (output)));
     CHECK (file_sync (handle));
 
     CHECK (file_close (handle));

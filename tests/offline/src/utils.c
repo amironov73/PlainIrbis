@@ -93,7 +93,7 @@ TESTER(choose_string_2)
 
 TESTER(choose_span_1)
 {
-    Span first = span_from_text ("Hello"), second = span_from_text ("World");
+    Span first = TEXT_SPAN ("Hello"), second = TEXT_SPAN ("World");
     Span choosen;
 
     choosen = choose_span (first, second);
@@ -110,8 +110,8 @@ TESTER(choose_buffer_1)
     Buffer first, second;
     Buffer *choosen;
 
-    buffer_static (&first, "Hello", 5);
-    buffer_static (&second, "World", 5);
+    buffer_static (&first, BTEXT ("Hello"), 5);
+    buffer_static (&second, BTEXT ("World"), 5);
     first.position = first.capacity;
     second.position = second.capacity;
 
@@ -125,4 +125,3 @@ TESTER(choose_buffer_1)
     choosen = choose_buffer (NULL, &second);
     CHECK (choosen == &second);
 }
-

@@ -323,7 +323,7 @@ MAGNA_API am_bool MAGNA_CALL buffer_puts
     assert (buffer != NULL);
     assert (str != NULL);
 
-    delta = strlen (str);
+    delta = strlen (CCTEXT (str));
     if (!buffer_grow (buffer, buffer->position + delta)) {
         return AM_FALSE;
     }
@@ -484,7 +484,7 @@ MAGNA_API Buffer* MAGNA_CALL buffer_from_text
         buffer->position = 0;
     }
     else {
-        len = strlen (text) + 1;
+        len = strlen (CCTEXT (text)) + 1;
         if (!buffer_grow (buffer, len)) {
             return NULL;
         }
@@ -610,8 +610,8 @@ MAGNA_API am_bool MAGNA_CALL buffer_replace_text
         return AM_TRUE;
     }
 
-    lenFrom = strlen (from);
-    lenTo = strlen (to);
+    lenFrom = strlen (CCTEXT (from));
+    lenTo = strlen (CCTEXT (to));
     end = buffer->ptr + buffer->position;
     for (ptr1 = buffer->ptr; ptr1 < end; ) {
         ptr2 = find_text (ptr1, end, from);
@@ -1040,7 +1040,8 @@ MAGNA_API am_bool MAGNA_CALL buffer_put_uint32
 
     assert (buffer != NULL);
 
-    sprintf (temp, "%u", value);
+    /* TODO: implement properly */
+    sprintf ((char*) temp, "%lu", (unsigned long) value);
 
     return buffer_puts (buffer, temp);
 }
@@ -1062,7 +1063,7 @@ MAGNA_API am_bool MAGNA_CALL buffer_put_uint64
 
     assert (buffer != NULL);
 
-    sprintf (temp, "%llu", value);
+    sprintf ((char*) temp, "%llu", value);
 
     return buffer_puts (buffer, temp);
 }
