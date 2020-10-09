@@ -1,11 +1,11 @@
-/* This is an open source non-commercial project. Dear PVS-Studio, please check it.
- * PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com */
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include "magna/irbis.h"
 
-/* ReSharper disable StringLiteralTypo */
-/* ReSharper disable IdentifierTypo */
-/* ReSharper disable CommentTypo */
+// ReSharper disable StringLiteralTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable CommentTypo
 
 /**
     \file subfield.c
@@ -56,20 +56,49 @@
     либо значение первого по порядку подполя" (смотря по тому,
     что присутствует в записи).
 
+    Подполе владеет собственной памятью, для освобождения которой
+    необходимо вызвать `subfield_destroy`.
+
  */
 
 #include <assert.h>
+#include <ctype.h>
 
 /*=========================================================*/
 
 /**
+ * Присвоение значения подполю.
+ *
+ * @param subfield Проинициализированное поле, значение которого необходимо задать.
+ * @param value Значение подполя (может быть пустым).
+ * @return Признак успешности завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL subfield_assign
+    (
+        SubField *subfield,
+        Span value
+    )
+{
+    assert (subfield != NULL);
+
+    if (!buffer_assign_span (&subfield->value, value)) {
+        return AM_FALSE;
+    }
+
+    subfield->value.position = value.len;
+
+    return AM_TRUE;
+}
+
+/**
  * Клонирование (глубокая копия) подполя.
  *
- * @param target Указатель на неинициализированное подполе, в которое должен быть помещен результат.
+ * @param target Указатель на неинициализированное подполе,
+ * в которое должен быть помещен результат.
  * @param source Подполе, подлежащее клонированию.
  * @return Указатель на подполе, в которое помещен клон.
  */
-MAGNA_API SubField* MAGNA_CALL subfield_clone
+MAGNA_API am_bool MAGNA_CALL subfield_clone
     (
         SubField *target,
         const SubField *source
@@ -79,19 +108,18 @@ MAGNA_API SubField* MAGNA_CALL subfield_clone
     assert (source != NULL);
 
     target->code = source->code;
-    buffer_clone (&target->value, &source->value);
 
-    return target;
+    return buffer_clone (&target->value, &source->value);
 }
 
 /**
  * Декодирование подполя из текстового представления.
  *
- * @param subfield
+ * @param subfield Указатель на инициализированную структуру.
  * @param text Текстовое представление подполя (без символа-разделителя).
- * @return
+ * @return Признак успешности завершения операции.
  */
-MAGNA_API SubField* MAGNA_CALL subfield_decode
+MAGNA_API am_bool MAGNA_CALL subfield_decode
     (
         SubField *subfield,
         Span text
@@ -100,14 +128,16 @@ MAGNA_API SubField* MAGNA_CALL subfield_decode
     assert (subfield != NULL);
 
     if (text.len != 0) {
-        subfield->code = text.ptr[0];
+        subfield->code = subfield_normalize_code (text.ptr[0]);
         if (--text.len != 0) {
             ++text.ptr;
-            buffer_from_span(&subfield->value, text);
+            if (!buffer_assign_span (&subfield->value, text)) {
+                return AM_FALSE;
+            }
         }
     }
 
-    return subfield;
+    return AM_TRUE;
 }
 
 /**
@@ -116,7 +146,7 @@ MAGNA_API SubField* MAGNA_CALL subfield_decode
  * @param subfield Подполе подлежащее проверке.
  * @return Результат проверки.
  */
-MAGNA_API am_bool MAGNA_CALL subfield_empty
+MAGNA_API am_bool MAGNA_CALL subfield_is_empty
     (
         const SubField *subfield
     )
@@ -132,23 +162,26 @@ MAGNA_API am_bool MAGNA_CALL subfield_empty
  *
  * @param subfield Указатель на неинициализированное подполе.
  * @param code Код подполя.
- * @param value Указатель на строку с данными.
- * @return Указатель на подполе.
+ * @param value Спан с данными (может быть пустым).
+ * @return Признак успешности завершения операции.
  */
-MAGNA_API SubField* MAGNA_CALL subfield_create
+MAGNA_API am_bool MAGNA_CALL subfield_create
     (
         SubField *subfield,
-        char code,
+        am_byte code,
         Span value
     )
 {
     assert (subfield != NULL);
 
     subfield->code = code;
-    buffer_create (&subfield->value, value.ptr, value.len);
+    if (!buffer_create (&subfield->value, value.ptr, value.len)) {
+        return AM_FALSE;
+    }
+
     subfield->value.position = value.len;
 
-    return subfield;
+    return AM_TRUE;
 }
 
 /**
@@ -158,11 +191,13 @@ MAGNA_API SubField* MAGNA_CALL subfield_create
  * @param code Код подполя.
  * @param value Указатель на строку с данными.
  * @return Указатель на подполе.
+ * @warning Инициализированное таким образом поле нельзя
+ * освобождать при помощи `subfield_destroy`.
  */
 MAGNA_API SubField* MAGNA_CALL subfield_init
     (
         SubField *subfield,
-        char code,
+        am_byte code,
         Span value
     )
 {
@@ -180,44 +215,73 @@ MAGNA_API SubField* MAGNA_CALL subfield_init
  *
  * @param subfield Подполе, подлежащее освобождению.
  */
-MAGNA_API void MAGNA_CALL subfield_free
+MAGNA_API void MAGNA_CALL subfield_destroy
     (
         SubField *subfield
     )
 {
     assert (subfield != NULL);
 
-    buffer_destroy(&subfield->value);
+    buffer_destroy (&subfield->value);
 }
 
 /**
  * Конвертация подполя в текстовое представление.
  *
- * @param subfield
- * @param buffer
- * @return
+ * @param subfield Подполе.
+ * @param output Буфер для размещения результата.
+ * @return Признак успешности завершения операции.
  */
-MAGNA_API Buffer* MAGNA_CALL subfield_to_string
+MAGNA_API am_bool MAGNA_CALL subfield_to_string
     (
         const SubField *subfield,
-        Buffer *buffer
+        Buffer *output
     )
 {
     assert (subfield != NULL);
-    assert (buffer != NULL);
+    assert (output != NULL);
 
-    return buffer_putc (buffer, '^')
-        && buffer_putc (buffer, subfield->code)
-        && buffer_concat (buffer, &subfield->value)
-        ? buffer
-        : NULL;
+    return buffer_putc (output, '^')
+        && buffer_putc (output, subfield->code)
+        && buffer_concat (output, &subfield->value);
+}
+
+/**
+ * Проверка, является ли указанный код подполя валидным.
+ *
+ * @param code Проверяемый код подполя.
+ * @return Результат проверки.
+ */
+MAGNA_API am_bool MAGNA_CALL subfield_code_is_valid
+    (
+        am_byte code
+    )
+{
+    return (code >= '!') && (code <= '~');
+}
+
+/**
+ * Нормализация кода подполя (приведение к нижнему регистру).
+ *
+ * @param code Код подполя, подлежащий нормализации.
+ * @return Нормализованный код подполя.
+ */
+MAGNA_API am_byte MAGNA_CALL subfield_normalize_code
+    (
+        am_byte code
+    )
+{
+    return tolower (code);
 }
 
 /**
  * Верификация подполя.
  *
- * @param subfield
- * @return
+ * @param subfield Подполе, подлежащее верификации.
+ * @return Результат верификации.
+ * @remarks Валидным подполем считается:
+ * 1) имеющее код из диапазона разрешенных,
+ * 2) имеющее непустое значение.
  */
 MAGNA_API am_bool MAGNA_CALL subfield_verify
     (
@@ -226,6 +290,6 @@ MAGNA_API am_bool MAGNA_CALL subfield_verify
 {
     assert (subfield != NULL);
 
-    return subfield->code != 0
-        && subfield->value.position != 0;
+    return subfield_code_is_valid (subfield->code)
+        && !subfield_is_empty (subfield);
 }

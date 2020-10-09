@@ -201,7 +201,7 @@ TESTER(buffer_clone_1)
 {
     Buffer target, source = BUFFER_INIT;
 
-    CHECK (buffer_clone (&target, &source) == &target);
+    CHECK (buffer_clone (&target, &source));
     CHECK (target.ptr == source.ptr);
     CHECK (target.capacity == source.capacity);
 }
@@ -213,7 +213,7 @@ TESTER(buffer_clone_2)
 
     buffer_static (&source, data, sizeof (data));
     source.position = source.capacity;
-    CHECK (buffer_clone (&target, &source) == &target);
+    CHECK (buffer_clone (&target, &source));
     CHECK (memcmp (data, target.ptr, sizeof (data)) == 0);
     CHECK (target.capacity == source.capacity);
 

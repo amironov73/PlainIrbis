@@ -16,6 +16,7 @@ set(CFiles
     src/ean.c
     src/encoding.c
     src/enumertr.c
+    src/field.c
     src/file.c
     src/intarray.c
     src/io.c

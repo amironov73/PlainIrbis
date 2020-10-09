@@ -81,7 +81,7 @@ MAGNA_API size_t MAGNA_CALL buffer_calculate_size
  * @param source Буфер, подлежащий клонированию.
  * @return Буфер назначения либо `NULL`.
  */
-MAGNA_API Buffer* MAGNA_CALL buffer_clone
+MAGNA_API am_bool MAGNA_CALL buffer_clone
     (
         Buffer* target,
         const Buffer *source
@@ -100,13 +100,13 @@ MAGNA_API Buffer* MAGNA_CALL buffer_clone
     else {
         target->ptr = mem_alloc (source->capacity);
         if (target->ptr == NULL) {
-            return NULL;
+            return AM_FALSE;
         }
 
         mem_copy (target->ptr, source->ptr, source->position);
     }
 
-    return target;
+    return AM_TRUE;
 }
 
 /**

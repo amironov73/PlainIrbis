@@ -627,7 +627,7 @@ MAGNA_API am_bool MAGNA_CALL mem_can_execute
 {
 #ifdef MAGNA_WINDOWS
 
-    return !IsBadCodePtr (ptr);
+    return !IsBadCodePtr ((FARPROC) ptr);
 
 #elif defined(MAGNA_LINUX)
 
@@ -849,6 +849,119 @@ MAGNA_API size_t MAGNA_CALL arena_total
 
     return result;
 }
+
+/*=========================================================*/
+
+#ifdef MAGNA_64BIT
+typedef am_uint64 uintptr_t;
+#else
+typedef am_uint32 uintptr_t;
+#endif
+
+typedef am_uint16 offset_t;
+#define PTR_OFFSET_SZ sizeof(offset_t)
+
+#ifndef align_up
+#define align_up(num, align) \
+    (((num) + ((align) - 1)) & ~((align) - 1))
+#endif
+
+/**
+ *
+ *
+ * @param alignment
+ * @param size
+ * @return
+ * @remarks Borrowed from
+ * https://embeddedartistry.com/blog/2017/02/22/generating-aligned-memory/
+ */
+MAGNA_API void* MAGNA_CALL mem_aligned_alloc
+    (
+        size_t alignment,
+        size_t size
+    )
+{
+    /*
+                              aligned_mem (returned to caller)
+                              V
+        +---------------+-----+---------------------------------+
+        |               |  ^  |  at least size bytes            |
+        +---------------+--+--+---------------------------------+
+        ^                  |
+        allocated_mem      value of allocated_mem
+        points here        stored here
+
+     */
+
+    am_uint32 headerSize;
+    void *result = NULL;
+
+    /* We want it to be a power of two since
+       align_up operates on powers of two */
+    assert ((alignment & (alignment - 1)) == 0);
+
+    if (alignment && size)
+    {
+        /*
+         * We know we have to fit an offset value
+         * We also allocate extra bytes to ensure we
+         * can meet the alignment
+         */
+        headerSize = PTR_OFFSET_SZ + (alignment - 1);
+        void *p = mem_alloc (size + headerSize);
+
+        if (p)
+        {
+            /*
+             * Add the offset size to malloc's pointer
+             * (we will always store that)
+             * Then align the resulting value to the
+             * target alignment
+             */
+            result = (void*) align_up (((uintptr_t) p + PTR_OFFSET_SZ), alignment);
+
+            /* Calculate the offset and store it
+               behind our aligned pointer */
+            *((offset_t*) result - 1) =
+                    (offset_t) ((uintptr_t) result - (uintptr_t) p);
+
+        } /* else NULL, could not malloc */
+    } /* else NULL, invalid arguments */
+
+    return result;
+}
+
+/**
+ *
+ * @param ptr
+ */
+MAGNA_API void MAGNA_CALL mem_aligned_free
+    (
+        void *ptr
+    )
+{
+    offset_t offset;
+    void *p;
+
+    assert (ptr);
+
+    /*
+    * Walk backwards from the passed-in pointer
+    * to get the pointer offset. We convert to an offset_t
+    * pointer and rely on pointer math to get the data
+    */
+    offset = *((offset_t *) ptr - 1);
+
+    /*
+    * Once we have the offset, we can get our
+    * original pointer and call free
+    */
+    p = (void*)((am_byte*) ptr - offset);
+
+    mem_free (p);
+}
+
+
 
 /*=========================================================*/
 

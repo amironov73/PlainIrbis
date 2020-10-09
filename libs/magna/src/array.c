@@ -513,6 +513,96 @@ MAGNA_API void MAGNA_CALL array_clear
 }
 
 /**
+ * Вставка в массив элемента непосредственно после указанного.
+ *
+ * @param array Массив.
+ * @param index Индекс.
+ * @param item Размещаемый элемент (происходит копирование).
+ * @return Признак успешности завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL array_insert_after
+    (
+        Array *array,
+        size_t index,
+        void *item
+    )
+{
+    assert (array != NULL);
+    assert (index < array->len);
+    assert (item != NULL);
+
+    /* TODO: implement */
+
+    return AM_FALSE;
+}
+
+/**
+ * Вставка в массив элемента непосредственно перед указанным.
+ *
+ * @param array Массив.
+ * @param index Индекс.
+ * @param item Размещаемый элемент (происходит копирование).
+ * @return Признак успешности завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL array_insert_before
+    (
+        Array *array,
+        size_t index,
+        void *item
+    )
+{
+    assert (array != NULL);
+    assert (index < array->len);
+    assert (item != NULL);
+
+    /* TODO: implement */
+
+    return AM_FALSE;
+}
+
+/**
+ * Вставка в массив элемента непосредственно после указанного.
+ *
+ * @param array Массив.
+ * @param index Индекс.
+ * @return Указатель на место для размещения элемента либо `NULL`.
+ */
+MAGNA_API void* MAGNA_CALL array_emplace_after
+    (
+        Array *array,
+        size_t index
+    )
+{
+    assert (array != NULL);
+    assert (index < array->len);
+
+    /* TODO: implement */
+
+    return NULL;
+}
+
+/**
+ * Вставка в массив элемента непосредственно перед указанным.
+ *
+ * @param array Массив.
+ * @param index Индекс.
+ * @return Указатель на место для размещения элемента либо `NULL`.
+ */
+MAGNA_API void* MAGNA_CALL array_emplace_before
+    (
+        Array *array,
+        size_t index
+    )
+{
+    assert (array != NULL);
+    assert (index < array->len);
+
+    /* TODO: implement */
+
+    return AM_FALSE;
+}
+
+/**
  * Удаление элемента из массива по указателю.
  *
  * @param array Массив.

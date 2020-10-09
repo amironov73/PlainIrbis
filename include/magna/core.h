@@ -619,26 +619,30 @@ struct MagnaArray
 
 #define ARRAY_INIT(__itemSize) { NULL, __itemSize, 0, 0, 0, NULL };
 
-MAGNA_API              void*   MAGNA_CALL array_bsearch      (Array *array, const void *value, Comparer comparer, const void *data);
-MAGNA_API              void    MAGNA_CALL array_clear        (Array *array);
-MAGNA_API              am_bool MAGNA_CALL array_clone        (Array *target, const Array *source, Cloner cloner);
-MAGNA_API              am_bool MAGNA_CALL array_concat       (Array *target, const Array *source);
-MAGNA_API              am_bool MAGNA_CALL array_copy         (Array *target, const Array *source);
-MAGNA_API              am_bool MAGNA_CALL array_create       (Array *array, size_t itemSize, size_t capacity);
-MAGNA_API              void*   MAGNA_CALL array_emplace_back (Array *array);
-MAGNA_API              void    MAGNA_CALL array_destroy      (Array *array);
-MAGNA_API MAGNA_INLINE void*   MAGNA_CALL array_get          (const Array *array, size_t index);
-MAGNA_API              am_bool MAGNA_CALL array_grow         (Array *array, size_t newSize);
-MAGNA_API              void    MAGNA_CALL array_init         (Array *array, size_t itemSize);
-MAGNA_API              void*   MAGNA_CALL array_pop_back     (Array *array);
-MAGNA_API              void*   MAGNA_CALL array_pop_front    (Array *array);
-MAGNA_API              am_bool MAGNA_CALL array_push_back    (Array *array, void *item);
-MAGNA_API              am_bool MAGNA_CALL array_push_front   (Array *array, void *item);
-MAGNA_API              void    MAGNA_CALL array_remove_index (Array *array, size_t index);
-MAGNA_API              void    MAGNA_CALL array_remove_item  (Array *array, void *item);
-MAGNA_API              void    MAGNA_CALL array_set          (Array *array, size_t index, void *value);
-MAGNA_API              void    MAGNA_CALL array_sort         (Array *array, Comparer comparer, const void *data);
-MAGNA_API              void    MAGNA_CALL array_truncate     (Array *array, size_t newSize);
+MAGNA_API              void*   MAGNA_CALL array_bsearch        (Array *array, const void *value, Comparer comparer, const void *data);
+MAGNA_API              void    MAGNA_CALL array_clear          (Array *array);
+MAGNA_API              am_bool MAGNA_CALL array_clone          (Array *target, const Array *source, Cloner cloner);
+MAGNA_API              am_bool MAGNA_CALL array_concat         (Array *target, const Array *source);
+MAGNA_API              am_bool MAGNA_CALL array_copy           (Array *target, const Array *source);
+MAGNA_API              am_bool MAGNA_CALL array_create         (Array *array, size_t itemSize, size_t capacity);
+MAGNA_API              void*   MAGNA_CALL array_emplace_after  (Array *array, size_t index);
+MAGNA_API              void*   MAGNA_CALL array_emplace_back   (Array *array);
+MAGNA_API              void*   MAGNA_CALL array_emplace_before (Array *array, size_t index);
+MAGNA_API              void    MAGNA_CALL array_destroy        (Array *array);
+MAGNA_API MAGNA_INLINE void*   MAGNA_CALL array_get            (const Array *array, size_t index);
+MAGNA_API              am_bool MAGNA_CALL array_grow           (Array *array, size_t newSize);
+MAGNA_API              void    MAGNA_CALL array_init           (Array *array, size_t itemSize);
+MAGNA_API              am_bool MAGNA_CALL array_insert_after   (Array *array, size_t index, void *item);
+MAGNA_API              am_bool MAGNA_CALL array_insert_before  (Array *array, size_t index, void *item);
+MAGNA_API              void*   MAGNA_CALL array_pop_back       (Array *array);
+MAGNA_API              void*   MAGNA_CALL array_pop_front      (Array *array);
+MAGNA_API              am_bool MAGNA_CALL array_push_back      (Array *array, void *item);
+MAGNA_API              am_bool MAGNA_CALL array_push_front     (Array *array, void *item);
+MAGNA_API              void    MAGNA_CALL array_remove_index   (Array *array, size_t index);
+MAGNA_API              void    MAGNA_CALL array_remove_item    (Array *array, void *item);
+MAGNA_API              void    MAGNA_CALL array_set            (Array *array, size_t index, void *value);
+MAGNA_API              void    MAGNA_CALL array_sort           (Array *array, Comparer comparer, const void *data);
+MAGNA_API              void    MAGNA_CALL array_truncate       (Array *array, size_t newSize);
 
 /*=========================================================*/
 
@@ -804,11 +808,11 @@ struct MagnaBuffer
 
 MAGNA_API am_bool        MAGNA_CALL buffer_ansi_to_utf8              (Buffer *target, const Buffer *source);
 MAGNA_API am_bool        MAGNA_CALL buffer_assign                    (Buffer *buffer, const am_byte *data, size_t length);
-MAGNA_API am_bool        MAGNA_CALL buffer_assign_span               (Buffer *buffer, const Span span);
+MAGNA_API am_bool        MAGNA_CALL buffer_assign_span               (Buffer *buffer, Span span);
 MAGNA_API am_bool        MAGNA_CALL buffer_assign_text               (Buffer *buffer, const char *text);
 MAGNA_API size_t         MAGNA_CALL buffer_calculate_size            (size_t newSize);
 MAGNA_API Buffer*        MAGNA_CALL buffer_clear                     (Buffer *buffer);
-MAGNA_API Buffer*        MAGNA_CALL buffer_clone                     (Buffer *target, const Buffer *source);
+MAGNA_API am_bool        MAGNA_CALL buffer_clone                     (Buffer *target, const Buffer *source);
 MAGNA_API int            MAGNA_CALL buffer_compare                   (const Buffer *first, const Buffer *second);
 MAGNA_API int            MAGNA_CALL buffer_compare_span              (const Buffer *buffer, Span span);
 MAGNA_API int            MAGNA_CALL buffer_compare_span_ignore_case  (const Buffer *buffer, Span span);

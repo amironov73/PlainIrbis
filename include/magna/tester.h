@@ -198,7 +198,7 @@ static int tester_main (int argc, const char **argv)
 
     for (ptr = begin; ptr != end; ++ptr) {
         if (ptr->run != tester__anchor__function) {
-            printf ("%-30s", ptr->test_name);
+            printf ("%-34s", ptr->test_name);
             rc = setjmp (tester_err);
             if (rc == 0) {
                 ptr->run();

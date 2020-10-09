@@ -202,19 +202,23 @@
 typedef struct
 {
     Buffer value;
-    char code;
+    am_byte code;
 
 } SubField;
 
-#define SUBFIELD_INIT { BUFFER_INIT, 0 };
+#define SUBFIELD_INIT { BUFFER_INIT, 0 }
 
-MAGNA_API SubField* MAGNA_CALL subfield_clone     (SubField *target, const SubField *source);
-MAGNA_API SubField* MAGNA_CALL subfield_decode    (SubField *subfield, Span span);
-MAGNA_API am_bool   MAGNA_CALL subfield_empty     (const SubField *subfield);
-MAGNA_API void      MAGNA_CALL subfield_free      (SubField *subfield);
-MAGNA_API SubField* MAGNA_CALL subfield_init      (SubField *subfield, char code, Span value);
-MAGNA_API Buffer*   MAGNA_CALL subfield_to_string (const SubField *subfield, Buffer *buffer);
-MAGNA_API am_bool   MAGNA_CALL subfield_verify    (const SubField *subfield);
+MAGNA_API am_bool   MAGNA_CALL subfield_assign         (SubField *subField, Span value);
+MAGNA_API am_bool   MAGNA_CALL subfield_clone          (SubField *target, const SubField *source);
+MAGNA_API am_bool   MAGNA_CALL subfield_code_is_valid  (am_byte code);
+MAGNA_API am_bool   MAGNA_CALL subfield_create         (SubField *subfield, am_byte code, Span value);
+MAGNA_API am_bool   MAGNA_CALL subfield_decode         (SubField *subfield, Span span);
+MAGNA_API am_bool   MAGNA_CALL subfield_is_empty       (const SubField *subfield);
+MAGNA_API void      MAGNA_CALL subfield_destroy        (SubField *subfield);
+MAGNA_API SubField* MAGNA_CALL subfield_init           (SubField *subfield, am_byte code, Span value);
+MAGNA_API am_byte   MAGNA_CALL subfield_normalize_code (am_byte code);
+MAGNA_API am_bool   MAGNA_CALL subfield_to_string      (const SubField *subfield, Buffer *output);
+MAGNA_API am_bool   MAGNA_CALL subfield_verify         (const SubField *subfield);
 
 /*=========================================================*/
 
@@ -223,25 +227,29 @@ MAGNA_API am_bool   MAGNA_CALL subfield_verify    (const SubField *subfield);
 typedef struct
 {
     Buffer value;
-    Vector subfields;
+    Array subfields;
     am_uint32 tag;
 
 } MarcField;
 
-MAGNA_API SubField*  MAGNA_CALL field_add                      (MarcField *field, char code, Span value);
+MAGNA_API am_bool    MAGNA_CALL field_add                      (MarcField *field, am_byte code, Span value);
 MAGNA_API MarcField* MAGNA_CALL field_clear                    (MarcField *field);
-MAGNA_API MarcField* MAGNA_CALL field_clone                    (MarcField *target, const MarcField *source);
-MAGNA_API SubField*  MAGNA_CALL subfield_create                (SubField *subfield, char code, Span value);
-MAGNA_API MarcField* MAGNA_CALL field_decode                   (MarcField *field, Span span);
-MAGNA_API am_bool    MAGNA_CALL field_empty                    (const MarcField *field);
+MAGNA_API am_bool    MAGNA_CALL field_clone                    (MarcField *target, const MarcField *source);
+MAGNA_API void       MAGNA_CALL field_create                   (MarcField *field);
+MAGNA_API am_bool    MAGNA_CALL field_decode                   (MarcField *field, Span span);
+MAGNA_API am_bool    MAGNA_CALL field_decode_body              (MarcField *field, Span span);
+MAGNA_API void       MAGNA_CALL field_destroy                  (MarcField *field);
 MAGNA_API Vector*    MAGNA_CALL field_get_embedded_fields      (const MarcField *field, Vector *array);
-MAGNA_API SubField*  MAGNA_CALL field_get_first_subfield       (const MarcField *field, char code);
-MAGNA_API Span       MAGNA_CALL field_get_first_subfield_value (const MarcField *field, char code);
-MAGNA_API MarcField* MAGNA_CALL field_init                     (MarcField *field, am_uint32 tag);
-MAGNA_API MarcField* MAGNA_CALL field_insert_at                (MarcField *field, size_t index, const SubField *subfield);
+MAGNA_API SubField*  MAGNA_CALL field_get_first_subfield       (const MarcField *field, am_byte code);
+MAGNA_API Span       MAGNA_CALL field_get_first_subfield_value (const MarcField *field, am_byte code);
+MAGNA_API SubField*  MAGNA_CALL field_get_subfield_by_index    (const MarcField *field, size_t index);
+MAGNA_API am_bool    MAGNA_CALL field_insert_at                (MarcField *field, size_t index, am_byte code, Span value);
+MAGNA_API am_bool    MAGNA_CALL field_is_empty                 (const MarcField *field);
 MAGNA_API MarcField* MAGNA_CALL field_remove_at                (MarcField *field, size_t index);
-MAGNA_API MarcField* MAGNA_CALL field_remove_subfield          (MarcField *field, char code);
-MAGNA_API Buffer*    MAGNA_CALL field_to_string                (const MarcField *field, Buffer *buffer);
+MAGNA_API MarcField* MAGNA_CALL field_remove_subfield          (MarcField *field, am_byte code);
+MAGNA_API am_bool    MAGNA_CALL field_set_subfield             (MarcField *field, am_byte code, Span value);
+MAGNA_API am_bool    MAGNA_CALL field_set_value                (MarcField *field, Span value);
+MAGNA_API am_bool    MAGNA_CALL field_to_string                (const MarcField *field, Buffer *buffer);
 MAGNA_API am_bool    MAGNA_CALL field_verify                   (const MarcField *field);
 
 /*=========================================================*/
@@ -263,8 +271,8 @@ MAGNA_API MarcField*  MAGNA_CALL record_add          (MarcRecord *record, am_uin
 MAGNA_API MarcRecord* MAGNA_CALL record_clone        (MarcRecord *target, const MarcRecord *source);
 MAGNA_API am_bool     MAGNA_CALL record_decode_lines (MarcRecord *record, Vector *lines);
 MAGNA_API am_bool     MAGNA_CALL record_encode       (const MarcRecord *record, const char *delimiter, Buffer *buffer);
-MAGNA_API Span        MAGNA_CALL record_fm           (const MarcRecord *record, am_uint32 tag, char code);
-MAGNA_API am_bool     MAGNA_CALL record_fma          (const MarcRecord *record, Vector *array, am_uint32 tag, char code);
+MAGNA_API Span        MAGNA_CALL record_fm           (const MarcRecord *record, am_uint32 tag, am_byte code);
+MAGNA_API am_bool     MAGNA_CALL record_fma          (const MarcRecord *record, Vector *array, am_uint32 tag, am_byte code);
 MAGNA_API MarcField*  MAGNA_CALL record_get_field    (const MarcRecord *record, am_uint32 tag, size_t occurrence);
 
 /*=========================================================*/

@@ -166,7 +166,7 @@ MAGNA_API Span MAGNA_CALL record_fm
     (
         const MarcRecord *record,
         am_uint32 tag,
-        char code
+        am_byte code
     )
 {
     size_t i, j;
@@ -185,7 +185,7 @@ MAGNA_API Span MAGNA_CALL record_fm
             }
             else {
                 for (j = 0; j < field->subfields.len; ++j) {
-                    subfield = (const SubField*) vector_get(&field->subfields, j);
+                    subfield = field_get_subfield_by_index (field, j);
                     if (same_char (code, subfield->code)) {
                         result = buffer_to_span (&subfield->value);
                         goto DONE;
@@ -213,7 +213,7 @@ MAGNA_API am_bool MAGNA_CALL record_fma
         const MarcRecord *record,
         Vector *array,
         am_uint32 tag,
-        char code
+        am_byte code
     )
 {
     assert (record != NULL);
