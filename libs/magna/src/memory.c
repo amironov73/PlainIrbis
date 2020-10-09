@@ -39,6 +39,14 @@
 
 #endif
 
+#ifdef MAGNA_APPLE
+
+#include <sys/types.h>
+#include <sys/sysctl.h>
+#include <sys/vmmeter.h>
+
+#endif
+
 #include <assert.h>
 #include <ctype.h>
 
@@ -283,6 +291,19 @@ MAGNA_API am_uint64 mem_total_installed (void)
 
     return parse_value ("MemTotal");
 
+#elif defined(MAGNA_APPLE)
+
+    int mib[2];
+    int64_t physical_memory;
+    size_t length;
+
+    mib[0] = CTL_HW;
+    mib[1] = HW_MEMSIZE;
+    length = sizeof (int64_t);
+    sysctl (mib, 2, &physical_memory, &length, NULL, 0);
+
+    return physical_memory;
+
 #else
 
     return 0;
@@ -313,6 +334,19 @@ MAGNA_API am_uint64 mem_total_virtual (void)
 #elif defined(MAGNA_LINUX)
 
     return parse_value ("MemTotal") + parse_value ("SwapTotal");
+
+#elif defined(MAGNA_APPLE)
+
+    int mib[2];
+    struct xsw_usage swapinfo;
+    size_t length;
+
+    mib[0] = CTL_VM;
+    mib[1] = VM_SWAPUSAGE;
+    length = sizeof (swapinfo);
+    sysctl (mib, 2, &swapinfo, &length, NULL, 0);
+
+    return mem_total_installed() + swapinfo.xsu_total;
 
 #else
 
@@ -352,6 +386,19 @@ MAGNA_API am_uint64 mem_avail_physical (void)
 
     return result;
 
+#elif defined(MAGNA_APPLE)
+
+    int mib[2];
+    struct vmtotal vminfo;
+    size_t length;
+
+    mib[0] = CTL_VM;
+    mib[1] = VM_METER;
+    length = sizeof (vminfo);
+    sysctl (mib, 2, &vminfo, &length, NULL, 0);
+
+    return vminfo.t_free * 4096;
+
 #else
 
     return 0;
@@ -382,6 +429,19 @@ MAGNA_API am_uint64 mem_avail_virtual (void)
 #elif defined(MAGNA_LINUX)
 
     return parse_value ("MemFree") + parse_value ("SwapFree");
+
+#elif defined(MAGNA_APPLE)
+
+    int mib[2];
+    struct xsw_usage swapinfo;
+    size_t length;
+
+    mib[0] = CTL_VM;
+    mib[1] = VM_SWAPUSAGE;
+    length = sizeof (swapinfo);
+    sysctl (mib, 2, &swapinfo, &length, NULL, 0);
+
+    return mem_avail_physical() + swapinfo.xsu_avail;
 
 #else
 
