@@ -2,7 +2,8 @@
 # Network client library
 #
 
-sources = [ 'src/connect.c',
+sources = [ 'src/alphatab.c',
+    'src/connect.c',
     'src/dll.c',
     'src/ean.c',
     'src/error.c',

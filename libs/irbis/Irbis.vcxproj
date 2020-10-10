@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\alphatab.c" />
     <ClCompile Include="src\connect.c" />
     <ClCompile Include="src\dll.c" />
     <ClCompile Include="src\ean.c" />

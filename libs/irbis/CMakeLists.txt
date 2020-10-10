@@ -14,6 +14,7 @@ set(HeaderFiles
 )
 
 set(CFiles
+    src/alphatab.c
     src/connect.c
     src/dll.c
     src/ean.c

@@ -1,5 +1,6 @@
 lib_LIBRARIES = libmirbis.a
-libsome_a_SOURCES = src/connect.c \
+libsome_a_SOURCES = src/alphatab.c \
+    src/connect.c  \
     src/dll.c      \
     src/ean.c      \
     src/error.c    \

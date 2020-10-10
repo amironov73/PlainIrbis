@@ -277,6 +277,25 @@ MAGNA_API MarcField*  MAGNA_CALL record_get_field    (const MarcRecord *record, 
 
 /*=========================================================*/
 
+/* Таблица алфавитных символов */
+
+typedef struct
+{
+    am_byte *characters;
+    size_t charCount;
+} AlphabetTable;
+
+MAGNA_API am_bool              MAGNA_CALL alpha_create    (AlphabetTable *table, const am_byte *characters, size_t charCount);
+MAGNA_API const AlphabetTable*            alpha_default   (void);
+MAGNA_API void                 MAGNA_CALL alpha_destroy   (AlphabetTable *table);
+MAGNA_API am_bool              MAGNA_CALL alpha_is_good   (const AlphabetTable *table, am_byte character);
+MAGNA_API am_bool              MAGNA_CALL alpha_parse     (AlphabetTable *table, Span text);
+MAGNA_API am_bool              MAGNA_CALL alpha_split     (const AlphabetTable *table, SpanArray *output, Span text);
+MAGNA_API Span                 MAGNA_CALL alpha_trim      (const AlphabetTable *table, Span text);
+MAGNA_API am_bool              MAGNA_CALL alpha_to_string (const AlphabetTable *table, Buffer *output);
+
+/*=========================================================*/
+
 /* Спецификация файла на сервере */
 
 typedef struct
