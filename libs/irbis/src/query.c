@@ -1,10 +1,29 @@
-/* This is an open source non-commercial project. Dear PVS-Studio, please check it.
- * PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com */
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include "magna/irbis.h"
 
+ // ReSharper disable StringLiteralTypo
+ // ReSharper disable IdentifierTypo
+ // ReSharper disable CommentTypo
+
+/*=========================================================*/
+
+#include "warnpush.h"
+
+/*=========================================================*/
+
 #include <assert.h>
 
+/*=========================================================*/
+
+/**
+ * \file query.c
+ *
+ * Клиентский запрос.
+ */
+
+ /*=========================================================*/
 
 /**
  * Добавление строки в кодировке ANSI (плюс перевод строки).
@@ -254,3 +273,9 @@ MAGNA_API am_bool MAGNA_CALL query_add_specification
     return spec_to_string (specification, &query->buffer)
         && buffer_putc (&query->buffer, 0x0A);
 }
+
+/*=========================================================*/
+
+#include "warnpop.h"
+
+/*=========================================================*/

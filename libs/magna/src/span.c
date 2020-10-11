@@ -149,7 +149,7 @@ MAGNA_API am_int32 MAGNA_CALL span_to_int32
         Span span
     )
 {
-    am_uint32 result = 0;
+    am_int32 result = 0;
     am_byte *ptr = span.ptr;
     size_t len = span.len;
     am_bool sign = AM_FALSE;
@@ -188,7 +188,7 @@ MAGNA_API am_int64 MAGNA_CALL span_to_int64
         Span span
     )
 {
-    am_uint64 result = 0;
+    am_int64 result = 0;
     am_byte *ptr = span.ptr;
     size_t len = span.len;
     am_bool sign = AM_FALSE;
@@ -436,7 +436,7 @@ MAGNA_API Span MAGNA_CALL span_slice
         length = result.len - start;
     }
 
-    if (length + start > span.len) {
+    if (length + start > ((ssize_t) span.len)) {
         length = span.len - start;
     }
 

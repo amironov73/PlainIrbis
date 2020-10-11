@@ -19,29 +19,48 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\address.c" />
     <ClCompile Include="src\alphatab.c" />
+    <ClCompile Include="src\author.c" />
+    <ClCompile Include="src\bookinfo.c" />
+    <ClCompile Include="src\codes.c" />
     <ClCompile Include="src\connect.c" />
+    <ClCompile Include="src\dbinfo.c" />
     <ClCompile Include="src\dll.c" />
     <ClCompile Include="src\ean.c" />
     <ClCompile Include="src\error.c" />
     <ClCompile Include="src\exemplar.c" />
     <ClCompile Include="src\field.c" />
     <ClCompile Include="src\format.c" />
+    <ClCompile Include="src\gbl.c" />
     <ClCompile Include="src\guard.c" />
+    <ClCompile Include="src\ilf.c" />
     <ClCompile Include="src\impex.c" />
     <ClCompile Include="src\ini.c" />
     <ClCompile Include="src\isbn.c" />
     <ClCompile Include="src\iso2709.c" />
     <ClCompile Include="src\menu.c" />
+    <ClCompile Include="src\mst.c" />
+    <ClCompile Include="src\opt.c" />
+    <ClCompile Include="src\par.c" />
+    <ClCompile Include="src\procinfo.c" />
     <ClCompile Include="src\query.c" />
+    <ClCompile Include="src\rawrecor.c" />
     <ClCompile Include="src\record.c" />
+    <ClCompile Include="src\registr.c" />
     <ClCompile Include="src\response.c" />
     <ClCompile Include="src\search.c" />
+    <ClCompile Include="src\servstat.c" />
     <ClCompile Include="src\spec.c" />
     <ClCompile Include="src\subfield.c" />
+    <ClCompile Include="src\term.c" />
+    <ClCompile Include="src\title.c" />
     <ClCompile Include="src\tree.c" />
     <ClCompile Include="src\upc.c" />
+    <ClCompile Include="src\uppertab.c" />
+    <ClCompile Include="src\userinfo.c" />
     <ClCompile Include="src\version.c" />
+    <ClCompile Include="src\visit.c" />
     <ClCompile Include="src\xrf.c" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

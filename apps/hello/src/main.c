@@ -32,7 +32,7 @@ int main (int argc, char **argv)
     connection.port = 6666;
 
     if (!irbis_connect (&connection)) {
-        fputs ("Connection failed", stderr);
+        fputs ("Connection failed\n", stderr);
         connection_destroy (&connection);
         return 1;
     }

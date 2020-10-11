@@ -285,6 +285,8 @@ typedef struct
     size_t charCount;
 } AlphabetTable;
 
+#define APLHABET_TABLE "ISISACW.TAB"
+
 MAGNA_API am_bool              MAGNA_CALL alpha_create    (AlphabetTable *table, const am_byte *characters, size_t charCount);
 MAGNA_API const AlphabetTable*            alpha_default   (void);
 MAGNA_API void                 MAGNA_CALL alpha_destroy   (AlphabetTable *table);
@@ -293,6 +295,24 @@ MAGNA_API am_bool              MAGNA_CALL alpha_parse     (AlphabetTable *table,
 MAGNA_API am_bool              MAGNA_CALL alpha_split     (const AlphabetTable *table, SpanArray *output, Span text);
 MAGNA_API Span                 MAGNA_CALL alpha_trim      (const AlphabetTable *table, Span text);
 MAGNA_API am_bool              MAGNA_CALL alpha_to_string (const AlphabetTable *table, Buffer *output);
+
+/*=========================================================*/
+
+/* Таблица преобразования в верхний регистр */
+
+typedef struct
+{
+    am_byte xlat[256];
+} UpperCaseTable;
+
+#define UPPERCASE_TABLE "ISISUCW.TAB"
+
+MAGNA_API am_bool MAGNA_CALL upper_init
+        (
+                UpperCaseTable *table,
+                const am_byte *characters
+        );
+
 
 /*=========================================================*/
 

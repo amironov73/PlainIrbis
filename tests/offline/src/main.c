@@ -3,6 +3,7 @@
 
 #define TESTER_MAIN
 #include "magna/tester.h"
+#include "magna/irbis.h"
 
 #include "offline.h"
 
@@ -102,6 +103,12 @@ int main (int argc, const char **argv)
     }
 
     printf ("memory available=%lld\n", mem_avail_physical());
+    printf ("sizeof (Buffer)     = %d\n", (int) sizeof (Buffer));
+    printf ("sizeof (Array)      = %d\n", (int) sizeof (Array));
+    printf ("sizeof (SubField)   = %d\n", (int) sizeof (SubField));
+    printf ("sizeof (MarcField)  = %d\n", (int) sizeof (MarcField));
+    printf ("sizeof (MarcRecord) = %d\n", (int) sizeof (MarcRecord));
+    printf ("sizeof (Connection) = %d\n", (int) sizeof (Connection));
 
     int result = tester_main (argc, argv);
 

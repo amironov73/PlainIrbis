@@ -1,9 +1,29 @@
-/* This is an open source non-commercial project. Dear PVS-Studio, please check it.
- * PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com */
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include "magna/irbis.h"
 
+// ReSharper disable StringLiteralTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable CommentTypo
+
+/*=========================================================*/
+
+#include "warnpush.h"
+
+/*=========================================================*/
+
 #include <assert.h>
+
+/*=========================================================*/
+
+/**
+ * \file response.c
+ *
+ * Ответ сервера.
+ */
+
+/*=========================================================*/
 
 MAGNA_API am_bool MAGNA_CALL response_create
     (
@@ -99,13 +119,7 @@ MAGNA_API am_int32 MAGNA_CALL response_read_int32
     /* TODO: implement properly */
 
     line = response_get_line (response);
-    if (line.len != 0 && line.ptr[0] == '-') {
-        line = span_slice (line, 1, line.len-1);
-        result = - span_to_uint32 (line);
-    }
-    else {
-        result = span_to_uint32 (line);
-    }
+    result = span_to_int32 (line);
 
     return result;
 }
@@ -179,3 +193,9 @@ MAGNA_API void MAGNA_CALL response_null
 
     mem_clear (response, sizeof (Response));
 }
+
+/*=========================================================*/
+
+#include "warnpop.h"
+
+/*=========================================================*/
