@@ -20,11 +20,124 @@
 /**
  * \file address.c
  *
- * Адрес.
+ * Адрес читателя: поле 13 в базе RDR.
  */
 
 /*=========================================================*/
 
+#define ADDRESS_TAG 13
+
+#define assign(__b, __f, __c) \
+    buffer_assign_span ((__b), field_get_first_subfield_value ((__f), (__c)))
+
+#define apply(__f, __c, __b) \
+    field_set_subfield((__f), (__c), buffer_to_span (__b))
+
+typedef struct
+{
+    Buffer postcode; //< Почтовый индекс, подполе A.
+    Buffer country; //< Страна/республика, подполе B.
+    Buffer city; //< Город, подполе C.
+    Buffer street; //< Улица, подполе D.
+    Buffer building; //< Номер дома, подполе E.
+    Buffer entrance; //< Номер подъезда, подполе G.
+    Buffer apartment; //< Номер квартиры, подпле H.
+    Buffer additional; //< Дополнительные данные, подполе F.
+    am_mix userData; //< Произвольные пользовательские данные.
+    MarcField *field; //< Поле, из которого извлечены данные об адресе.
+
+} Address;
+
+/**
+ * Инициализация структуры.
+ *
+ * @param address Указатель на неинициализированную структуру.
+ */
+MAGNA_API void MAGNA_CALL address_init
+    (
+        Address *address
+    )
+{
+    assert (address != NULL);
+
+    mem_clear (address, sizeof (*address));
+}
+
+/**
+ * Освобождение памяти, занятой структурой.
+ *
+ * @param address Указатель на структуру, подлежащую освобождению.
+ */
+MAGNA_API void MAGNA_CALL address_destroy
+    (
+        Address *address
+    )
+{
+    assert (address != NULL);
+
+    buffer_destroy (&address->postcode);
+    buffer_destroy (&address->country);
+    buffer_destroy (&address->city);
+    buffer_destroy (&address->street);
+    buffer_destroy (&address->building);
+    buffer_destroy (&address->entrance);
+    buffer_destroy (&address->apartment);
+    buffer_destroy (&address->additional);
+    mem_clear (address, sizeof (*address));
+}
+
+/**
+ * Применение адреса к указанному полю.
+ *
+ * @param address Структура адреса.
+ * @param field Поле, подлежащее заполнению элементами адреса.
+ * @return Признак успешности завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL address_apply
+    (
+        const Address *address,
+        MarcField *field
+    )
+{
+    assert (address != NULL);
+    assert (field != NULL);
+
+    return apply (field, 'a', &address->postcode)
+        && apply (field, 'b', &address->country)
+        && apply (field, 'c', &address->city)
+        && apply (field, 'd', &address->street)
+        && apply (field, 'e', &address->building)
+        && apply (field, 'g', &address->entrance)
+        && apply (field, 'h', &address->apartment)
+        && apply (field, 'f', &address->additional);
+}
+
+/**
+ * Разбор указанного поля а элементы адреса.
+ *
+ * @param address Структура адреса, подлежащая заполнению.
+ * @param field Поле для разбора.
+ * @return Признак успешности завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL address_parse_field
+    (
+        Address *address,
+        const MarcField *field
+    )
+{
+    assert (address != NULL);
+    assert (field != NULL);
+
+    address->field = (MarcField*) field;
+    return assign (&address->postcode,   field, 'a')
+        && assign (&address->country,    field, 'b')
+        && assign (&address->city,       field, 'c')
+        && assign (&address->street,     field, 'd')
+        && assign (&address->building,   field, 'e')
+        && assign (&address->entrance,   field, 'g')
+        && assign (&address->apartment,  field, 'h')
+        && assign (&address->additional, field, 'f');
+}
 
 /*=========================================================*/
 

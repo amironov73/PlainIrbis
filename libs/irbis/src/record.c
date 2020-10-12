@@ -66,7 +66,7 @@ MAGNA_API MarcField* MAGNA_CALL record_add
     field = calloc (1, sizeof (MarcField));
     field->tag = tag;
     buffer_from_text (&field->value, CBTEXT (value));
-    vector_push_back(&record->fields, field);
+    array_push_back (&record->fields, field);
 
     return field;
 }
@@ -95,19 +95,21 @@ MAGNA_API MarcRecord* MAGNA_CALL record_clone
     target->status = source->status;
     target->version = source->version;
     buffer_clone (&target->database, &source->database);
-    if (!vector_grow(&target->fields, source->fields.len)) {
+    if (!array_grow (&target->fields, source->fields.len)) {
         return NULL;
     }
+
     for (index = 0; index < source->fields.len; ++index) {
-        src = (const MarcField*) vector_get(&source->fields, index);
+        src = (const MarcField*) array_get(&source->fields, index);
         dst = (MarcField*) calloc (1, sizeof (MarcField));
         if (dst == NULL) {
             return NULL;
         }
 
-        field_init (dst, src->tag);
+        field_create (dst);
+        dst->tag = src->tag;
         field_clone (dst, src);
-        vector_push_back(&target->fields, dst);
+        array_push_back (&target->fields, dst);
     }
 
     return target;
@@ -177,7 +179,7 @@ MAGNA_API Span MAGNA_CALL record_fm
 
     assert (record != NULL);
     for (i = 0; i < record->fields.len; ++i) {
-        field = (const MarcField *) vector_get(&record->fields, i);
+        field = (const MarcField *) array_get (&record->fields, i);
         if (field->tag == tag) {
             if (code) {
                 result = buffer_to_span (&field->value);
@@ -243,7 +245,7 @@ MAGNA_API MarcField* MAGNA_CALL record_get_field
     assert (record != NULL);
 
     for (i = 0; i < record->fields.len; ++i) {
-        field = (const MarcField *) vector_get(&record->fields, i);
+        field = (const MarcField *) array_get (&record->fields, i);
         if (field->tag == tag) {
             if (!occurrence) {
                 return (MarcField*) field;
@@ -277,9 +279,9 @@ MAGNA_API am_bool MAGNA_CALL record_get_fields
     assert (array != NULL);
 
     for (i = 0; i < record->fields.len; ++i) {
-        field = (const MarcField *) vector_get(&record->fields, i);
+        field = (const MarcField *) array_get (&record->fields, i);
         if (field->tag == tag) {
-            if (!vector_push_back(array, (void *) field)) {
+            if (!vector_push_back (array, (void *) field)) {
                 return AM_FALSE;
             }
         }
@@ -307,7 +309,7 @@ MAGNA_API size_t MAGNA_CALL record_count_fields
     assert (record != NULL);
 
     for (i = 0; i < record->fields.len; ++i) {
-        field = (const MarcField *) vector_get(&record->fields, i);
+        field = (const MarcField *) array_get (&record->fields, i);
         if (field->tag == tag) {
             ++result;
         }
@@ -392,8 +394,8 @@ MAGNA_API am_bool MAGNA_CALL record_verify
 
     result = record->fields.len != 0;
     for (i = 0; i < record->fields.len; ++i) {
-        field = (const MarcField *) vector_get(&record->fields, i);
-        if (!field_verify(field)) {
+        field = (const MarcField *) array_get (&record->fields, i);
+        if (!field_verify (field)) {
             result = AM_FALSE;
         }
     }

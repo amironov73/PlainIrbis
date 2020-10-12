@@ -103,6 +103,7 @@ int main (int argc, const char **argv)
     }
 
     printf ("memory available=%lld\n", mem_avail_physical());
+    printf ("sizeof (void*)      = %d\n", (int) sizeof (void*));
     printf ("sizeof (Buffer)     = %d\n", (int) sizeof (Buffer));
     printf ("sizeof (Array)      = %d\n", (int) sizeof (Array));
     printf ("sizeof (SubField)   = %d\n", (int) sizeof (SubField));

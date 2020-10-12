@@ -258,7 +258,7 @@ MAGNA_API am_bool    MAGNA_CALL field_verify                   (const MarcField 
 
 typedef struct
 {
-    Vector fields;
+    Array fields;
     Buffer database;
     void *data;
     am_mfn mfn;

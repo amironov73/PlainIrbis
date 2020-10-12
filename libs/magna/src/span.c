@@ -724,7 +724,7 @@ MAGNA_API am_bool MAGNA_CALL span_split_by_chars
     size_t left, right, i;
     Span item;
     am_byte c;
-    am_bool found;
+    am_bool found = AM_FALSE;
 
     assert (array != NULL);
     assert (values != NULL);
