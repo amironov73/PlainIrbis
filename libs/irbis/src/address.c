@@ -1,7 +1,7 @@
 // This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-#include "magna/irbis.h"
+#include "magna/fields.h"
 
 // ReSharper disable StringLiteralTypo
 // ReSharper disable IdentifierTypo
@@ -32,21 +32,6 @@
 
 #define apply(__f, __c, __b) \
     field_set_subfield((__f), (__c), buffer_to_span (__b))
-
-typedef struct
-{
-    Buffer postcode; //< Почтовый индекс, подполе A.
-    Buffer country; //< Страна/республика, подполе B.
-    Buffer city; //< Город, подполе C.
-    Buffer street; //< Улица, подполе D.
-    Buffer building; //< Номер дома, подполе E.
-    Buffer entrance; //< Номер подъезда, подполе G.
-    Buffer apartment; //< Номер квартиры, подпле H.
-    Buffer additional; //< Дополнительные данные, подполе F.
-    am_mix userData; //< Произвольные пользовательские данные.
-    MarcField *field; //< Поле, из которого извлечены данные об адресе.
-
-} Address;
 
 /**
  * Инициализация структуры.

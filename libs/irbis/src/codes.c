@@ -1,7 +1,7 @@
 // This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-#include "magna/irbis.h"
+#include "magna/fields.h"
 
 // ReSharper disable StringLiteralTypo
 // ReSharper disable IdentifierTypo
@@ -32,16 +32,6 @@
 #define apply(__f, __c, __b) \
     field_set_subfield((__f), (__c), buffer_to_span (__b))
 
-typedef struct
-{
-    Buffer type; //< Тип документа, подполе T.
-    Buffer kind; //< Вид документа, подполе B.
-    Buffer character [6]; //< Характер документа, подполя C, 2, 3, 4, 5, 6.
-    Buffer purpose [3]; //< Код целевого назначения, подполя X, Y, 9.
-    Buffer restrictions; //< Возрастные ограничения, подполе Z.
-    MarcField *field; //< Поле, из которого была извлечена информация.
-
-} Codes;
 
 /**
  * Инициализация структуры.

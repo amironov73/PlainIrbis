@@ -9,6 +9,8 @@ project(irbis C)
 set(HeaderFiles
     ../../include/magna/core.h
     ../../include/magna/irbis.h
+    ../../include/magna/direct.h
+    ../../include/magna/fields.h
     ../include/warnpop.h
     ../include/warnpush.h
 )

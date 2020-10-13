@@ -1,7 +1,7 @@
 // This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-#include "magna/irbis.h"
+#include "magna/fields.h"
 
 // ReSharper disable StringLiteralTypo
 // ReSharper disable IdentifierTypo
@@ -115,41 +115,6 @@
 
 #define apply(__f, __c, __b) \
     field_set_subfield((__f), (__c), buffer_to_span (__b))
-
-typedef struct
-{
-    Buffer status; // Статус экзмепляра, подполе 'a'.
-    Buffer number; // Инвентарный номер, подполе `b`.
-    Buffer date; // Дата поступления, подполе 'c'.
-    Buffer place; // Место хранения, подполе 'd'.
-    Buffer collection; // Наименование коллекции, подполе 'q'.
-    Buffer shelf; // Расстановочный шифр (полочный индекс), подполе 'r'.
-    Buffer price; // Цена экземпляра, подполе 'e'.
-    Buffer barcode; // Штрих-код или радиометка, подполе 'h'.
-    Buffer amount; // Количество экземпляров, подполе '1'.
-    Buffer purpose; // Специальное назначение фонда, подполе 't'.
-    Buffer coefficient; // Коэффициент многоразового использования, подполе '='.
-    Buffer offBalance; // Экземпляры не на баланс, подполе '4'.
-    Buffer ksuNumber1; // Номер записи КСУ (поступление), подполе 'u'.
-    Buffer actNumber1; // Номер акта поступления, подполе 'y'.
-    Buffer channel; // Канал поступления, подполе 'f'.
-    Buffer onHand; // Число выданных экземпляров, подполе '2'.
-    Buffer actNumber2; // Номер акта списания, подполе 'v'.
-    Buffer writeOff; // Количество списываемых экземпляров, подполе 'x'.
-    Buffer completion; // Количество экземпляров для докомплектования, подполе 'k'.
-    Buffer actNumber3; // Номер акта передачи в другое подразделение, подполе 'w'.
-    Buffer moving; // Количество передаваемых экземпляров, подполе 'z'.
-    Buffer newPlace; // Новое место хранения, подполе 'm'.
-    Buffer checkDate; // Дата проверки фонда, подполе 's'.
-    Buffer checkedAmount; // Число проверенных экземпляров, подполе '0'.
-    Buffer realPlace; // Реальное место нахождения книги, подполе '!'.
-    Buffer bindingIndex; // Шифр подшивки, подполе 'p'.
-    Buffer bindingNumber; // Инвентарный номер подшивки, подполе 'i'.
-    MarcField *field; // Поле, из которого извлечена информация.
-
-} Exemplar;
-
-#define EXEMPLAR_TAG 910
 
 /**
  * Инициализация структуры.
@@ -302,15 +267,15 @@ MAGNA_API am_bool MAGNA_CALL exemplar_parse_field
 /**
  * Поиск в записи сведений об экземплярах с последующим их разбором.
  *
- * @param array Массив для размещения сведений об экземплярах.
  * @param record Запись для разбора.
+ * @param exemplars Массив для размещения сведений об экземплярах.
  * @param tag Метка поля, как правило, 910.
  * @return Признак успешности завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL exemplar_parse_record
     (
-        Array *array,
         const MarcRecord *record,
+        Array *exemplars,
         am_uint32 tag
     )
 {
@@ -318,14 +283,14 @@ MAGNA_API am_bool MAGNA_CALL exemplar_parse_record
     const MarcField *field;
     Exemplar *exemplar;
 
-    assert (array != NULL);
+    assert (exemplars != NULL);
     assert (record != NULL);
     assert (tag != 0);
 
     for (index = 0; index < record->fields.len; ++index) {
         field = (const MarcField*) array_get (&record->fields, index);
         if (field->tag == tag) {
-            exemplar = (Exemplar*) array_emplace_back (array);
+            exemplar = (Exemplar*) array_emplace_back (exemplars);
             if (exemplar == NULL) {
                 return AM_FALSE;
             }

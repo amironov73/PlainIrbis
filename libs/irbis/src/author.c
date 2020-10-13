@@ -1,7 +1,7 @@
 // This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-#include "magna/irbis.h"
+#include "magna/fields.h"
 
 // ReSharper disable StringLiteralTypo
 // ReSharper disable IdentifierTypo
@@ -31,22 +31,6 @@
 
 #define apply(__f, __c, __b) \
     field_set_subfield((__f), (__c), buffer_to_span (__b))
-
-typedef struct
-{
-    Buffer familyName; //< Фамилия, подполе A.
-    Buffer initials; //< Инициалы (сокращение), подполе B.
-    Buffer fullName; //< Расширение инициалов (имя и отчество), подполе G.
-    Buffer canBeInverted; //< Инвертирование имени недопустимо? Подполе 9.
-    Buffer postfix; //< Неотъемлемая часть имени (отец, сын, младший, старший и т. п.), подполе 1.
-    Buffer appendix; //< Дополнения к именам кроме дат (род деятельности, звание, титул и т. д.), подполе C.
-    Buffer number; //< Династический номер (римские цифры), подполе D.
-    Buffer dates; //< Даты жизни, подполе F.
-    Buffer variant; //< Разночтение фамилии, подполе R.
-    Buffer workplace; //< Место работы автора, подполе P.
-    MarcField *field; //< Поле, из которого была извлечена информация.
-
-} Author;
 
 /**
  * Инициализация структуры.
@@ -157,7 +141,7 @@ MAGNA_API am_bool MAGNA_CALL author_parse_field
 MAGNA_API am_bool MAGNA_CALL author_parse_record
     (
         const MarcRecord *record,
-        int tag,
+        am_uint32 tag,
         Array *authors
     )
 {

@@ -1,7 +1,7 @@
 // This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-#include "magna/irbis.h"
+#include "magna/fields.h"
 
 // ReSharper disable StringLiteralTypo
 // ReSharper disable IdentifierTypo
@@ -32,21 +32,6 @@
 
 #define apply(__f, __c, __b) \
     field_set_subfield((__f), (__c), buffer_to_span (__b))
-
-typedef struct
-{
-    Buffer title;
-    Buffer country;
-    Buffer abbreviation;
-    Buffer number;
-    Buffer date;
-    Buffer city;
-    Buffer department;
-    Buffer characteristic;
-    Buffer gost;
-    MarcField *field;
-
-} Collective;
 
 /**
  * Простая инициализация структуры.
@@ -146,15 +131,15 @@ MAGNA_API am_bool MAGNA_CALL collective_parse_field
 /**
  * Разбор записи на сведения о коллективных авторах.
  *
- * @param array Массив, подлежащий заполнению.
+ * @param collectives Массив, подлежащий заполнению.
  * @param record Запись для разбора.
  * @param ... Метки полей, заканчивающиеся 0.
  * @return Признак успешности завершения операции.
  */
 MAGNA_API am_bool collective_parse_record
     (
-        Array *array,
-        MarcRecord *record,
+        const MarcRecord *record,
+        Array *collectives,
         ...
     )
 {
@@ -164,10 +149,10 @@ MAGNA_API am_bool collective_parse_record
     const MarcField *field;
     am_uint32 tag;
 
-    assert (array != NULL);
+    assert (collectives != NULL);
     assert (record != NULL);
 
-    va_start (args, record);
+    va_start (args, collectives);
     while (AM_TRUE) {
         tag = va_arg (args, am_uint32);
         if (tag == 0) {
@@ -177,7 +162,7 @@ MAGNA_API am_bool collective_parse_record
         for (index = 0; index < record->fields.len; ++index) {
             field = (const MarcField*) array_get (&record->fields, index);
             if (field->tag == tag) {
-                collective = array_emplace_back (array);
+                collective = array_emplace_back (collectives);
                 if (collective == NULL) {
                     return AM_FALSE;
                 }

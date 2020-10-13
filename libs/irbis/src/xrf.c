@@ -1,7 +1,7 @@
 /* This is an open source non-commercial project. Dear PVS-Studio, please check it.
  * PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com */
 
-#include "magna/irbis.h"
+#include "magna/direct.h"
 
 /* ReSharper disable StringLiteralTypo */
 /* ReSharper disable IdentifierTypo */
@@ -45,24 +45,6 @@
  */
 
 /*=========================================================*/
-
-/* Размер записи в XRF-файле */
-#define XRF_RECORD_SIZE 12
-
-typedef struct IrbisXrfFile   XrfFile;
-typedef struct IrbisXrfRecord XrfRecord;
-
-struct IrbisXrfRecord
-{
-    am_uint32 low;
-    am_uint32 high;
-    am_uint32 flags;
-};
-
-struct IrbisXrfFile
-{
-    am_handle handle;
-};
 
 MAGNA_API am_bool MAGNA_CALL xrf_is_deleted
     (
