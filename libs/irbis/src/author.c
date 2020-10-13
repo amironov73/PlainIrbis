@@ -91,7 +91,7 @@ MAGNA_API void MAGNA_CALL author_destroy
 /**
  * Применение ФИО автора к указанному полю.
  *
- * @param author Структура адреса.
+ * @param author Структура автора.
  * @param field Поле, подлежащее заполнению элементами ФИО автора.
  * @return Признак успешности завершения операции.
  */
@@ -104,6 +104,7 @@ MAGNA_API am_bool MAGNA_CALL author_apply
     assert (author != NULL);
     assert (field != NULL);
 
+    field_clear (field);
     return apply (field, 'a', &author->familyName)
         && apply (field, 'b', &author->initials)
         && apply (field, 'g', &author->fullName)
@@ -117,9 +118,9 @@ MAGNA_API am_bool MAGNA_CALL author_apply
 }
 
 /**
- * Разбор указанного поля а элементы адреса.
+ * Разбор указанного поля на элементы ФИО автора.
  *
- * @param author Структура адреса, подлежащая заполнению.
+ * @param author Структура автора, подлежащая заполнению.
  * @param field Поле для разбора.
  * @return Признак успешности завершения операции.
  */

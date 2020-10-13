@@ -119,7 +119,7 @@ MAGNA_API am_bool MAGNA_CALL int32_array_create
 
     array->len = 0;
     array->capacity = capacity;
-    array->ptr = (am_int32*) malloc (capacity * sizeof (am_int32));
+    array->ptr = (am_int32*) mem_alloc (capacity * sizeof (am_int32));
     if (array->ptr == NULL) {
         return AM_FALSE;
     }
@@ -132,7 +132,7 @@ MAGNA_API am_bool MAGNA_CALL int32_array_create
  *
  * @param array Массив, подлежащий освобождению.
  */
-MAGNA_API void MAGNA_CALL int32_array_free
+MAGNA_API void MAGNA_CALL int32_array_destroy
     (
         Int32Array *array
     )
@@ -142,7 +142,7 @@ MAGNA_API void MAGNA_CALL int32_array_free
     array->len = 0;
     array->capacity = 0;
     if (array->ptr != NULL) {
-        free (array->ptr);
+        mem_free (array->ptr);
         array->ptr = NULL;
     }
 }
@@ -196,18 +196,18 @@ MAGNA_API am_bool MAGNA_CALL int32_array_grow
         }
         newSize = size;
 
-        newPtr = malloc (newSize * sizeof (am_int32));
+        newPtr = mem_alloc (newSize * sizeof (am_int32));
         if (newPtr == NULL) {
             return AM_FALSE;
         }
 
         if (array->len) {
             assert (array->ptr != NULL);
-            memcpy (newPtr, array->ptr, array->len * sizeof(am_int32));
+            mem_copy (newPtr, array->ptr, array->len * sizeof(am_int32));
         }
 
         if (array->ptr) {
-            free (array->ptr);
+            mem_free (array->ptr);
         }
 
         array->ptr = newPtr;

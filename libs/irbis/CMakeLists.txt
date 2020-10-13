@@ -19,6 +19,7 @@ set(CFiles
     src/author.c
     src/bookinfo.c
     src/codes.c
+    src/collecti.c
     src/connect.c
     src/dbinfo.c
     src/dll.c
@@ -26,6 +27,7 @@ set(CFiles
     src/error.c
     src/exemplar.c
     src/field.c
+    src/field203.c
     src/format.c
     src/gbl.c
     src/guard.c
@@ -38,6 +40,7 @@ set(CFiles
     src/mst.c
     src/opt.c
     src/par.c
+    src/phantom.c
     src/procinfo.c
     src/query.c
     src/rawrecor.c

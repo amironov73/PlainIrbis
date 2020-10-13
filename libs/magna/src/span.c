@@ -638,15 +638,42 @@ MAGNA_API am_bool MAGNA_CALL span_contains
         am_byte value
     )
 {
-    size_t index;
+    const am_byte *ptr, *end;
 
-    for (index = 0; index < span.len; ++index) {
-        if (span.ptr [index] == value) {
+    ptr = span.ptr;
+    for (end = ptr + span.len; ptr < end; ++ptr) {
+        if (*ptr == value) {
             return AM_TRUE;
         }
     }
 
     return AM_FALSE;
+}
+
+/**
+ * Подсчитывает количество вхождений указанного символа.
+ *
+ * @param span Спан.
+ * @param value Искуомое значение.
+ * @return Количество вхождений.
+ */
+MAGNA_API size_t MAGNA_CALL span_count
+    (
+        Span span,
+        am_byte value
+    )
+{
+    size_t result = 0;
+    const am_byte *ptr, *end;
+
+    ptr = span.ptr;
+    for (end = ptr + span.len; ptr < end; ++ptr) {
+        if (*ptr == value) {
+            ++result;
+        }
+    }
+
+    return result;
 }
 
 /**

@@ -19,7 +19,7 @@ TESTER(int32_array_create_1)
     int32_array_create(&a1, 10);
     CHECK (a1.capacity == 10);
     CHECK (a1.len == 0);
-    int32_array_free (&a1);
+    int32_array_destroy(&a1);
 }
 
 TESTER(int32_array_push_back_1)
@@ -38,7 +38,7 @@ TESTER(int32_array_push_back_1)
     CHECK (g1 == c1);
     g2 = int32_array_get (&a1, 1);
     CHECK (g2 == c2);
-    int32_array_free (&a1);
+    int32_array_destroy(&a1);
 }
 
 TESTER(int32_array_push_front_1)
@@ -56,7 +56,7 @@ TESTER(int32_array_push_front_1)
     int32_array_push_front (&a1, c2);
     g2 = int32_array_get (&a1, 0);
     CHECK (g2 == c2);
-    int32_array_free (&a1);
+    int32_array_destroy(&a1);
 }
 
 TESTER(int32_array_pop_back_1)
@@ -77,7 +77,7 @@ TESTER(int32_array_pop_back_1)
     g2 = int32_array_pop_back (&a1);
     CHECK (a1.len == 0);
     CHECK (g2 == c1);
-    int32_array_free (&a1);
+    int32_array_destroy(&a1);
 }
 
 TESTER(int32_array_pop_front_1)
@@ -98,7 +98,7 @@ TESTER(int32_array_pop_front_1)
     g2 = int32_array_pop_front (&a1);
     CHECK (a1.len == 0);
     CHECK (g2 == c2);
-    int32_array_free (&a1);
+    int32_array_destroy(&a1);
 }
 
 TESTER(int32_array_set_1)
@@ -118,7 +118,7 @@ TESTER(int32_array_set_1)
     CHECK (g1 == c3);
     g2 = int32_array_get (&a1, 1);
     CHECK (g2 == c2);
-    int32_array_free (&a1);
+    int32_array_destroy(&a1);
 }
 
 TESTER(int32_array_clone_1)
@@ -139,8 +139,8 @@ TESTER(int32_array_clone_1)
     CHECK (g1 == c1);
     g2 = int32_array_get (&a2, 1);
     CHECK (g2 == c2);
-    int32_array_free (&a1);
-    int32_array_free (&a2);
+    int32_array_destroy(&a1);
+    int32_array_destroy(&a2);
 }
 
 TESTER(int32_array_clone_2)
@@ -151,8 +151,8 @@ TESTER(int32_array_clone_2)
     CHECK (a1.len == 0);
     int32_array_clone (&a2, &a1);
     CHECK (a1.len == a2.len);
-    int32_array_free (&a1);
-    int32_array_free (&a2);
+    int32_array_destroy(&a1);
+    int32_array_destroy(&a2);
 }
 
 TESTER(int32_array_copy_1)
@@ -175,8 +175,8 @@ TESTER(int32_array_copy_1)
     CHECK (g1 == c1);
     g2 = int32_array_get (&a2, 1);
     CHECK (g2 == c2);
-    int32_array_free (&a1);
-    int32_array_free (&a2);
+    int32_array_destroy(&a1);
+    int32_array_destroy(&a2);
 }
 
 TESTER(int32_array_concat_1)
@@ -200,8 +200,8 @@ TESTER(int32_array_concat_1)
     CHECK (g1 == c1);
     g2 = int32_array_get (&a1, 1);
     CHECK (g2 == c2);
-    int32_array_free (&a1);
-    int32_array_free (&a2);
+    int32_array_destroy(&a1);
+    int32_array_destroy(&a2);
 }
 
 TESTER(int32_array_shrink_1)
@@ -222,7 +222,7 @@ TESTER(int32_array_shrink_1)
     CHECK (g1 == c1);
     g2 = int32_array_get (&a1, 1);
     CHECK (g2 == c2);
-    int32_array_free (&a1);
+    int32_array_destroy(&a1);
 }
 
 TESTER(int32_array_shrink_2)
@@ -232,7 +232,7 @@ TESTER(int32_array_shrink_2)
     int32_array_create (&a1, 10);
     int32_array_shrink (&a1);
     CHECK (a1.capacity == 0);
-    int32_array_free (&a1);
+    int32_array_destroy(&a1);
 }
 
 TESTER(int32_array_truncate_1)
@@ -253,7 +253,7 @@ TESTER(int32_array_truncate_1)
     CHECK (g1 == c1);
     int32_array_truncate (&a1, 0);
     CHECK (a1.len == 0);
-    int32_array_free (&a1);
+    int32_array_destroy(&a1);
 }
 
 TESTER(int32_array_grow_1)
@@ -264,7 +264,7 @@ TESTER(int32_array_grow_1)
     CHECK (a1.capacity == 10);
     int32_array_grow (&a1, 100);
     CHECK (a1.capacity >= 100);
-    int32_array_free (&a1);
+    int32_array_destroy(&a1);
 }
 
 TESTER(int32_array_grow_2)
@@ -275,7 +275,7 @@ TESTER(int32_array_grow_2)
     CHECK (a1.capacity == 10);
     int32_array_grow (&a1, 11);
     CHECK (a1.capacity >= 11);
-    int32_array_free (&a1);
+    int32_array_destroy(&a1);
 }
 
 TESTER(int32_array_grow_3)
@@ -290,7 +290,7 @@ TESTER(int32_array_grow_3)
     int32_array_grow (&a1, 11);
     CHECK (a1.capacity >= 11);
     CHECK (a1.len == 2);
-    int32_array_free (&a1);
+    int32_array_destroy(&a1);
 }
 
 TESTER(int32_array_compress_1)

@@ -13,7 +13,7 @@ TESTER(menu_entry_init_1)
     CHECK (entry.code.position == 0);
     CHECK (entry.comment.position == 0);
 
-    menu_entry_free (&entry);
+    menu_entry_destroy (&entry);
 }
 
 TESTER(menu_entry_to_string_1)
@@ -26,8 +26,8 @@ TESTER(menu_entry_to_string_1)
     CHECK (menu_entry_to_string (&entry, &text));
     CHECK (buffer_is_empty(&text));
 
-    menu_entry_free (&entry);
-    buffer_destroy(&text);
+    menu_entry_destroy (&entry);
+    buffer_destroy (&text);
 }
 
 TESTER(menu_entry_to_string_2)
@@ -42,8 +42,8 @@ TESTER(menu_entry_to_string_2)
     CHECK (menu_entry_to_string (&entry, &text));
     CHECK (buffer_compare_text (&text, CBTEXT ("A")) == 0);
 
-    menu_entry_free (&entry);
-    buffer_destroy(&text);
+    menu_entry_destroy (&entry);
+    buffer_destroy (&text);
 }
 
 TESTER(menu_entry_to_string_3)
@@ -52,32 +52,31 @@ TESTER(menu_entry_to_string_3)
     Buffer text = BUFFER_INIT;
 
     menu_entry_init (&entry);
-
     buffer_assign_text (&entry.code, "A");
     buffer_assign_text (&entry.comment, "first letter");
 
     CHECK (menu_entry_to_string (&entry, &text));
     CHECK (buffer_compare_text (&text, CBTEXT ("A - first letter")) == 0);
 
-    menu_entry_free (&entry);
-    buffer_destroy(&text);
+    menu_entry_destroy (&entry);
+    buffer_destroy (&text);
 }
 
 TESTER(menu_init_1)
 {
     MenuFile menu;
 
-    CHECK (menu_init (&menu));
+    menu_init (&menu);
     CHECK (menu.entries.len == 0);
 
-    menu_free (&menu);
+    menu_destroy (&menu);
 }
 
 TESTER(menu_append_1)
 {
     MenuFile menu;
 
-    CHECK (menu_init (&menu));
+    menu_init (&menu);
 
     CHECK (menu_append (&menu, span_null(), span_null()));
     CHECK (menu.entries.len == 1);
@@ -85,7 +84,7 @@ TESTER(menu_append_1)
     CHECK (menu_append (&menu, span_null(), span_null()));
     CHECK (menu.entries.len == 2);
 
-    menu_free (&menu);
+    menu_destroy (&menu);
 }
 
 TESTER(menu_get_entry_1)
@@ -93,8 +92,7 @@ TESTER(menu_get_entry_1)
     MenuFile menu;
     const MenuEntry *entry;
 
-    CHECK (menu_init (&menu));
-
+    menu_init (&menu);
     entry = menu_get_entry
         (
             &menu,
@@ -102,7 +100,7 @@ TESTER(menu_get_entry_1)
         );
     CHECK (entry == NULL);
 
-    menu_free (&menu);
+    menu_destroy (&menu);
 }
 
 TESTER(menu_get_comment_1)
@@ -111,8 +109,7 @@ TESTER(menu_get_comment_1)
     Span comment;
     const am_byte *defaultValue = CBTEXT ("default");
 
-    CHECK (menu_init (&menu));
-
+    menu_init (&menu);
     comment = menu_get_comment
         (
             &menu,
@@ -121,7 +118,7 @@ TESTER(menu_get_comment_1)
         );
     CHECK (comment.ptr == defaultValue);
 
-    menu_free (&menu);
+    menu_destroy (&menu);
 }
 
 TESTER(menu_parse_1)
@@ -130,15 +127,16 @@ TESTER(menu_parse_1)
     StreamTexter texter;
     MenuFile menu;
 
-    CHECK (menu_init (&menu));
+    menu_init (&menu);
+
     CHECK (memory_stream_create (&memory));
     CHECK (texter_init (&texter, &memory, 0));
 
     CHECK (menu_parse (&menu, &texter));
     CHECK (menu.entries.len == 0);
 
-    texter_destroy(&texter);
-    menu_free (&menu);
+    texter_destroy (&texter);
+    menu_destroy (&menu);
 }
 
 TESTER(menu_parse_2)
@@ -150,7 +148,8 @@ TESTER(menu_parse_2)
     const MenuEntry *entry;
     Span comment, defaultValue = TEXT_SPAN ("default");
 
-    CHECK (menu_init (&menu));
+    menu_init (&menu);
+
     CHECK (memory_stream_open (&memory, text, strlen (CCTEXT (text))));
     CHECK (texter_init (&texter, &memory, 0));
 
@@ -177,6 +176,24 @@ TESTER(menu_parse_2)
     comment = menu_get_comment (&menu, TEXT_SPAN ("?"), defaultValue);
     CHECK (span_compare (comment, defaultValue) == 0);
 
-    texter_destroy(&texter);
-    menu_free (&menu);
+    texter_destroy (&texter);
+    menu_destroy (&menu);
+}
+
+TESTER(menu_to_stream_1)
+{
+    Stream memory;
+    MenuFile menu;
+    am_byte *text;
+
+    menu_init (&menu);
+
+    CHECK (memory_stream_create (&memory));
+    CHECK (menu_to_stream (&menu, &memory));
+    text = memory_stream_to_text (&memory);
+    CHECK (text != NULL);
+    CHECK (strcmp (CCTEXT (text), "*****\n") == 0);
+
+    menu_destroy (&menu);
+    stream_close (&memory);
 }

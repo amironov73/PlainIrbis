@@ -417,17 +417,18 @@ typedef struct
 } MenuEntry;
 
 MAGNA_API void    MAGNA_CALL menu_entry_init      (MenuEntry *entry);
-MAGNA_API void    MAGNA_CALL menu_entry_free      (MenuEntry *entry);
+MAGNA_API void    MAGNA_CALL menu_entry_destroy   (MenuEntry *entry);
 MAGNA_API am_bool MAGNA_CALL menu_entry_to_string (const MenuEntry *entry, Buffer *output);
 
 /* MNU-файл. состоит из пар строк (см. MenuEntry). */
 typedef struct
 {
-    Vector entries;
+    Array entries;
+
 } MenuFile;
 
-MAGNA_API am_bool          MAGNA_CALL menu_init        (MenuFile *menu);
-MAGNA_API void             MAGNA_CALL menu_free        (MenuFile *menu);
+MAGNA_API void             MAGNA_CALL menu_init        (MenuFile *menu);
+MAGNA_API void             MAGNA_CALL menu_destroy     (MenuFile *menu);
 MAGNA_API am_bool          MAGNA_CALL menu_append      (MenuFile *menu, Span code, Span comment);
 MAGNA_API const MenuEntry* MAGNA_CALL menu_get_entry   (const MenuFile *menu, Span code);
 MAGNA_API Span             MAGNA_CALL menu_get_comment (const MenuFile *menu, Span code, Span defaultValue);

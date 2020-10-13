@@ -450,6 +450,8 @@ MAGNA_API const char* choose_string (const char *first, ...);
 MAGNA_API Span        choose_span   (Span first, ...);
 MAGNA_API Buffer*     choose_buffer (const Buffer *first, ...);
 
+extern MAGNA_API MAGNA_INLINE const char* newline       (void);
+
 /*=========================================================*/
 
 /* Ввод-вывод */
@@ -531,6 +533,7 @@ struct MagnaSpan
 extern MAGNA_API              int        MAGNA_CALL span_compare             (Span first, Span second);
 extern MAGNA_API              int        MAGNA_CALL span_compare_ignore_case (Span first, Span second    );
 extern MAGNA_API              am_bool    MAGNA_CALL span_contains            (Span span, am_byte value);
+extern MAGNA_API              size_t     MAGNA_CALL span_count               (Span span, am_byte value);
 extern MAGNA_API              am_bool    MAGNA_CALL span_ends_with           (Span span, Span suffix);
 extern MAGNA_API              Span       MAGNA_CALL span_fill                (Span span, am_byte value);
 extern MAGNA_API              am_byte*   MAGNA_CALL span_find_byte           (Span span, am_byte value);
@@ -663,7 +666,7 @@ MAGNA_API am_bool  MAGNA_CALL int32_array_compress   (const Int32Array *array, s
 MAGNA_API am_bool  MAGNA_CALL int32_array_concat     (Int32Array *target, const Int32Array *source);
 MAGNA_API am_bool  MAGNA_CALL int32_array_copy       (Int32Array *target, const Int32Array *source);
 MAGNA_API am_bool  MAGNA_CALL int32_array_create     (Int32Array *array, size_t capacity);
-MAGNA_API void     MAGNA_CALL int32_array_free       (Int32Array *array);
+MAGNA_API void     MAGNA_CALL int32_array_destroy    (Int32Array *array);
 MAGNA_API am_int32 MAGNA_CALL int32_array_get        (const Int32Array *array, size_t index);
 MAGNA_API am_bool  MAGNA_CALL int32_array_grow       (Int32Array *array, size_t newSize);
 MAGNA_API am_bool  MAGNA_CALL int32_array_shrink     (Int32Array *array);
@@ -809,7 +812,7 @@ struct MagnaBuffer
 MAGNA_API am_bool        MAGNA_CALL buffer_ansi_to_utf8              (Buffer *target, const Buffer *source);
 MAGNA_API am_bool        MAGNA_CALL buffer_assign                    (Buffer *buffer, const am_byte *data, size_t length);
 MAGNA_API am_bool        MAGNA_CALL buffer_assign_span               (Buffer *buffer, Span span);
-MAGNA_API am_bool        MAGNA_CALL buffer_assign_text               (Buffer *buffer, const char *text);
+MAGNA_API am_bool        MAGNA_CALL buffer_assign_text               (Buffer *buffer, const am_byte *text);
 MAGNA_API size_t         MAGNA_CALL buffer_calculate_size            (size_t newSize);
 MAGNA_API Buffer*        MAGNA_CALL buffer_clear                     (Buffer *buffer);
 MAGNA_API am_bool        MAGNA_CALL buffer_clone                     (Buffer *target, const Buffer *source);
@@ -835,6 +838,7 @@ MAGNA_API am_bool        MAGNA_CALL buffer_put_uint64                (Buffer *bu
 MAGNA_API am_bool        MAGNA_CALL buffer_putc                      (Buffer *buffer, am_byte c);
 MAGNA_API am_bool        MAGNA_CALL buffer_puts                      (Buffer *buffer, const am_byte *str);
 MAGNA_API size_t         MAGNA_CALL buffer_read                      (Buffer *buffer, am_byte *data, size_t length);
+MAGNA_API void           MAGNA_CALL buffer_remove_at                 (Buffer *buffer, size_t index, size_t size);
 MAGNA_API am_bool        MAGNA_CALL buffer_replace_text              (Buffer *buffer, const am_byte *from, const am_byte *to);
 MAGNA_API Buffer*        MAGNA_CALL buffer_static                    (Buffer *buffer, const am_byte *data, size_t length);
 MAGNA_API Buffer*        MAGNA_CALL buffer_swap                      (Buffer *first, Buffer *second);
@@ -1047,19 +1051,21 @@ typedef struct {
     am_bool eot;
 } StreamTexter;
 
-MAGNA_API am_bool    MAGNA_CALL stream_close      (Stream *stream);
-MAGNA_API am_bool    MAGNA_CALL stream_copy       (Stream *target, Stream *source);
-MAGNA_API am_bool    MAGNA_CALL stream_init       (Stream *stream);
-MAGNA_API ssize_t    MAGNA_CALL stream_read       (Stream *stream, am_byte *buffer, size_t length);
-MAGNA_API ssize_t    MAGNA_CALL stream_seek       (Stream *stream, size_t position);
-MAGNA_API ssize_t    MAGNA_CALL stream_tell       (Stream *stream);
-MAGNA_API am_bool    MAGNA_CALL stream_write      (Stream *stream, const am_byte *buffer, size_t length);
-MAGNA_API am_bool    MAGNA_CALL stream_write_line (Stream *stream, const char *text);
+MAGNA_API am_bool    MAGNA_CALL stream_close        (Stream *stream);
+MAGNA_API am_bool    MAGNA_CALL stream_copy         (Stream *target, Stream *source);
+MAGNA_API am_bool    MAGNA_CALL stream_init         (Stream *stream);
+MAGNA_API ssize_t    MAGNA_CALL stream_read         (Stream *stream, am_byte *buffer, size_t length);
+MAGNA_API ssize_t    MAGNA_CALL stream_seek         (Stream *stream, size_t position);
+MAGNA_API ssize_t    MAGNA_CALL stream_tell         (Stream *stream);
+MAGNA_API am_bool    MAGNA_CALL stream_write        (Stream *stream, const am_byte *buffer, size_t length);
+MAGNA_API am_bool    MAGNA_CALL stream_write_buffer (Stream *stream, const Buffer *buffer);
+MAGNA_API am_bool    MAGNA_CALL stream_write_char   (Stream *stream, am_byte value);
+MAGNA_API am_bool    MAGNA_CALL stream_write_text   (Stream *stream, const char *text);
 
-MAGNA_API am_bool    MAGNA_CALL texter_init      (StreamTexter *texter, Stream *stream, size_t bufsize);
+MAGNA_API am_bool    MAGNA_CALL texter_init         (StreamTexter *texter, Stream *stream, size_t bufsize);
 MAGNA_API void       MAGNA_CALL texter_destroy      (StreamTexter *texter);
-MAGNA_API int        MAGNA_CALL texter_read_byte (StreamTexter *texter);
-MAGNA_API ssize_t    MAGNA_CALL texter_read_line (StreamTexter *texter, Buffer *output);
+MAGNA_API int        MAGNA_CALL texter_read_byte    (StreamTexter *texter);
+MAGNA_API ssize_t    MAGNA_CALL texter_read_line    (StreamTexter *texter, Buffer *output);
 
 MAGNA_API am_bool    MAGNA_CALL null_stream_open       (Stream *stream);
 MAGNA_API am_bool    MAGNA_CALL broken_stream_open     (Stream *stream);

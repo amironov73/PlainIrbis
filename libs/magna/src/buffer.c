@@ -430,7 +430,7 @@ MAGNA_API am_bool MAGNA_CALL buffer_assign
 MAGNA_API am_bool MAGNA_CALL buffer_assign_text
     (
         Buffer *buffer,
-        const char *text
+        const am_byte *text
     )
 {
     size_t len;
@@ -446,7 +446,7 @@ MAGNA_API am_bool MAGNA_CALL buffer_assign_text
         buffer->position = 0;
     }
     else {
-        len = strlen (text) + 1;
+        len = strlen (CCTEXT (text)) + 1;
         if (!buffer_grow (buffer, len)) {
             return AM_FALSE;
         }
@@ -1158,6 +1158,11 @@ MAGNA_API void MAGNA_CALL buffer_to_file
     }
 }
 
+/**
+ * Вывод содержимого буфера в консоль.
+ *
+ * @param buffer Буфер.
+ */
 MAGNA_API void MAGNA_CALL buffer_to_console
     (
         const Buffer *buffer
@@ -1168,6 +1173,30 @@ MAGNA_API void MAGNA_CALL buffer_to_console
     if (!buffer_is_empty (buffer)) {
         fwrite (buffer->ptr, 1, buffer->position, stdout);
     }
+}
+
+/**
+ * Удаление из буфера указанных байтов.
+ *
+ * @param buffer Буфер.
+ * @param index Индекс первого удаляемого байта.
+ * @param size Количество удаляемых байт.
+ */
+MAGNA_API void MAGNA_CALL buffer_remove_at
+    (
+        Buffer *buffer,
+        size_t index,
+        size_t size
+    )
+{
+    assert (buffer != NULL);
+
+    memmove
+        (
+            buffer->ptr + index,
+            buffer->ptr + index + size,
+            buffer->position - index - size
+        );
 }
 
 /*=========================================================*/

@@ -467,7 +467,7 @@ TESTER(file_stream_create_1)
     }
 
     CHECK (file_stream_create (&stream, fname));
-    CHECK (stream_write_line (&stream, "Hello, world!"));
+    CHECK (stream_write_text(&stream, "Hello, world!"));
     CHECK (stream_close (&stream));
 
     CHECK (file_delete (fname));
@@ -510,7 +510,7 @@ TESTER(file_stream_open_write_1)
     CHECK (file_touch (fname));
 
     CHECK (file_stream_open_write (&stream, fname));
-    CHECK (stream_write_line (&stream, "Hello, world!"));
+    CHECK (stream_write_text(&stream, "Hello, world!"));
     CHECK (stream_close (&stream));
 
     CHECK (file_delete (fname));

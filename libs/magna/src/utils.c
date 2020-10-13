@@ -90,6 +90,24 @@ MAGNA_API Span choose_span
 }
 
 /**
+ * Выдает специфичный для платформы перевод строки.
+ *
+ * @return ASCIIZ с переводом строки.
+ */
+MAGNA_API MAGNA_INLINE const char* newline (void)
+{
+#if defined(MAGNA_WINDOWS)
+
+    return "\r\n";
+
+#else
+
+    return "\n";
+
+#endif
+}
+
+/**
  * Выбор первого не пустого буфера.
  *
  * @param first Буфер для затравки.

@@ -71,15 +71,15 @@ MAGNA_API void MAGNA_CALL menu_entry_init
  *
  * @param entry Указатель на структуру.
  */
-MAGNA_API void MAGNA_CALL menu_entry_free
+MAGNA_API void MAGNA_CALL menu_entry_destroy
     (
         MenuEntry *entry
     )
 {
     assert (entry != NULL);
 
-    buffer_destroy(&entry->code);
-    buffer_destroy(&entry->comment);
+    buffer_destroy (&entry->code);
+    buffer_destroy (&entry->comment);
 }
 
 /**
@@ -103,8 +103,8 @@ MAGNA_API am_bool MAGNA_CALL menu_entry_to_string
     }
 
     if (entry->comment.position != 0) {
-        return buffer_puts(output, CBTEXT (" - "))
-           && buffer_concat(output, &entry->comment);
+        return buffer_puts (output, CBTEXT (" - "))
+           && buffer_concat (output, &entry->comment);
     }
 
     return AM_TRUE;
@@ -118,14 +118,14 @@ MAGNA_API am_bool MAGNA_CALL menu_entry_to_string
  * @param menu Указатель на неинициализированную структуру.
  * @return Признак успешности завершения операции.
  */
-MAGNA_API am_bool MAGNA_CALL menu_init
+MAGNA_API void MAGNA_CALL menu_init
     (
         MenuFile *menu
     )
 {
     assert (menu != NULL);
 
-    return vector_create(&menu->entries, 4);
+    array_init (&menu->entries, sizeof (MenuEntry));
 }
 
 /**
@@ -133,7 +133,7 @@ MAGNA_API am_bool MAGNA_CALL menu_init
  *
  * @param menu Меню.
  */
-MAGNA_API void MAGNA_CALL menu_free
+MAGNA_API void MAGNA_CALL menu_destroy
     (
         MenuFile *menu
     )
@@ -144,12 +144,11 @@ MAGNA_API void MAGNA_CALL menu_free
     assert (menu != NULL);
 
     for (index = 0; index < menu->entries.len; ++index) {
-        entry = (MenuEntry*) menu->entries.ptr [index];
-        menu_entry_free (entry);
-        mem_free (entry);
+        entry = (MenuEntry*) array_get (&menu->entries, index);
+        menu_entry_destroy (entry);
     }
 
-    vector_destroy(&menu->entries);
+    array_destroy (&menu->entries);
 }
 
 /**
@@ -171,7 +170,7 @@ MAGNA_API am_bool MAGNA_CALL menu_append
 
     assert (menu != NULL);
 
-    entry = (MenuEntry*) mem_alloc (sizeof (MenuEntry));
+    entry = array_emplace_back (&menu->entries);
     if (entry == NULL) {
         return AM_FALSE;
     }
@@ -179,14 +178,9 @@ MAGNA_API am_bool MAGNA_CALL menu_append
     menu_entry_init (entry);
     if (!buffer_assign_span (&entry->code, code)
         || !buffer_assign_span (&entry->comment, comment)) {
-        menu_entry_free (entry);
-        mem_free (entry);
-        return AM_FALSE;
-    }
+        menu_entry_destroy (entry);
+        --menu->entries.len;
 
-    if (!vector_push_back(&menu->entries, entry)) {
-        menu_entry_free (entry);
-        mem_free (entry);
         return AM_FALSE;
     }
 
@@ -212,7 +206,7 @@ MAGNA_API const MenuEntry* MAGNA_CALL menu_get_entry
     assert (menu != NULL);
 
     for (index = 0; index < menu->entries.len; ++index) {
-        entry = (const MenuEntry*) menu->entries.ptr [index];
+        entry = (const MenuEntry*) array_get (&menu->entries, index);
         if (buffer_compare_span_ignore_case (&entry->code, code) == 0) {
             return entry;
         }
@@ -221,7 +215,7 @@ MAGNA_API const MenuEntry* MAGNA_CALL menu_get_entry
     code = span_trim (code);
 
     for (index = 0; index < menu->entries.len; ++index) {
-        entry = (const MenuEntry*) menu->entries.ptr [index];
+        entry = (const MenuEntry*) array_get (&menu->entries, index);
         if (buffer_compare_span_ignore_case (&entry->code, code) == 0) {
             return entry;
         }
@@ -230,7 +224,7 @@ MAGNA_API const MenuEntry* MAGNA_CALL menu_get_entry
     code = trim_code (code);
 
     for (index = 0; index < menu->entries.len; ++index) {
-        entry = (const MenuEntry*) menu->entries.ptr [index];
+        entry = (const MenuEntry*) array_get (&menu->entries, index);
         if (buffer_compare_span_ignore_case (&entry->code, code) == 0) {
             return entry;
         }
@@ -315,22 +309,43 @@ MAGNA_API am_bool MAGNA_CALL menu_parse
         }
     }
 
-    buffer_destroy(&line1);
-    buffer_destroy(&line2);
+    buffer_destroy (&line1);
+    buffer_destroy (&line2);
 
     return result;
 }
 
+/**
+ * Вывод меню в поток.
+ *
+ * @param menu Меню.
+ * @param output Поток для вывода.
+ * @return Признак успешности завершения операции.
+ */
 MAGNA_API am_bool MAGNA_CALL menu_to_stream
     (
         const MenuFile *menu,
-        Stream *stream
+        Stream *output
     )
 {
-    assert (menu != NULL);
-    assert (stream != NULL);
+    size_t index;
+    const MenuEntry *entry;
 
-    return AM_FALSE;
+    assert (menu != NULL);
+    assert (output != NULL);
+
+    for (index = 0; index < menu->entries.len; ++index) {
+        entry = (const MenuEntry*) array_get (&menu->entries, index);
+        if (!stream_write_buffer (output, &entry->code)
+           || !stream_write_char (output, '\n')
+           || !stream_write_buffer (output, &entry->comment)
+           || !stream_write_char (output, '\n')) {
+            return AM_FALSE;
+        }
+    }
+
+    return stream_write_text (output, "*****")
+           && stream_write_char (output, '\n');
 }
 
 /*=========================================================*/

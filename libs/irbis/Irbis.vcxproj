@@ -24,6 +24,7 @@
     <ClCompile Include="src\author.c" />
     <ClCompile Include="src\bookinfo.c" />
     <ClCompile Include="src\codes.c" />
+    <ClCompile Include="src\collecti.c" />
     <ClCompile Include="src\connect.c" />
     <ClCompile Include="src\dbinfo.c" />
     <ClCompile Include="src\dll.c" />
@@ -31,6 +32,7 @@
     <ClCompile Include="src\error.c" />
     <ClCompile Include="src\exemplar.c" />
     <ClCompile Include="src\field.c" />
+    <ClCompile Include="src\field203.c" />
     <ClCompile Include="src\format.c" />
     <ClCompile Include="src\gbl.c" />
     <ClCompile Include="src\guard.c" />
@@ -43,6 +45,7 @@
     <ClCompile Include="src\mst.c" />
     <ClCompile Include="src\opt.c" />
     <ClCompile Include="src\par.c" />
+    <ClCompile Include="src\phantom.c" />
     <ClCompile Include="src\procinfo.c" />
     <ClCompile Include="src\query.c" />
     <ClCompile Include="src\rawrecor.c" />

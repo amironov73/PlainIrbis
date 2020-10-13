@@ -142,13 +142,13 @@ MAGNA_API am_bool MAGNA_CALL stream_close
 }
 
 /**
- * Запись строки в поток.
+ * Запись ASCIIZ-текста в поток.
  *
  * @param stream Поток.
- * @param text Строка.
+ * @param text Некий текст.
  * @return Признак успешности завершения операции.
  */
-MAGNA_API am_bool MAGNA_CALL stream_write_line
+MAGNA_API am_bool MAGNA_CALL stream_write_text
     (
         Stream *stream,
         const char *text
@@ -158,6 +158,43 @@ MAGNA_API am_bool MAGNA_CALL stream_write_line
     assert (text != NULL);
 
     return stream_write (stream, CBTEXT (text), strlen (text));
+}
+
+/**
+ * Запись содержимого буфера в поток.
+ *
+ * @param stream Поток.
+ * @param buffer Буфер.
+ * @return Признак успешности завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL stream_write_buffer
+    (
+        Stream *stream,
+        const Buffer *buffer
+    )
+{
+    assert (stream != NULL);
+    assert (buffer != NULL);
+
+    return stream_write (stream, buffer->ptr, buffer->position);
+}
+
+/**
+ * Запись символа в поток.
+ *
+ * @param stream Поток.
+ * @param value Символ.
+ * @return Признак успешности завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL stream_write_char
+    (
+        Stream *stream,
+        am_byte value
+    )
+{
+    assert (stream != NULL);
+
+    return stream_write (stream, &value, 1);
 }
 
 /**

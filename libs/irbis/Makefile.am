@@ -4,12 +4,14 @@ libsome_a_SOURCES =  src/address.c \
     src/author.c   \
     src/bookinfo.c \
     src/codes.c    \
+    src/collecti.c \
     src/connect.c  \
     src/dbinfo.c   \
     src/dll.c      \
     src/ean.c      \
     src/error.c    \
     src/field.c    \
+    src/field203.c \
     src/format.c   \
     src/gbl.c      \
     src/guard.c    \
@@ -22,6 +24,7 @@ libsome_a_SOURCES =  src/address.c \
     src/mst.c      \
     src/opt.c      \
     src/par.c      \
+    src/phantom.c  \
     src/procinfo.c \
     src/query.c    \
     src/rawrecor.c \
