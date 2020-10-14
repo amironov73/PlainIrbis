@@ -283,7 +283,7 @@ MAGNA_API am_byte MAGNA_CALL subfield_normalize_code
         am_byte code
     )
 {
-    return tolower (code);
+    return (am_byte) (((unsigned) (tolower (code))) & 0xFFu);
 }
 
 /**
@@ -308,6 +308,6 @@ MAGNA_API am_bool MAGNA_CALL subfield_verify
 
 /*=========================================================*/
 
-#include "warnpush.h"
+#include "warnpop.h"
 
 /*=========================================================*/

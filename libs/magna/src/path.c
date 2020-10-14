@@ -29,13 +29,17 @@
 
 #ifdef MAGNA_WINDOWS
 
-#define _WINSOCK_DEPRECATED_NO_WARNINGS
+    #ifdef _MSC_VER
+    #pragma warning(push)
+    #pragma warning(disable:4668)
+    #endif
 
-#include <winsock2.h>
-#include <windows.h>
-#include <io.h>
+    #include <windows.h>
+    #include <io.h>
 
-#pragma comment (lib, "ws2_32.lib") // for ntohl/htonl
+    #ifdef _MSC_VER
+    #pragma warning(pop)
+    #endif
 
 #elif defined (MAGNA_MSDOS)
 

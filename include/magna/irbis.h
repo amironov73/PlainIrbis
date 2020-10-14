@@ -269,17 +269,39 @@ typedef struct
     void *data;
     am_mfn mfn;
     am_flag status;
-    am_int32 version;
+    am_uint32 version;
 
 } MarcRecord;
 
 MAGNA_API MarcField*  MAGNA_CALL record_add          (MarcRecord *record, am_uint32 tag, const char *value);
 MAGNA_API MarcRecord* MAGNA_CALL record_clone        (MarcRecord *target, const MarcRecord *source);
+MAGNA_API void        MAGNA_CALL record_destroy      (MarcRecord *record);
 MAGNA_API am_bool     MAGNA_CALL record_decode_lines (MarcRecord *record, Vector *lines);
 MAGNA_API am_bool     MAGNA_CALL record_encode       (const MarcRecord *record, const char *delimiter, Buffer *buffer);
 MAGNA_API Span        MAGNA_CALL record_fm           (const MarcRecord *record, am_uint32 tag, am_byte code);
 MAGNA_API am_bool     MAGNA_CALL record_fma          (const MarcRecord *record, Vector *array, am_uint32 tag, am_byte code);
 MAGNA_API MarcField*  MAGNA_CALL record_get_field    (const MarcRecord *record, am_uint32 tag, size_t occurrence);
+MAGNA_API void        MAGNA_CALL record_init         (MarcRecord *record);
+
+/*=========================================================*/
+
+/* Сырая запись */
+
+typedef struct
+{
+    Array fields;
+    Buffer database;
+    void *data;
+    am_mfn mfn;
+    am_flag status;
+    am_uint32 version;
+
+} RawRecord;
+
+MAGNA_API void    MAGNA_CALL raw_record_destroy       (RawRecord *record);
+MAGNA_API void    MAGNA_CALL raw_record_init          (RawRecord *record);
+MAGNA_API am_bool MAGNA_CALL raw_record_parse_single  (RawRecord *record, void *response);
+MAGNA_API am_bool MAGNA_CALL raw_record_to_string (const RawRecord *record, Buffer *output, const am_byte *delimiter);
 
 /*=========================================================*/
 
@@ -389,6 +411,7 @@ typedef struct
 MAGNA_API am_bool  MAGNA_CALL response_create                (struct IrbisConnection *connection, Response *response);
 MAGNA_API am_bool             response_check                 (Response *response, ...);
 MAGNA_API void     MAGNA_CALL response_destroy               (Response *response);
+MAGNA_API am_bool  MAGNA_CALL response_eot                   (const Response *response);
 MAGNA_API Span     MAGNA_CALL response_get_line              (Response *response);
 MAGNA_API am_int32 MAGNA_CALL response_get_return_code       (Response *response);
 MAGNA_API void     MAGNA_CALL response_null                  (Response *response);
@@ -399,6 +422,30 @@ MAGNA_API am_bool  MAGNA_CALL response_remaining_ansi_lines  (Response *response
 MAGNA_API Span     MAGNA_CALL response_remaining_ansi_text   (Response *response);
 MAGNA_API am_bool  MAGNA_CALL response_remaining_utf_lines   (Response *response, Vector *array);
 MAGNA_API Span     MAGNA_CALL response_remaining_utf_text    (Response *response);
+
+/*=========================================================*/
+
+/* Инфорация о пользователе системы */
+
+typedef struct
+{
+    Buffer number;
+    Buffer name;
+    Buffer password;
+    Buffer cataloger;
+    Buffer reader;
+    Buffer circulation;
+    Buffer acquisitions;
+    Buffer provision;
+    Buffer administrator;
+
+} UserInfo;
+
+MAGNA_API void    MAGNA_CALL userinfo_destroy       (UserInfo *userinfo);
+MAGNA_API void    MAGNA_CALL userinfo_destroy_array (Array *users);
+MAGNA_API void    MAGNA_CALL userinfo_init          (UserInfo *userinfo);
+MAGNA_API void    MAGNA_CALL userinfo_init_array    (Array *users);
+MAGNA_API am_bool MAGNA_CALL userinfo_parse_lines   (UserInfo *userinfo, const Span *lines);
 
 /*=========================================================*/
 
@@ -680,7 +727,7 @@ MAGNA_API am_mfn  MAGNA_CALL connection_get_max_mfn        (Connection *connecti
 MAGNA_API am_bool MAGNA_CALL connection_get_server_version (Connection *connection, ServerVersion *version);
 MAGNA_API am_bool MAGNA_CALL connection_no_operation       (Connection *connection);
 MAGNA_API am_bool MAGNA_CALL connection_parse_string       (Connection *connection, Span connectionString);
-MAGNA_API am_bool MAGNA_CALL connection_read_raw_record    (Connection *connection, am_mfn mfn, Buffer *buffer);
+MAGNA_API am_bool MAGNA_CALL connection_read_record_text   (Connection *connection, am_mfn mfn, Buffer *buffer);
 MAGNA_API am_bool MAGNA_CALL connection_read_text_file     (Connection *connection, const Specification *specification, Buffer *buffer);
 MAGNA_API am_bool MAGNA_CALL connection_reload_dictionary  (Connection *connection, const am_byte *database);
 MAGNA_API am_bool MAGNA_CALL connection_reload_master_file (Connection *connection, const am_byte *database);

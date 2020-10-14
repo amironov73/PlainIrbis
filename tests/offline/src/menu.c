@@ -37,7 +37,7 @@ TESTER(menu_entry_to_string_2)
 
     menu_entry_init (&entry);
 
-    buffer_assign_text (&entry.code, "A");
+    buffer_assign_text (&entry.code, CBTEXT ("A"));
 
     CHECK (menu_entry_to_string (&entry, &text));
     CHECK (buffer_compare_text (&text, CBTEXT ("A")) == 0);
@@ -52,8 +52,8 @@ TESTER(menu_entry_to_string_3)
     Buffer text = BUFFER_INIT;
 
     menu_entry_init (&entry);
-    buffer_assign_text (&entry.code, "A");
-    buffer_assign_text (&entry.comment, "first letter");
+    buffer_assign_text (&entry.code, CBTEXT ("A"));
+    buffer_assign_text (&entry.comment, CBTEXT ("first letter"));
 
     CHECK (menu_entry_to_string (&entry, &text));
     CHECK (buffer_compare_text (&text, CBTEXT ("A - first letter")) == 0);

@@ -15,11 +15,22 @@
 
 #ifdef MAGNA_WINDOWS
 
-#define _WINSOCK_DEPRECATED_NO_WARNINGS
-#include <winsock2.h>
-#include <windows.h>
+    #ifdef _MSC_VER
+    #pragma warning(push)
+    #pragma warning(disable:4668)
+    #endif
 
-static WSADATA wsaData;
+    #define _WINSOCK_DEPRECATED_NO_WARNINGS
+    #include <winsock2.h>
+    #include <windows.h>
+
+    #ifdef _MSC_VER
+    #pragma warning(pop)
+    #endif
+
+    static WSADATA wsaData;
+
+    #pragma comment (lib, "ws2_32.lib")
 
 #elif defined(MAGNA_MSDOS)
 
@@ -282,7 +293,7 @@ MAGNA_API am_bool MAGNA_CALL tcp4_send_buffer
 
     result = tcp4_send (handle, buffer->ptr, buffer->position);
 
-    return result == buffer->position;
+    return result == ((ssize_t) buffer->position);
 }
 
 /*=========================================================*/

@@ -1246,7 +1246,71 @@ MAGNA_API am_bool MAGNA_CALL connection_to_string
         && buffer_putc (output, ';');
 }
 
+/**
+ * Чтение записи с сервера. Запись никак не раскодируется и возвращается
+ * в виде текста.
+ *
+ * @param connection Активное соединение.
+ * @param mfn MFN записи.
+ * @param buffer Буфер для размещения записи.
+ * @return Признак успешного завершения операции.
+ */
 MAGNA_API am_bool MAGNA_CALL connection_read_raw_record
+    (
+        Connection *connection,
+        am_mfn mfn,
+        RawRecord *record
+    )
+{
+    Query query;
+    Response response;
+    am_bool result = AM_FALSE;
+    Span line;
+
+    assert (connection != NULL);
+    assert (mfn > 0);
+
+    if (!connection_check (connection)) {
+        return AM_FALSE;
+    }
+
+    response_null (&response);
+    if (!query_create (&query, connection, CBTEXT (READ_RECORD))) {
+        return AM_FALSE;
+    }
+
+    if (!query_add_ansi_buffer (&query, &connection->database)
+        || !query_add_int32 (&query, mfn)) {
+        goto DONE;
+    }
+
+    if (!connection_execute (connection, &query, &response)) {
+        goto DONE;
+    }
+
+    if (!raw_record_parse_single(record, &response)) {
+        goto DONE;
+    }
+
+    result = AM_TRUE;
+
+    DONE:
+    query_destroy (&query);
+    response_destroy (&response);
+
+    return result;
+}
+
+/**
+ * Чтение записи с сервера. Запись никак не раскодируется и возвращается
+ * в виде текста.
+ *
+ * @param connection Активное соединение.
+ * @param mfn MFN записи.
+ * @param buffer Буфер для размещения записи.
+ * @return Признак успешного завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL connection_read_record_text
     (
         Connection *connection,
         am_mfn mfn,

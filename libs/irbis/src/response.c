@@ -52,8 +52,24 @@ MAGNA_API void MAGNA_CALL response_destroy
 {
     assert (response != NULL);
 
-    buffer_destroy(&response->answer);
+    buffer_destroy (&response->answer);
     mem_clear (response, sizeof (Response));
+}
+
+/**
+ * Достигнут конец ответа сервера?
+ *
+ * @param response Ответ сервера.
+ * @return Результат проверки.
+ */
+MAGNA_API am_bool MAGNA_CALL response_eot
+    (
+        const Response *response
+    )
+{
+    assert (response != NULL);
+
+    return nav_eot (&response->navigator);
 }
 
 MAGNA_API am_bool response_check

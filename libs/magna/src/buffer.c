@@ -549,7 +549,7 @@ MAGNA_API Buffer* MAGNA_CALL buffer_from_span
 MAGNA_API am_bool MAGNA_CALL buffer_assign_span
     (
         Buffer *buffer,
-        const Span span
+        Span span
     )
 {
     assert (buffer != NULL);

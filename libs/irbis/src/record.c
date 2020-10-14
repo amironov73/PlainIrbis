@@ -28,21 +28,42 @@
 /*=========================================================*/
 
 /**
- * Инициализация записи.
+ * Простая инициализация структуры.
+ * Не выделяет память в куче.
  *
- * @param record Запись.
- * @return Запись.
+ * @param record Указатель на неинициализированную структуру.
  */
-MAGNA_API MarcRecord* MAGNA_CALL record_init
+MAGNA_API void MAGNA_CALL record_init
     (
         MarcRecord *record
     )
 {
     assert (record != NULL);
 
-    memset (record, 0, sizeof (MarcRecord));
+    mem_clear (record, sizeof (*record));
+}
 
-    return record;
+/**
+ * Освобождение ресурсов, занятых записью.
+ *
+ * @param record Запись, подлежащая освобождению.
+ */
+MAGNA_API void MAGNA_CALL record_destroy
+    (
+        MarcRecord *record
+    )
+{
+    size_t index;
+    MarcField *field;
+
+    assert (record != NULL);
+
+    for (index = 0; index < record->fields.len; ++index) {
+        field = (MarcField*) array_get (&record->fields, index);
+        field_destroy (field);
+    }
+
+    array_destroy (&record->fields);
 }
 
 /**

@@ -50,7 +50,7 @@ int main (int argc, char **argv)
     buffer_destroy (&fileContent);
 
     printf ("\n\nMFN=1:\n\n");
-    connection_read_raw_record (&connection, 1, &rawRecord);
+    connection_read_record_text(&connection, 1, &rawRecord);
     buffer_to_console (&rawRecord);
     buffer_destroy (&rawRecord);
 

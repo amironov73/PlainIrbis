@@ -12,18 +12,25 @@
 
 /*=========================================================*/
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable: 4255)
-#pragma warning(disable: 4820)
-#endif
+#include "warnpush.h"
 
 /*=========================================================*/
 
 #ifdef MAGNA_WINDOWS
-#define _WINSOCK_DEPRECATED_NO_WARNINGS
-#include <winsock2.h>
-#include <windows.h>
+
+    #ifdef _MSC_VER
+    #pragma warning(push)
+    #pragma warning(disable:4668)
+    #endif
+
+    #define _WINSOCK_DEPRECATED_NO_WARNINGS
+    #include <winsock2.h>
+    #include <windows.h>
+
+    #ifdef _MSC_VER
+    #pragma warning(pop)
+    #endif
+
 #endif
 
 /*=========================================================*/
@@ -41,7 +48,7 @@ static void press_key
         (
             vk,
             scan,
-            KEYEVENTF_EXTENDEDKEY | 0,
+            ((DWORD) KEYEVENTF_EXTENDEDKEY) | 0u,
             0
         );
 
@@ -50,7 +57,7 @@ static void press_key
         (
             vk,
             scan,
-            KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP,
+            ((DWORD) KEYEVENTF_EXTENDEDKEY) | ((DWORD) KEYEVENTF_KEYUP),
             0
         );
 }
@@ -64,7 +71,7 @@ static int key_pressed
 
     GetKeyboardState (keyState);
 
-    return (keyState [virtualKey] & 1) != 0;
+    return (((DWORD) keyState [virtualKey]) & 1u) != 0;
 }
 
 /**
@@ -207,8 +214,6 @@ MAGNA_API int MAGNA_CALL waitkeyt (int duration)
 
 /*=========================================================*/
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
+#include "warnpop.h"
 
 /*=========================================================*/

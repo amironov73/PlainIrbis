@@ -3,9 +3,9 @@
 
 #include "magna/core.h"
 
-/* ReSharper disable StringLiteralTypo */
-/* ReSharper disable IdentifierTypo */
-/* ReSharper disable CommentTypo */
+// ReSharper disable StringLiteralTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable CommentTypo
 
 /*=========================================================*/
 
@@ -15,7 +15,16 @@
 
 #if defined(MAGNA_WINDOWS)
 
-#include <windows.h>
+    #ifdef _MSC_VER
+    #pragma warning(push)
+    #pragma warning(disable:4668)
+    #endif
+
+    #include <windows.h>
+
+    #ifdef _MSC_VER
+    #pragma warning(pop)
+    #endif
 
 #elif defined(MAGNA_MSDOS)
 
@@ -126,9 +135,9 @@ MAGNA_API am_bool MAGNA_CALL date_parse
     assert (date != NULL);
     assert (text.len >= 8);
 
-    year = fastParse32 (text.ptr, 4);
+    year  = fastParse32 (text.ptr, 4);
     month = fastParse32 (text.ptr + 4, 2);
-    day = fastParse32 (text.ptr + 6, 2);
+    day   = fastParse32 (text.ptr + 6, 2);
 
     return AM_FALSE;
 }
@@ -155,7 +164,7 @@ MAGNA_API am_byte* MAGNA_CALL date_to_text
         return NULL;
     }
 
-    sprintf ((char*) buffer, "%04u%02u%02u", year, month, day);
+    sprintf (CTEXT (buffer), "%04u%02u%02u", year, month, day);
 
     return buffer;
 }

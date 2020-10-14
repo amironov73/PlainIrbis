@@ -8,6 +8,13 @@
 
 /*=========================================================*/
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable: 4820)
+#endif
+
+/*=========================================================*/
+
 typedef struct
 {
     am_uint32 low;
@@ -78,6 +85,12 @@ typedef struct
 
 MAGNA_API am_bool MAGNA_CALL mst_read_control (am_handle handle, MstControlRecord64 *record);
 MAGNA_API am_bool MAGNA_CALL mst_read_record  (am_handle handle, MstRecord64 *record);
+
+/*=========================================================*/
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 /*=========================================================*/
 

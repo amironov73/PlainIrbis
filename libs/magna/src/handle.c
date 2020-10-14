@@ -3,9 +3,9 @@
 
 #include "magna/core.h"
 
-/* ReSharper disable StringLiteralTypo */
-/* ReSharper disable IdentifierTypo */
-/* ReSharper disable CommentTypo */
+// ReSharper disable StringLiteralTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable CommentTypo
 
 /*=========================================================*/
 
@@ -15,7 +15,16 @@
 
 #ifdef MAGNA_WINDOWS
 
-#include <windows.h>
+    #ifdef _MSC_VER
+    #pragma warning(push)
+    #pragma warning(disable:4668)
+    #endif
+
+    #include <windows.h>
+
+    #ifdef _MSC_VER
+    #pragma warning(pop)
+    #endif
 
 #endif
 
