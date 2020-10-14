@@ -7,6 +7,18 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable CommentTypo
 
+/*=========================================================*/
+
+#include "warnpush.h"
+
+/*=========================================================*/
+
+#include <assert.h>
+#include <stdarg.h>
+#include <ctype.h>
+
+/*=========================================================*/
+
 /**
     \file subfield.c
 
@@ -293,3 +305,9 @@ MAGNA_API am_bool MAGNA_CALL subfield_verify
     return subfield_code_is_valid (subfield->code)
         && !subfield_is_empty (subfield);
 }
+
+/*=========================================================*/
+
+#include "warnpush.h"
+
+/*=========================================================*/

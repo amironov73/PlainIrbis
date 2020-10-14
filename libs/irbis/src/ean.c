@@ -1,14 +1,15 @@
-/* This is an open source non-commercial project. Dear PVS-Studio, please check it.
- * PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com */
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-#include "magna/core.h"
+#include "magna/irbis.h"
+
+// ReSharper disable StringLiteralTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable CommentTypo
 
 /*=========================================================*/
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable: 5045)
-#endif
+#include "warnpush.h"
 
 /*=========================================================*/
 
@@ -165,8 +166,6 @@ MAGNA_API am_bool MAGNA_CALL ean8_check_control_digit
 
 /*=========================================================*/
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
+#include "warnpop.h"
 
 /*=========================================================*/

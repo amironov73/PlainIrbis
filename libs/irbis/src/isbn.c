@@ -1,13 +1,23 @@
-/* This is an open source non-commercial project. Dear PVS-Studio, please check it.
- * PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com */
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include "magna/irbis.h"
 
-/* ReSharper disable StringLiteralTypo */
-/* ReSharper disable IdentifierTypo */
-/* ReSharper disable CommentTypo */
+// ReSharper disable StringLiteralTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable CommentTypo
+
+/*=========================================================*/
+
+#include "warnpush.h"
+
+/*=========================================================*/
 
 #include <assert.h>
+#include <stdarg.h>
+#include <ctype.h>
+
+/*=========================================================*/
 
 /**
    \file isbn.c
@@ -254,3 +264,9 @@ MAGNA_API am_bool MAGNA_CALL isbn_check_control_digit
 
     return j == 10 && result == 0 && (hyphens == 3 || hyphens == 0);
 }
+
+/*=========================================================*/
+
+#include "warnpop.h"
+
+/*=========================================================*/

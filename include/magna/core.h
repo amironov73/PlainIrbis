@@ -850,6 +850,7 @@ MAGNA_API am_bool        MAGNA_CALL buffer_utf8_to_ansi              (Buffer *ta
 MAGNA_API am_bool        MAGNA_CALL buffer_write                     (Buffer *target, const am_byte *data, size_t length);
 
 #define B2T(__s) ((char*)buffer_to_text (__s))
+#define B2B(__s) ((am_byte*)buffer_to_text (__s))
 
 /*=========================================================*/
 

@@ -1,11 +1,11 @@
-/* This is an open source non-commercial project. Dear PVS-Studio, please check it.
- * PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com */
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include "magna/irbis.h"
 
-/* ReSharper disable StringLiteralTypo */
-/* ReSharper disable IdentifierTypo */
-/* ReSharper disable CommentTypo */
+// ReSharper disable StringLiteralTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable CommentTypo
 
 /*=========================================================*/
 
@@ -27,20 +27,35 @@
 
 /**
  * Инициализация структуры.
+ * Не выделяет память в куче.
  *
  * @param version Структура, подлежащая инициализации.
- * @return Проинициализированная структура.
  */
-MAGNA_API ServerVersion* MAGNA_CALL version_init
+MAGNA_API void MAGNA_CALL version_init
     (
         ServerVersion *version
     )
 {
     assert (version != NULL);
 
-    mem_clear (version, sizeof (ServerVersion));
+    mem_clear (version, sizeof (*version));
+}
 
-    return version;
+/**
+ * Освобождение ресурсов, занятых структурой.
+ *
+ * @param version Указатель на структуру, подлежащую освобождению.
+ */
+MAGNA_API void MAGNA_CALL version_destroy
+    (
+        ServerVersion *version
+    )
+{
+    assert (version != NULL);
+
+    buffer_destroy (&version->organization);
+    buffer_destroy (&version->version);
+    mem_clear (version, sizeof (*version));
 }
 
 /**
@@ -50,7 +65,7 @@ MAGNA_API ServerVersion* MAGNA_CALL version_init
  * @param response Ответ сервера.
  * @return Признак успешности завершения операции.
  */
-MAGNA_API am_bool MAGNA_CALL version_parse
+MAGNA_API am_bool MAGNA_CALL version_parse_response
     (
         ServerVersion *version,
         Response *response
@@ -62,7 +77,7 @@ MAGNA_API am_bool MAGNA_CALL version_parse
     assert (version != NULL);
     assert (response != NULL);
 
-    if (!vector_create(&lines, 4)) {
+    if (!vector_create (&lines, 4)) {
         return AM_FALSE;
     }
 
@@ -83,7 +98,7 @@ MAGNA_API am_bool MAGNA_CALL version_parse
     result = AM_TRUE;
 
     DONE:
-    vector_destroy(&lines);
+    vector_destroy (&lines);
 
     return result;
 }
@@ -92,26 +107,26 @@ MAGNA_API am_bool MAGNA_CALL version_parse
  * Текстовое представление информации о версии сервера.
  *
  * @param version Информация о версии.
- * @param buffer Буфер, в который должно быть помещено текстовое представление.
+ * @param output Буфер, в который должно быть помещено текстовое представление.
  * @return Признак успешности завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL version_to_string
     (
         const ServerVersion *version,
-        Buffer *buffer
+        Buffer *output
     )
 {
     assert (version != NULL);
-    assert (buffer != NULL);
+    assert (output != NULL);
 
-    return buffer_puts (buffer, CBTEXT ("organization="))
-           && buffer_concat (buffer, &version->organization)
-           && buffer_puts (buffer, CBTEXT (", version="))
-           && buffer_concat (buffer, &version->version)
-           && buffer_puts (buffer, CBTEXT (", maxClients="))
-           && buffer_put_uint32(buffer, version->maxClients)
-           && buffer_puts (buffer, CBTEXT (", connected="))
-           && buffer_put_uint32(buffer, version->connected);
+    return buffer_puts (output, CBTEXT ("organization="))
+           && buffer_concat (output, &version->organization)
+           && buffer_puts (output, CBTEXT (", version="))
+           && buffer_concat (output, &version->version)
+           && buffer_puts (output, CBTEXT (", maxClients="))
+           && buffer_put_uint32(output, version->maxClients)
+           && buffer_puts (output, CBTEXT (", connected="))
+           && buffer_put_uint32(output, version->connected);
 }
 
 /*=========================================================*/

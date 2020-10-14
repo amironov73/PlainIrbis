@@ -197,6 +197,12 @@
 
 /*=========================================================*/
 
+/* Работа с ошибками */
+
+MAGNA_API const char* MAGNA_CALL irbis_describe_error (am_int32 code);
+
+/*=========================================================*/
+
 /* Подполе записи */
 
 typedef struct
@@ -283,6 +289,7 @@ typedef struct
 {
     am_byte *characters;
     size_t charCount;
+
 } AlphabetTable;
 
 #define APLHABET_TABLE "ISISACW.TAB"
@@ -303,6 +310,7 @@ MAGNA_API am_bool              MAGNA_CALL alpha_to_string (const AlphabetTable *
 typedef struct
 {
     am_byte xlat[256];
+
 } UpperCaseTable;
 
 #define UPPERCASE_TABLE "ISISUCW.TAB"
@@ -312,7 +320,6 @@ MAGNA_API am_bool MAGNA_CALL upper_init
                 UpperCaseTable *table,
                 const am_byte *characters
         );
-
 
 /*=========================================================*/
 
@@ -332,18 +339,6 @@ MAGNA_API am_bool MAGNA_CALL spec_init      (Specification *spec, int path, cons
 MAGNA_API am_bool MAGNA_CALL spec_parse     (Specification *spec, Buffer *buffer);
 MAGNA_API am_bool MAGNA_CALL spec_to_string (const Specification *spec, Buffer *buffer);
 MAGNA_API am_bool MAGNA_CALL spec_verify    (const Specification *spec);
-
-/*=========================================================*/
-
-/* Информация о версии сервера */
-
-typedef struct {
-    Buffer organization;
-    Buffer version;
-    am_uint32 maxClients;
-    am_uint32 connected;
-
-} ServerVersion;
 
 /*=========================================================*/
 
@@ -407,6 +402,23 @@ MAGNA_API Span     MAGNA_CALL response_remaining_utf_text    (Response *response
 
 /*=========================================================*/
 
+/* Информация о версии сервера */
+
+typedef struct {
+    Buffer organization;
+    Buffer version;
+    am_uint32 maxClients;
+    am_uint32 connected;
+
+} ServerVersion;
+
+MAGNA_API void    MAGNA_CALL version_destroy        (ServerVersion *version);
+MAGNA_API void    MAGNA_CALL version_init           (ServerVersion *version);
+MAGNA_API am_bool MAGNA_CALL version_parse_response (ServerVersion *version, Response *response);
+MAGNA_API am_bool MAGNA_CALL version_to_string      (const ServerVersion *version, Buffer *output);
+
+/*=========================================================*/
+
 /* Меню */
 
 /* Пара строк в MNU-файле. */
@@ -448,7 +460,7 @@ typedef struct
 
 } IniLine;
 
-MAGNA_API void    MAGNA_CALL ini_line_free      (IniLine *line);
+MAGNA_API void    MAGNA_CALL ini_line_destroy   (IniLine *line);
 MAGNA_API void    MAGNA_CALL ini_line_init      (IniLine *line);
 MAGNA_API am_bool MAGNA_CALL ini_line_set_key   (IniLine *line, Span key);
 MAGNA_API am_bool MAGNA_CALL ini_line_set_value (IniLine *line, Span value);
@@ -464,7 +476,7 @@ typedef struct
 } IniSection;
 
 MAGNA_API void           MAGNA_CALL ini_section_clear        (IniSection *section);
-MAGNA_API void           MAGNA_CALL ini_section_free         (IniSection *section);
+MAGNA_API void           MAGNA_CALL ini_section_destroy      (IniSection *section);
 MAGNA_API const IniLine* MAGNA_CALL ini_section_get_line     (const IniSection *section, Span key);
 MAGNA_API Span           MAGNA_CALL ini_section_get_value    (const IniSection *section, Span key, Span defaultValue);
 MAGNA_API am_bool        MAGNA_CALL ini_section_init         (IniSection *section);
@@ -477,10 +489,64 @@ typedef struct
     Vector sections;
 } IniFile;
 
-MAGNA_API void    MAGNA_CALL ini_file_free         (IniFile *file);
+MAGNA_API void    MAGNA_CALL ini_file_destroy      (IniFile *file);
 MAGNA_API am_bool MAGNA_CALL ini_file_init         (IniFile *file);
 MAGNA_API am_bool MAGNA_CALL ini_file_is_modified  (const IniFile *file);
 MAGNA_API void    MAGNA_CALL ini_file_not_modified (IniFile *file);
+
+/*=========================================================*/
+
+/* Работа с терминами словаря */
+
+/* Информация об одном термине поискового словаря */
+typedef struct
+{
+    Buffer text;
+    am_int32 count;
+
+} TermInfo;
+
+MAGNA_API void    MAGNA_CALL term_destroy        (TermInfo *term);
+MAGNA_API void    MAGNA_CALL term_destroy_array  (Array *terms);
+MAGNA_API void    MAGNA_CALL term_init           (TermInfo *term);
+MAGNA_API void    MAGNA_CALL term_init_array     (Array *terms);
+MAGNA_API am_bool MAGNA_CALL term_parse_line     (TermInfo *term, Span line);
+MAGNA_API am_bool MAGNA_CALL term_parse_response (Array *terms, Response *response);
+MAGNA_API am_bool MAGNA_CALL term_to_string      (const TermInfo *term, Buffer *output);
+
+
+/* Параметры извлечения терминов из поискового словаря */
+typedef struct
+{
+    Buffer database;
+    Buffer startTerm;
+    Buffer format;
+    am_uint32 number;
+    am_bool reverseOrder;
+
+} TermParameters;
+
+MAGNA_API void MAGNA_CALL term_parameters_destroy (TermParameters *parameters);
+MAGNA_API void MAGNA_CALL term_parameters_init    (TermParameters *parameters);
+
+/* Постинг термина */
+typedef struct
+{
+    Buffer text;
+    am_uint32 mfn;
+    am_uint32 tag;
+    am_uint32 occurrence;
+    am_uint32 count;
+
+} TermPosting;
+
+MAGNA_API void    MAGNA_CALL posting_destroy        (TermPosting *posting);
+MAGNA_API void    MAGNA_CALL posting_destroy_array  (Array *postings);
+MAGNA_API void    MAGNA_CALL posting_init           (TermPosting *posting);
+MAGNA_API void    MAGNA_CALL posting_init_array     (Array *postings);
+MAGNA_API am_bool MAGNA_CALL posting_parse_line     (TermPosting *posting, Span line);
+MAGNA_API am_bool MAGNA_CALL posting_parse_response (Array *postings, Response *response);
+MAGNA_API am_bool MAGNA_CALL posting_to_string      (const TermPosting *posting, Buffer *output);
 
 /*=========================================================*/
 
@@ -501,8 +567,8 @@ typedef struct
 
 } SearchParameters;
 
-MAGNA_API am_bool MAGNA_CALL search_init    (SearchParameters *parameters);
-MAGNA_API void    MAGNA_CALL search_destroy (SearchParameters *parameters);
+MAGNA_API void    MAGNA_CALL search_destroy_parameters (SearchParameters *parameters);
+MAGNA_API void    MAGNA_CALL search_init_parameters    (SearchParameters *parameters);
 
 /* Сценарий поиска */
 typedef struct
@@ -591,36 +657,42 @@ struct IrbisConnection
     am_int32 interval;
     am_bool connected;
     am_int16 port;
-    char workstation;
+    am_byte workstation;
 
 };
 
-MAGNA_API am_bool MAGNA_CALL connection_actualize_database (Connection *connection, const char *database);
-MAGNA_API am_bool MAGNA_CALL connection_actualize_record   (Connection *connection, const char *database, am_mfn mfn);
+MAGNA_API am_bool MAGNA_CALL connection_actualize_database (Connection *connection, const am_byte *database);
+MAGNA_API am_bool MAGNA_CALL connection_actualize_record   (Connection *connection, const am_byte *database, am_mfn mfn);
 MAGNA_API am_bool MAGNA_CALL connection_check              (Connection *connection);
 MAGNA_API am_bool MAGNA_CALL connection_create             (Connection *connection);
 MAGNA_API am_bool MAGNA_CALL connection_connect            (Connection *connection);
-MAGNA_API am_bool MAGNA_CALL connection_create_database    (Connection *connection, const char *database, const char *description, am_bool readerAccess);
-MAGNA_API am_bool MAGNA_CALL connection_create_dictionary  (Connection *connection, const char *database);
-MAGNA_API am_bool MAGNA_CALL connection_delete_database    (Connection *connection, const char *database);
-MAGNA_API am_bool MAGNA_CALL connection_delete_file        (Connection *connection, const char *fileName);
+MAGNA_API am_bool MAGNA_CALL connection_create_database    (Connection *connection, const am_byte *database, const am_byte *description, am_bool readerAccess);
+MAGNA_API am_bool MAGNA_CALL connection_create_dictionary  (Connection *connection, const am_byte *database);
+MAGNA_API am_bool MAGNA_CALL connection_delete_database    (Connection *connection, const am_byte *database);
+MAGNA_API am_bool MAGNA_CALL connection_delete_file        (Connection *connection, const am_byte *fileName);
 MAGNA_API am_bool MAGNA_CALL connection_delete_record      (Connection *connection, am_mfn mfn);
 MAGNA_API am_bool MAGNA_CALL connection_disconnect         (Connection *connection);
 MAGNA_API am_bool MAGNA_CALL connection_execute            (Connection *connection, Query *query, Response *response);
 MAGNA_API am_bool            connection_execute_simple     (Connection *connection, Response *response, const am_byte *command, int argCount, ...);
 MAGNA_API void    MAGNA_CALL connection_destroy            (Connection *connection);
-MAGNA_API am_bool MAGNA_CALL connection_format_mfn         (Connection *connection, const char *format, am_mfn mfn, Buffer *output);
-MAGNA_API am_mfn  MAGNA_CALL connection_get_max_mfn        (Connection *connection, const char *database);
+MAGNA_API am_bool MAGNA_CALL connection_format_mfn         (Connection *connection, const am_byte *format, am_mfn mfn, Buffer *output);
+MAGNA_API am_mfn  MAGNA_CALL connection_get_max_mfn        (Connection *connection, const am_byte *database);
+MAGNA_API am_bool MAGNA_CALL connection_get_server_version (Connection *connection, ServerVersion *version);
 MAGNA_API am_bool MAGNA_CALL connection_no_operation       (Connection *connection);
 MAGNA_API am_bool MAGNA_CALL connection_parse_string       (Connection *connection, Span connectionString);
 MAGNA_API am_bool MAGNA_CALL connection_read_raw_record    (Connection *connection, am_mfn mfn, Buffer *buffer);
 MAGNA_API am_bool MAGNA_CALL connection_read_text_file     (Connection *connection, const Specification *specification, Buffer *buffer);
+MAGNA_API am_bool MAGNA_CALL connection_reload_dictionary  (Connection *connection, const am_byte *database);
+MAGNA_API am_bool MAGNA_CALL connection_reload_master_file (Connection *connection, const am_byte *database);
+MAGNA_API am_bool MAGNA_CALL connection_restart_server     (Connection *connection);
 MAGNA_API am_bool MAGNA_CALL connection_search_ex          (Connection *connection, const SearchParameters *parameters, Response *response);
-MAGNA_API am_bool MAGNA_CALL connection_set_database       (Connection *connection, const char *database);
-MAGNA_API am_bool MAGNA_CALL connection_set_host           (Connection *connection, const char *host);
-MAGNA_API am_bool MAGNA_CALL connection_set_password       (Connection *connection, const char *password);
-MAGNA_API am_bool MAGNA_CALL connection_set_username       (Connection *connection, const char *username);
+MAGNA_API am_bool MAGNA_CALL connection_set_database       (Connection *connection, const am_byte *database);
+MAGNA_API am_bool MAGNA_CALL connection_set_host           (Connection *connection, const am_byte *host);
+MAGNA_API am_bool MAGNA_CALL connection_set_password       (Connection *connection, const am_byte *password);
+MAGNA_API am_bool MAGNA_CALL connection_set_username       (Connection *connection, const am_byte *username);
 MAGNA_API am_bool MAGNA_CALL connection_to_string          (const Connection *connection, Buffer *output);
+MAGNA_API am_bool MAGNA_CALL connection_truncate_database  (Connection *connection, const am_byte *database);
+MAGNA_API am_bool MAGNA_CALL connection_unlock_database    (Connection *connection, const am_byte *database);
 
 /* Синонимы */
 
@@ -634,20 +706,20 @@ MAGNA_API am_bool MAGNA_CALL irbis_disconnect              (Connection *connecti
 
 /* EAN-8 и EAN-13 */
 
-MAGNA_API am_byte MAGNA_CALL ean13_compute_check_digit (const Span text);
-MAGNA_API am_bool MAGNA_CALL ean13_check_control_digit (const Span text);
-MAGNA_API am_byte MAGNA_CALL ean8_compute_check_digit  (const Span text);
-MAGNA_API am_bool MAGNA_CALL ean8_check_control_digit  (const Span text);
+MAGNA_API am_byte MAGNA_CALL ean13_compute_check_digit (Span text);
+MAGNA_API am_bool MAGNA_CALL ean13_check_control_digit (Span text);
+MAGNA_API am_byte MAGNA_CALL ean8_compute_check_digit  (Span text);
+MAGNA_API am_bool MAGNA_CALL ean8_check_control_digit  (Span text);
 
 /* UPC-12 */
 
-MAGNA_API am_byte MAGNA_CALL upc12_compute_check_digit (const Span text);
-MAGNA_API am_bool MAGNA_CALL upc12_check_control_digit (const Span text);
+MAGNA_API am_byte MAGNA_CALL upc12_compute_check_digit (Span text);
+MAGNA_API am_bool MAGNA_CALL upc12_check_control_digit (Span text);
 
 /* ISBN */
 
-MAGNA_API am_bool MAGNA_CALL isbn_check_978           (const Span isbn);
-MAGNA_API am_bool MAGNA_CALL isbn_check_control_digit (const Span isbn);
+MAGNA_API am_bool MAGNA_CALL isbn_check_978           (Span isbn);
+MAGNA_API am_bool MAGNA_CALL isbn_check_control_digit (Span isbn);
 
 /*=========================================================*/
 

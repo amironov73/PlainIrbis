@@ -1,11 +1,11 @@
-/* This is an open source non-commercial project. Dear PVS-Studio, please check it.
- * PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com */
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include "magna/irbis.h"
 
-/* ReSharper disable StringLiteralTypo */
-/* ReSharper disable IdentifierTypo */
-/* ReSharper disable CommentTypo */
+// ReSharper disable StringLiteralTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable CommentTypo
 
 /*=========================================================*/
 
@@ -35,41 +35,40 @@
 
 /**
  * Инициализация параметров поиска.
+ * Не выделяет память в куче.
  *
  * @param parameters Параметры поиска, подлежащие инициализации.
  * @return Признак успешности завершения операции.
  */
-MAGNA_API am_bool MAGNA_CALL search_init
+MAGNA_API void MAGNA_CALL search_init_parameters
     (
         SearchParameters *parameters
     )
 {
     assert (parameters != NULL);
 
-    memset (parameters, 0, sizeof (SearchParameters));
+    mem_clear (parameters, sizeof (*parameters));
     parameters->firstRecord = 1;
-
-    return AM_TRUE;
 }
 
 /**
  * Освобождение ресурсов, занятых параметрами поиска.
  *
- * @param parameters Параметры поиска.
+ * @param parameters Структура, подлежащая освобождению.
  */
-MAGNA_API void MAGNA_CALL search_destroy
+MAGNA_API void MAGNA_CALL search_destroy_parameters
     (
         SearchParameters *parameters
     )
 {
     assert (parameters != NULL);
 
-    buffer_destroy(&parameters->expression);
-    buffer_destroy(&parameters->database);
-    buffer_destroy(&parameters->format);
-    buffer_destroy(&parameters->sequential);
-    buffer_destroy(&parameters->filter);
-    memset (parameters, 0, sizeof (SearchParameters));
+    buffer_destroy (&parameters->expression);
+    buffer_destroy (&parameters->database);
+    buffer_destroy (&parameters->format);
+    buffer_destroy (&parameters->sequential);
+    buffer_destroy (&parameters->filter);
+    mem_clear (parameters, sizeof (*parameters));
 }
 
 /**

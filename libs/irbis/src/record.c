@@ -1,28 +1,29 @@
-/* This is an open source non-commercial project. Dear PVS-Studio, please check it.
- * PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com */
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include "magna/irbis.h"
 
-/* ReSharper disable StringLiteralTypo */
-/* ReSharper disable IdentifierTypo */
-/* ReSharper disable CommentTypo */
+// ReSharper disable StringLiteralTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable CommentTypo
+
+/*=========================================================*/
+
+#include "warnpush.h"
+
+/*=========================================================*/
+
+#include <assert.h>
+#include <stdarg.h>
+#include <ctype.h>
+
+/*=========================================================*/
 
 /*!
  * \file record.c
  *
  * Запись в формате MARC.
  */
-
-/*=========================================================*/
-
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable: 5045)
-#endif
-
-/*=========================================================*/
-
-#include <assert.h>
 
 /*=========================================================*/
 
@@ -405,8 +406,6 @@ MAGNA_API am_bool MAGNA_CALL record_verify
 
 /*=========================================================*/
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
+#include "warnpop.h"
 
 /*=========================================================*/

@@ -134,6 +134,16 @@ MAGNA_API Span MAGNA_CALL response_read_utf
     return response_get_line (response);
 }
 
+MAGNA_API am_bool MAGNA_CALL response_remaining_lines
+    (
+        Response *response,
+        SpanArray *lines
+    )
+{
+    assert (response != NULL);
+    assert (lines != NULL);
+}
+
 MAGNA_API am_bool MAGNA_CALL response_remaining_ansi_lines
     (
         Response *response,

@@ -1,11 +1,15 @@
-/* This is an open source non-commercial project. Dear PVS-Studio, please check it.
- * PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com */
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include "magna/irbis.h"
 
-/* ReSharper disable StringLiteralTypo */
-/* ReSharper disable IdentifierTypo */
-/* ReSharper disable CommentTypo */
+// ReSharper disable StringLiteralTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable CommentTypo
+
+/*=========================================================*/
+
+#include "warnpush.h"
 
 /*=========================================================*/
 
@@ -16,7 +20,7 @@
  *
  */
 
-#ifdef _M_IX86
+#if defined(_M_IX86) && !defined(__MINGW32__)
 
 #include <windows.h>
 #include <assert.h>
@@ -1174,3 +1178,9 @@ MAGNA_API int MAGNA_CALL irbis_dll_record_undelete
 /*=========================================================*/
 
 #endif
+
+/*=========================================================*/
+
+#include "warnpop.h"
+
+/*=========================================================*/

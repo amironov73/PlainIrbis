@@ -24,7 +24,7 @@ TESTER(connection_create_1)
 TESTER(connection_set_host_1)
 {
     Connection connection;
-    const char *value = "Some";
+    const am_byte *value = CBTEXT ("Some");
 
     CHECK (connection_create (&connection));
     CHECK (connection_set_database (&connection, value));
@@ -36,7 +36,7 @@ TESTER(connection_set_host_1)
 TESTER(connection_set_username_1)
 {
     Connection connection;
-    const char *value = "Some";
+    const am_byte *value = CBTEXT ("Some");
 
     CHECK (connection_create (&connection));
     CHECK (connection_set_username (&connection, value));
@@ -48,7 +48,7 @@ TESTER(connection_set_username_1)
 TESTER(connection_set_password_1)
 {
     Connection connection;
-    const char *value = "Some";
+    const am_byte *value = CBTEXT ("Some");
 
     CHECK (connection_create (&connection));
     CHECK (connection_set_password (&connection, value));
@@ -60,7 +60,7 @@ TESTER(connection_set_password_1)
 TESTER(connection_set_database_1)
 {
     Connection connection;
-    const char *value = "Some";
+    const am_byte *value = CBTEXT ("Some");
 
     CHECK (connection_create (&connection));
     CHECK (connection_set_database (&connection, value));
@@ -195,8 +195,8 @@ TESTER(connection_to_string_2)
     Buffer output = BUFFER_INIT;
 
     CHECK (connection_create (&connection));
-    CHECK (connection_set_username (&connection, "ninja"));
-    CHECK (connection_set_password (&connection, "invisible"));
+    CHECK (connection_set_username (&connection, CBTEXT ("ninja")));
+    CHECK (connection_set_password (&connection, CBTEXT ("invisible")));
     CHECK (connection_to_string (&connection, &output));
     CHECK (buffer_compare_text (&output,
         CBTEXT ("host=127.0.0.1;port=6666;username=ninja;password=invisible;database=IBIS;workstation=C;")) == 0);

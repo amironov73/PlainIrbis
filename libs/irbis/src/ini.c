@@ -39,7 +39,7 @@ MAGNA_API void MAGNA_CALL ini_line_init
  *
  * @param line Указатель на структуру.
  */
-MAGNA_API void MAGNA_CALL ini_line_free
+MAGNA_API void MAGNA_CALL ini_line_destroy
     (
         IniLine *line
     )
@@ -164,7 +164,7 @@ MAGNA_API am_bool MAGNA_CALL ini_section_init
  *
  * @param section Секция.
  */
-MAGNA_API void MAGNA_CALL ini_section_free
+MAGNA_API void MAGNA_CALL ini_section_destroy
     (
         IniSection *section
     )
@@ -177,7 +177,7 @@ MAGNA_API void MAGNA_CALL ini_section_free
     buffer_destroy(&section->name);
     for (index = 0; index < section->lines.len; ++index) {
         line = (IniLine*) section->lines.ptr [index];
-        ini_line_free (line);
+        ini_line_destroy(line);
         mem_free (line);
     }
 
@@ -251,7 +251,7 @@ MAGNA_API void MAGNA_CALL ini_section_clear
 
     for (index = 0; index < section->lines.len; ++index) {
         line = (IniLine*) section->lines.ptr [index];
-        ini_line_free (line);
+        ini_line_destroy(line);
         mem_free (line);
     }
 
@@ -341,7 +341,7 @@ MAGNA_API IniLine* MAGNA_CALL ini_section_append_line
     if (!ini_line_set_key (line, key)
         || !ini_line_set_value (line, value)
         || !vector_push_back(&section->lines, line)) {
-        ini_line_free (line);
+        ini_line_destroy(line);
         mem_free (line);
         return AM_FALSE;
     }
@@ -420,7 +420,7 @@ MAGNA_API am_bool MAGNA_CALL ini_file_init
  *
  * @param file INI-файл.
  */
-MAGNA_API void MAGNA_CALL ini_file_free
+MAGNA_API void MAGNA_CALL ini_file_destroy
     (
         IniFile *file
     )
@@ -432,7 +432,7 @@ MAGNA_API void MAGNA_CALL ini_file_free
 
     for (index = 0; index < file->sections.len; ++index) {
         section = (IniSection*) file->sections.ptr [index];
-        ini_section_free (section);
+        ini_section_destroy(section);
         mem_free (section);
     }
 

@@ -36,6 +36,7 @@
 
 /**
  * Инициализация структуры.
+ * Выделяет память в куче.
  *
  * @param connection Структура, подлежащая инициализации.
  * @return Признак успешности завершения операции.
@@ -50,8 +51,8 @@ MAGNA_API am_bool MAGNA_CALL connection_create
     assert (connection != NULL);
 
     mem_clear (connection, sizeof (Connection));
-    result = buffer_assign_text (&connection->host, "127.0.0.1")
-        && buffer_assign_text (&connection->database, "IBIS");
+    result = buffer_assign_text (&connection->host, CBTEXT ("127.0.0.1"))
+        && buffer_assign_text (&connection->database, CBTEXT ("IBIS"));
     connection->port = 6666;
     connection->workstation = CATALOGER;
 
@@ -79,7 +80,7 @@ MAGNA_API void MAGNA_CALL connection_destroy
     buffer_destroy (&connection->password);
     buffer_destroy (&connection->database);
     buffer_destroy (&connection->serverVersion);
-    mem_clear (connection, sizeof (Connection));
+    mem_clear (connection, sizeof (*connection));
 }
 
 /*=========================================================*/
@@ -95,7 +96,7 @@ MAGNA_API void MAGNA_CALL connection_destroy
 MAGNA_API am_bool MAGNA_CALL connection_set_host
     (
         Connection *connection,
-        const char *host
+        const am_byte *host
     )
 {
     assert (connection != NULL);
@@ -116,7 +117,7 @@ MAGNA_API am_bool MAGNA_CALL connection_set_host
 MAGNA_API am_bool MAGNA_CALL connection_set_username
     (
         Connection *connection,
-        const char *username
+        const am_byte *username
     )
 {
     assert (connection != NULL);
@@ -137,7 +138,7 @@ MAGNA_API am_bool MAGNA_CALL connection_set_username
 MAGNA_API am_bool MAGNA_CALL connection_set_password
     (
         Connection *connection,
-        const char *password
+        const am_byte *password
     )
 {
     assert (connection != NULL);
@@ -158,7 +159,7 @@ MAGNA_API am_bool MAGNA_CALL connection_set_password
 MAGNA_API am_bool MAGNA_CALL connection_set_database
     (
         Connection *connection,
-        const char *database
+        const am_byte *database
     )
 {
     assert (connection != NULL);
@@ -179,7 +180,7 @@ MAGNA_API am_bool MAGNA_CALL connection_set_database
 MAGNA_API am_bool MAGNA_CALL connection_actualize_database
     (
         Connection *connection,
-        const char *database
+        const am_byte *database
     )
 {
     assert (connection != NULL);
@@ -199,7 +200,7 @@ MAGNA_API am_bool MAGNA_CALL connection_actualize_database
 MAGNA_API am_bool MAGNA_CALL connection_actualize_record
     (
         Connection *connection,
-        const char *database,
+        const am_byte *database,
         am_mfn mfn
     )
 {
@@ -355,18 +356,34 @@ MAGNA_API am_bool MAGNA_CALL connection_connect
 MAGNA_API am_bool MAGNA_CALL connection_create_database
     (
         Connection *connection,
-        const char *database,
-        const char *description,
+        const am_byte *database,
+        const am_byte *description,
         am_bool readerAccess
     )
 {
-    assert (database != NULL);
+    am_bool result;
+    Response response;
+    const am_byte *accessString;
 
-    if (!connection_check (connection)) {
-        return AM_FALSE;
+    if (!database) {
+        database = B2B (&connection->database);
     }
 
-    return AM_FALSE;
+    accessString = CBTEXT (readerAccess ? "1" : "0");
+    result = connection_execute_simple
+        (
+            connection,
+            &response,
+            CBTEXT (CREATE_DATABASE),
+            3,
+            database,
+            description,
+            accessString
+        );
+
+    response_destroy (&response);
+
+    return result;
 }
 
 /**
@@ -379,16 +396,28 @@ MAGNA_API am_bool MAGNA_CALL connection_create_database
 MAGNA_API am_bool MAGNA_CALL connection_create_dictionary
     (
         Connection *connection,
-        const char *database
+        const am_byte *database
     )
 {
-    assert (database != NULL);
+    am_bool result;
+    Response response;
 
-    if (!connection_check (connection)) {
-        return AM_FALSE;
+    if (!database) {
+        database = B2B (&connection->database);
     }
 
-    return AM_FALSE;
+    result = connection_execute_simple
+        (
+            connection,
+            &response,
+            CBTEXT (CREATE_DICTIONARY),
+            1,
+            database
+        );
+
+    response_destroy (&response);
+
+    return result;
 }
 
 /**
@@ -401,16 +430,28 @@ MAGNA_API am_bool MAGNA_CALL connection_create_dictionary
 MAGNA_API am_bool MAGNA_CALL connection_delete_database
     (
         Connection *connection,
-        const char *database
+        const am_byte *database
     )
 {
-    assert (database != NULL);
+    am_bool result;
+    Response response;
 
-    if (!connection_check (connection)) {
-        return AM_FALSE;
+    if (!database) {
+        database = B2B (&connection->database);
     }
 
-    return AM_FALSE;
+    result = connection_execute_simple
+        (
+            connection,
+            &response,
+            CBTEXT (DELETE_DATABASE),
+            1,
+            database
+        );
+
+    response_destroy (&response);
+
+    return result;
 }
 
 /**
@@ -423,7 +464,7 @@ MAGNA_API am_bool MAGNA_CALL connection_delete_database
 MAGNA_API am_bool MAGNA_CALL connection_delete_file
     (
         Connection *connection,
-        const char *fileName
+        const am_byte *fileName
     )
 {
     assert (fileName != NULL);
@@ -523,14 +564,14 @@ MAGNA_API am_bool MAGNA_CALL connection_disconnect
 MAGNA_API am_mfn MAGNA_CALL connection_get_max_mfn
     (
         Connection *connection,
-        const char *database
+        const am_byte *database
     )
 {
     am_mfn result = 0;
     Response response;
 
     if (!database) {
-        database = B2T (&connection->database);
+        database = B2B (&connection->database);
     }
 
     if (connection_execute_simple
@@ -687,10 +728,19 @@ MAGNA_API am_bool connection_execute_simple
     return result;
 }
 
+/**
+ * Форматирование указанного MFN.
+ *
+ * @param connection Активное подключение.
+ * @param format Формат.
+ * @param mfn MFN записи.
+ * @param output Буфер для размещения результата.
+ * @return Признак успешности завершения операции.
+ */
 MAGNA_API am_bool MAGNA_CALL connection_format_mfn
     (
         Connection *connection,
-        const char *format,
+        const am_byte *format,
         am_mfn mfn,
         Buffer *output
     )
@@ -750,7 +800,42 @@ MAGNA_API am_bool MAGNA_CALL connection_format_mfn
     response_destroy (&response);
 
     return result;
+}
 
+/**
+ * Пустая операция (используется для периодического
+ * подтверждения подключения клиента).
+ *
+ * @param connection Активное подключение.
+ * @return Признак успешности заврешения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL connection_get_server_version
+    (
+        Connection *connection,
+        ServerVersion *version
+    )
+{
+    am_bool result;
+    Response response;
+
+    assert (connection != NULL);
+    assert (version != NULL);
+
+    result = connection_execute_simple
+        (
+            connection,
+            &response,
+            CBTEXT (SERVER_INFO),
+            0
+        );
+
+    if (result) {
+        result = version_parse_response (version, &response);
+    }
+
+    response_destroy (&response);
+
+    return result;
 }
 
 /**
@@ -916,6 +1001,169 @@ MAGNA_API am_bool MAGNA_CALL connection_read_text_file
 
     DONE:
     query_destroy (&query);
+    response_destroy (&response);
+
+    return result;
+}
+
+/**
+ * Реорганизация словаря указанной базы данных.
+ *
+ * @param connection Активное подключение.
+ * @param database Имя базы данных. `NULL` означает "текущая база данных".
+ * @return Признак успешности завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL connection_reload_dictionary
+    (
+        Connection *connection,
+        const am_byte *database
+    )
+{
+    am_bool result;
+    Response response;
+
+    if (!database) {
+        database = B2B (&connection->database);
+    }
+
+    result = connection_execute_simple
+        (
+            connection,
+            &response,
+            CBTEXT (RELOAD_DICTIONARY),
+            1,
+            database
+        );
+
+    response_destroy (&response);
+
+    return result;
+}
+
+/**
+ * Реорганизация мастер-файла указанной базы данных.
+ *
+ * @param connection Активное подключение.
+ * @param database Имя базы данных. `NULL` означает "текущая база данных".
+ * @return Признак успешности завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL connection_reload_master_file
+    (
+        Connection *connection,
+        const am_byte *database
+    )
+{
+    am_bool result;
+    Response response;
+
+    if (!database) {
+        database = B2B (&connection->database);
+    }
+
+    result = connection_execute_simple
+        (
+            connection,
+            &response,
+            CBTEXT (RELOAD_MASTER_FILE),
+            1,
+            database
+        );
+
+    response_destroy (&response);
+
+    return result;
+}
+
+/**
+ * Реорганизация мастер-файла указанной базы данных.
+ *
+ * @param connection Активное подключение.
+ * @return Признак успешности завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL connection_restart_server
+    (
+        Connection *connection
+    )
+{
+    am_bool result;
+    Response response;
+
+    result = connection_execute_simple
+        (
+            connection,
+            &response,
+            CBTEXT (RESTART_SERVER),
+            0
+        );
+
+    response_destroy (&response);
+
+    return result;
+}
+
+/**
+ * Опустошение указанной базы данных.
+ *
+ * @param connection Активное подключение.
+ * @param database Имя базы данных. `NULL` означает "текущая база данных".
+ * @return Признак успешности завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL connection_truncate_database
+    (
+        Connection *connection,
+        const am_byte *database
+    )
+{
+    am_bool result;
+    Response response;
+
+    if (!database) {
+        database = B2B (&connection->database);
+    }
+
+    result = connection_execute_simple
+        (
+            connection,
+            &response,
+            CBTEXT (EMPTY_DATABASE),
+            1,
+            database
+        );
+
+    response_destroy (&response);
+
+    return result;
+}
+
+/**
+ * Разблокирование указанной базы данных.
+ *
+ * @param connection Активное подключение.
+ * @param database Имя базы данных. `NULL` означает "текущая база данных".
+ * @return Признак успешности завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL connection_unlock_database
+    (
+        Connection *connection,
+        const am_byte *database
+    )
+{
+    am_bool result;
+    Response response;
+
+    if (!database) {
+        database = B2B (&connection->database);
+    }
+
+    result = connection_execute_simple
+        (
+            connection,
+            &response,
+            CBTEXT (UNLOCK_DATABASE),
+            1,
+            database
+        );
+
     response_destroy (&response);
 
     return result;
