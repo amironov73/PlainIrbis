@@ -51,22 +51,14 @@ MAGNA_API am_bool MAGNA_CALL vector_clone
     assert (target != NULL);
     assert (source != NULL);
 
-    vector_truncate(target, 0);
-    if (!vector_grow(target, source->len)) {
+    vector_truncate (target, 0, NULL);
+    if (!vector_grow (target, source->len)) {
         return AM_FALSE;
     }
 
-    target->cloner = source->cloner;
-    target->liberator = source->liberator;
-
     for (index = 0; index < source->len; ++index) {
         item = source->ptr [index];
-        if (source->cloner != NULL) {
-            target->ptr [index] = source->cloner (item);
-        }
-        else {
-            target->ptr [index] = item;
-        }
+        target->ptr [index] = item;
     }
 
     target->len = source->len;
@@ -90,9 +82,9 @@ MAGNA_API am_bool MAGNA_CALL vector_copy
     assert (target != NULL);
     assert (source != NULL);
 
-    vector_truncate(target, 0);
+    vector_truncate (target, 0, NULL);
 
-    return vector_concat(target, source);
+    return vector_concat (target, source);
 }
 
 /**
@@ -141,8 +133,6 @@ MAGNA_API am_bool MAGNA_CALL vector_create
     assert (vector != NULL);
     assert (capacity != 0);
 
-    vector->cloner = NULL;
-    vector->liberator = NULL;
     vector->len = 0;
     vector->capacity = capacity;
 
@@ -158,26 +148,32 @@ MAGNA_API am_bool MAGNA_CALL vector_create
  * Освобождение ресурсов, занятых вектором.
  *
  * @param vector Вектор, подлежащий освобождению.
+ * @param liberator Функция для освобождения памяти, занятой элементом вектора.
  */
 MAGNA_API void MAGNA_CALL vector_destroy
     (
-        Vector *vector
+        Vector *vector,
+        Liberator liberator
     )
 {
     size_t index;
+    void *ptr;
 
     assert (vector != NULL);
 
-    if (vector->liberator != NULL) {
+    if (liberator != NULL) {
         for (index = 0; index < vector->len; ++index) {
-            vector->liberator (vector->ptr[index]);
+            ptr = vector->ptr [index];
+            if (ptr != NULL) {
+                liberator (ptr);
+            }
         }
     }
 
-    vector->len = 0;
-    vector->capacity = 0;
     mem_free (vector->ptr);
     vector->ptr = NULL;
+    vector->len = 0;
+    vector->capacity = 0;
 }
 
 /**
@@ -350,19 +346,26 @@ MAGNA_API am_bool MAGNA_CALL vector_push_front
  * @param vector Вектор.
  * @param index Индекс.
  * @param item Новое значение для элемента вектора.
+ * @param liberator Функция для освобождения ресурсов, занятых элементом массива.
  */
 MAGNA_API void MAGNA_CALL vector_set
     (
         Vector *vector,
         size_t index,
-        void *item
+        void *item,
+        Liberator liberator
     )
 {
+    void *ptr;
+
     assert (vector != NULL);
     assert (index < vector->len);
 
-    if (vector->liberator != NULL) {
-        vector->liberator (vector->ptr [index]);
+    if (liberator != NULL) {
+        ptr = vector->ptr [index];
+        if (ptr != NULL) {
+            liberator (ptr);
+        }
     }
 
     vector->ptr [index] = item;
@@ -378,16 +381,21 @@ MAGNA_API void MAGNA_CALL vector_set
 MAGNA_API void MAGNA_CALL vector_truncate
     (
         Vector *vector,
-        size_t newSize
+        size_t newSize,
+        Liberator liberator
     )
 {
     size_t index;
+    void *ptr;
 
     assert (vector != NULL);
 
-    if (vector->liberator != NULL) {
+    if (liberator != NULL) {
         for (index = vector->len; index < newSize; ++index) {
-            vector->liberator (vector->ptr [index]);
+            ptr = vector->ptr [index];
+            if (ptr != NULL) {
+                liberator (ptr);
+            }
             vector->ptr [index] = NULL;
         }
     }

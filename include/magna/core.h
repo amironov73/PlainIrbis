@@ -373,7 +373,7 @@ typedef struct MagnaMemoryChunk    MemoryChunk;
 typedef struct MagnaSpan           Span;
 typedef struct MagnaSpanArray      SpanArray;
 typedef struct MagnaStream         Stream;
-typedef struct MagnaArray     Array;
+typedef struct MagnaArray          Array;
 typedef struct MagnaVector         Vector;
 
 /*=========================================================*/
@@ -584,30 +584,27 @@ struct MagnaVector
     void **ptr;
     size_t len;
     size_t capacity;
-
-    Cloner cloner;
-    Liberator liberator;
 };
 
-#define VECTOR_INIT { NULL, 0, 0, NULL, NULL }
+#define VECTOR_INIT { NULL, 0, 0 }
 
 extern MAGNA_API              am_bool MAGNA_CALL vector_clone      (Vector *target, const Vector *source);
 extern MAGNA_API              am_bool MAGNA_CALL vector_concat     (Vector *target, const Vector *source);
 extern MAGNA_API              am_bool MAGNA_CALL vector_copy       (Vector *target, const Vector *source);
 extern MAGNA_API              am_bool MAGNA_CALL vector_create     (Vector *vector, size_t capacity);
-extern MAGNA_API              void    MAGNA_CALL vector_destroy    (Vector *vector);
+extern MAGNA_API              void    MAGNA_CALL vector_destroy    (Vector *vector, Liberator liberator);
 extern MAGNA_API MAGNA_INLINE void*   MAGNA_CALL vector_get        (const Vector *vector, size_t index);
 extern MAGNA_API              am_bool MAGNA_CALL vector_grow       (Vector *vector, size_t newSize);
 extern MAGNA_API              void*   MAGNA_CALL vector_pop_back   (Vector *vector);
 extern MAGNA_API              void*   MAGNA_CALL vector_pop_front  (Vector *vector);
 extern MAGNA_API              am_bool MAGNA_CALL vector_push_back  (Vector *vector, void *item);
 extern MAGNA_API              am_bool MAGNA_CALL vector_push_front (Vector *vector, void *item);
-extern MAGNA_API              void    MAGNA_CALL vector_set        (Vector *vector, size_t index, void *item);
-extern MAGNA_API              void    MAGNA_CALL vector_truncate   (Vector *vector, size_t newSize);
+extern MAGNA_API              void    MAGNA_CALL vector_set        (Vector *vector, size_t index, void *item, Liberator liberator);
+extern MAGNA_API              void    MAGNA_CALL vector_truncate   (Vector *vector, size_t newSize, Liberator liberator);
 
 /*=========================================================*/
 
-/* Массив мелких объектов */
+/* Динамический массив мелких объектов */
 
 struct MagnaArray
 {
@@ -616,11 +613,9 @@ struct MagnaArray
     size_t len;
     size_t capacity;
     size_t offset;
-
-    Liberator liberator;
 };
 
-#define ARRAY_INIT(__itemSize) { NULL, __itemSize, 0, 0, 0, NULL };
+#define ARRAY_INIT(__itemSize) { NULL, (__itemSize), 0, 0, 0 };
 
 MAGNA_API              void*   MAGNA_CALL array_bsearch        (Array *array, const void *value, Comparer comparer, const void *data);
 MAGNA_API              void    MAGNA_CALL array_clear          (Array *array);
@@ -628,15 +623,15 @@ MAGNA_API              am_bool MAGNA_CALL array_clone          (Array *target, c
 MAGNA_API              am_bool MAGNA_CALL array_concat         (Array *target, const Array *source);
 MAGNA_API              am_bool MAGNA_CALL array_copy           (Array *target, const Array *source);
 MAGNA_API              am_bool MAGNA_CALL array_create         (Array *array, size_t itemSize, size_t capacity);
-MAGNA_API              void*   MAGNA_CALL array_emplace_after  (Array *array, size_t index);
+MAGNA_API              void*   MAGNA_CALL array_emplace_at     (Array *array, size_t index);
 MAGNA_API              void*   MAGNA_CALL array_emplace_back   (Array *array);
 MAGNA_API              void*   MAGNA_CALL array_emplace_before (Array *array, size_t index);
 MAGNA_API              void    MAGNA_CALL array_destroy        (Array *array);
 MAGNA_API MAGNA_INLINE void*   MAGNA_CALL array_get            (const Array *array, size_t index);
 MAGNA_API              am_bool MAGNA_CALL array_grow           (Array *array, size_t newSize);
 MAGNA_API              void    MAGNA_CALL array_init           (Array *array, size_t itemSize);
-MAGNA_API              am_bool MAGNA_CALL array_insert_after   (Array *array, size_t index, void *item);
-MAGNA_API              am_bool MAGNA_CALL array_insert_before  (Array *array, size_t index, void *item);
+MAGNA_API              am_bool MAGNA_CALL array_insert_at      (Array *array, size_t index, void *item);
+MAGNA_API              void    MAGNA_CALL array_liberate       (Array *array, Liberator liberator);
 MAGNA_API              void*   MAGNA_CALL array_pop_back       (Array *array);
 MAGNA_API              void*   MAGNA_CALL array_pop_front      (Array *array);
 MAGNA_API              am_bool MAGNA_CALL array_push_back      (Array *array, void *item);
@@ -780,20 +775,19 @@ typedef struct {
 } MapBacket;
 
 typedef struct {
-    size_t factor;
-    Vector **buckets;
+    Array buckets;
     HashFunction hasher;
     KeyComparer comparer;
-    Liberator keyLiberator, valueLiberator;
+    size_t factor;
 
 } Map;
 
-MAGNA_API am_bool MAGNA_CALL map_create (Map *map, size_t factor, KeyComparer comparer, HashFunction hasher, Liberator keyLiberator, Liberator valueLiberator);
-MAGNA_API void    MAGNA_CALL map_free   (Map *map);
-MAGNA_API void*   MAGNA_CALL map_get    (const Map *map, void *key);
-MAGNA_API am_bool MAGNA_CALL map_set    (Map *map, void *key, void *value);
-MAGNA_API am_bool MAGNA_CALL map_unset  (Map *map, void *key);
-MAGNA_API am_bool MAGNA_CALL map_walk   (const Map *map, MapWalker walker, void *data);
+MAGNA_API am_bool MAGNA_CALL map_create  (Map *map, size_t factor, KeyComparer comparer, HashFunction hasher);
+MAGNA_API void    MAGNA_CALL map_destroy (Map *map, Liberator keyLiberator, Liberator valueLiberator);
+MAGNA_API void*   MAGNA_CALL map_get     (const Map *map, void *key);
+MAGNA_API am_bool MAGNA_CALL map_set     (Map *map, void *key, void *value, Liberator liberator);
+MAGNA_API am_bool MAGNA_CALL map_unset   (Map *map, void *key);
+MAGNA_API am_bool MAGNA_CALL map_walk    (const Map *map, MapWalker walker, void *data);
 
 /*=========================================================*/
 
@@ -999,12 +993,12 @@ typedef struct {
 } NumberTextChunk;
 
 typedef struct {
-    Vector  chunks;
+    Array  chunks;
 
 } NumberText;
 
 extern MAGNA_API              int                    MAGNA_CALL ntc_compare         (const NumberTextChunk *first, const NumberTextChunk *second);
-extern MAGNA_API              void                   MAGNA_CALL ntc_free            (NumberTextChunk *chunk);
+extern MAGNA_API              void                   MAGNA_CALL ntc_destroy         (NumberTextChunk *chunk);
 extern MAGNA_API MAGNA_INLINE am_bool                MAGNA_CALL ntc_have_prefix     (const NumberTextChunk *chunk);
 extern MAGNA_API              void                   MAGNA_CALL ntc_init            (NumberTextChunk *chunk);
 extern MAGNA_API              am_bool                MAGNA_CALL ntc_setup           (NumberTextChunk *chunk, Span prefix, Span number);
@@ -1013,11 +1007,11 @@ extern MAGNA_API              am_bool                MAGNA_CALL ntc_to_string   
 extern MAGNA_API              am_bool                MAGNA_CALL number_append       (NumberText *number, Span prefix, am_int64 value, int length);
 extern MAGNA_API              NumberTextChunk*       MAGNA_CALL number_append_chunk (NumberText *number);
 extern MAGNA_API              int                    MAGNA_CALL number_compare      (const NumberText *first, const NumberText *second);
-extern MAGNA_API              void                   MAGNA_CALL number_free         (NumberText *number);
+extern MAGNA_API              void                   MAGNA_CALL number_destroy      (NumberText *number);
 extern MAGNA_API              const NumberTextChunk* MAGNA_CALL number_get_chunk    (const NumberText *number, size_t index);
 extern MAGNA_API              NumberText*            MAGNA_CALL number_increment    (NumberText *number);
 extern MAGNA_API              NumberText*            MAGNA_CALL number_increment_ex (NumberText *number, size_t index, am_int64 delta);
-extern MAGNA_API              NumberText*            MAGNA_CALL number_init         (NumberText *number);
+extern MAGNA_API              void                   MAGNA_CALL number_init         (NumberText *number);
 extern MAGNA_API MAGNA_INLINE const NumberTextChunk* MAGNA_CALL number_last         (const NumberText *number);
 extern MAGNA_API              am_bool                MAGNA_CALL number_parse        (NumberText *number, Span text);
 extern MAGNA_API MAGNA_INLINE size_t                 MAGNA_CALL number_size         (const NumberText *number);

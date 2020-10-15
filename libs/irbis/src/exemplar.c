@@ -188,6 +188,7 @@ MAGNA_API am_bool MAGNA_CALL exemplar_apply
     assert (exemplar != NULL);
     assert (field != NULL);
 
+    field_clear (field);
     return apply (field, 'a', &exemplar->status)
         && apply (field, 'b', &exemplar->number)
         && apply (field, 'c', &exemplar->date)
@@ -297,6 +298,7 @@ MAGNA_API am_bool MAGNA_CALL exemplar_parse_record
 
             exemplar_init (exemplar);
             if (!exemplar_parse_field (exemplar, field)) {
+                --exemplars->len;
                 return AM_FALSE;
             }
         }

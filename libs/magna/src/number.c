@@ -52,14 +52,14 @@ MAGNA_API void MAGNA_CALL ntc_init
  *
  * @param chunk Указатель на чанк.
  */
-MAGNA_API void MAGNA_CALL ntc_free
+MAGNA_API void MAGNA_CALL ntc_destroy
     (
         NumberTextChunk *chunk
     )
 {
     assert (chunk != NULL);
 
-    buffer_destroy(&chunk->prefix);
+    buffer_destroy (&chunk->prefix);
 }
 
 /**
@@ -186,7 +186,7 @@ MAGNA_API const NumberTextChunk* MAGNA_CALL number_get_chunk
         return NULL;
     }
 
-    return (NumberTextChunk*) number->chunks.ptr [index];
+    return (const NumberTextChunk*) array_get (&number->chunks, index);
 }
 
 /**
@@ -208,7 +208,7 @@ MAGNA_API MAGNA_INLINE const NumberTextChunk* MAGNA_CALL number_last
     length = number->chunks.len;
 
     return (length != 0)
-        ? number->chunks.ptr [length-1]
+        ? array_get (&number->chunks, length - 1)
         : NULL;
 }
 
@@ -218,16 +218,14 @@ MAGNA_API MAGNA_INLINE const NumberTextChunk* MAGNA_CALL number_last
  * @param number Указатель на ненициализированную структуру.
  * @return Указатель на инициализированную структуру.
  */
-MAGNA_API NumberText* MAGNA_CALL number_init
+MAGNA_API void MAGNA_CALL number_init
     (
         NumberText *number
     )
 {
     assert (number != NULL);
 
-    vector_create(&number->chunks, 2);
-
-    return number;
+    array_init (&number->chunks, sizeof (NumberTextChunk));
 }
 
 /**
@@ -235,7 +233,7 @@ MAGNA_API NumberText* MAGNA_CALL number_init
  *
  * @param number Текст, подлежащий освобождению.
  */
-MAGNA_API void MAGNA_CALL number_free
+MAGNA_API void MAGNA_CALL number_destroy
     (
         NumberText *number
     )
@@ -246,12 +244,11 @@ MAGNA_API void MAGNA_CALL number_free
     assert (number != NULL);
 
     for (index = 0; index < number->chunks.len; ++index) {
-        chunk = (NumberTextChunk*) number->chunks.ptr [index];
-        ntc_free (chunk);
-        mem_free (chunk);
+        chunk = (NumberTextChunk*) array_get (&number->chunks, index);
+        ntc_destroy (chunk);
     }
 
-    vector_destroy(&number->chunks);
+    array_destroy (&number->chunks);
 }
 
 /**
@@ -269,16 +266,9 @@ MAGNA_API NumberTextChunk* MAGNA_CALL number_append_chunk
 
     assert (number != NULL);
 
-    result = (NumberTextChunk*) mem_alloc (sizeof (NumberTextChunk));
-    if (result == NULL) {
-        return result;
-    }
-
-    ntc_init (result);
-    if (vector_push_back(&number->chunks, result)) {
-        mem_free (result);
-        result = NULL;
-        return result;
+    result = (NumberTextChunk*) array_emplace_back (&number->chunks);
+    if (result != NULL) {
+        ntc_init (result);
     }
 
     return result;
@@ -384,7 +374,7 @@ MAGNA_API am_bool MAGNA_CALL number_parse
 
                 ntc_init (chunk);
                 if (!ntc_setup (chunk, prefix, num)
-                    || vector_push_back(&number->chunks, chunk)) {
+                    || array_push_back (&number->chunks, chunk)) {
                     return AM_FALSE;
                 }
 
@@ -397,18 +387,18 @@ MAGNA_API am_bool MAGNA_CALL number_parse
 
     ntc_init (&temp);
     if (!ntc_setup (&temp, prefix, num)) {
-        ntc_free (&temp);
+        ntc_destroy (&temp);
     }
     else {
         chunk = mem_alloc (sizeof (NumberTextChunk));
         if (chunk == NULL) {
-            ntc_free (&temp);
+            ntc_destroy (&temp);
             return AM_FALSE;
         }
 
         mem_copy (chunk, &temp, sizeof (temp));
-        if (!vector_push_back(&number->chunks, chunk)) {
-            ntc_free (&temp);
+        if (!array_push_back (&number->chunks, chunk)) {
+            ntc_destroy (&temp);
             return AM_FALSE;
         }
     }

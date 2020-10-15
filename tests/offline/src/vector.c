@@ -30,13 +30,11 @@ TESTER(vector_create_1)
     Vector v1;
 
     vector_create (&v1, 10);
-    v1.cloner = canary_cloner;
-    v1.liberator = canary_liberator;
 
     CHECK (v1.capacity == 10);
     CHECK (v1.len == 0);
 
-    vector_destroy (&v1);
+    vector_destroy (&v1, NULL);
 }
 
 TESTER(vector_push_back_1)
@@ -58,7 +56,7 @@ TESTER(vector_push_back_1)
     CHECK (p1->first == c1.first);
     CHECK (p1->second == c1.second);
 
-    vector_destroy (&v1);
+    vector_destroy (&v1, NULL);
 }
 
 TESTER(vector_push_front_1)
@@ -80,7 +78,7 @@ TESTER(vector_push_front_1)
     CHECK (p1->first == c1.first);
     CHECK (p1->second == c1.second);
 
-    vector_destroy (&v1);
+    vector_destroy (&v1, NULL);
 }
 
 TESTER(vector_pop_back_1)
@@ -103,7 +101,7 @@ TESTER(vector_pop_back_1)
     CHECK (p1->first == c1.first);
     CHECK (p1->second == c1.second);
 
-    vector_destroy (&v1);
+    vector_destroy (&v1, NULL);
 }
 
 TESTER(vector_pop_front_1)
@@ -126,7 +124,7 @@ TESTER(vector_pop_front_1)
     CHECK (p1->first == c1.first);
     CHECK (p1->second == c1.second);
 
-    vector_destroy (&v1);
+    vector_destroy (&v1, NULL);
 }
 
 TESTER(vector_set_1)
@@ -143,13 +141,13 @@ TESTER(vector_set_1)
 
     CHECK (v1.len == 1);
 
-    vector_set (&v1, 0, &c1);
+    vector_set (&v1, 0, &c1, NULL);
     p1 = (Canary*) vector_get (&v1, 0);
 
     CHECK (p1 ->first == c1.first);
     CHECK (p1 ->second == c1.second);
 
-    vector_destroy (&v1);
+    vector_destroy (&v1, NULL);
 }
 
 TESTER(vector_clone_1)
@@ -180,8 +178,8 @@ TESTER(vector_clone_1)
     CHECK (p1->first == c1.first);
     CHECK (p1->second == c1.second);
 
-    vector_destroy (&v1);
-    vector_destroy (&v2);
+    vector_destroy (&v1, NULL);
+    vector_destroy (&v2, NULL);
 }
 
 TESTER(vector_clone_2)
@@ -191,7 +189,6 @@ TESTER(vector_clone_2)
     Canary *p1;
 
     vector_create (&v1, 10);
-    v1.cloner = canary_cloner;
 
     CHECK (v1.len == 0);
 
@@ -205,7 +202,6 @@ TESTER(vector_clone_2)
     CHECK (v2.len == 0);
 
     vector_clone (&v2, &v1);
-    v2.liberator = canary_liberator;
 
     CHECK (v2.len == 1);
 
@@ -214,8 +210,8 @@ TESTER(vector_clone_2)
     CHECK (p1->first == c1.first);
     CHECK (p1->second == c1.second);
 
-    vector_destroy (&v1);
-    vector_destroy (&v2);
+    vector_destroy (&v1, NULL);
+    vector_destroy (&v2, NULL);
 }
 
 TESTER(vector_copy_1)
@@ -246,8 +242,8 @@ TESTER(vector_copy_1)
     CHECK (p1->first == c1.first);
     CHECK (p1->second == c1.second);
 
-    vector_destroy (&v1);
-    vector_destroy (&v2);
+    vector_destroy (&v1, NULL);
+    vector_destroy (&v2, NULL);
 }
 
 TESTER(vector_concat_1)
@@ -286,6 +282,6 @@ TESTER(vector_concat_1)
     CHECK (p1->first == c2.first);
     CHECK (p1->second == c2.second);
 
-    vector_destroy (&v1);
-    vector_destroy (&v2);
+    vector_destroy (&v1, NULL);
+    vector_destroy (&v2, NULL);
 }

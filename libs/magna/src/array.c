@@ -23,8 +23,7 @@
  * Простой динамический массив, хранящий собственно объекты.
  *
  * Владеет только собственной памятью. Памятью элементов
- * распоряжаются сами элементы. Чтобы разрешить освобождение
- * памяти элементов, необходимо задать `liberator`.
+ * распоряжаются сами элементы.
  */
 
 /*=========================================================*/
@@ -47,12 +46,11 @@ MAGNA_API void MAGNA_CALL array_init
     assert (itemSize != 0);
 
     /* Округляем вверх по модулю 4 */
-    array->itemSize = (itemSize + 3) & ~3;
+    array->itemSize = (itemSize + 3u) & ~3u;
     array->ptr = NULL;
     array->len = 0;
     array->capacity = 0;
     array->offset = 0;
-    array->liberator = NULL;
 }
 
 /**
@@ -78,7 +76,6 @@ MAGNA_API am_bool MAGNA_CALL array_create
     array->len = 0;
     array->capacity = capacity;
     array->offset = 0;
-    array->liberator = NULL;
     array->ptr = mem_alloc (capacity * itemSize);
 
     return (array->ptr != NULL);
@@ -94,24 +91,39 @@ MAGNA_API void MAGNA_CALL array_destroy
         Array *array
     )
 {
-    size_t index;
-    am_byte *ptr;
-
     assert (array != NULL);
-
-    if (array->liberator != NULL) {
-        ptr = array->ptr;
-        for (index = 0; index < array->len; ++index) {
-            array->liberator (ptr);
-            ptr += array->itemSize;
-        }
-    }
 
     array->len = 0;
     array->capacity = 0;
     array->offset = 0;
     mem_free (array->ptr);
     array->ptr = NULL;
+}
+
+/**
+ * Освобождение ресурсов, занятых массивом.
+ *
+ * @param array Массив, подлежащий освобождению.
+ * @param liberator Функция для освобождения памяти, занятой элементом массива.
+ */
+MAGNA_API void MAGNA_CALL array_liberate
+    (
+        Array *array,
+        Liberator liberator
+    )
+{
+    size_t index;
+    void *ptr;
+
+    assert (array != NULL);
+    assert (liberator != NULL);
+
+    for (index = 0; index < array->len; ++index) {
+        ptr = array_get (array, index);
+        liberator (ptr);
+    }
+
+    array_destroy (array);
 }
 
 /**
@@ -513,14 +525,14 @@ MAGNA_API void MAGNA_CALL array_clear
 }
 
 /**
- * Вставка в массив элемента непосредственно после указанного.
+ * Вставка в массив элемента непосредственно перед указанным.
  *
  * @param array Массив.
  * @param index Индекс.
  * @param item Размещаемый элемент (происходит копирование).
  * @return Признак успешности завершения операции.
  */
-MAGNA_API am_bool MAGNA_CALL array_insert_after
+MAGNA_API am_bool MAGNA_CALL array_insert_at
     (
         Array *array,
         size_t index,
@@ -541,33 +553,9 @@ MAGNA_API am_bool MAGNA_CALL array_insert_after
  *
  * @param array Массив.
  * @param index Индекс.
- * @param item Размещаемый элемент (происходит копирование).
- * @return Признак успешности завершения операции.
- */
-MAGNA_API am_bool MAGNA_CALL array_insert_before
-    (
-        Array *array,
-        size_t index,
-        void *item
-    )
-{
-    assert (array != NULL);
-    assert (index < array->len);
-    assert (item != NULL);
-
-    /* TODO: implement */
-
-    return AM_FALSE;
-}
-
-/**
- * Вставка в массив элемента непосредственно после указанного.
- *
- * @param array Массив.
- * @param index Индекс.
  * @return Указатель на место для размещения элемента либо `NULL`.
  */
-MAGNA_API void* MAGNA_CALL array_emplace_after
+MAGNA_API void* MAGNA_CALL array_emplace_at
     (
         Array *array,
         size_t index
@@ -579,27 +567,6 @@ MAGNA_API void* MAGNA_CALL array_emplace_after
     /* TODO: implement */
 
     return NULL;
-}
-
-/**
- * Вставка в массив элемента непосредственно перед указанным.
- *
- * @param array Массив.
- * @param index Индекс.
- * @return Указатель на место для размещения элемента либо `NULL`.
- */
-MAGNA_API void* MAGNA_CALL array_emplace_before
-    (
-        Array *array,
-        size_t index
-    )
-{
-    assert (array != NULL);
-    assert (index < array->len);
-
-    /* TODO: implement */
-
-    return AM_FALSE;
 }
 
 /**

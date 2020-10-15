@@ -98,7 +98,7 @@ MAGNA_API am_bool MAGNA_CALL version_parse_response
     result = AM_TRUE;
 
     DONE:
-    vector_destroy (&lines);
+    vector_destroy (&lines, NULL);
 
     return result;
 }

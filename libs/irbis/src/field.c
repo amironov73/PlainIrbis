@@ -183,7 +183,6 @@ MAGNA_API void MAGNA_CALL field_create
     field->tag = 0;
     buffer_null (&field->value);
     array_init (&field->subfields, sizeof (SubField));
-    field->subfields.liberator = (Liberator) subfield_liberator;
 }
 
 /**

@@ -126,7 +126,7 @@ MAGNA_API void MAGNA_CALL term_destroy_array
 MAGNA_API am_bool MAGNA_CALL term_parse_line
     (
         TermInfo *term,
-        const Span line
+        Span line
     )
 {
     Span parts[2];
@@ -156,12 +156,27 @@ MAGNA_API am_bool MAGNA_CALL term_parse_response
     )
 {
     Span line;
+    TermInfo *term;
 
     assert (terms != NULL);
+    assert (response != NULL);
 
-    /* TODO: implement */
+    while (!response_eot (response)) {
+        line = response_get_line (response);
+        if (!span_is_empty (line)) {
+            term = (TermInfo*) array_emplace_back (terms);
+            if (term != NULL) {
+                return AM_FALSE;
+            }
 
-    return AM_FALSE;
+            term_init (term);
+            if (!term_parse_line (term, line)) {
+                return AM_FALSE;
+            }
+        }
+    }
+
+    return AM_TRUE;
 }
 
 /**

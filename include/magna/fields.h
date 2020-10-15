@@ -25,6 +25,8 @@ typedef struct
 
 } Address;
 
+#define ADDRESS_TAG 13
+
 MAGNA_API am_bool MAGNA_CALL address_apply       (const Address *address, MarcField *field);
 MAGNA_API void    MAGNA_CALL address_destroy     (Address *address);
 MAGNA_API void    MAGNA_CALL address_init        (Address *address);
@@ -145,6 +147,42 @@ MAGNA_API void    MAGNA_CALL exemplar_destroy      (Exemplar *exemplar);
 MAGNA_API void    MAGNA_CALL exemplar_init         (Exemplar *exemplar);
 MAGNA_API am_bool MAGNA_CALL exemplar_parse_field  (Exemplar *exemplar, const MarcField *field);
 MAGNA_API am_bool MAGNA_CALL exemplar_parse_record (const MarcRecord *record, Array *exemplars, am_uint32 tag);
+
+/*=========================================================*/
+
+/* Сведения о посещении/книговыдаче */
+
+typedef struct
+{
+    Buffer database;    /* Имя БД каталога, подполе g. */
+    Buffer index;       /* Шифр документа, подполе a. */
+    Buffer inventory;   /* Инвентарный номер экземпляра, подполе b. */
+    Buffer barcode;     /* Штрих-код экземпляра, подполе h. */
+    Buffer sigla;       /* Место хранения экземпляра, подполе k. */
+    Buffer given;       /* Дата выдачи, подполе d. */
+    Buffer department;  /* Место выдачи, подполе v. */
+    Buffer expected;    /* Дата предполагаемого возврата, подполе e. */
+    Buffer returned;    /* Дата фактического возврата, подполе f. */
+    Buffer prolong;     /* Дата продления, подполе l. */
+    Buffer lost;        /* Признак утерянной книги, подполе u. */
+    Buffer description; /* Краткое библиографическое описание, подполе c. */
+    Buffer responsible; /* Ответственное лицо, подполе i. */
+    Buffer timeIn;      /* Время начала визита в библиотеку, подполе 1. */
+    Buffer timeOut;     /* Время окончания визита в библиотеку, подполе 2. */
+    Buffer count;       /* Счетчик продлений, подполе 4. */
+    MarcField *field;   /* Поле, из которого извлечены данные о посещении. */
+
+} Visit;
+
+#define VISIT_TAG 40
+
+MAGNA_API am_bool MAGNA_CALL visit_apply        (const Visit *visit, MarcField *field);
+MAGNA_API void    MAGNA_CALL visit_destroy      (Visit *visit);
+MAGNA_API void    MAGNA_CALL visit_init         (Visit *visit);
+MAGNA_API am_bool MAGNA_CALL visit_is_returned  (const Visit *visit);
+MAGNA_API am_bool MAGNA_CALL visit_is_visit     (const Visit *visit);
+MAGNA_API am_bool MAGNA_CALL visit_parse_field  (Visit *visit, const MarcField *field);
+MAGNA_API am_bool MAGNA_CALL visit_parse_record (const MarcRecord *record, Array *visits, am_uint32 tag);
 
 /*=========================================================*/
 

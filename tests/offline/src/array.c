@@ -41,7 +41,6 @@ TESTER(array_init_1)
     CHECK (array.len == 0);
     CHECK (array.capacity == 0);
     CHECK (array.ptr == NULL);
-    CHECK (array.liberator == NULL);
 
     array_destroy (&array);
 }
@@ -56,7 +55,6 @@ TESTER(array_create_1)
     CHECK (array.len == 0);
     CHECK (array.capacity == 4);
     CHECK (array.ptr != NULL);
-    CHECK (array.liberator == NULL);
 
     array_destroy (&array);
 
@@ -66,19 +64,18 @@ TESTER(array_create_1)
     CHECK (array.ptr == NULL);
 }
 
-TESTER(array_free_1)
+TESTER(array_liberate_1)
 {
     Array array;
     Canary c1 = { 1, 2 }, c2 = { 3, 4 };
 
     liberationCounter = 0;
     array_init (&array, sizeof (Canary));
-    array.liberator = canary_liberator;
 
     CHECK (array_push_back (&array, &c1));
     CHECK (array_push_back (&array, &c2));
 
-    array_destroy (&array);
+    array_liberate (&array, canary_liberator);
 
     CHECK (liberationCounter == 2);
 }

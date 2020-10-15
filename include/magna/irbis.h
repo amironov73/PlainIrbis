@@ -518,7 +518,7 @@ MAGNA_API am_bool MAGNA_CALL ini_line_verify    (const IniLine *line);
 typedef struct
 {
     Buffer name;
-    Vector lines;
+    Array lines;
 
 } IniSection;
 
@@ -533,7 +533,7 @@ MAGNA_API void           MAGNA_CALL ini_section_not_modified (IniSection *sectio
 /* INI-файл. Состоит из секций. */
 typedef struct
 {
-    Vector sections;
+    Array sections;
 } IniFile;
 
 MAGNA_API void    MAGNA_CALL ini_file_destroy      (IniFile *file);

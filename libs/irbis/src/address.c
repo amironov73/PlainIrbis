@@ -25,16 +25,17 @@
 
 /*=========================================================*/
 
-#define ADDRESS_TAG 13
-
 #define assign(__b, __f, __c) \
     buffer_assign_span ((__b), field_get_first_subfield_value ((__f), (__c)))
 
 #define apply(__f, __c, __b) \
     field_set_subfield((__f), (__c), buffer_to_span (__b))
 
+/*=========================================================*/
+
 /**
  * Инициализация структуры.
+ * Не выделяет память в куче.
  *
  * @param address Указатель на неинициализированную структуру.
  */
@@ -87,6 +88,7 @@ MAGNA_API am_bool MAGNA_CALL address_apply
     assert (address != NULL);
     assert (field != NULL);
 
+    field_clear (field);
     return apply (field, 'a', &address->postcode)
         && apply (field, 'b', &address->country)
         && apply (field, 'c', &address->city)
@@ -98,7 +100,7 @@ MAGNA_API am_bool MAGNA_CALL address_apply
 }
 
 /**
- * Разбор указанного поля а элементы адреса.
+ * Разбор указанного поля на элементы адреса.
  *
  * @param address Структура адреса, подлежащая заполнению.
  * @param field Поле для разбора.
