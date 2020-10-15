@@ -19,93 +19,139 @@
 /*=========================================================*/
 
 /**
- * \file exemplar.c
- *
- * Сведения об экземпляре.
- *
- *  \var Exemplar::status
- *      \brief Статус экземпляра. Подполе `a`.
- *
- *  \var Exemplar::number
- *      \brief Инвентарный номер. Подполе `b`.
- *
- *  \var Exemplar::date
- *      \brief Дата поступления. Подполе `c`.
- *
- *  \var Exemplar::place
- *      \brief Место хранения. Подполе `d`.
- *
- *  \var Exemplar::collection
- *      \brief Наименование коллекции. Подполе `q`.
- *
- *  \var Exemplar::shelf
- *      \brief Расстановочный шифр (полочный индекс). Подполе `r`.
- *
- *  \var Exemplar::price
- *      \brief Цена экземпляра. Подполе `e`.
- *
- *  \var Exemplar::barcode
- *      \brief Штрих-код или радиометка. Подполе `h`.
- *
- *  \var Exemplar::amount
- *      \brief Количество экземпляров. Подполе `1`.
- *
- *  \var Exemplar::purpose
- *      \brief Специальное назначение фонда. Подполе `t`.
- *
- *  \var Exemplar::coefficient
- *      \brief Коэффициент многоразового использования. Подполе `=`.
- *
- *  \var Exemplar::offBalance
- *      \brief Экземпляры не на баланс. Подполе `4`.
- *
- *  \var Exemplar::ksuNumber1
- *      \brief Номер записи КСУ (поступление). Подполе `u`.
- *
- *  \var Exemplar::actNumber1
- *      \brief Номер акта поступления. Подполе `y`.
- *
- *  \var Exemplar::channel
- *      \brief Канал поступления. Подполе `f`.
- *
- *  \var Exemplar::onHand
- *      \brief Число выданных экземпляров. Подполе `2`.
- *
- *  \var Exemplar::actNumber2
- *      \brief Номер акта списания. Подполе `v`.
- *
- *  \var Exemplar::writeOff
- *      \brief Количество списываемых экземпляров. Подполе `x`.
- *
- *  \var Exemplar::completion
- *      \brief Количество экземпляров для докомплектования. Подполе `k`.
- *
- *  \var Exemplar::actNumber3
- *      \brief Номер акта передачи в другое подразделение. Подполе `w`.
- *
- *  \var Exemplar::moving
- *      \brief Количество передаваемых экземпляров. Подполе `z`.
- *
- *  \var Exemplar::newPlace
- *      \brief Новое место хранения. Подполе `m`.
- *
- *  \var Exemplar::checkedDate
- *      \brief Дата проверки фонда. Подполе `s`.
- *
- *  \var Exemplar::checkedAmount
- *      \brief Число проверенных экземпляров. Подполе `0`.
- *
- *  \var Exemplar::realPlace
- *      \brief Реальное место нахождения книги. Подполе `!`.
- *
- *  \var Exemplar::bindingIndex
- *      \brief Шифр подшивки. Подполе `p`.
- *
- *  \var Exemplar::bindingNumber
- *      \brief Инвентарный номер подшивки. Подполе `i`.
- *
- *  \var Exemplar::field
- *      \brief Поле, из которого извлечена информация.
+   \file exemplar.c
+
+   Сведения об экземпляре.
+
+   \struct Exemplar
+       \brief Сведения об экземпляре книги/журнала, поле 910.
+
+   \var Exemplar::status
+       \brief Статус экземпляра. Подполе `a`.
+
+   \var Exemplar::number
+       \brief Инвентарный номер. Подполе `b`.
+
+   \var Exemplar::date
+       \brief Дата поступления. Подполе `c`.
+
+   \var Exemplar::place
+       \brief Место хранения. Подполе `d`.
+
+   \var Exemplar::collection
+       \brief Наименование коллекции. Подполе `q`.
+
+   \var Exemplar::shelf
+       \brief Расстановочный шифр (полочный индекс). Подполе `r`.
+
+   \var Exemplar::price
+       \brief Цена экземпляра. Подполе `e`.
+
+   \var Exemplar::barcode
+       \brief Штрих-код или радиометка. Подполе `h`.
+
+   \var Exemplar::amount
+       \brief Количество экземпляров. Подполе `1`.
+
+   \var Exemplar::purpose
+       \brief Специальное назначение фонда. Подполе `t`.
+
+   \var Exemplar::coefficient
+       \brief Коэффициент многоразового использования. Подполе `=`.
+
+   \var Exemplar::offBalance
+       \brief Экземпляры не на баланс. Подполе `4`.
+
+   \var Exemplar::ksuNumber1
+       \brief Номер записи КСУ (поступление). Подполе `u`.
+
+   \var Exemplar::actNumber1
+       \brief Номер акта поступления. Подполе `y`.
+
+   \var Exemplar::channel
+       \brief Канал поступления. Подполе `f`.
+
+   \var Exemplar::onHand
+       \brief Число выданных экземпляров. Подполе `2`.
+
+   \var Exemplar::actNumber2
+       \brief Номер акта списания. Подполе `v`.
+
+   \var Exemplar::writeOff
+       \brief Количество списываемых экземпляров. Подполе `x`.
+
+   \var Exemplar::completion
+       \brief Количество экземпляров для докомплектования. Подполе `k`.
+
+   \var Exemplar::actNumber3
+       \brief Номер акта передачи в другое подразделение. Подполе `w`.
+
+   \var Exemplar::moving
+       \brief Количество передаваемых экземпляров. Подполе `z`.
+
+   \var Exemplar::newPlace
+       \brief Новое место хранения. Подполе `m`.
+
+   \var Exemplar::checkedDate
+       \brief Дата проверки фонда. Подполе `s`.
+
+   \var Exemplar::checkedAmount
+       \brief Число проверенных экземпляров. Подполе `0`.
+
+   \var Exemplar::realPlace
+       \brief Реальное место нахождения книги. Подполе `!`.
+
+   \var Exemplar::bindingIndex
+       \brief Шифр подшивки. Подполе `p`.
+
+   \var Exemplar::bindingNumber
+       \brief Инвентарный номер подшивки. Подполе `i`.
+
+   \var Exemplar::field
+       \brief Поле, из которого извлечена информация.
+
+   \def EXEMPLAR_TAG
+        \brief Метка для поля "Экземпляры"
+
+   \def EXEMPLAR_FREE
+        \brief Отдельный экземпляо находится по месту хранения.
+
+   \def EXEMPLAR_LOAN
+        \brief Экземпляр выдан читателю.
+
+   \def EXEMPLAR_WAIT
+        \brief Экземпляр в библиотеку еще не поступал, ожидается.
+
+   \def EXEMPLAR_BINDERY
+        \brief Экземпляр находится в переплете.
+
+   \def EXEMPLAR_LOST
+        \brief Экземпляр утерян.
+
+   \def EXEMPLAR_NOT_AVAILABLE
+        \brief Экземпляр временно недоступен для выдачи.
+
+   \def EXEMPLAR_WRITTEN_OFF
+        \brief Экземпляр списан.
+
+   \def EXEMPLAR_ON_THE_WAY
+        \brief Номер журнала/газеты поступил, но еще не дошел до места хранения.
+
+   \def EXEMPLAR_RESERVED
+        \brief Экземпляр находится на бронеполке.
+
+   \def EXEMPLAR_BIBLIO_NET
+        \brief Группа экземпляров для библиотеки сети.
+
+   \def EXEMPLAR_BOUND
+        \brief
+
+   \def EXEMPLAR_REPRODUCTION
+        \brief Группа экземпляров. Размножение с вводом инвентарных номеров.
+
+   \def EXEMPLAR_SUMMARY
+        \brief Группа экземпляров безинвентарного учета.
+
  */
 
 /*=========================================================*/
@@ -116,8 +162,11 @@
 #define apply(__f, __c, __b) \
     field_set_subfield((__f), (__c), buffer_to_span (__b))
 
+/*=========================================================*/
+
 /**
- * Инициализация структуры.
+ * Простая инициализация структуры.
+ * Не выделяет памяти в куче.
  *
  * @param exemplar Указатель на неинициализированную структуру.
  */
@@ -134,7 +183,7 @@ MAGNA_API void MAGNA_CALL exemplar_init
 /**
  * Освобождение ресурсов, занятых структурой.
  *
- * @param exemplar Указатель на структуру.
+ * @param exemplar Указатель на структуру, подлежащую освобождению.
  */
 MAGNA_API void MAGNA_CALL exemplar_destroy
     (
@@ -177,7 +226,7 @@ MAGNA_API void MAGNA_CALL exemplar_destroy
  *
  * @param exemplar Сведения об экземпляре.
  * @param field Поле для заполнения.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL exemplar_apply
     (
@@ -223,7 +272,7 @@ MAGNA_API am_bool MAGNA_CALL exemplar_apply
  *
  * @param exemplar Сведения об экземпляре, подлежащие заполнению.
  * @param field Поле для разбора.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL exemplar_parse_field
     (
@@ -271,7 +320,7 @@ MAGNA_API am_bool MAGNA_CALL exemplar_parse_field
  * @param record Запись для разбора.
  * @param exemplars Массив для размещения сведений об экземплярах.
  * @param tag Метка поля, как правило, 910.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL exemplar_parse_record
     (

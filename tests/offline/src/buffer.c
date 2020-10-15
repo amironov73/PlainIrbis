@@ -324,9 +324,9 @@ TESTER(buffer_assign_text_1)
     CHECK (buffer_assign_text (&buffer, NULL));
     CHECK (buffer.ptr[0] == 0);
     CHECK (buffer.position == 0);
-    CHECK (buffer_assign_text (&buffer, text1));
+    CHECK (buffer_assign_text (&buffer, CBTEXT (text1)));
     CHECK (buffer_compare_text (&buffer, CBTEXT (text1)) == 0);
-    CHECK (buffer_assign_text (&buffer, text2));
+    CHECK (buffer_assign_text (&buffer, CBTEXT (text2)));
     CHECK (buffer_compare_text (&buffer, CBTEXT (text2)) == 0);
 
     buffer_destroy (&buffer);

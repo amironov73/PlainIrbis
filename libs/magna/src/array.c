@@ -662,7 +662,7 @@ static void va_qsort
 
         while(i < j) {
             while (comparer (ptr + i * size, ptr + pivot * size, data) <= 0
-                && (i < right)) {
+                && (((ssize_t)i) < right)) {
                 i++;
             }
 

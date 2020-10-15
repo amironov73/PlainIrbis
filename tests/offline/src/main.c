@@ -104,8 +104,10 @@ int main (int argc, const char **argv)
 
     printf ("memory available=%lld\n", mem_avail_physical());
     printf ("sizeof (void*)      = %d\n", (int) sizeof (void*));
+    printf ("sizeof (Span)       = %d\n", (int) sizeof (Span));
     printf ("sizeof (Buffer)     = %d\n", (int) sizeof (Buffer));
     printf ("sizeof (Array)      = %d\n", (int) sizeof (Array));
+    printf ("sizeof (Vector)     = %d\n", (int) sizeof (Vector));
     printf ("sizeof (SubField)   = %d\n", (int) sizeof (SubField));
     printf ("sizeof (MarcField)  = %d\n", (int) sizeof (MarcField));
     printf ("sizeof (MarcRecord) = %d\n", (int) sizeof (MarcRecord));

@@ -69,6 +69,8 @@ MAGNA_API MAGNA_INLINE am_handle file_stdin (void)
     return handle_from_value (0);
 
 #endif
+
+    return handle_get_bad ();
 }
 
 MAGNA_API MAGNA_INLINE am_handle file_stdout (void)
@@ -171,7 +173,7 @@ MAGNA_API am_handle MAGNA_CALL file_create_insist
     )
 {
     am_handle result = handle_get_bad ();
-    int count;
+    unsigned int count;
 
     assert (fileName != NULL);
     assert (delay > 0);
@@ -261,7 +263,7 @@ MAGNA_API am_handle MAGNA_CALL file_open_read_insist
     )
 {
     am_handle result = handle_get_bad ();
-    int count;
+    unsigned int count;
 
     assert (fileName != NULL);
     assert (delay > 0);
@@ -351,7 +353,7 @@ MAGNA_API am_handle MAGNA_CALL file_open_write_insist
     )
 {
     am_handle result = handle_get_bad ();
-    int count;
+    unsigned int count;
 
     assert (fileName != NULL);
     assert (delay > 0);

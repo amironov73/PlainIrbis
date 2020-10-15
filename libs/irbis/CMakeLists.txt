@@ -37,6 +37,7 @@ set(CFiles
     src/impex.c
     src/ini.c
     src/isbn.c
+    src/isbninfo.c
     src/iso2709.c
     src/menu.c
     src/mst.c
@@ -46,8 +47,10 @@ set(CFiles
     src/procinfo.c
     src/query.c
     src/rawrecor.c
+    src/reader.c
     src/record.c
     src/registr.c
+    src/resource.c
     src/response.c
     src/search.c
     src/servstat.c

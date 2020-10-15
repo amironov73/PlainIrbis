@@ -19,10 +19,44 @@
 /*=========================================================*/
 
 /**
- * \file collecti.c
- *
- * Коллективный (в т. ч. временный) автор.
- * Раскладка полей 710, 711, 962, 972.
+   \file collecti.c
+
+   Коллективный (в т. ч. временный) автор.
+   Раскладка полей 710, 711, 962, 972.
+
+   \struct Collective
+        \brief Сведения о коллективном авторе.
+
+   \var Collective::title
+        \brief Наименование коллектива, подполе A.
+
+   \var Collective::country
+        \brief Страна, подполе S.
+
+   \var Collective::abbreviation
+        \brief Аббревиатура, подполе R.
+
+   \var Collective::number
+        \brief Номер, подполе N.
+
+   \var Collective::date
+        \brief Дата, подполе F.
+
+   \var Collective::city
+        \brief Город, подполе C.
+
+   \var Collective::department
+        \brief Подразделение, подполе B.
+
+   \var Collective::characteristic
+        \brief Характерное название подразделения, подполе X.
+
+   \var Collective::gost
+        \brief Сокращение названия по ГОСТ, подполе 7.
+
+   \var Collective::field
+        \brief Поле, из которого извлечена информация.
+
  */
 
 /*=========================================================*/
@@ -33,8 +67,11 @@
 #define apply(__f, __c, __b) \
     field_set_subfield((__f), (__c), buffer_to_span (__b))
 
+/*=========================================================*/
+
 /**
  * Простая инициализация структуры.
+ * Не выделяет памяти в куче.
  *
  * @param collective Указатель на неинициализированную структуру.
  */
@@ -73,11 +110,11 @@ MAGNA_API void MAGNA_CALL collective_destroy
 }
 
 /**
- * Применение сведений о коллеквтиве к указанному полю.
+ * Применение сведений о коллективе к указанному полю.
  *
  * @param collective Сведения о коллективе.
  * @param field Поле, подлежащее заполнению сведениями о коллективе.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL collective_apply
     (
@@ -105,7 +142,7 @@ MAGNA_API am_bool MAGNA_CALL collective_apply
  *
  * @param collective Сведения о коллективе, подлежащие заполнению.
  * @param field Поле для разбора.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL collective_parse_field
     (
@@ -134,7 +171,7 @@ MAGNA_API am_bool MAGNA_CALL collective_parse_field
  * @param collectives Массив, подлежащий заполнению.
  * @param record Запись для разбора.
  * @param ... Метки полей, заканчивающиеся 0.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool collective_parse_record
     (

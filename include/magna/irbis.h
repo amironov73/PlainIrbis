@@ -274,6 +274,7 @@ typedef struct
 } MarcRecord;
 
 MAGNA_API MarcField*  MAGNA_CALL record_add          (MarcRecord *record, am_uint32 tag, const char *value);
+MAGNA_API void        MAGNA_CALL record_clear        (MarcRecord *record);
 MAGNA_API MarcRecord* MAGNA_CALL record_clone        (MarcRecord *target, const MarcRecord *source);
 MAGNA_API void        MAGNA_CALL record_destroy      (MarcRecord *record);
 MAGNA_API am_bool     MAGNA_CALL record_decode_lines (MarcRecord *record, Vector *lines);
@@ -282,6 +283,7 @@ MAGNA_API Span        MAGNA_CALL record_fm           (const MarcRecord *record, 
 MAGNA_API am_bool     MAGNA_CALL record_fma          (const MarcRecord *record, Vector *array, am_uint32 tag, am_byte code);
 MAGNA_API MarcField*  MAGNA_CALL record_get_field    (const MarcRecord *record, am_uint32 tag, size_t occurrence);
 MAGNA_API void        MAGNA_CALL record_init         (MarcRecord *record);
+MAGNA_API am_bool     MAGNA_CALL record_set_field    (MarcRecord *record, am_uint32 tag, Span value);
 
 /*=========================================================*/
 

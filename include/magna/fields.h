@@ -8,20 +8,27 @@
 
 /*=========================================================*/
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable: 4820)
+#endif
+
+/*=========================================================*/
+
 /* Адрес читателя */
 
 typedef struct
 {
-    Buffer postcode; //< Почтовый индекс, подполе A.
-    Buffer country; //< Страна/республика, подполе B.
-    Buffer city; //< Город, подполе C.
-    Buffer street; //< Улица, подполе D.
-    Buffer building; //< Номер дома, подполе E.
-    Buffer entrance; //< Номер подъезда, подполе G.
-    Buffer apartment; //< Номер квартиры, подпле H.
-    Buffer additional; //< Дополнительные данные, подполе F.
-    am_mix userData; //< Произвольные пользовательские данные.
-    MarcField *field; //< Поле, из которого извлечены данные об адресе.
+    Buffer postcode;   /* Почтовый индекс, подполе A. */
+    Buffer country;    /* Страна/республика, подполе B. */
+    Buffer city;       /* Город, подполе C. */
+    Buffer street;     /* Улица, подполе D. */
+    Buffer building;   /* Номер дома, подполе E. */
+    Buffer entrance;   /* Номер подъезда, подполе G. */
+    Buffer apartment;  /* Номер квартиры, подпле H. */
+    Buffer additional; /* Дополнительные данные, подполе F. */
+    am_mix userData;   /* Произвольные пользовательские данные. */
+    MarcField *field;  /* Поле, из которого извлечены данные об адресе. */
 
 } Address;
 
@@ -34,21 +41,21 @@ MAGNA_API am_bool MAGNA_CALL address_parse_field (Address *address, const MarcFi
 
 /*=========================================================*/
 
-/* Индивидуальный автор */
+/* Индивидуальный автор/редактор */
 
 typedef struct
 {
-    Buffer familyName; //< Фамилия, подполе A.
-    Buffer initials; //< Инициалы (сокращение), подполе B.
-    Buffer fullName; //< Расширение инициалов (имя и отчество), подполе G.
-    Buffer canBeInverted; //< Инвертирование имени недопустимо? Подполе 9.
-    Buffer postfix; //< Неотъемлемая часть имени (отец, сын, младший, старший и т. п.), подполе 1.
-    Buffer appendix; //< Дополнения к именам кроме дат (род деятельности, звание, титул и т. д.), подполе C.
-    Buffer number; //< Династический номер (римские цифры), подполе D.
-    Buffer dates; //< Даты жизни, подполе F.
-    Buffer variant; //< Разночтение фамилии, подполе R.
-    Buffer workplace; //< Место работы автора, подполе P.
-    MarcField *field; //< Поле, из которого была извлечена информация.
+    Buffer familyName;    /* Фамилия, подполе A. */
+    Buffer initials;      /* Инициалы (сокращение), подполе B. */
+    Buffer fullName;      /* Расширение инициалов (имя и отчество), подполе G. */
+    Buffer canBeInverted; /* Инвертирование имени недопустимо? Подполе 9. */
+    Buffer postfix;       /* Неотъемлемая часть имени (отец, сын, младший, старший и т. п.), подполе 1. */
+    Buffer appendix;      /* Дополнения к именам кроме дат (род деятельности, звание, титул и т. д.), подполе C. */
+    Buffer number;        /* Династический номер (римские цифры), подполе D. */
+    Buffer dates;         /* Даты жизни, подполе F. */
+    Buffer variant;       /* Разночтение фамилии, подполе R. */
+    Buffer workplace;     /* Место работы автора, подполе P. */
+    MarcField *field;     /* Поле, из которого была извлечена информация. */
 
 } Author;
 
@@ -64,12 +71,12 @@ MAGNA_API am_bool MAGNA_CALL author_parse_record (const MarcRecord *record, am_u
 
 typedef struct
 {
-    Buffer type; //< Тип документа, подполе T.
-    Buffer kind; //< Вид документа, подполе B.
-    Buffer character [6]; //< Характер документа, подполя C, 2, 3, 4, 5, 6.
-    Buffer purpose [3]; //< Код целевого назначения, подполя X, Y, 9.
-    Buffer restrictions; //< Возрастные ограничения, подполе Z.
-    MarcField *field; //< Поле, из которого была извлечена информация.
+    Buffer type;          /* Тип документа, подполе T. */
+    Buffer kind;          /* Вид документа, подполе B. */
+    Buffer character [6]; /* Характер документа, подполя C, 2, 3, 4, 5, 6. */
+    Buffer purpose [3];   /* Код целевого назначения, подполя X, Y, 9. */
+    Buffer restrictions;  /* Возрастные ограничения, подполе Z. */
+    MarcField *field;     /* Поле, из которого была извлечена информация. */
 
 } Codes;
 
@@ -84,16 +91,16 @@ MAGNA_API am_bool MAGNA_CALL codes_parse_field (Codes *codes, const MarcField *f
 
 typedef struct
 {
-    Buffer title;
-    Buffer country;
-    Buffer abbreviation;
-    Buffer number;
-    Buffer date;
-    Buffer city;
-    Buffer department;
-    Buffer characteristic;
-    Buffer gost;
-    MarcField *field;
+    Buffer title;          /* Наименование коллектива, подполе A. */
+    Buffer country;        /* Страна, подполе S. */
+    Buffer abbreviation;   /* Аббревиатура, подполе R. */
+    Buffer number;         /* Номер, подполе N. */
+    Buffer date;           /* Дата, подполе F. */
+    Buffer city;           /* Город, подполе C. */
+    Buffer department;     /* Подразделение, подполе B. */
+    Buffer characteristic; /* Характерное название подразделения, подполе X. */
+    Buffer gost;           /* Сокращение названия по ГОСТ, подполе 7. */
+    MarcField *field;      /* Поле, из которого извлечена информация. */
 
 } Collective;
 
@@ -102,6 +109,90 @@ MAGNA_API void    MAGNA_CALL collective_destroy      (Collective *collective);
 MAGNA_API void    MAGNA_CALL collective_init         (Collective *collective);
 MAGNA_API am_bool MAGNA_CALL collective_parse_field  (Collective *collective, const MarcField *field);
 MAGNA_API am_bool            collective_parse_record (const MarcRecord *record, Array *collectives, ...);
+
+/*=========================================================*/
+
+/* ISBN и цена */
+
+typedef struct
+{
+    Buffer isbn;       /* ISBN, подполе A. */
+    Buffer refinement; /* Уточнение для ISBN, подполе B. */
+    Buffer erroneous;  /* Ошибочный ISBN, подполе Z. */
+    Buffer price;      /* Цена общая для всех экземпляров, цифры, подполе D, */
+    Buffer currency;   /* Обозначение валюты, подполе C, */
+    MarcField *field;  /* Поле, из которого извлечена информация. */
+
+} IsbnInfo;
+
+#define ISBN_TAG 10
+
+MAGNA_API am_bool MAGNA_CALL isbn_apply       (const IsbnInfo *isbn, MarcField *field);
+MAGNA_API void    MAGNA_CALL isbn_destroy     (IsbnInfo *isbn);
+MAGNA_API void    MAGNA_CALL isbn_init        (IsbnInfo *isbn);
+MAGNA_API am_bool MAGNA_CALL isbn_parse_field (IsbnInfo *isbn, const MarcField *field);
+
+/*=========================================================*/
+
+/* Сведения о внешнем ресурсе */
+
+typedef struct
+{
+    Buffer filename;     /* Имя файла, подполе A. */
+    Buffer url;          /* URL, подполе I. */
+    Buffer description;  /* Текст для ссылки, подполе T. */
+    Buffer fileCount;    /* Количество файлов, подполе N. */
+    Buffer nameTemplate; /* Имя шаблона первого файла, подполе M. */
+    Buffer fileType;     /* Тип внешнего файла, подполе H. */
+    Buffer textbook;     /* Признак электронного учебника, подполе K. */
+    Buffer accessLevel;  /* Уровень доступа по категориям пользователей, подполе D. */
+    Buffer lanOnly;      /* Ресурс доступен только в ЛВС, подполе L. */
+    Buffer inputDate;    /* Дата ввода информации, подполе 1. */
+    Buffer fileSize;     /* Размер фмйла, подполе 2. */
+    Buffer number;       /* Номер источника копии, подполе 3. */
+    Buffer lastCheck;    /* Дата последней проверки доступности, подполе 5. */
+    Buffer imageSize;    /* Размеры изображения в пикселах, подполе 6. */
+    Buffer issn;         /* ISSN, подполе X. */
+    Buffer form;         /* Форма представления, подполе B. */
+    Buffer provider;     /* Код поставщика информации, подполе F. */
+    Buffer price;        /* Цена, подполе E. */
+    Buffer index;        /* Шифр в БД, подполе W. */
+    Buffer remarks;      /* Примечания в свободной форме, подполе P. */
+    Buffer system;       /* Электронная библиотечная система, подполе S. */
+    MarcField *field;    /* Поле, из которого извлечена информация. */
+
+
+} ExternalResource;
+
+#define EXTERNAL_RESOURCE_TAG 951
+
+MAGNA_API am_bool MAGNA_CALL external_resource_apply        (const ExternalResource *resource, MarcField *field);
+MAGNA_API void    MAGNA_CALL external_resource_destroy      (ExternalResource *resource);
+MAGNA_API void    MAGNA_CALL external_resource_init         (ExternalResource *resource);
+MAGNA_API am_bool MAGNA_CALL external_resource_parse_field  (ExternalResource *resource, const MarcField *field);
+MAGNA_API am_bool MAGNA_CALL external_resource_parse_record (const MarcRecord *record, Array *resources, am_uint32 tag);
+
+/*=========================================================*/
+
+/* Сведения о двоичном ресурсе */
+
+typedef struct
+{
+    Buffer kind;      /* Тип двоичного ресурса, подполе A. */
+    Buffer resource;  /* Закодированный двоичный ресурс, подполе B. */
+    Buffer title;     /* Название двоичного ресурса, подполе T. */
+    Buffer view;      /* Характер просмотра, подполе P. */
+    MarcField *field; /* Поле, из которого извлечена информация. */
+
+} BinaryResource;
+
+#define BINARY_RESOURCE_TAG 953
+
+MAGNA_API am_bool MAGNA_CALL binary_resource_apply        (const BinaryResource *resource, MarcField *field);
+MAGNA_API void    MAGNA_CALL binary_resource_destroy      (BinaryResource *resource);
+MAGNA_API void    MAGNA_CALL binary_resource_init         (BinaryResource *resource);
+MAGNA_API am_bool MAGNA_CALL binary_resource_parse_field  (BinaryResource *resource, const MarcField *field);
+MAGNA_API am_bool MAGNA_CALL binary_resource_parse_record (const MarcRecord *record, Array *resources, am_uint32 tag);
 
 /*=========================================================*/
 
@@ -141,6 +232,20 @@ typedef struct
 } Exemplar;
 
 #define EXEMPLAR_TAG 910
+
+#define EXEMPLAR_FREE          "0"
+#define EXEMPLAR_LOAN          "1"
+#define EXEMPLAR_WAIT          "2"
+#define EXEMPLAR_BINDERY       "3"
+#define EXEMPLAR_LOST          "4"
+#define EXEMPLAR_NOT_AVAILABLE "5"
+#define EXEMPLAR_WRITTEN_OFF   "6"
+#define EXEMPLAR_ON_THE_WAY    "8"
+#define EXEMPLAR_RESERVED      "9"
+#define EXEMPLAR_BIBLIO_NET    "C"
+#define EXEMPLAR_BOUND         "P"
+#define EXEMPLAR_REPRODUCTION  "R"
+#define EXEMPLAR_SUMMARY       "U"
 
 MAGNA_API am_bool MAGNA_CALL exemplar_apply        (const Exemplar *exemplar, MarcField *field);
 MAGNA_API void    MAGNA_CALL exemplar_destroy      (Exemplar *exemplar);
@@ -200,6 +305,40 @@ typedef struct
 MAGNA_API void    MAGNA_CALL field203_init        (Field203 *field);
 MAGNA_API void    MAGNA_CALL field203_destroy     (Field203 *field);
 MAGNA_API am_bool MAGNA_CALL field203_parse_field (Field203 *fld203, MarcField *field);
+
+/*=========================================================*/
+
+/* Сведения о читателе */
+
+typedef struct
+{
+    Buffer familyName;  /* Фамилия, поле 10. */
+    Buffer firstName;   /* Имя, поле 11. */
+    Buffer patronymic;  /* Отчество, поле 12. */
+    Buffer dateOfBirth; /* Дата рождения, поле 21. */
+    Buffer passCard;    /* Номер пропуска, поле 22. */
+    Buffer ticket;      /* Номер читательского билета (идентификатор читателя), поле 30. */
+    Buffer gender;      /* Пол, поле 23. */
+    Buffer category;    /* Категория, поле 50. */
+    /* Address */       /* */
+    Buffer workPlace;   /* Место работы, поле 15. */
+    Buffer education;   /* Образование, поле 20. */
+    Buffer email;       /* Электронная почта, поле 32. */
+    Buffer phone;       /* Домашний телефон, поле 17. */
+    MarcRecord *record; /* Запись, из которой извлечены сведения о читателе. */
+
+} ReaderInfo;
+
+MAGNA_API am_bool MAGNA_CALL reader_apply        (const ReaderInfo *reader, MarcRecord *record);
+MAGNA_API void    MAGNA_CALL reader_destroy      (ReaderInfo *reader);
+MAGNA_API void    MAGNA_CALL reader_init         (ReaderInfo *reader);
+MAGNA_API am_bool MAGNA_CALL reader_parse_record (ReaderInfo *reader, const MarcRecord *record);
+
+/*=========================================================*/
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 /*=========================================================*/
 

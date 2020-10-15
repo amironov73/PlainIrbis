@@ -127,7 +127,7 @@ TESTER(memory_stream_to_text_1)
     data = memory_stream_to_text (&memory);
 
     CHECK (data != NULL);
-    CHECK (strlen (CCTEXT (data)) == length);
+    CHECK (((ssize_t) strlen (CCTEXT (data))) == length);
     CHECK (strcmp (CCTEXT (data), text) == 0);
     CHECK (stream_close (&memory));
 }
@@ -236,7 +236,7 @@ TESTER(texter_read_line_2)
     CHECK (memory_stream_open (&memory, text, length));
     CHECK (texter_init (&texter, &memory, 0));
 
-    CHECK (texter_read_line (&texter, &line) == length);
+    CHECK (((size_t) texter_read_line (&texter, &line)) == length);
     CHECK (line.position == length);
 
     texter_destroy(&texter);

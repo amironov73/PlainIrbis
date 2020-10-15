@@ -18,9 +18,42 @@
 /*=========================================================*/
 
 /**
- * \file address.c
- *
- * Адрес читателя: поле 13 в базе RDR.
+   \file address.c
+
+   Адрес читателя: поле 13 в базе RDR.
+
+    \struct Address
+
+    \var Address::TAG
+        \brief Метка поля для адреса.
+
+    \var Address::postcode
+        \brief Почтовый индекс, подполе a.
+
+    \var Address::country
+        \brief Страна/республика, подполе b.
+
+    \var Address::city
+        \brief Город, подполе c.
+
+    \var Address::street
+        \brief Улица, подполе d.
+
+    \var Address::building
+        \brief Номер дома, подполе e.
+
+    \var Address::entrance
+        \brief Номер подъезда, подполе g.
+
+    \var Address::apartment
+        \brief Номер квартиры, подполе h.
+
+    \var Address::additional
+        \brief Дополнительные данные, подполе f.
+
+    \var Address::field
+        \brief Поле, из которого извлечены данные об адресе.
+
  */
 
 /*=========================================================*/

@@ -40,6 +40,7 @@
     <ClCompile Include="src\impex.c" />
     <ClCompile Include="src\ini.c" />
     <ClCompile Include="src\isbn.c" />
+    <ClCompile Include="src\isbninfo.c" />
     <ClCompile Include="src\iso2709.c" />
     <ClCompile Include="src\menu.c" />
     <ClCompile Include="src\mst.c" />
@@ -49,8 +50,10 @@
     <ClCompile Include="src\procinfo.c" />
     <ClCompile Include="src\query.c" />
     <ClCompile Include="src\rawrecor.c" />
+    <ClCompile Include="src\reader.c" />
     <ClCompile Include="src\record.c" />
     <ClCompile Include="src\registr.c" />
+    <ClCompile Include="src\resource.c" />
     <ClCompile Include="src\response.c" />
     <ClCompile Include="src\search.c" />
     <ClCompile Include="src\servstat.c" />

@@ -93,6 +93,16 @@ MAGNA_API MarcField* MAGNA_CALL record_add
     return field;
 }
 
+MAGNA_API void MAGNA_CALL record_clear
+    (
+        MarcRecord *record
+    )
+{
+    assert (record != NULL);
+
+    array_clear (&record->fields);
+}
+
 /**
  * Создание клона (глубокой копии записи).
  *
@@ -367,7 +377,7 @@ MAGNA_API am_bool MAGNA_CALL record_set_field
     (
         MarcRecord *record,
         am_uint32 tag,
-        const char *value
+        Span value
     )
 {
     assert (record != NULL);

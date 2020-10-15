@@ -957,21 +957,21 @@ MAGNA_API am_bool MAGNA_CALL chunked_write_utf8
     }
 
     if (chr < (1u << 11u)) {
-        return chunked_write_byte (chunked, (chr >> 6u) | 0xC0u)
-               && chunked_write_byte (chunked, (chr & 0x3Fu) | 0x80u);
+        return chunked_write_byte (chunked, (am_byte) ((chr >> 6u) | 0xC0u))
+               && chunked_write_byte (chunked,(am_byte) ((chr & 0x3Fu) | 0x80u));
     }
 
     if (chr < (1u << 16u)) {
-        return chunked_write_byte (chunked, (chr >> 12u) | 0xE0u)
-               && chunked_write_byte (chunked, ((chr >> 6u) & 0x3Fu) | 0x80u)
-               && chunked_write_byte (chunked, (chr & 0x3Fu) | 0x80u);
+        return chunked_write_byte (chunked, (am_byte) ((chr >> 12u) | 0xE0u))
+               && chunked_write_byte (chunked, (am_byte) (((chr >> 6u) & 0x3Fu) | 0x80u))
+               && chunked_write_byte (chunked, (am_byte) ((chr & 0x3Fu) | 0x80u));
     }
 
     if (chr < (1u << 21u)) {
-        return chunked_write_byte (chunked, (chr >> 18u) | 0xF0u)
-               && chunked_write_byte (chunked, ((chr >> 12u) & 0x3Fu) | 0x80u)
-               && chunked_write_byte (chunked, ((chr >> 6u) & 0x3Fu) | 0x80u)
-               && chunked_write_byte (chunked, (chr & 0x3Fu) | 0x80u);
+        return chunked_write_byte (chunked, (am_byte) ((chr >> 18u) | 0xF0u))
+               && chunked_write_byte (chunked, (am_byte) (((chr >> 12u) & 0x3Fu) | 0x80u))
+               && chunked_write_byte (chunked, (am_byte) (((chr >> 6u) & 0x3Fu) | 0x80u))
+               && chunked_write_byte (chunked, (am_byte) ((chr & 0x3Fu) | 0x80u));
     }
 
     return AM_FALSE;
