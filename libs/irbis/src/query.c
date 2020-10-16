@@ -77,7 +77,7 @@ MAGNA_API am_bool MAGNA_CALL query_add_format
 }
 
 /**
- * Добавление целого числа без знака (плюс перевод строки).
+ * Добавление целого числа (плюс перевод строки).
  *
  * @param query Клиентский запрос
  * @param value Целое число.
@@ -87,6 +87,28 @@ MAGNA_API am_bool MAGNA_CALL query_add_int32
     (
         Query *query,
         am_int32 value
+    )
+{
+    am_byte temp[16];
+
+    assert (query != NULL);
+
+    sprintf (CTEXT (temp), "%d", value);
+
+    return query_add_utf (query, temp);
+}
+
+/**
+ * Добавление целого числа без знака (плюс перевод строки).
+ *
+ * @param query Клиентский запрос
+ * @param value Целое число.
+ * @return Признак успешности завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL query_add_uint32
+    (
+        Query *query,
+        am_uint32 value
     )
 {
     am_byte temp[16];

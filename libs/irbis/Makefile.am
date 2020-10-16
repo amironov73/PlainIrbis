@@ -18,6 +18,7 @@ libsome_a_SOURCES =  src/address.c \
     src/ilf.c      \
     src/impex.     \
     src/ini.c      \
+    src/iri.c      \
     src/isbn.c     \
     src/isbninfo.c \
     src/iso2709.c  \
@@ -38,6 +39,7 @@ libsome_a_SOURCES =  src/address.c \
     src/servstat.c \
     src/spec.c     \
     src/subfield.c \
+    src/tabledef.c \
     src/term.c     \
     src/title.c    \
     src/tree.c     \

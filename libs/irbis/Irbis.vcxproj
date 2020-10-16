@@ -39,6 +39,7 @@
     <ClCompile Include="src\ilf.c" />
     <ClCompile Include="src\impex.c" />
     <ClCompile Include="src\ini.c" />
+    <ClCompile Include="src\iri.c" />
     <ClCompile Include="src\isbn.c" />
     <ClCompile Include="src\isbninfo.c" />
     <ClCompile Include="src\iso2709.c" />
@@ -59,6 +60,7 @@
     <ClCompile Include="src\servstat.c" />
     <ClCompile Include="src\spec.c" />
     <ClCompile Include="src\subfield.c" />
+    <ClCompile Include="src\tabledef.c" />
     <ClCompile Include="src\term.c" />
     <ClCompile Include="src\title.c" />
     <ClCompile Include="src\tree.c" />

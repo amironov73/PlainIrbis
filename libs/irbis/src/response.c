@@ -27,7 +27,7 @@
 
 MAGNA_API am_bool MAGNA_CALL response_create
     (
-        struct IrbisConnection *connection,
+        Connection *connection,
         Response *response
     )
 {

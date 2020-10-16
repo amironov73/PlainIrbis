@@ -949,6 +949,54 @@ MAGNA_API am_bool MAGNA_CALL connection_parse_string
 }
 
 /**
+ * Расформатирование таблицы в RTF.
+ *
+ * @param connection Активное подключение.
+ * @param definition Определение таблицы.
+ * @param output Буфер для размещения результата
+ * @return Признак успешного заверешния операции.
+ */
+MAGNA_API am_bool MAGNA_CALL connection_print_table
+    (
+        Connection *connection,
+        TableDefinition *definition,
+        Buffer *output
+    )
+{
+    Query query;
+    Response response;
+    am_bool result = AM_FALSE;
+
+    assert (connection != NULL);
+    assert (definition != NULL);
+
+    if (!connection_check (connection)) {
+        return AM_FALSE;
+    }
+
+    response_null (&response);
+    if (!query_create (&query, connection, CBTEXT (PRINT))) {
+        return AM_FALSE;
+    }
+
+    if (!table_definition_encode (definition, connection, &query)) {
+        goto DONE;
+    }
+
+    if (!connection_execute (connection, &query, &response)) {
+        goto DONE;
+    }
+
+    result = table_definition_decode (definition, &response, output);
+
+    DONE:
+    query_destroy (&query);
+    response_destroy (&response);
+
+    return result;
+}
+
+/**
  * Чтение текстового файла с сервера.
  *
  * @param connection Активное подключение.
