@@ -106,6 +106,10 @@ MAGNA_API void* MAGNA_CALL mem_realloc
         return ptr;
     }
 
+    if (ptr == NULL) {
+        return mem_alloc (newSize);
+    }
+
     result = realloc (ptr, newSize);
     if ((result == NULL) && (allocationHandler != NULL)) {
         result = allocationHandler (newSize);

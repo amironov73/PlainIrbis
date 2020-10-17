@@ -78,7 +78,7 @@ MAGNA_API MarcField* MAGNA_CALL record_add
     (
         MarcRecord *record,
         am_uint32 tag,
-        const char *value
+        const am_byte *value
     )
 {
     MarcField *field;
@@ -93,12 +93,25 @@ MAGNA_API MarcField* MAGNA_CALL record_add
     return field;
 }
 
+/**
+ * Удаление всех полей из записи.
+ *
+ * @param record Запись.
+ */
 MAGNA_API void MAGNA_CALL record_clear
     (
         MarcRecord *record
     )
 {
+    size_t index;
+    MarcField *field;
+
     assert (record != NULL);
+
+    for (index = 0; index < record->fields.len; ++index) {
+        field = (MarcField*) array_get (&record->fields, index);
+        field_destroy (field);
+    }
 
     array_clear (&record->fields);
 }
@@ -257,6 +270,25 @@ MAGNA_API am_bool MAGNA_CALL record_fma
 }
 
 /**
+ * Получение ссылки на поле по его индексу (не по метке!).
+ *
+ * @param record Запись.
+ * @param index Индекс поля (нумерация с 0).
+ * @return Ссылка на поле.
+ */
+MAGNA_API MarcField* MAGNA_CALL record_get
+    (
+        const MarcRecord *record,
+        size_t index
+    )
+{
+    assert (record != NULL);
+    assert (index < record->fields.len);
+
+    return (MarcField*) array_get (&record->fields, index);
+}
+
+/**
  * Получение указателя на поле с указанной меткой.
  *
  * @param record Запись.
@@ -266,9 +298,9 @@ MAGNA_API am_bool MAGNA_CALL record_fma
  */
 MAGNA_API MarcField* MAGNA_CALL record_get_field
     (
-            const MarcRecord *record,
-            am_uint32 tag,
-            size_t occurrence
+        const MarcRecord *record,
+        am_uint32 tag,
+        size_t occurrence
     )
 {
     const MarcField *field;
@@ -405,6 +437,61 @@ MAGNA_API MarcRecord* MAGNA_CALL record_reset
     record->database.position = 0;
 
     return record;
+}
+
+/**
+ * Разбор ответа сервера для ситуации, когда сервер присылает одну запись.
+ *
+ * @param record Запись, которая должна быть заполнена.
+ * @param response Ответ сервера.
+ * @return Признак успешного завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL record_parse_single
+    (
+        MarcRecord *record,
+        Response *response
+    )
+{
+    Span line;
+    Span parts[2];
+    size_t nparts;
+    MarcField *field;
+
+    assert (record != NULL);
+    assert (response != NULL);
+
+    record_clear (record);
+    line = response_get_line (response);
+    nparts = span_split_n_by_char (line, parts, 2, '#');
+    record->mfn = span_to_uint32 (parts[0]);
+    record->status = 0;
+    if (nparts == 2) {
+        record->status = span_to_uint32 (parts[1]);
+    }
+
+    line = response_get_line (response);
+    record->version = 0;
+    nparts = span_split_n_by_char (line, parts, 2, '#');
+    if (nparts == 2) {
+        record->version = span_to_uint32 (parts[1]);
+    }
+
+    while (!response_eot (response)) {
+        line = response_get_line (response);
+        if (!span_is_empty (line)) {
+            field = (MarcField*) array_emplace_back (&record->fields);
+            if (field == NULL) {
+                return AM_FALSE;
+            }
+
+            field_create (field);
+            if (!field_decode (field, line)) {
+                return AM_FALSE;
+            }
+        }
+    }
+
+    return AM_TRUE;
 }
 
 /**

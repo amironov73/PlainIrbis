@@ -34,6 +34,73 @@
 /*=========================================================*/
 
 /**
+ * Инициализация структуры.
+ * Выделяет память в куче.
+ *
+ * @param search Указатель на неинициализированную структуру.
+ * @param text Затравочное значение (не должно быть пустым).
+ * @return Признак успешного завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL search_create
+    (
+        Search *search,
+        Span text
+    )
+{
+    assert (search != NULL);
+    assert (!span_is_empty (text));
+
+    buffer_init (&search->buffer);
+
+    return buffer_assign_span (&search->buffer, text);
+}
+
+/**
+ * Освобождение ресурсов, занятых структурой.
+ *
+ * @param search Указатель на структуру, подлежащую освобождению.
+ */
+MAGNA_API void MAGNA_CALL search_destroy
+    (
+        Search *search
+    )
+{
+    assert (&search->buffer);
+
+    buffer_destroy (&search->buffer);
+    mem_clear (search, sizeof (*search));
+}
+
+MAGNA_API am_bool MAGNA_CALL search_equals
+    (
+        Search *search,
+        Span prefix,
+        Span value
+    )
+{
+    assert (search != NULL);
+
+    buffer_init (&search->buffer);
+
+    return buffer_assign_span (&search->buffer, prefix)
+        && buffer_write_span (&search->buffer, value);
+}
+
+MAGNA_API am_bool MAGNA_CALL search_and
+    (
+        Search *first,
+        Span second
+    )
+{
+    assert (first != NULL);
+    assert (!span_is_empty (second));
+
+    return AM_FALSE;
+}
+
+/*=========================================================*/
+
+/**
  * Инициализация параметров поиска.
  * Не выделяет память в куче.
  *

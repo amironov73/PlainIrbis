@@ -362,7 +362,7 @@ MAGNA_API size_t MAGNA_CALL buffer_read
 }
 
 /**
- * Пишет данные в буфер.
+ * Дописывает данные в хвост буфера.
  *
  * @param buffer
  * @param data
@@ -386,6 +386,24 @@ MAGNA_API am_bool MAGNA_CALL buffer_write
     }
 
     return AM_TRUE;
+}
+
+/**
+ * Дописывает данные в хвост буфера.
+ *
+ * @param buffer
+ * @param span
+ * @return
+ */
+MAGNA_API am_bool MAGNA_CALL buffer_write_span
+    (
+        Buffer *buffer,
+        Span span
+    )
+{
+    assert (buffer != NULL);
+
+    return buffer_write (buffer, span.ptr, span.len);
 }
 
 /**
@@ -1102,22 +1120,6 @@ MAGNA_API am_bool MAGNA_CALL buffer_is_empty
     return buffer->position == 0;
 }
 
-/* Функция-прокладка для вывода форматированного текста */
-static am_bool output_function
-    (
-        void *output,
-        void *data,
-        size_t size
-    )
-{
-    return buffer_write
-        (
-            (Buffer*)output,
-            data,
-            size
-        );
-}
-
 /**
  * Аналог printf для буфера.
  *
@@ -1139,7 +1141,7 @@ MAGNA_API am_bool buffer_format
     assert (buffer != NULL);
 
     va_start (args, format);
-    result = format_generic (buffer, output_function, format, args);
+    result = format_generic (buffer, (OutputFunction) buffer_write, format, args);
     va_end (args);
 
     return result;

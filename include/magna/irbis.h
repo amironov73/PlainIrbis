@@ -286,7 +286,7 @@ typedef struct
 
 } MarcRecord;
 
-MAGNA_API MarcField*  MAGNA_CALL record_add          (MarcRecord *record, am_uint32 tag, const char *value);
+MAGNA_API MarcField*  MAGNA_CALL record_add          (MarcRecord *record, am_uint32 tag, const am_byte *value);
 MAGNA_API void        MAGNA_CALL record_clear        (MarcRecord *record);
 MAGNA_API MarcRecord* MAGNA_CALL record_clone        (MarcRecord *target, const MarcRecord *source);
 MAGNA_API void        MAGNA_CALL record_destroy      (MarcRecord *record);
@@ -294,8 +294,10 @@ MAGNA_API am_bool     MAGNA_CALL record_decode_lines (MarcRecord *record, Vector
 MAGNA_API am_bool     MAGNA_CALL record_encode       (const MarcRecord *record, const char *delimiter, Buffer *buffer);
 MAGNA_API Span        MAGNA_CALL record_fm           (const MarcRecord *record, am_uint32 tag, am_byte code);
 MAGNA_API am_bool     MAGNA_CALL record_fma          (const MarcRecord *record, Vector *array, am_uint32 tag, am_byte code);
+MAGNA_API MarcField*  MAGNA_CALL record_get          (const MarcRecord *record, size_t index);
 MAGNA_API MarcField*  MAGNA_CALL record_get_field    (const MarcRecord *record, am_uint32 tag, size_t occurrence);
 MAGNA_API void        MAGNA_CALL record_init         (MarcRecord *record);
+MAGNA_API am_bool     MAGNA_CALL record_parse_single (MarcRecord *record, Response *response);
 MAGNA_API am_bool     MAGNA_CALL record_set_field    (MarcRecord *record, am_uint32 tag, Span value);
 
 /*=========================================================*/
@@ -313,10 +315,12 @@ typedef struct
 
 } RawRecord;
 
+MAGNA_API void    MAGNA_CALL raw_record_clear         (RawRecord *record);
 MAGNA_API void    MAGNA_CALL raw_record_destroy       (RawRecord *record);
+MAGNA_API Buffer* MAGNA_CALL raw_record_get           (const RawRecord *record, size_t index);
 MAGNA_API void    MAGNA_CALL raw_record_init          (RawRecord *record);
-MAGNA_API am_bool MAGNA_CALL raw_record_parse_single  (RawRecord *record, void *response);
-MAGNA_API am_bool MAGNA_CALL raw_record_to_string (const RawRecord *record, Buffer *output, const am_byte *delimiter);
+MAGNA_API am_bool MAGNA_CALL raw_record_parse_single  (RawRecord *record, Response *response);
+MAGNA_API am_bool MAGNA_CALL raw_record_to_string     (const RawRecord *record, Buffer *output, const am_byte *delimiter);
 
 /*=========================================================*/
 
@@ -352,11 +356,7 @@ typedef struct
 
 #define UPPERCASE_TABLE "ISISUCW.TAB"
 
-MAGNA_API am_bool MAGNA_CALL upper_init
-        (
-                UpperCaseTable *table,
-                const am_byte *characters
-        );
+MAGNA_API am_bool MAGNA_CALL upper_init (UpperCaseTable *table, const am_byte *characters);
 
 /*=========================================================*/
 
@@ -505,6 +505,7 @@ typedef struct
 {
     Buffer code;
     Buffer comment;
+
 } MenuEntry;
 
 MAGNA_API void    MAGNA_CALL menu_entry_init      (MenuEntry *entry);
@@ -629,6 +630,17 @@ MAGNA_API am_bool MAGNA_CALL posting_to_string      (const TermPosting *posting,
 /*=========================================================*/
 
 /* Поиск */
+
+/* Построитель запросов */
+typedef struct
+{
+    Buffer buffer;
+
+} Search;
+
+MAGNA_API am_bool MAGNA_CALL search_create  (Search *search, Span text);
+MAGNA_API void    MAGNA_CALL search_destroy (Search *search);
+MAGNA_API am_bool MAGNA_CALL search_equals  (Search *search, Span prefix, Span value);
 
 /* Параметры для поиска записей */
 typedef struct
@@ -760,6 +772,8 @@ MAGNA_API am_bool MAGNA_CALL connection_get_server_version (Connection *connecti
 MAGNA_API am_bool MAGNA_CALL connection_no_operation       (Connection *connection);
 MAGNA_API am_bool MAGNA_CALL connection_parse_string       (Connection *connection, Span connectionString);
 MAGNA_API am_bool MAGNA_CALL connection_print_table        (Connection *connection, TableDefinition *definition, Buffer *output);
+MAGNA_API am_bool MAGNA_CALL connection_read_raw_record    (Connection *connection, am_mfn mfn, RawRecord *record);
+MAGNA_API am_bool MAGNA_CALL connection_read_record        (Connection *connection, am_mfn mfn, MarcRecord *record);
 MAGNA_API am_bool MAGNA_CALL connection_read_record_text   (Connection *connection, am_mfn mfn, Buffer *buffer);
 MAGNA_API am_bool MAGNA_CALL connection_read_text_file     (Connection *connection, const Specification *specification, Buffer *buffer);
 MAGNA_API am_bool MAGNA_CALL connection_reload_dictionary  (Connection *connection, const am_byte *database);

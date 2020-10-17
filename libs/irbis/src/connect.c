@@ -889,18 +889,23 @@ MAGNA_API am_bool MAGNA_CALL connection_parse_string
 
     nav_from_span (&navigator, connectionString);
     while (AM_TRUE) {
+        /* Разделителем служит точка с запятой.  */
         item = span_trim (nav_read_to (&navigator, ';'));
         if (span_is_empty (item)) {
+            /* Пустые фрагменты игнорируются. */
             break;
         }
 
         if (span_split_n_by_char (item, parts, 2, '=') != 2) {
+            /* Фрагмент должен иметь вид `КЛЮЧ=значение` */
             return AM_FALSE;
         }
 
+        /* Пробелы вокруг ключа и значения игнорируются */
         key = span_trim (parts[0]);
         value = span_trim (parts[1]);
         if (span_is_empty (key) || span_is_empty (value)) {
+            /* Пустой ключ или значение не допускается */
             return AM_FALSE;
         }
 
@@ -940,7 +945,7 @@ MAGNA_API am_bool MAGNA_CALL connection_parse_string
             connection->workstation = toupper (value.ptr[0]);
         }
         else {
-            /* Неизвестный ключ */
+            /* Неизвестный ключ - ошибка. */
             return AM_FALSE;
         }
     }
@@ -1295,12 +1300,11 @@ MAGNA_API am_bool MAGNA_CALL connection_to_string
 }
 
 /**
- * Чтение записи с сервера. Запись никак не раскодируется и возвращается
- * в виде текста.
+ * Чтение записи с сервера. Запись разделяется на отдельные строки.
  *
  * @param connection Активное соединение.
  * @param mfn MFN записи.
- * @param buffer Буфер для размещения записи.
+ * @param record Проинициализированная структура.
  * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL connection_read_raw_record
@@ -1336,7 +1340,69 @@ MAGNA_API am_bool MAGNA_CALL connection_read_raw_record
         goto DONE;
     }
 
-    if (!raw_record_parse_single(record, &response)) {
+    if (!response_check (&response, -201, -600, -602, -603, 0)) {
+        goto DONE;
+    }
+
+    if (!raw_record_parse_single (record, &response)) {
+        goto DONE;
+    }
+
+    result = AM_TRUE;
+
+    DONE:
+    query_destroy (&query);
+    response_destroy (&response);
+
+    return result;
+}
+
+/**
+ * Чтение записи с сервера.
+ *
+ * @param connection Активное соединение.
+ * @param mfn MFN записи.
+ * @param record Проинициализированная структура.
+ * @return Признак успешного завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL connection_read_record
+    (
+        Connection *connection,
+        am_mfn mfn,
+        MarcRecord *record
+    )
+{
+    Query query;
+    Response response;
+    am_bool result = AM_FALSE;
+    Span line;
+
+    assert (connection != NULL);
+    assert (mfn > 0);
+
+    if (!connection_check (connection)) {
+        return AM_FALSE;
+    }
+
+    response_null (&response);
+    if (!query_create (&query, connection, CBTEXT (READ_RECORD))) {
+        return AM_FALSE;
+    }
+
+    if (!query_add_ansi_buffer (&query, &connection->database)
+        || !query_add_int32 (&query, mfn)) {
+        goto DONE;
+    }
+
+    if (!connection_execute (connection, &query, &response)) {
+        goto DONE;
+    }
+
+    if (!response_check (&response, -201, -600, -602, -603, 0)) {
+        goto DONE;
+    }
+
+    if (!record_parse_single (record, &response)) {
         goto DONE;
     }
 
@@ -1388,6 +1454,10 @@ MAGNA_API am_bool MAGNA_CALL connection_read_record_text
     }
 
     if (!connection_execute (connection, &query, &response)) {
+        goto DONE;
+    }
+
+    if (!response_check (&response, -201, -600, -602, -603, 0)) {
         goto DONE;
     }
 

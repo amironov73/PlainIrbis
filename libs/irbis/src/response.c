@@ -14,6 +14,7 @@
 /*=========================================================*/
 
 #include <assert.h>
+#include <stdarg.h>
 
 /*=========================================================*/
 
@@ -34,7 +35,7 @@ MAGNA_API am_bool MAGNA_CALL response_create
     assert (connection != NULL);
     assert (response != NULL);
 
-    mem_clear (response, sizeof (Response));
+    mem_clear (response, sizeof (*response));
     response->connection = connection;
 
     return AM_TRUE;
@@ -78,9 +79,30 @@ MAGNA_API am_bool response_check
         ...
     )
 {
+    am_bool result;
+    va_list args;
+    am_int32 rc;
+
     assert (response != NULL);
 
-    return 0;
+    result = response_get_return_code (response) >= 0;
+    if (!result) {
+        va_start (args, response);
+        while (AM_TRUE) {
+            rc = va_arg (args, am_int32);
+            if (rc >= 0) {
+                break;
+            }
+
+            if (rc == response->returnCode) {
+                result = AM_TRUE;
+                break;
+            }
+        }
+        va_end (args);
+    }
+
+    return result;
 }
 
 MAGNA_API Span MAGNA_CALL response_get_line

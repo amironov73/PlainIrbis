@@ -13,8 +13,8 @@ int main (int argc, char **argv)
     Connection connection;
     Specification spec;
     Buffer fileContent = BUFFER_INIT;
-    Buffer rawRecord = BUFFER_INIT;
     Buffer formatted = BUFFER_INIT;
+    MarcRecord record;
     am_mfn maxMfn;
 
     (void) argc;
@@ -24,10 +24,10 @@ int main (int argc, char **argv)
 
     printf ("Library version: %d\n", magna_get_version());
     connection_create       (&connection);
-    connection_set_host     (&connection, "localhost");
-    connection_set_username (&connection, "librarian");
-    connection_set_password (&connection, "secret");
-    connection_set_database (&connection, "IBIS");
+    connection_set_host     (&connection, CBTEXT ("localhost"));
+    connection_set_username (&connection, CBTEXT ("librarian"));
+    connection_set_password (&connection, CBTEXT ("secret"));
+    connection_set_database (&connection, CBTEXT ("IBIS"));
     connection.workstation = CATALOGER;
     connection.port = 6666;
 
@@ -50,12 +50,12 @@ int main (int argc, char **argv)
     buffer_destroy (&fileContent);
 
     printf ("\n\nMFN=1:\n\n");
-    connection_read_record_text(&connection, 1, &rawRecord);
-    buffer_to_console (&rawRecord);
-    buffer_destroy (&rawRecord);
+    record_init (&record);
+    connection_read_record (&connection, 1, &record);
+    record_destroy (&record);
 
     printf ("\n\nFormatted:\n\n");
-    connection_format_mfn (&connection, "@brief", 1, &formatted);
+    connection_format_mfn (&connection, CBTEXT ("@brief"), 1, &formatted);
     buffer_to_console (&formatted);
     buffer_destroy (&formatted);
 

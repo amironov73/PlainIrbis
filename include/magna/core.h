@@ -465,7 +465,7 @@ extern MAGNA_API              void      MAGNA_CALL irbis_encode_64 (am_uint32 *b
 
 /* Работа с памятью */
 
-typedef void* (*AllocationHandler) (size_t size);
+typedef void* (MAGNA_CALL *AllocationHandler) (size_t size);
 
 MAGNA_API void*             MAGNA_CALL mem_alloc            (size_t size);
 MAGNA_API void*             MAGNA_CALL mem_alloc_ex         (size_t size);
@@ -570,10 +570,10 @@ extern MAGNA_API              Span       MAGNA_CALL span_tolower             (Sp
 
 /*=========================================================*/
 
-typedef void*   (*Cloner)     (void*);
-typedef void    (*Liberator)  (void*);
-typedef int     (*Comparer)   (const void*, const void*, const void*);
-typedef am_bool (*Outputer)   (const void*, struct MagnaBuffer*);
+typedef void*   (MAGNA_CALL *Cloner)     (void*);
+typedef void    (MAGNA_CALL *Liberator)  (void*);
+typedef int     (MAGNA_CALL *Comparer)   (const void*, const void*, const void*);
+typedef am_bool (MAGNA_CALL *Outputer)   (const void*, struct MagnaBuffer*);
 
 /*=========================================================*/
 
@@ -723,7 +723,7 @@ typedef struct
 
 } LinkedList;
 
-typedef am_bool (*ListWalker) (LinkedList*, ListItem*, void*);
+typedef am_bool (MAGNA_CALL *ListWalker) (LinkedList*, ListItem*, void*);
 
 extern MAGNA_API              void      MAGNA_CALL list_clear          (LinkedList *list, Liberator liberator);
 extern MAGNA_API MAGNA_INLINE void*     MAGNA_CALL list_data           (const ListItem *item);
@@ -842,6 +842,7 @@ MAGNA_API const am_byte* MAGNA_CALL buffer_to_text                   (Buffer *bu
 MAGNA_API Span           MAGNA_CALL buffer_to_span                   (const Buffer *buffer);
 MAGNA_API am_bool        MAGNA_CALL buffer_utf8_to_ansi              (Buffer *target, const Buffer *source);
 MAGNA_API am_bool        MAGNA_CALL buffer_write                     (Buffer *target, const am_byte *data, size_t length);
+MAGNA_API am_bool        MAGNA_CALL buffer_write_span                (Buffer *buffer, Span span);
 
 #define B2T(__s) ((char*)buffer_to_text (__s))
 #define B2B(__s) ((am_byte*)buffer_to_text (__s))
@@ -1044,6 +1045,7 @@ typedef struct {
     Buffer buffer;
     size_t position;
     am_bool eot;
+
 } StreamTexter;
 
 MAGNA_API am_bool    MAGNA_CALL stream_close        (Stream *stream);
@@ -1232,7 +1234,7 @@ MAGNA_API am_bool  MAGNA_CALL koi8r_buffer_from_utf8 (Buffer *target, const Buff
 
 /* Форматированный вывод текста */
 
-typedef am_bool (*OutputFunction) (void *output, void *data, size_t size);
+typedef am_bool (MAGNA_CALL *OutputFunction) (void *output, void *data, size_t size);
 
 MAGNA_API am_bool MAGNA_CALL format_generic (void *output, OutputFunction handler, Span format, va_list args);
 
@@ -1264,7 +1266,7 @@ MAGNA_API am_bool  MAGNA_CALL date_today   (struct tm *date);
 
 typedef struct MagnaRetryManager RetryManager;
 
-typedef void* (MAGNA_CALL *Action) (void *data);
+typedef void*   (MAGNA_CALL *Action)  (void *data);
 typedef am_bool (MAGNA_CALL *Handler) (RetryManager *manager);
 
 struct MagnaRetryManager

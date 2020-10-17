@@ -65,6 +65,48 @@ MAGNA_API void MAGNA_CALL raw_record_destroy
 }
 
 /**
+ * Удаление всех полей из записи.
+ *
+ * @param record Запись.
+ */
+MAGNA_API void MAGNA_CALL raw_record_clear
+    (
+        RawRecord *record
+    )
+{
+    size_t index;
+    Buffer *field;
+
+    assert (record != NULL);
+
+    for (index = 0; index < record->fields.len; ++index) {
+        field = (Buffer*) array_get (&record->fields, index);
+        buffer_destroy (field);
+    }
+
+    array_clear (&record->fields);
+}
+
+/**
+ * Получение ссылки на поле по его индексу (не по метке!).
+ *
+ * @param record Запись.
+ * @param index Индекс поля (нумерация с 0).
+ * @return Ссылка на буфер.
+ */
+MAGNA_API Buffer* MAGNA_CALL raw_record_get
+    (
+        const RawRecord *record,
+        size_t index
+    )
+{
+    assert (record != NULL);
+    assert (index < record->fields.len);
+
+    return (Buffer*) array_get (&record->fields, index);
+}
+
+/**
  * Разбор ответа сервера для ситуации, когда сервер присылает одну запись.
  *
  * @param record Запись, которая должна быть заполнена.
@@ -74,7 +116,7 @@ MAGNA_API void MAGNA_CALL raw_record_destroy
 MAGNA_API am_bool MAGNA_CALL raw_record_parse_single
     (
         RawRecord *record,
-        void *response
+        Response *response
     )
 {
     Span line;
@@ -85,6 +127,7 @@ MAGNA_API am_bool MAGNA_CALL raw_record_parse_single
     assert (record != NULL);
     assert (response != NULL);
 
+    raw_record_clear (record);
     line = response_get_line (response);
     nparts = span_split_n_by_char (line, parts, 2, '#');
     record->mfn = span_to_uint32 (parts[0]);
@@ -100,7 +143,6 @@ MAGNA_API am_bool MAGNA_CALL raw_record_parse_single
         record->version = span_to_uint32 (parts[1]);
     }
 
-    array_clear (&record->fields);
     while (!response_eot (response)) {
         line = response_get_line (response);
         if (!span_is_empty (line)) {
