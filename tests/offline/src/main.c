@@ -90,28 +90,31 @@ int main (int argc, const char **argv)
 
     if (where_test_data (&tdp)) {
         printf ("test data=");
-        fwrite (tdp.ptr, 1, tdp.position, stdout);
+        fwrite (tdp.start, 1, tdp.position, stdout);
         printf ("\n");
         buffer_destroy (&tdp);
     }
 
     if (path_get_temporary_directory (&td)) {
         printf ("temp dir=");
-        fwrite (td.ptr, 1, td.position, stdout);
+        fwrite (td.start, 1, td.position, stdout);
         printf ("\n");
         buffer_destroy (&td);
     }
 
     printf ("memory available=%lld\n", mem_avail_physical());
-    printf ("sizeof (void*)      = %d\n", (int) sizeof (void*));
-    printf ("sizeof (Span)       = %d\n", (int) sizeof (Span));
-    printf ("sizeof (Buffer)     = %d\n", (int) sizeof (Buffer));
-    printf ("sizeof (Array)      = %d\n", (int) sizeof (Array));
-    printf ("sizeof (Vector)     = %d\n", (int) sizeof (Vector));
-    printf ("sizeof (SubField)   = %d\n", (int) sizeof (SubField));
-    printf ("sizeof (MarcField)  = %d\n", (int) sizeof (MarcField));
-    printf ("sizeof (MarcRecord) = %d\n", (int) sizeof (MarcRecord));
-    printf ("sizeof (Connection) = %d\n", (int) sizeof (Connection));
+    printf ("sizeof (void*)         = %d\n", (int) sizeof (void*));
+    printf ("sizeof (Span)          = %d\n", (int) sizeof (Span));
+    printf ("sizeof (Buffer)        = %d\n", (int) sizeof (Buffer));
+    printf ("sizeof (Array)         = %d\n", (int) sizeof (Array));
+    printf ("sizeof (Vector)        = %d\n", (int) sizeof (Vector));
+    printf ("sizeof (TextNavigator) = %d\n", (int) sizeof (TextNavigator));
+    printf ("sizeof (SubField)      = %d\n", (int) sizeof (SubField));
+    printf ("sizeof (MarcField)     = %d\n", (int) sizeof (MarcField));
+    printf ("sizeof (MarcRecord)    = %d\n", (int) sizeof (MarcRecord));
+    printf ("sizeof (Query)         = %d\n", (int) sizeof (Query));
+    printf ("sizeof (Response)      = %d\n", (int) sizeof (Response));
+    printf ("sizeof (Connection)    = %d\n", (int) sizeof (Connection));
 
     int result = tester_main (argc, argv);
 

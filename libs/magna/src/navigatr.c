@@ -89,7 +89,7 @@ MAGNA_API TextNavigator* MAGNA_CALL nav_from_buffer
     assert (nav != NULL);
     assert (buffer != NULL);
 
-    return nav_init (nav, buffer->ptr, buffer->position);
+    return nav_init (nav, buffer->start, buffer_length (buffer));
 }
 
 /**

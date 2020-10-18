@@ -910,8 +910,8 @@ MAGNA_API am_bool MAGNA_CALL file_write_buffer
     result = file_write
         (
             handle,
-            buffer->ptr,
-            buffer->position
+            buffer->start,
+            buffer_length (buffer)
         );
 
     return result;

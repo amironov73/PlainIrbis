@@ -103,7 +103,7 @@ MAGNA_API am_bool MAGNA_CALL path_get_current_directory
 
 #endif
 
-    return buffer_assign_text (path, temporary);
+    return buffer_assign_text (path, CBTEXT (temporary));
 }
 
 /**
@@ -121,12 +121,13 @@ MAGNA_API am_bool MAGNA_CALL path_set_current_directory
 
     assert (path != NULL);
 
-    if (path->position >= FILENAME_MAX) {
+    if (buffer_length (path) >= FILENAME_MAX) {
         /* Слишком длинный путь */
         return AM_FALSE;
     }
+
     memset (temporary, 0, sizeof (temporary));
-    memcpy (temporary, path->ptr, path->position);
+    memcpy (temporary, path->start, buffer_length (path));
 
 #ifdef MAGNA_WINDOWS
 
@@ -167,7 +168,7 @@ MAGNA_API am_bool MAGNA_CALL path_get_temporary_directory
         return AM_FALSE;
     }
 
-    return buffer_puts (path, buffer);
+    return buffer_puts (path, CBTEXT (buffer));
 
 
 #elif defined (MAGNA_UNIX)
@@ -221,21 +222,21 @@ MAGNA_API Span MAGNA_CALL path_get_extension
 
     assert (path != NULL);
 
-    if (path->position <= 2) {
-        result.end = result.start = path->ptr;
+    if (buffer_length (path) <= 2) {
+        result.end = result.start = path->start;
         return result;
     }
 
-    result.end = result.start = path->ptr + path->position - 1;
+    result.end = result.start = path->current;
 
-    while (result.start >= path->ptr) {
+    while (result.start >= path->start) {
         c = *result.start;
         if (c == '.') {
             break;
         }
 
         if (c == '/' || c == '\\') {
-            result.end = result.start = path->ptr;
+            result.end = result.start = path->start;
             break;
         }
 
@@ -261,14 +262,14 @@ MAGNA_API Span MAGNA_CALL path_get_filename
 
     assert (path != NULL);
 
-    if (path->position <= 2) {
-        result.end = result.start = path->ptr;
+    if (buffer_length (path) <= 2) {
+        result.end = result.start = path->start;
         return result;
     }
 
-    result.end = result.start = path->ptr + path->position - 1;
+    result.end = result.start = path->current;
 
-    while (result.start >= path->ptr) {
+    while (result.start >= path->start) {
         c = *result.start;
         if (c == '/' || c == '\\') {
             ++result.start;
@@ -302,19 +303,19 @@ MAGNA_API Span MAGNA_CALL path_get_directory
         return buffer_to_span (path);
     }
 
-    result.start = path->ptr;
-    ptr = path->ptr + path->position - 1;
-    if (ptr >= path->ptr) {
+    result.start = path->start;
+    ptr = path->current;
+    if (ptr >= path->start) {
         while (AM_TRUE) {
             c = *ptr;
             if (c == '/' || c == '\\') {
-                if (ptr != path->ptr) {
+                if (ptr != path->start) {
                     --ptr;
                 }
                 break;
             }
 
-            if (ptr == path->ptr) {
+            if (ptr == path->start) {
                 break;
             }
 
@@ -322,7 +323,7 @@ MAGNA_API Span MAGNA_CALL path_get_directory
         }
     }
 
-    if (ptr == path->ptr) {
+    if (ptr == path->start) {
         if (*ptr == '/' || *ptr == '\\') {
             result.end = result.start + 1;
             return result;
@@ -331,7 +332,7 @@ MAGNA_API Span MAGNA_CALL path_get_directory
         result.end = result.start;
     }
     else {
-        result.end = result.start + (ptr - path->ptr) + 1;
+        result.end = result.start + (ptr - path->start) + 1;
     }
 
     return result;
@@ -351,7 +352,7 @@ MAGNA_API void MAGNA_CALL path_convert_slashes
 
     assert (path != NULL);
 
-    for (ptr = path->ptr, end = ptr + path->position; ptr < end; ++ptr) {
+    for (ptr = path->start, end = path->current; ptr < end; ++ptr) {
 
 #if defined (MAGNA_WINDOWS) || defined (MAGNA_MSDOS)
 
@@ -482,12 +483,12 @@ MAGNA_API void MAGNA_CALL path_trim_trailing_slashes
 
     assert (path != NULL);
 
-    while (path->position > 1) {
-        chr = path->ptr [path->position - 1];
+    while (buffer_length (path) > 1) {
+        chr = path->current [-1];
         if (chr != '/' && chr != '\\') {
             break;
         }
-        --path->position;
+        --path->current;
     }
 }
 

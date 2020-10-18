@@ -176,7 +176,7 @@ MAGNA_API am_bool MAGNA_CALL stream_write_buffer
     assert (stream != NULL);
     assert (buffer != NULL);
 
-    return stream_write (stream, buffer->ptr, buffer->position);
+    return stream_write (stream, buffer->start, buffer_length (buffer));
 }
 
 /**
@@ -334,7 +334,9 @@ MAGNA_API ssize_t MAGNA_CALL memory_read_function
     buffer = (Buffer *) stream->data;
     assert (buffer != NULL);
 
-    return (ssize_t) buffer_read (buffer, data, length);
+    /* TODO: implement */
+
+    return (ssize_t) 0;
 }
 
 MAGNA_API ssize_t MAGNA_CALL memory_write_function
@@ -371,7 +373,9 @@ MAGNA_API ssize_t MAGNA_CALL memory_seek_function
         return -1;
     }
 
-    return buffer->position = position;
+    buffer->current = buffer->start + position;
+
+    return position;
 }
 
 MAGNA_API ssize_t MAGNA_CALL memory_tell_function
@@ -386,7 +390,7 @@ MAGNA_API ssize_t MAGNA_CALL memory_tell_function
     buffer = (Buffer *) stream->data;
     assert (buffer != NULL);
 
-    return (ssize_t) buffer->position;
+    return (ssize_t) buffer_position (buffer);
 }
 
 /**
@@ -703,9 +707,9 @@ MAGNA_API int MAGNA_CALL texter_read_byte
     assert (texter != NULL);
 
     buffer = &texter->buffer;
-    if (texter->position >= buffer->position) {
-        buffer->position = 0;
-        rc = stream_read (texter->stream, buffer->ptr, buffer->capacity);
+    if (texter->position >= buffer_position (buffer)) {
+        buffer->current = buffer->start;
+        rc = stream_read (texter->stream, buffer->start, buffer_capacity (buffer));
         if (rc < 0) {
             return -1;
         }
@@ -715,11 +719,11 @@ MAGNA_API int MAGNA_CALL texter_read_byte
             return 0;
         }
 
-        buffer->position = rc;
+        buffer->current = buffer->start + rc;
         texter->position = 0;
     }
 
-    chr = buffer->ptr [texter->position++];
+    chr = buffer->start [texter->position++];
 
     return chr;
 }

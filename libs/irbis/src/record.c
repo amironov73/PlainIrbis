@@ -434,7 +434,7 @@ MAGNA_API MarcRecord* MAGNA_CALL record_reset
     record->mfn = 0;
     record->status = 0;
     record->version = 0;
-    record->database.position = 0;
+    buffer_clear (&record->database);
 
     return record;
 }

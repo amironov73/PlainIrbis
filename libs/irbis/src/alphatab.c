@@ -197,7 +197,7 @@ MAGNA_API am_bool MAGNA_CALL alpha_parse
     }
 
     while (!nav_eot (&nav)) {
-        if (buffer.position >= 256) {
+        if (buffer_position (&buffer) >= 256) {
             /* Что-то таблица слишком большая! */
             goto DONE;
         }
@@ -221,7 +221,7 @@ MAGNA_API am_bool MAGNA_CALL alpha_parse
         }
     }
 
-    result = alpha_create (table, buffer.ptr, buffer.position);
+    result = alpha_create (table, buffer.start, buffer_position (&buffer));
 
     DONE:
     buffer_destroy (&buffer);

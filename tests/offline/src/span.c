@@ -507,6 +507,15 @@ TESTER(span_compare_ignore_case_5)
     CHECK (span_compare_ignore_case (span1, span2) > 0);
 }
 
+TESTER(span_compare_ignore_case_6)
+{
+    const am_byte *text1 = CBTEXT ("QWERTY"), *text2 = CBTEXT ("qwert");
+    Span span1 = TEXT_SPAN (text1);
+    Span span2 = TEXT_SPAN (text2);
+
+    CHECK (span_compare_ignore_case (span1, span2) > 0);
+}
+
 TESTER(span_contains_1)
 {
     Span span = SPAN_INIT;
@@ -886,3 +895,140 @@ TESTER(span_hex_to_uint64_2)
     CHECK (value == MAGNA_UINT64 (0x0123456789ABC));
 }
 
+TESTER(span_verify_1)
+{
+    Span span;
+
+    span.start = (am_byte*) 0x2000;
+    span.end   = (am_byte*) 0x1000;
+
+    CHECK (!span_verify (span));
+}
+
+TESTER(span_count_1)
+{
+    Span span = span_null();
+
+    CHECK (span_count (span, '1') == 0);
+}
+
+TESTER(span_count_2)
+{
+    Span span = TEXT_SPAN ("0000000");
+
+    CHECK (span_count (span, '1') == 0);
+}
+
+TESTER(span_count_3)
+{
+    Span span = TEXT_SPAN ("0001000");
+
+    CHECK (span_count (span, '1') == 1);
+}
+
+TESTER(span_count_4)
+{
+    Span span = TEXT_SPAN ("1111111");
+
+    CHECK (span_count (span, '1') == 7);
+}
+
+TESTER(span_remove_prefix_1)
+{
+    Span span1 = TEXT_SPAN ("Hello, world");
+    Span span2 = TEXT_SPAN ("(");
+    Span span3 = span_remove_prefix (span1, span2);
+
+    CHECK (span_compare (span1, span3) == 0);
+
+}
+
+TESTER(span_remove_prefix_2)
+{
+    Span span1 = TEXT_SPAN ("(Hello, world");
+    Span span2 = TEXT_SPAN ("(");
+    Span span3 = span_remove_prefix (span1, span2);
+
+    CHECK (span_compare (span3, TEXT_SPAN ("Hello, world")) == 0);
+
+}
+
+TESTER(span_remove_suffix_1)
+{
+    Span span1 = TEXT_SPAN ("Hello, world");
+    Span span2 = TEXT_SPAN (")");
+    Span span3 = span_remove_suffix (span1, span2);
+
+    CHECK (span_compare (span1, span3) == 0);
+
+}
+
+TESTER(span_remove_suffix_2)
+{
+    Span span1 = TEXT_SPAN ("Hello, world)");
+    Span span2 = TEXT_SPAN (")");
+    Span span3 = span_remove_suffix (span1, span2);
+
+    CHECK (span_compare (span3, TEXT_SPAN ("Hello, world")) == 0);
+
+}
+
+TESTER(span_remove_prefix_and_suffix_1)
+{
+    Span span1 = TEXT_SPAN ("Hello, world");
+    Span span2 = TEXT_SPAN ("(");
+    Span span3 = TEXT_SPAN (")");
+    Span span4 = span_remove_prefix_and_suffix (span1, span2, span3);
+
+    CHECK (span_compare (span1, span4) == 0);
+}
+
+TESTER(span_remove_prefix_and_suffix_2)
+{
+    Span span1 = TEXT_SPAN ("(Hello, world");
+    Span span2 = TEXT_SPAN ("(");
+    Span span3 = TEXT_SPAN (")");
+    Span span4 = span_remove_prefix_and_suffix (span1, span2, span3);
+
+    CHECK (span_compare (span1, span4) == 0);
+}
+
+TESTER(span_remove_prefix_and_suffix_3)
+{
+    Span span1 = TEXT_SPAN ("Hello, world)");
+    Span span2 = TEXT_SPAN ("(");
+    Span span3 = TEXT_SPAN (")");
+    Span span4 = span_remove_prefix_and_suffix (span1, span2, span3);
+
+    CHECK (span_compare (span1, span4) == 0);
+}
+
+TESTER(span_remove_prefix_and_suffix_4)
+{
+    Span span1 = TEXT_SPAN ("(Hello, world)");
+    Span span2 = TEXT_SPAN ("(");
+    Span span3 = TEXT_SPAN (")");
+    Span span4 = span_remove_prefix_and_suffix (span1, span2, span3);
+
+    CHECK (span_compare (span4, TEXT_SPAN ("Hello, world")) == 0);
+}
+
+TESTER(span_remove_prefix_and_suffix_5)
+{
+    Span span1 = TEXT_SPAN ("+Hello, world+");
+    Span span2 = TEXT_SPAN ("+");
+    Span span3 = TEXT_SPAN ("+");
+    Span span4 = span_remove_prefix_and_suffix (span1, span2, span3);
+
+    CHECK (span_compare (span4, TEXT_SPAN ("Hello, world")) == 0);
+}
+
+TESTER(span_remove_prefix_and_suffix_6)
+{
+    Span span1 = TEXT_SPAN ("+");
+    Span span2 = TEXT_SPAN ("+");
+    Span span3 = TEXT_SPAN ("+");
+    Span span4 = span_remove_prefix_and_suffix (span1, span2, span3);
+
+    CHECK (span_compare (span1, span4) == 0);
+}

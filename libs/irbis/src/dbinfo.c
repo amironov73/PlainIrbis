@@ -143,7 +143,7 @@ MAGNA_API am_bool MAGNA_CALL dbinfo_parse_menu
         }
 
         if (!buffer_is_empty (&dbinfo->name)
-            && dbinfo->name.ptr[0] == '-') {
+            && dbinfo->name.start[0] == '-') {
             buffer_remove_at (&dbinfo->name, 0, 1);
             dbinfo->readOnly = AM_TRUE;
         }

@@ -38,6 +38,8 @@ set(CFiles
     src/vector.c
 )
 
+# set(CFiles src/span.c src/main.c)
+
 set(HeaderFiles
     include/offline.h
 )

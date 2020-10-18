@@ -227,13 +227,13 @@ MAGNA_API ssize_t MAGNA_CALL tcp4_receive_with_limit
     assert (handle >= 0);
     assert (buffer != NULL);
 
-    if (!buffer_grow (buffer, limit)) {
+    if (!buffer_grow (buffer, buffer_length (buffer) + limit)) {
         return -1;
     }
 
-    result = recv (handle, (char*) (buffer->ptr + buffer->position), limit, 0);
+    result = recv (handle, (char*) (buffer->current), limit, 0);
     if (result > 0) {
-        buffer->position += result;
+        buffer->current += result;
     }
 
     return result;
@@ -287,13 +287,13 @@ MAGNA_API am_bool MAGNA_CALL tcp4_send_buffer
 
     assert (buffer != NULL);
 
-    if (buffer->position == 0) {
+    if (buffer_is_empty (buffer)) {
         return AM_TRUE;
     }
 
-    result = tcp4_send (handle, buffer->ptr, buffer->position);
+    result = tcp4_send (handle, buffer->start, buffer_position (buffer));
 
-    return result == ((ssize_t) buffer->position);
+    return result == ((ssize_t) buffer_position (buffer));
 }
 
 /*=========================================================*/

@@ -149,14 +149,13 @@ MAGNA_API am_bool MAGNA_CALL cp1251_buffer_to_utf8
         const Buffer *source
     )
 {
-    am_byte c;
-    size_t index;
+    am_byte c, *ptr;
 
     assert (target != NULL);
     assert (source != NULL);
 
-    for (index = 0; index < source->position; ++index) {
-        c = source->ptr [index];
+    for (ptr = source->start; ptr != source->current; ++ptr) {
+        c = *ptr;
         if (!cp1251_char_to_utf8 (target, c)) {
             return AM_FALSE;
         }

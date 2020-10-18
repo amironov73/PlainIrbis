@@ -9,7 +9,7 @@ TESTER(ntc_init_1)
 
     ntc_init (&chunk);
 
-    CHECK (chunk.prefix.ptr == NULL);
+    CHECK (chunk.prefix.start == NULL);
     CHECK (chunk.prefix.position == 0);
     CHECK (chunk.prefix.capacity == 0);
     CHECK (chunk.value == 0);

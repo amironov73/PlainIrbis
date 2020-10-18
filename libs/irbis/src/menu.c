@@ -62,8 +62,8 @@ MAGNA_API void MAGNA_CALL menu_entry_init
 {
     assert (entry != NULL);
 
-    buffer_null (&entry->code);
-    buffer_null (&entry->comment);
+    buffer_init (&entry->code);
+    buffer_init (&entry->comment);
 }
 
 /**
@@ -102,7 +102,7 @@ MAGNA_API am_bool MAGNA_CALL menu_entry_to_string
         return AM_FALSE;
     }
 
-    if (entry->comment.position != 0) {
+    if (!buffer_is_empty (&entry->comment)) {
         return buffer_puts (output, CBTEXT (" - "))
            && buffer_concat (output, &entry->comment);
     }

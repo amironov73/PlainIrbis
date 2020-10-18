@@ -9,12 +9,12 @@ TESTER(buffer_create_1)
     Buffer buffer;
 
     buffer_create (&buffer, data, sizeof (data));
-    CHECK (buffer.ptr != NULL);
+    CHECK (buffer.start != NULL);
     CHECK (buffer.position == sizeof (data));
     CHECK (buffer.capacity >= sizeof (data));
 
     buffer_destroy (&buffer);
-    CHECK (buffer.ptr == NULL);
+    CHECK (buffer.start == NULL);
     CHECK (buffer.capacity == 0);
     CHECK (buffer.position == 0);
 }
@@ -24,12 +24,12 @@ TESTER(buffer_create_2)
     Buffer buffer;
 
     buffer_create (&buffer, NULL, 0);
-    CHECK (buffer.ptr == NULL);
+    CHECK (buffer.start == NULL);
     CHECK (buffer.position == 0);
     CHECK (buffer.capacity == 0);
 
     buffer_destroy (&buffer);
-    CHECK (buffer.ptr == NULL);
+    CHECK (buffer.start == NULL);
     CHECK (buffer.capacity == 0);
     CHECK (buffer.position == 0);
 }
@@ -40,7 +40,7 @@ TESTER(buffer_static_1)
     Buffer buffer;
 
     buffer_static (&buffer, data, sizeof (data));
-    CHECK (buffer.ptr == data);
+    CHECK (buffer.start == data);
     CHECK (buffer.position == 0);
     CHECK (buffer.capacity == sizeof (data));
 }
@@ -50,7 +50,7 @@ TESTER(buffer_static_2)
     Buffer buffer;
 
     buffer_static (&buffer, NULL, 0);
-    CHECK (buffer.ptr == NULL);
+    CHECK (buffer.start == NULL);
     CHECK (buffer.position == 0);
     CHECK (buffer.capacity == 0);
 }
@@ -93,7 +93,7 @@ TESTER(buffer_copy_1)
 
     CHECK (buffer_copy (&target, &source));
     CHECK (target.position == source.position);
-    CHECK (memcmp (target.ptr, source.ptr, source.position) == 0);
+    CHECK (memcmp (target.start, source.start, source.position) == 0);
 
     buffer_destroy (&target);
 }
@@ -110,7 +110,7 @@ TESTER(buffer_copy_2)
 
     CHECK (buffer_copy (&target, &source));
     CHECK (target.position == source.position);
-    CHECK (memcmp (target.ptr, source.ptr, source.position) == 0);
+    CHECK (memcmp (target.start, source.start, source.position) == 0);
 
     buffer_destroy (&target);
 }
@@ -169,7 +169,7 @@ TESTER(buffer_from_span_1)
 
     buffer_from_span (&buffer, span);
 
-    CHECK (buffer.ptr == span.start);
+    CHECK (buffer.start == span.start);
     CHECK (buffer.position == 0);
     CHECK (buffer.capacity == span_length (span));
 }
@@ -182,8 +182,8 @@ TESTER(buffer_assign_1)
     buffer_assign (&buffer, data, sizeof (data));
 
     CHECK (buffer.position == sizeof (data));
-    CHECK (buffer.ptr[0] == 1);
-    CHECK (buffer.ptr[6] == 7);
+    CHECK (buffer.start[0] == 1);
+    CHECK (buffer.start[6] == 7);
 
     buffer_destroy (&buffer);
 }
@@ -202,7 +202,7 @@ TESTER(buffer_clone_1)
     Buffer target, source = BUFFER_INIT;
 
     CHECK (buffer_clone (&target, &source));
-    CHECK (target.ptr == source.ptr);
+    CHECK (target.start == source.start);
     CHECK (target.capacity == source.capacity);
 }
 
@@ -214,7 +214,7 @@ TESTER(buffer_clone_2)
     buffer_static (&source, data, sizeof (data));
     source.position = source.capacity;
     CHECK (buffer_clone (&target, &source));
-    CHECK (memcmp (data, target.ptr, sizeof (data)) == 0);
+    CHECK (memcmp (data, target.start, sizeof (data)) == 0);
     CHECK (target.capacity == source.capacity);
 
     buffer_destroy (&target);
@@ -225,7 +225,7 @@ TESTER(buffer_from_text_1)
     Buffer buffer = BUFFER_INIT;
 
     CHECK (buffer_from_text (&buffer, NULL) == &buffer);
-    CHECK (buffer.ptr[0] == 0);
+    CHECK (buffer.start[0] == 0);
     CHECK (buffer.position == 0);
 
     buffer_destroy (&buffer);
@@ -322,7 +322,7 @@ TESTER(buffer_assign_text_1)
     Buffer buffer = BUFFER_INIT;
 
     CHECK (buffer_assign_text (&buffer, NULL));
-    CHECK (buffer.ptr[0] == 0);
+    CHECK (buffer.start[0] == 0);
     CHECK (buffer.position == 0);
     CHECK (buffer_assign_text (&buffer, CBTEXT (text1)));
     CHECK (buffer_compare_text (&buffer, CBTEXT (text1)) == 0);

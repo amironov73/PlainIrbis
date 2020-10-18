@@ -491,13 +491,13 @@ MAGNA_API Span MAGNA_CALL span_slice
  * @param span Спан для преобразования.
  * @return Размещенная в куче копия строки.
  */
-MAGNA_API char* MAGNA_CALL span_to_string
+MAGNA_API am_byte* MAGNA_CALL span_to_string
     (
         Span span
     )
 {
     size_t length = span_length (span);
-    char *result = (char*) mem_alloc (length + 1);
+    am_byte *result = (am_byte*) mem_alloc (length + 1);
 
     if (result == NULL) {
         return result;
@@ -1039,6 +1039,85 @@ MAGNA_API MAGNA_INLINE void MAGNA_CALL span_assert
     )
 {
     assert (span.start <= span.end);
+}
+
+/**
+ * Удаляет префикс, если тот присутствует.
+ *
+ * @param span Спан.
+ * @param prefix Префикс, подлежащий удалению.
+ * @return Спан без префикса (возможно, пустой).
+ */
+MAGNA_API Span MAGNA_CALL span_remove_prefix
+    (
+        Span span,
+        Span prefix
+    )
+{
+    Span result;
+
+    if (span_starts_with (span, prefix)) {
+        result.start = span.start + span_length (prefix);
+        result.end = span.end;
+
+        return result;
+    }
+
+    return span;
+}
+
+/**
+ * Удаляет суффикс, если тот присутствует.
+ *
+ * @param span Спан.
+ * @param suffix Суффикс, подлежащий удалению.
+ * @return Спан без суффикса (возможно, пустой).
+ */
+MAGNA_API Span MAGNA_CALL span_remove_suffix
+    (
+        Span span,
+        Span suffix
+    )
+{
+    Span result;
+
+    if (span_ends_with (span, suffix)) {
+        result.start = span.start;
+        result.end = span.end - span_length (suffix);
+
+        return result;
+    }
+
+    return span;
+}
+
+/**
+ * Удаляет префикс и суффикс, если те одновременно присутствуют.
+ *
+ * @param span Спан.
+ * @param prefix Префикс.
+ * @param suffix Суффикс.
+ * @return Спан без префикса и суффикса (возможно, пустой).
+ */
+MAGNA_API Span MAGNA_CALL span_remove_prefix_and_suffix
+    (
+        Span span,
+        Span prefix,
+        Span suffix
+    )
+{
+    Span result;
+
+    if (span_length (span) >= (span_length (prefix) + span_length (suffix))
+        && span_starts_with (span, prefix)
+        && span_ends_with (span, suffix)) {
+        result.start = span.start + span_length (prefix);
+        result.end = span.end - span_length (suffix);
+
+        return result;
+    }
+
+    return span;
 }
 
 /*=========================================================*/

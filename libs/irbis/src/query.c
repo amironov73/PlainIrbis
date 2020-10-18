@@ -232,7 +232,7 @@ MAGNA_API am_bool MAGNA_CALL query_encode
     assert (query != NULL);
     assert (prefix != NULL);
 
-    sprintf ((char*) temp, "%u\n", (unsigned int) query->buffer.position);
+    sprintf ((char*) temp, "%u\n", (unsigned int) buffer_length (&query->buffer));
 
     return buffer_puts (prefix, temp);
 }

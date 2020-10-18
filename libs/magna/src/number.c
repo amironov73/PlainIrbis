@@ -103,7 +103,7 @@ MAGNA_API MAGNA_INLINE am_bool MAGNA_CALL ntc_have_prefix
 {
     assert (chunk != NULL);
 
-    return chunk->prefix.position != 0;
+    return !buffer_is_empty (&chunk->prefix);
 }
 
 /**
@@ -125,7 +125,10 @@ MAGNA_API am_bool MAGNA_CALL ntc_setup
 
     assert (chunk != NULL);
 
-    buffer_assign_span (&chunk->prefix, prefix);
+    if (!buffer_assign_span (&chunk->prefix, prefix)) {
+        return AM_FALSE;
+    }
+
     if (span_is_empty (number)) {
         chunk->haveValue = AM_FALSE;
         chunk->value = 0;

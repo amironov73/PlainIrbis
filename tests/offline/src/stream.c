@@ -143,7 +143,7 @@ TESTER(texter_init_1)
     CHECK (texter.position == 0);
     CHECK (texter.buffer.position == 0);
     CHECK (texter.buffer.capacity != 0);
-    CHECK (texter.buffer.ptr != NULL);
+    CHECK (texter.buffer.start != NULL);
 
     texter_destroy(&texter);
 }
@@ -161,7 +161,7 @@ TESTER(texter_init_2)
     CHECK (texter.position == 0);
     CHECK (texter.buffer.position == 0);
     CHECK (texter.buffer.capacity != 0);
-    CHECK (texter.buffer.ptr != NULL);
+    CHECK (texter.buffer.start != NULL);
 
     texter_destroy(&texter);
 }

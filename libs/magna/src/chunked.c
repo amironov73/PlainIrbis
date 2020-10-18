@@ -1030,7 +1030,7 @@ MAGNA_API am_bool MAGNA_CALL chunked_utf8_to_ansi
     assert (target != NULL);
     assert (source != NULL);
 
-    delta = utf8_code_points (source->ptr, source->position);
+    delta = utf8_code_points (source->start, buffer_length (source));
     if (!chunked_grow (target, delta)) {
         return AM_FALSE;
     }
@@ -1056,7 +1056,7 @@ MAGNA_API am_bool MAGNA_CALL chunked_ansi_to_utf8
     assert (target != NULL);
     assert (source != NULL);
 
-    if (!chunked_grow (target, source->position)) {
+    if (!chunked_grow (target, buffer_length (source))) {
         return AM_FALSE;
     }
 
