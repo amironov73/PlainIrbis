@@ -523,13 +523,14 @@ MAGNA_API int MAGNA_CALL delphi_call_6 (void *function, int arg1, int arg2, int 
 
 struct MagnaSpan
 {
-    am_byte *ptr;
-    size_t len;
+    am_byte *start;
+    am_byte *end;
 
 };
 
-#define SPAN_INIT { NULL, 0 }
+#define SPAN_INIT { NULL, NULL }
 
+extern MAGNA_API MAGNA_INLINE void       MAGNA_CALL span_assert              (Span span);
 extern MAGNA_API              int        MAGNA_CALL span_compare             (Span first, Span second);
 extern MAGNA_API              int        MAGNA_CALL span_compare_ignore_case (Span first, Span second    );
 extern MAGNA_API              am_bool    MAGNA_CALL span_contains            (Span span, am_byte value);
@@ -539,10 +540,11 @@ extern MAGNA_API              Span       MAGNA_CALL span_fill                (Sp
 extern MAGNA_API              am_byte*   MAGNA_CALL span_find_byte           (Span span, am_byte value);
 extern MAGNA_API MAGNA_INLINE Span       MAGNA_CALL span_from_text           (const am_byte *str);
 extern MAGNA_API              am_uint64  MAGNA_CALL span_hex_to_uint64       (Span span);
-extern MAGNA_API MAGNA_INLINE Span       MAGNA_CALL span_init                (const am_byte *ptr, size_t len);
+extern MAGNA_API MAGNA_INLINE Span       MAGNA_CALL span_init                (const am_byte *ptr, size_t length);
 extern MAGNA_API              ssize_t    MAGNA_CALL span_index_of            (Span span, am_byte value);
 extern MAGNA_API MAGNA_INLINE am_bool    MAGNA_CALL span_is_empty            (Span span);
 extern MAGNA_API              ssize_t    MAGNA_CALL span_last_index_of       (Span span, am_byte value);
+extern MAGNA_API MAGNA_INLINE size_t     MAGNA_CALL span_length              (Span span);
 extern MAGNA_API MAGNA_INLINE Span                  span_null                (void);
 extern MAGNA_API MAGNA_INLINE Span       MAGNA_CALL span_slice               (Span span, ssize_t start, ssize_t length);
 extern MAGNA_API              am_bool    MAGNA_CALL span_split_by_char       (Span span, SpanArray *array, am_byte value);
@@ -561,6 +563,7 @@ extern MAGNA_API              am_uint64  MAGNA_CALL span_to_uint64           (Sp
 extern MAGNA_API              am_byte*   MAGNA_CALL span_to_vector           (Span span);
 extern MAGNA_API              Span       MAGNA_CALL span_toupper             (Span span);
 extern MAGNA_API              Span       MAGNA_CALL span_tolower             (Span span);
+extern MAGNA_API MAGNA_INLINE am_bool    MAGNA_CALL span_verify              (Span span);
 
 #define TEXT_SPAN(__s) (span_from_text ((const am_byte*)(__s)))
 #define BTEXT(__s) ((am_byte*)(__s))

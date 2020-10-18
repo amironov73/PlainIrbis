@@ -19,7 +19,7 @@ TESTER(nav_init_1)
 TESTER(nav_from_span_1)
 {
     am_byte data[] = { 1, 2, 3 };
-    Span span = { data, sizeof (data) };
+    Span span = span_init (data, sizeof (data));
     TextNavigator nav;
 
     CHECK (nav_from_span (&nav, span) == &nav);
@@ -368,12 +368,12 @@ TESTER(nav_peek_string_1)
     CHECK (nav_from_text (&nav, text) == &nav);
 
     span = nav_peek_string (&nav, 5);
-    CHECK (span.ptr == text);
-    CHECK (span.len == 5);
+    CHECK (span.start == text);
+    CHECK (span_length (span) == 5);
 
     span = nav_peek_string (&nav, 5);
-    CHECK (span.ptr == text);
-    CHECK (span.len == 5);
+    CHECK (span.start == text);
+    CHECK (span_length (span) == 5);
 }
 
 
@@ -386,12 +386,12 @@ TESTER(nav_peek_string_2)
     CHECK (nav_from_text (&nav, text) == &nav);
 
     span = nav_peek_string (&nav, 5);
-    CHECK (span.ptr == text);
-    CHECK (span.len == 2);
+    CHECK (span.start == text);
+    CHECK (span_length (span) == 2);
 
     span = nav_peek_string (&nav, 5);
-    CHECK (span.ptr == text);
-    CHECK (span.len == 2);
+    CHECK (span.start == text);
+    CHECK (span_length (span) == 2);
 }
 
 TESTER(nav_peek_string_3)
@@ -403,12 +403,12 @@ TESTER(nav_peek_string_3)
     CHECK (nav_from_text (&nav, text) == &nav);
 
     span = nav_peek_string (&nav, 5);
-    CHECK (span.ptr == text);
-    CHECK (span.len == 2);
+    CHECK (span.start == text);
+    CHECK (span_length (span) == 2);
 
     span = nav_peek_string (&nav, 5);
-    CHECK (span.ptr == text);
-    CHECK (span.len == 2);
+    CHECK (span.start == text);
+    CHECK (span_length (span) == 2);
 }
 
 TESTER(nav_peek_string_4)
@@ -420,12 +420,12 @@ TESTER(nav_peek_string_4)
     CHECK (nav_from_text (&nav, text) == &nav);
 
     span = nav_peek_string (&nav, 5);
-    CHECK (span.ptr == text);
-    CHECK (span.len == 0);
+    CHECK (span.start == text);
+    CHECK (span_length (span) == 0);
 
     span = nav_peek_string (&nav, 5);
-    CHECK (span.ptr == text);
-    CHECK (span.len == 0);
+    CHECK (span.start == text);
+    CHECK (span_length (span) == 0);
 }
 
 TESTER(nav_peek_to_1)
@@ -437,12 +437,12 @@ TESTER(nav_peek_to_1)
     CHECK (nav_from_text (&nav, text) == &nav);
 
     span = nav_peek_to (&nav, 'o');
-    CHECK (span.ptr == text);
-    CHECK (span.len == 5);
+    CHECK (span.start == text);
+    CHECK (span_length (span) == 5);
 
     span = nav_peek_to (&nav, 'o');
-    CHECK (span.ptr == text);
-    CHECK (span.len == 5);
+    CHECK (span.start == text);
+    CHECK (span_length (span) == 5);
 }
 
 TESTER(nav_peek_to_2)
@@ -454,12 +454,12 @@ TESTER(nav_peek_to_2)
     CHECK (nav_from_text (&nav, text) == &nav);
 
     span = nav_peek_to (&nav, '?');
-    CHECK (span.ptr == text);
-    CHECK (span.len == 12);
+    CHECK (span.start == text);
+    CHECK (span_length (span) == 12);
 
     span = nav_peek_to (&nav, '?');
-    CHECK (span.ptr == text);
-    CHECK (span.len == 12);
+    CHECK (span.start == text);
+    CHECK (span_length (span) == 12);
 }
 
 TESTER(nav_peek_to_3)
@@ -471,12 +471,12 @@ TESTER(nav_peek_to_3)
     CHECK (nav_from_text (&nav, text) == &nav);
 
     span = nav_peek_to (&nav, '?');
-    CHECK (span.ptr == text);
-    CHECK (span.len == 0);
+    CHECK (span.start == text);
+    CHECK (span_length (span) == 0);
 
     span = nav_peek_to (&nav, '?');
-    CHECK (span.ptr == text);
-    CHECK (span.len == 0);
+    CHECK (span.start == text);
+    CHECK (span_length (span) == 0);
 }
 
 TESTER(nav_until_to_1)
@@ -488,12 +488,12 @@ TESTER(nav_until_to_1)
     CHECK (nav_from_text (&nav, text) == &nav);
 
     span = nav_peek_until (&nav, ',');
-    CHECK (span.ptr == text);
-    CHECK (span.len == 5);
+    CHECK (span.start == text);
+    CHECK (span_length (span) == 5);
 
     span = nav_peek_until (&nav, ',');
-    CHECK (span.ptr == text);
-    CHECK (span.len == 5);
+    CHECK (span.start == text);
+    CHECK (span_length (span) == 5);
 }
 
 TESTER(nav_until_to_2)
@@ -505,12 +505,12 @@ TESTER(nav_until_to_2)
     CHECK (nav_from_text (&nav, text) == &nav);
 
     span = nav_peek_until (&nav, '?');
-    CHECK (span.ptr == text);
-    CHECK (span.len == 12);
+    CHECK (span.start == text);
+    CHECK (span_length (span) == 12);
 
     span = nav_peek_until (&nav, '?');
-    CHECK (span.ptr == text);
-    CHECK (span.len == 12);
+    CHECK (span.start == text);
+    CHECK (span_length (span) == 12);
 }
 
 TESTER(nav_until_to_3)
@@ -522,12 +522,12 @@ TESTER(nav_until_to_3)
     CHECK (nav_from_text (&nav, text) == &nav);
 
     span = nav_peek_until (&nav, '?');
-    CHECK (span.ptr == text);
-    CHECK (span.len == 0);
+    CHECK (span.start == text);
+    CHECK (span_length (span) == 0);
 
     span = nav_peek_until (&nav, '?');
-    CHECK (span.ptr == text);
-    CHECK (span.len == 0);
+    CHECK (span.start == text);
+    CHECK (span_length (span) == 0);
 }
 
 TESTER(nav_read_line_1)
@@ -539,12 +539,12 @@ TESTER(nav_read_line_1)
     CHECK (nav_from_text (&nav, text) == &nav);
 
     span = nav_read_line (&nav);
-    CHECK (span.ptr == text);
-    CHECK (span.len == 0);
+    CHECK (span.start == text);
+    CHECK (span_length (span) == 0);
 
     span = nav_read_line (&nav);
-    CHECK (span.ptr == text);
-    CHECK (span.len == 0);
+    CHECK (span.start == text);
+    CHECK (span_length (span) == 0);
 }
 
 TESTER(nav_read_line_2)
@@ -556,12 +556,12 @@ TESTER(nav_read_line_2)
     CHECK (nav_from_text (&nav, text) == &nav);
 
     span = nav_read_line (&nav);
-    CHECK (span.ptr == text);
-    CHECK (span.len == 12);
+    CHECK (span.start == text);
+    CHECK (span_length (span) == 12);
 
     span = nav_read_line (&nav);
-    CHECK (span.ptr == text + 12);
-    CHECK (span.len == 0);
+    CHECK (span.start == text + 12);
+    CHECK (span_length (span) == 0);
 }
 
 TESTER(nav_read_line_3)
@@ -573,12 +573,12 @@ TESTER(nav_read_line_3)
     CHECK (nav_from_text (&nav, text) == &nav);
 
     span = nav_read_line (&nav);
-    CHECK (span.ptr == text);
-    CHECK (span.len == 5);
+    CHECK (span.start == text);
+    CHECK (span_length (span) == 5);
 
     span = nav_read_line (&nav);
-    CHECK (span.ptr == text + 7);
-    CHECK (span.len == 5);
+    CHECK (span.start == text + 7);
+    CHECK (span_length (span) == 5);
 }
 
 TESTER(nav_is_control_1)
@@ -710,12 +710,12 @@ TESTER(nav_read_integer_1)
     CHECK (nav_from_text (&nav, text) == &nav);
 
     span = nav_read_integer (&nav);
-    CHECK (span.ptr == text);
-    CHECK (span.len == 0);
+    CHECK (span.start == text);
+    CHECK (span_length (span) == 0);
 
     span = nav_read_integer (&nav);
-    CHECK (span.ptr == text);
-    CHECK (span.len == 0);
+    CHECK (span.start == text);
+    CHECK (span_length (span) == 0);
 }
 
 TESTER(nav_read_integer_2)
@@ -727,12 +727,12 @@ TESTER(nav_read_integer_2)
     CHECK (nav_from_text (&nav, text) == &nav);
 
     span = nav_read_integer (&nav);
-    CHECK (span.ptr == text);
-    CHECK (span.len == 3);
+    CHECK (span.start == text);
+    CHECK (span_length (span) == 3);
 
     span = nav_read_integer (&nav);
-    CHECK (span.ptr == text + 3);
-    CHECK (span.len == 0);
+    CHECK (span.start == text + 3);
+    CHECK (span_length (span) == 0);
 }
 
 TESTER(nav_read_integer_3)
@@ -744,12 +744,12 @@ TESTER(nav_read_integer_3)
     CHECK (nav_from_text (&nav, text) == &nav);
 
     span = nav_read_integer (&nav);
-    CHECK (span.ptr == text);
-    CHECK (span.len == 3);
+    CHECK (span.start == text);
+    CHECK (span_length (span) == 3);
 
     span = nav_read_integer (&nav);
-    CHECK (span.ptr == text + 3);
-    CHECK (span.len == 0);
+    CHECK (span.start == text + 3);
+    CHECK (span_length (span) == 0);
 }
 
 TESTER(nav_read_integer_4)
@@ -761,13 +761,13 @@ TESTER(nav_read_integer_4)
     CHECK (nav_from_text (&nav, text) == &nav);
 
     span = nav_read_integer (&nav);
-    CHECK (span.ptr == text);
-    CHECK (span.len == 3);
+    CHECK (span.start == text);
+    CHECK (span_length (span) == 3);
 
     (void) nav_read (&nav);
     span = nav_read_integer (&nav);
-    CHECK (span.ptr == text + 4);
-    CHECK (span.len == 3);
+    CHECK (span.start == text + 4);
+    CHECK (span_length (span) == 3);
 }
 
 TESTER(nav_extract_integer_1)
@@ -779,12 +779,12 @@ TESTER(nav_extract_integer_1)
     CHECK (nav_from_text (&nav, text) == &nav);
 
     span = nav_extract_integer (&nav);
-    CHECK (span.ptr == text);
-    CHECK (span.len == 0);
+    CHECK (span.start == text);
+    CHECK (span_length (span) == 0);
 
     span = nav_extract_integer (&nav);
-    CHECK (span.ptr == text);
-    CHECK (span.len == 0);
+    CHECK (span.start == text);
+    CHECK (span_length (span) == 0);
 }
 
 TESTER(nav_extract_integer_2)
@@ -796,12 +796,12 @@ TESTER(nav_extract_integer_2)
     CHECK (nav_from_text (&nav, text) == &nav);
 
     span = nav_extract_integer (&nav);
-    CHECK (span.ptr == text);
-    CHECK (span.len == 3);
+    CHECK (span.start == text);
+    CHECK (span_length (span) == 3);
 
     span = nav_extract_integer (&nav);
-    CHECK (span.ptr == text + 3);
-    CHECK (span.len == 0);
+    CHECK (span.start == text + 3);
+    CHECK (span_length (span) == 0);
 }
 
 TESTER(nav_extract_integer_3)
@@ -813,12 +813,12 @@ TESTER(nav_extract_integer_3)
     CHECK (nav_from_text (&nav, text) == &nav);
 
     span = nav_extract_integer (&nav);
-    CHECK (span.ptr == text + 1);
-    CHECK (span.len == 3);
+    CHECK (span.start == text + 1);
+    CHECK (span_length (span) == 3);
 
     span = nav_extract_integer (&nav);
-    CHECK (span.ptr == text + 5);
-    CHECK (span.len == 0);
+    CHECK (span.start == text + 5);
+    CHECK (span_length (span) == 0);
 }
 
 TESTER(nav_extract_integer_4)
@@ -830,12 +830,12 @@ TESTER(nav_extract_integer_4)
     CHECK (nav_from_text (&nav, text) == &nav);
 
     span = nav_extract_integer (&nav);
-    CHECK (span.ptr == text);
-    CHECK (span.len == 3);
+    CHECK (span.start == text);
+    CHECK (span_length (span) == 3);
 
     span = nav_extract_integer (&nav);
-    CHECK (span.ptr == text + 4);
-    CHECK (span.len == 3);
+    CHECK (span.start == text + 4);
+    CHECK (span_length (span) == 3);
 }
 
 TESTER(nav_read_string_1)
@@ -847,12 +847,12 @@ TESTER(nav_read_string_1)
     CHECK (nav_from_text (&nav, text) == &nav);
 
     span = nav_read_string (&nav, 10);
-    CHECK (span.ptr == text);
-    CHECK (span.len == 0);
+    CHECK (span.start == text);
+    CHECK (span_length (span) == 0);
 
     span = nav_read_string (&nav, 10);
-    CHECK (span.ptr == text);
-    CHECK (span.len == 0);
+    CHECK (span.start == text);
+    CHECK (span_length (span) == 0);
 }
 
 TESTER(nav_read_string_2)
@@ -864,12 +864,12 @@ TESTER(nav_read_string_2)
     CHECK (nav_from_text (&nav, text) == &nav);
 
     span = nav_read_string (&nav, 3);
-    CHECK (span.ptr == text);
-    CHECK (span.len == 3);
+    CHECK (span.start == text);
+    CHECK (span_length (span) == 3);
 
     span = nav_read_string (&nav, 10);
-    CHECK (span.ptr == text + 3);
-    CHECK (span.len == 7);
+    CHECK (span.start == text + 3);
+    CHECK (span_length (span) == 7);
 }
 
 

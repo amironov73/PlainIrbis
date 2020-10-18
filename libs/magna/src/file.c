@@ -937,8 +937,8 @@ MAGNA_API am_bool MAGNA_CALL file_write_span
     result = file_write
         (
             handle,
-            span.ptr,
-            span.len
+            span.start,
+            span_length (span)
         );
 
     return result;

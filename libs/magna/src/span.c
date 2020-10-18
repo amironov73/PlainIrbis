@@ -3,6 +3,10 @@
 
 #include "magna/core.h"
 
+// ReSharper disable StringLiteralTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable CommentTypo
+
 /*=========================================================*/
 
 #include "warnpush.h"
@@ -18,43 +22,56 @@
  * @file span.c
  *
  * Невладеющий указатель на участок памяти.
+ * Освобождать ресурсы, занимаемые спаном, не нужно.
  *
+ * \struct Span
+ *      \brief Невладеющий указатель на участок памяти.
+ *
+ * \var Span::start
+ *      \brief Указатель на первый байт участка памяти.
+ *
+ * \var Span::end
+ *      \brief Указатель за последним байтом участком памяти.
+ *      \details Если `start == end`, значит, спан пустой.
  */
 
 /*=========================================================*/
 
 /**
  * Простая инициализация спана.
+ * Не выделяет памяти в куче.
  *
  * @param ptr Указатель на начало фрагмента памяти.
- * @param len Длина фрагмента памяти.
+ * @param length Длина фрагмента памяти.
  * @return Инициализированный спан.
  */
 MAGNA_API Span MAGNA_CALL span_init
     (
         const am_byte *ptr,
-        size_t len
+        size_t length
     )
 {
-    Span result = { (am_byte*) ptr, len };
+    Span result = { (am_byte*) ptr, (am_byte*) (ptr + length) };
 
     return result;
 }
 
 /**
  * Сверхпростая инициализация -- создает пустой спан.
+ * Не выделяет памяти в куче.
  *
  * @return Пустой спан.
  */
 MAGNA_API MAGNA_INLINE Span span_null (void)
 {
-    Span result = { NULL, 0 };
+    Span result = { NULL, NULL };
 
     return result;
 }
 
 /**
  * Инициализация строкой, завершающейся нулём.
+ * Не выделяет памяти в куче.
  *
  * @param str Указатель на начало строки.
  * @return Инициализированный спан. Завершающий нуль не включается.
@@ -68,14 +85,30 @@ MAGNA_API Span MAGNA_CALL span_from_text
 
     assert (str != NULL);
 
-    result.ptr = (am_byte*) str;
-    result.len = strlen (CCTEXT (str));
+    result.start = (am_byte*) str;
+    result.end = (am_byte*) (str + strlen (CCTEXT (str)));
 
     return result;
 }
 
 /**
+ * Вычисление длины спана, т. е. количества байтов в нём.
+ *
+ * @param span Спан.
+ * @return Результат вычисления (возможно, 0).
+ */
+MAGNA_API MAGNA_INLINE size_t MAGNA_CALL span_length
+    (
+        Span span
+    )
+{
+    return (size_t) (span.end - span.start);
+}
+
+/**
  * Удаление пробельных символов из начала спана.
+ * Не производит никаких изменений в данных,
+ * на которые ссылается спан.
  *
  * @param span Спан.
  * @return Тот же спан, возможно, укороченный.
@@ -87,12 +120,12 @@ MAGNA_API Span MAGNA_CALL span_trim_start
 {
     Span result = span;
 
-    while (result.len != 0) {
-        if (!isspace (*result.ptr)) {
+    while (result.start != result.end) {
+        if (!isspace (*result.start)) {
             break;
         }
-        ++result.ptr;
-        --result.len;
+
+        ++result.start;
     }
 
     return result;
@@ -100,6 +133,8 @@ MAGNA_API Span MAGNA_CALL span_trim_start
 
 /**
  * Удаление пробельных символов из конца спана.
+ * Не производит никаких изменений в данных,
+ * на которые ссылается спан.
  *
  * @param span Спан.
  * @return Тот же спан, возможно, укороченный.
@@ -111,11 +146,12 @@ MAGNA_API Span MAGNA_CALL span_trim_end
 {
     Span result = span;
 
-    while (result.len != 0) {
-        if (!isspace (result.ptr [result.len - 1])) {
+    while (result.start != result.end) {
+        if (!isspace (result.end [-1])) {
             break;
         }
-        --result.len;
+
+        --result.end;
     }
 
     return result;
@@ -123,6 +159,8 @@ MAGNA_API Span MAGNA_CALL span_trim_end
 
 /**
  * Удаление пробельных символов из начала и конца спана.
+ * Не производит никаких изменений в данных,
+ * на которые ссылается спан.
  *
  * @param span Спан.
  * @return Тот же спан, возможно, укороченный.
@@ -150,13 +188,11 @@ MAGNA_API am_int32 MAGNA_CALL span_to_int32
     )
 {
     am_int32 result = 0;
-    am_byte *ptr = span.ptr;
-    size_t len = span.len;
+    am_byte *ptr = span.start;
     am_bool sign = AM_FALSE;
 
-    while (len) {
+    while (ptr != span.end) {
         if (*ptr == '+') {
-            --len;
             ++ptr;
             continue;
         }
@@ -166,11 +202,10 @@ MAGNA_API am_int32 MAGNA_CALL span_to_int32
         }
 
         sign = !sign;
-        --len;
         ++ptr;
     }
 
-    while (len--) {
+    while (ptr != span.end) {
         result = result * 10 + (*ptr++ - '0');
     }
 
@@ -189,13 +224,11 @@ MAGNA_API am_int64 MAGNA_CALL span_to_int64
     )
 {
     am_int64 result = 0;
-    am_byte *ptr = span.ptr;
-    size_t len = span.len;
+    am_byte *ptr = span.start;
     am_bool sign = AM_FALSE;
 
-    while (len) {
+    while (ptr != span.end) {
         if (*ptr == '+') {
-            --len;
             ++ptr;
             continue;
         }
@@ -205,11 +238,10 @@ MAGNA_API am_int64 MAGNA_CALL span_to_int64
         }
 
         sign = !sign;
-        --len;
         ++ptr;
     }
 
-    while (len--) {
+    while (ptr != span.end) {
         result = result * 10 + (*ptr++ - '0');
     }
 
@@ -228,10 +260,9 @@ MAGNA_API am_uint32 MAGNA_CALL span_to_uint32
     )
 {
     am_uint32 result = 0;
-    am_byte *ptr = span.ptr;
-    size_t len = span.len;
+    am_byte *ptr = span.start;
 
-    while (len--) {
+    while (ptr != span.end) {
         result = result * 10 + (*ptr++ - '0');
     }
 
@@ -250,10 +281,9 @@ MAGNA_API am_uint64 MAGNA_CALL span_to_uint64
     )
 {
     am_uint64 result = 0;
-    am_byte *ptr = span.ptr;
-    size_t len = span.len;
+    am_byte *ptr = span.start;
 
-    while (len--) {
+    while (ptr != span.end) {
         result = result * 10 + (*ptr++ - '0');
     }
 
@@ -261,7 +291,7 @@ MAGNA_API am_uint64 MAGNA_CALL span_to_uint64
 }
 
 /**
- * Перевод спана в верхний регистр (в нативной кодировке).
+ * Перевод спана в верхний регистр (в кодировке ASCII).
  *
  * @param span Спан.
  * @return Тот же спан.
@@ -271,10 +301,9 @@ MAGNA_API Span MAGNA_CALL span_toupper
         Span span
     )
 {
-    am_byte *ptr = span.ptr;
-    size_t len = span.len;
+    am_byte *ptr = span.start;
 
-    while (len--) {
+    while (ptr != span.end) {
         *ptr = (am_byte) toupper (*ptr);
         ++ptr;
     }
@@ -283,7 +312,7 @@ MAGNA_API Span MAGNA_CALL span_toupper
 }
 
 /**
- * Перевод спана в нижний регистр (в нативной кодировке).
+ * Перевод спана в нижний регистр (в кодировке ASCII).
  *
  * @param span Спан.
  * @return Тот же спан.
@@ -293,10 +322,9 @@ MAGNA_API Span MAGNA_CALL span_tolower
         Span span
     )
 {
-    am_byte *ptr = span.ptr;
-    size_t len = span.len;
+    am_byte *ptr = span.start;
 
-    while (len--) {
+    while (ptr != span.end) {
         *ptr = (am_byte) tolower (*ptr);
         ++ptr;
     }
@@ -305,7 +333,7 @@ MAGNA_API Span MAGNA_CALL span_tolower
 }
 
 /**
- * Спан пустой?
+ * Проверка: спан пустой?
  *
  * @param span Проверяемый спан.
  * @return Результат проверки.
@@ -315,7 +343,7 @@ MAGNA_API MAGNA_INLINE am_bool MAGNA_CALL span_is_empty
         Span span
     )
 {
-    return span.len == 0 || span.ptr == NULL;
+    return (span.start == span.end) || (span.start == NULL);
 }
 
 /**
@@ -331,13 +359,13 @@ MAGNA_API am_byte* MAGNA_CALL span_find_byte
         am_byte value
     )
 {
-    am_byte *ptr = span.ptr;
-    size_t len = span.len;
+    am_byte *ptr = span.start;
 
-    while (len--) {
+    while (ptr != span.end) {
         if (*ptr == value) {
             return ptr;
         }
+
         ++ptr;
     }
 
@@ -357,10 +385,9 @@ MAGNA_API Span MAGNA_CALL span_fill
         am_byte value
     )
 {
-    am_byte *ptr = span.ptr;
-    size_t len = span.len;
+    am_byte *ptr = span.start;
 
-    while (len--) {
+    while (ptr != span.end) {
         *ptr++ = value;
     }
 
@@ -380,15 +407,19 @@ MAGNA_API ssize_t MAGNA_CALL span_index_of
         am_byte value
     )
 {
-    size_t i;
+    ssize_t index = 0;
+    am_byte *ptr = span.start;
 
-    for (i = 0; i < span.len; ++i) {
-        if (span.ptr[i] == value) {
-            return (ssize_t) i;
+    while (ptr != span.end) {
+        if (*ptr == value) {
+            return index;
         }
+
+        ++index;
+        ++ptr;
     }
 
-    return -1;
+    return (ssize_t) -1;
 }
 
 /**
@@ -404,24 +435,27 @@ MAGNA_API ssize_t MAGNA_CALL span_last_index_of
         am_byte value
     )
 {
-    ssize_t i;
+    am_byte *ptr = span.end;
+    ssize_t index = span.end - span.start;
 
-    for (i = span.len - 1; i >= 0; --i) {
-        if (span.ptr[i] == value) {
-            return i;
+    while (ptr != span.start) {
+        --index;
+        --ptr;
+        if (*ptr == value) {
+            return index;
         }
     }
 
-    return i;
+    return (ssize_t) -1;
 }
 
 /**
- * Срез спана.
+ * Срез спана. Данные, на которые указывает спан, никак не меняются.
  *
  * @param span Спан.
  * @param start Смещение от начала.
  * @param length Длина среза.
- * @return Обрезанный спан.
+ * @return Обрезанный спан (возможно, пустой).
  */
 MAGNA_API Span MAGNA_CALL span_slice
     (
@@ -431,27 +465,28 @@ MAGNA_API Span MAGNA_CALL span_slice
     )
 {
     Span result = span;
+    ssize_t previousLength = (ssize_t) (span.end - span.start);
 
     if (length == -1) {
-        length = result.len - start;
+        length = previousLength - start;
     }
 
-    if (length + start > ((ssize_t) span.len)) {
-        length = span.len - start;
+    if (length + start > previousLength) {
+        length = previousLength - start;
     }
 
     if (length < 0) {
         length = 0;
     }
 
-    result.ptr += start;
-    result.len = (size_t) length;
+    result.end = (result.start += start) + length;
 
     return result;
 }
 
 /**
  * Преобразование спана в строку.
+ * Выделяет память под строку в куче.
  *
  * @param span Спан для преобразования.
  * @return Размещенная в куче копия строки.
@@ -461,22 +496,25 @@ MAGNA_API char* MAGNA_CALL span_to_string
         Span span
     )
 {
-    char *result = mem_alloc (span.len + 1);
+    size_t length = span_length (span);
+    char *result = (char*) mem_alloc (length + 1);
 
-    if (!result) {
+    if (result == NULL) {
         return result;
     }
 
-    if (span.len != 0 && span.ptr != NULL) {
-        mem_copy (result, span.ptr, span.len);
+    if (length != 0) {
+        mem_copy (result, span.start, length);
     }
-    result [span.len] = 0;
+
+    result [length] = 0;
 
     return result;
 }
 
 /**
  * Преобразование спана в вектор байтов.
+ * Выделяет память под вектор в куче.
  *
  * @param span Спан для преобразования.
  * @return Размещенный в куче вектор байтов (копия).
@@ -486,10 +524,11 @@ MAGNA_API am_byte* MAGNA_CALL span_to_vector
         Span span
     )
 {
-    am_byte *result = mem_alloc (span.len);
+    size_t length = span_length (span);
+    am_byte *result = mem_alloc (length);
 
-    if (span.len != 0 && span.ptr != NULL) {
-        mem_copy (result, span.ptr, span.len);
+    if (length != 0) {
+        mem_copy (result, span.start, length);
     }
 
     return result;
@@ -508,12 +547,14 @@ MAGNA_API am_bool MAGNA_CALL span_starts_with
         Span prefix
     )
 {
-    am_bool result = prefix.len <= span.len;
-    size_t i;
+    size_t spanLength = span_length (span);
+    size_t prefixLength = span_length (prefix);
+    am_bool result = prefixLength <= spanLength;
+    size_t index;
 
     if (result) {
-        for (i = 0; i < prefix.len; ++i) {
-            if (span.ptr[i] != prefix.ptr[i]) {
+        for (index = 0; index < prefixLength; ++index) {
+            if (span.start [index] != prefix.start [index]) {
                 result = AM_FALSE;
                 break;
             }
@@ -536,12 +577,15 @@ MAGNA_API am_bool MAGNA_CALL span_ends_with
         Span suffix
     )
 {
-    am_bool result = suffix.len <= span.len;
-    size_t i;
+    size_t spanLength = span_length (span);
+    size_t suffixLength = span_length (suffix);
+    am_bool result = suffixLength <= spanLength;
+    size_t index;
 
     if (result) {
-        for (i = 0; i < suffix.len; ++i) {
-            if (span.ptr[span.len - i - 1] != suffix.ptr [suffix.len - i - 1]) {
+        for (index = 0; index < suffixLength; ++index) {
+            if (span.start [spanLength - index - 1]
+                    != suffix.start [suffixLength - index - 1]) {
                 result = AM_FALSE;
                 break;
             }
@@ -556,8 +600,8 @@ MAGNA_API am_bool MAGNA_CALL span_ends_with
  *
  * @param first Первый спан.
  * @param second Второй спан.
- * @return Результат сравнения: < 0, если первый спан меньше,
- * > 0, если первый спан больше и = 0, если содержимое спанов совпадает.
+ * @return Результат сравнения: &lt; 0, если первый спан меньше,
+ * &gt; 0, если первый спан больше и = 0, если содержимое спанов совпадает.
  */
 MAGNA_API int MAGNA_CALL span_compare
     (
@@ -565,23 +609,25 @@ MAGNA_API int MAGNA_CALL span_compare
         Span second
     )
 {
+    size_t firstLength = span_length (first);
+    size_t secondLength = span_length (second);
     int result;
-    size_t i;
+    size_t index;
 
-    for (i = 0; ; ++i) {
-        if (i == first.len) {
-            if (i == second.len) {
+    for (index = 0; ; ++index) {
+        if (index == firstLength) {
+            if (index == secondLength) {
                 return 0;
             }
 
             return -1;
         }
 
-        if (i == second.len) {
+        if (index == secondLength) {
             return 1;
         }
 
-        result = first.ptr[i] - second.ptr[i];
+        result = first.start [index] - second.start [index];
         if (result) {
             return result;
         }
@@ -593,8 +639,8 @@ MAGNA_API int MAGNA_CALL span_compare
  *
  * @param first Первый спан.
  * @param second Второй спан.
- * @return Результат сравнения: < 0, если первый спан меньше,
- * > 0, если первый спан больше и = 0, если содержимое спанов совпадает.
+ * @return Результат сравнения: &lt; 0, если первый спан меньше,
+ * &gt; 0, если первый спан больше и = 0, если содержимое спанов совпадает.
  */
 MAGNA_API int MAGNA_CALL span_compare_ignore_case
     (
@@ -602,23 +648,25 @@ MAGNA_API int MAGNA_CALL span_compare_ignore_case
         Span second
     )
 {
+    size_t firstLength = span_length (first);
+    size_t secondLength = span_length (second);
     int result;
-    size_t i;
+    size_t index;
 
-    for (i = 0; ; ++i) {
-        if (i == first.len) {
-            if (i == second.len) {
+    for (index = 0; ; ++index) {
+        if (index == firstLength) {
+            if (index == secondLength) {
                 return 0;
             }
 
             return -1;
         }
 
-        if (i == second.len) {
+        if (index == secondLength) {
             return 1;
         }
 
-        result = toupper (first.ptr[i]) - toupper (second.ptr[i]);
+        result = toupper (first.start [index]) - toupper (second.start [index]);
         if (result) {
             return result;
         }
@@ -630,7 +678,7 @@ MAGNA_API int MAGNA_CALL span_compare_ignore_case
  *
  * @param span Спан.
  * @param value Искомое значение.
- * @return Результат поиска.
+ * @return Результат проверки.
  */
 MAGNA_API am_bool MAGNA_CALL span_contains
     (
@@ -638,10 +686,9 @@ MAGNA_API am_bool MAGNA_CALL span_contains
         am_byte value
     )
 {
-    const am_byte *ptr, *end;
+    const am_byte *ptr;
 
-    ptr = span.ptr;
-    for (end = ptr + span.len; ptr < end; ++ptr) {
+    for (ptr = span.start; ptr != span.end; ++ptr) {
         if (*ptr == value) {
             return AM_TRUE;
         }
@@ -664,10 +711,9 @@ MAGNA_API size_t MAGNA_CALL span_count
     )
 {
     size_t result = 0;
-    const am_byte *ptr, *end;
+    const am_byte *ptr;
 
-    ptr = span.ptr;
-    for (end = ptr + span.len; ptr < end; ++ptr) {
+    for (ptr = span.start; ptr != span.end; ++ptr) {
         if (*ptr == value) {
             ++result;
         }
@@ -691,20 +737,20 @@ MAGNA_API am_bool MAGNA_CALL span_split_by_char
         am_byte value
     )
 {
-    size_t left, right;
+    am_byte *left, *right;
     am_bool found;
     Span item;
 
     assert (array != NULL);
 
-    left = 0;
-    while (left < span.len) {
+    left = span.start;
+    while (left < span.end) {
         found = AM_FALSE;
-        for (right = left; right < span.len; ++right) {
-            if (span.ptr[right] == value) {
+        for (right = left; right != span.end; ++right) {
+            if (*right == value) {
                 if (left != right) {
-                    item.ptr = span.ptr + left;
-                    item.len = right - left;
+                    item.start = left;
+                    item.end = right;
                     if (!span_array_push_back (array, item)) {
                         return AM_FALSE;
                     }
@@ -716,8 +762,8 @@ MAGNA_API am_bool MAGNA_CALL span_split_by_char
         }
 
         if (!found) {
-            item.ptr = span.ptr + left;
-            item.len = span.len - left;
+            item.start = left;
+            item.end = span.end;
             if (!span_array_push_back (array, item)) {
                 return AM_FALSE;
             }
@@ -748,7 +794,8 @@ MAGNA_API am_bool MAGNA_CALL span_split_by_chars
         size_t valueCount
     )
 {
-    size_t left, right, i;
+    am_byte *left, *right;
+    size_t index;
     Span item;
     am_byte c;
     am_bool found = AM_FALSE;
@@ -756,13 +803,13 @@ MAGNA_API am_bool MAGNA_CALL span_split_by_chars
     assert (array != NULL);
     assert (values != NULL);
 
-    left = 0;
-    while (left < span.len) {
-        for (right = left; right < span.len; ++right) {
-            c = span.ptr[right];
+    left = span.start;
+    while (left < span.end) {
+        for (right = left; right != span.end; ++right) {
+            c = *right;
             found = AM_FALSE;
-            for (i = 0; i < valueCount; ++i) {
-                if (c == values[i]) {
+            for (index = 0; index < valueCount; ++index) {
+                if (c == values [index]) {
                     found = AM_TRUE;
                     break;
                 }
@@ -770,8 +817,8 @@ MAGNA_API am_bool MAGNA_CALL span_split_by_chars
 
             if (found) {
                 if (left != right) {
-                    item.ptr = span.ptr + left;
-                    item.len = right - left;
+                    item.start = left;
+                    item.end = right;
                     if (!span_array_push_back (array, item)) {
                         return AM_FALSE;
                     }
@@ -781,8 +828,8 @@ MAGNA_API am_bool MAGNA_CALL span_split_by_chars
         }
 
         if (!found) {
-            item.ptr = span.ptr + left;
-            item.len = span.len - left;
+            item.start = left;
+            item.end = span.end;
             if (!span_array_push_back (array, item)) {
                 return AM_FALSE;
             }
@@ -796,14 +843,14 @@ MAGNA_API am_bool MAGNA_CALL span_split_by_chars
     return AM_TRUE;
 }
 
-static const am_byte* find_one
+static am_byte* find_one
     (
-        const am_byte *from,
+        am_byte *from,
         const am_byte *to,
         am_byte value
     )
 {
-    const am_byte *ptr;
+    am_byte *ptr;
 
     for (ptr = from; ptr < to; ++ptr) {
         if (*ptr == value) {
@@ -814,15 +861,15 @@ static const am_byte* find_one
     return NULL;
 }
 
-static const am_byte* find_many
+static am_byte* find_many
     (
-        const am_byte *from,
+        am_byte *from,
         const am_byte *to,
-        const am_byte *values,
+        am_byte *values,
         size_t valueCount
     )
 {
-    const am_byte *ptr1, *ptr2 = values + valueCount, *ptr3;
+    am_byte *ptr1, *ptr2 = values + valueCount, *ptr3;
 
     for (ptr1 = from; ptr1 < to; ++ptr1) {
         ptr3 = find_one (values, ptr2, *ptr1);
@@ -852,13 +899,13 @@ MAGNA_API size_t MAGNA_CALL span_split_n_by_char
     )
 {
     size_t count;
-    const am_byte *ptr = span.ptr, *end = ptr + span.len, *found;
+    am_byte *ptr = span.start, *found;
     Span *item;
 
     assert (array != NULL);
 
     for (count = 0; count < arraySize - 1; ) {
-        found = find_one (ptr, end, value);
+        found = find_one (ptr, span.end, value);
         if (!found) {
             break;
         }
@@ -869,16 +916,16 @@ MAGNA_API size_t MAGNA_CALL span_split_n_by_char
         }
 
         item = array + count;
-        item->ptr = (am_byte*) ptr;
-        item->len = found - ptr;
+        item->start = ptr;
+        item->end = found;
         ptr = found + 1;
         ++count;
     }
 
-    if (ptr != end) {
+    if (ptr != span.end) {
         item = array + count;
-        item->ptr = (am_byte*) ptr;
-        item->len = end - ptr;
+        item->start = ptr;
+        item->end = span.end;
         ++count;
     }
 
@@ -905,13 +952,13 @@ MAGNA_API size_t MAGNA_CALL span_split_n_by_chars
     )
 {
     size_t count;
-    const am_byte *ptr = span.ptr, *end = ptr + span.len, *found;
+    am_byte *ptr = span.start, *found;
     Span *item;
 
     assert (array != NULL);
 
     for (count = 0; count < arraySize - 1; ) {
-        found = find_many (ptr, end, values, valueCount);
+        found = find_many (ptr, span.end, (am_byte*) values, valueCount);
         if (!found) {
             break;
         }
@@ -922,16 +969,16 @@ MAGNA_API size_t MAGNA_CALL span_split_n_by_chars
         }
 
         item = array + count;
-        item->ptr = (am_byte*) ptr;
-        item->len = found - ptr;
+        item->start = ptr;
+        item->end = found;
         ptr = found + 1;
         ++count;
     }
 
-    if (ptr != end) {
+    if (ptr != span.end) {
         item = array + count;
-        item->ptr = (am_byte*) ptr;
-        item->len = end - ptr;
+        item->start = ptr;
+        item->end = span.end;
         ++count;
     }
 
@@ -951,11 +998,11 @@ MAGNA_API am_uint64 MAGNA_CALL span_hex_to_uint64
     )
 {
     am_uint64 result = 0;
-    size_t i;
+    const am_byte *ptr;
     am_byte c;
 
-    for (i = 0; i < span.len; ++i) {
-        c = toupper (span.ptr [i]);
+    for (ptr = span.start; ptr != span.end; ++ptr) {
+        c = (am_byte) toupper (*ptr);
         if (c <= '9') {
             result = result * 16 + c - '0';
         }
@@ -967,6 +1014,32 @@ MAGNA_API am_uint64 MAGNA_CALL span_hex_to_uint64
     return result;
 }
 
+/**
+ * Проверка: валидный ли спан.
+ *
+ * @param span Спан для проверки.
+ * @return Результат проверки.
+ */
+MAGNA_API MAGNA_INLINE am_bool MAGNA_CALL span_verify
+    (
+        Span span
+    )
+{
+    return span.start <= span.end;
+}
+
+/**
+ * Проверка, валидный ли спан, с помощью `assert`.
+ *
+ * @param span Спан для проверки.
+ */
+MAGNA_API MAGNA_INLINE void MAGNA_CALL span_assert
+    (
+        Span span
+    )
+{
+    assert (span.start <= span.end);
+}
 
 /*=========================================================*/
 

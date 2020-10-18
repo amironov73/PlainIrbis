@@ -61,11 +61,11 @@ MAGNA_API am_byte MAGNA_CALL upc12_compute_check_digit
     am_int32 sum, i, length;
     am_byte result;
 
-    assert (text.len >= 11);
+    assert (span_length (text) >= 11);
 
-    length = min_int32 (text.len, 11);
+    length = min_int32 (span_length (text), 11);
     for (sum = i = 0; i < length; ++i) {
-        sum = sum + (text.ptr[i] - '0') * coefficients[i];
+        sum = sum + (text.start[i] - '0') * coefficients[i];
     }
 
     result = (am_byte) (10 - sum % 10 + '0');
@@ -86,12 +86,12 @@ MAGNA_API am_bool MAGNA_CALL upc12_check_control_digit
 {
     am_int32 sum, i, length;
 
-    assert (text.len >= 12);
+    assert (span_length (text) >= 12);
 
-    length = min_int32 (text.len, 12);
+    length = min_int32 (span_length (text), 12);
 
     for (sum = i = 0; i < length; ++i) {
-        sum = sum + (text.ptr[i] - '0') * coefficients[i];
+        sum = sum + (text.start[i] - '0') * coefficients[i];
     }
 
     return sum % 10 == 0;

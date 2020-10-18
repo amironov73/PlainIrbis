@@ -99,7 +99,7 @@ TESTER(choose_span_1)
     choosen = choose_span (first, second);
     CHECK (span_compare (choosen, first) == 0);
 
-    first.len = 0;
+    first.end = first.start;
 
     choosen = choose_span (first, second);
     CHECK (span_compare (choosen, second) == 0);

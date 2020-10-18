@@ -71,12 +71,12 @@ MAGNA_API am_byte MAGNA_CALL ean13_compute_check_digit
     am_byte result = 0;
     int i, sum = 0;
 
-    if (text.len < 12) {
+    if (span_length (text) < 12) {
         return result;
     }
 
     for (i = 0; i < 12; ++i) {
-        sum = sum + (text.ptr[i] - '0') * coefficients[i];
+        sum = sum + (text.start [i] - '0') * coefficients[i];
     }
 
     result = (char)(10 - sum % 10 + '0');
@@ -98,12 +98,12 @@ MAGNA_API am_bool MAGNA_CALL ean13_check_control_digit
     am_bool result = 0;
     int i, sum = 0;
 
-    if (text.len < 13) {
+    if (span_length (text) < 13) {
         return result;
     }
 
     for (i = 0; i < 13; ++i) {
-        sum = sum + (text.ptr[i] - '0') * coefficients[i];
+        sum = sum + (text.start [i] - '0') * coefficients[i];
     }
 
     result = (sum % 10) == 0;
@@ -124,12 +124,12 @@ MAGNA_API am_byte MAGNA_CALL ean8_compute_check_digit
     am_byte result = 0;
     int i, sum = 0;
 
-    if (text.len < 7) {
+    if (span_length (text) < 7) {
         return result;
     }
 
     for (i = 0; i < 7; ++i) {
-        sum = sum + (text.ptr[i] - '0') * coefficients[i + 1];
+        sum = sum + (text.start [i] - '0') * coefficients[i + 1];
     }
 
     result = (char) (10 - sum % 10 + '0');
@@ -151,12 +151,12 @@ MAGNA_API am_bool MAGNA_CALL ean8_check_control_digit
     am_bool result = 0;
     int i, sum = 0;
 
-    if (text.len < 8) {
+    if (span_length (text) < 8) {
         return result;
     }
 
     for (i = 0; i < 8; ++i) {
-        sum = sum + (text.ptr[i] - '0') * coefficients[i + 1];
+        sum = sum + (text.start [i] - '0') * coefficients[i + 1];
     }
 
     result = sum % 10 == 0;

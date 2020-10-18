@@ -35,11 +35,11 @@ static Span trim_code
         Span code
     )
 {
-    size_t i, j;
+    size_t i, j, length = span_length (code);
     am_byte chr;
 
-    for (i = 0; i < code.len; ++i) {
-        chr = code.ptr [i];
+    for (i = 0; i < length; ++i) {
+        chr = code.start [i];
         for (j = 0; j < sizeof (MenuSeparators); j++) {
             if (chr == MenuSeparators[j]) {
                 return span_slice (code, 0, i);

@@ -51,7 +51,7 @@ am_bool where_test_data
         }
 
         directory = path_get_directory (path);
-        path->position = directory.len;
+        path->position = span_length (directory);
     }
 
     buffer_destroy (&candidate);

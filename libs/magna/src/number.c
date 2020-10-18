@@ -342,16 +342,15 @@ MAGNA_API am_bool MAGNA_CALL number_parse
 {
     NumberTextChunk *chunk, temp;
     Span prefix, num;
-    am_byte *ptr, *end, c;
+    am_byte *ptr, c;
     am_bool textPart;
 
     assert (number != NULL);
 
-    end = (ptr = text.ptr) + text.len;
     num = span_null ();
-    prefix = span_init (ptr, 0);
+    prefix = span_init (text.start, 0);
     textPart = AM_TRUE;
-    for (; ptr < end; ++ptr) {
+    for (ptr = text.start; ptr != text.end; ++ptr) {
         c = *ptr;
         if (textPart) {
             if (isdigit (c)) {
@@ -359,12 +358,12 @@ MAGNA_API am_bool MAGNA_CALL number_parse
                 textPart = AM_FALSE;
             }
             else {
-                ++prefix.len;
+                ++prefix.end;
             }
         }
         else {
             if (isdigit (c)) {
-                ++num.len;
+                ++num.end;
             }
             else {
                 chunk = mem_alloc (sizeof (NumberTextChunk));

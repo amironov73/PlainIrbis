@@ -180,16 +180,16 @@ MAGNA_API am_bool MAGNA_CALL ansi2utf
     )
 {
     const Encoding *ansi;
-    size_t index;
+    am_byte *ptr;
     unsigned int chr;
 
     assert (output != NULL);
 
-    ansi = encoding_ansi();
+    ansi = encoding_ansi ();
     assert (ansi != NULL);
 
-    for (index = 0; index < input.len; ++index) {
-        chr = ansi->char_to_unicode (input.ptr[index]);
+    for (ptr = input.start; ptr != input.end; ++ptr) {
+        chr = ansi->char_to_unicode (*ptr);
         if (!buffer_putc_utf8 (output, chr)) {
             return AM_FALSE;
         }
@@ -212,7 +212,7 @@ MAGNA_API am_bool MAGNA_CALL utf2ansi
     )
 {
     const Encoding *ansi;
-    const am_byte *text, *stop;
+    const am_byte *ptr;
     UtfHelper rc;
     am_byte chr;
 
@@ -221,15 +221,15 @@ MAGNA_API am_bool MAGNA_CALL utf2ansi
     ansi = encoding_ansi();
     assert (ansi != NULL);
 
-    stop = (text = input.ptr) + input.len;
-    while (text < stop) {
-        rc = utf8_read (text);
+    ptr  = input.start;
+    while (ptr < input.end) {
+        rc = utf8_read (ptr);
         chr = ansi->unicode_to_char (rc.value);
         if (!buffer_putc (output, chr)) {
             return AM_FALSE;
         }
 
-        text = rc.position;
+        ptr = rc.position;
     }
 
     return AM_TRUE;

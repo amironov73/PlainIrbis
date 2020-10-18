@@ -789,7 +789,7 @@ MAGNA_API am_bool MAGNA_CALL connection_format_mfn
             result = AM_FALSE;
         }
         else {
-            if (!buffer_write (output, text.ptr, text.len)) {
+            if (!buffer_write (output, text.start, span_length (text))) {
                 result = AM_FALSE;
             }
         }
@@ -942,7 +942,7 @@ MAGNA_API am_bool MAGNA_CALL connection_parse_string
         }
         else if (span_compare_ignore_case (key, TEXT_SPAN ("arm")) == 0
                  || span_compare_ignore_case (key, TEXT_SPAN ("workstation")) == 0) {
-            connection->workstation = toupper (value.ptr[0]);
+            connection->workstation = toupper (value.start[0]);
         }
         else {
             /* Неизвестный ключ - ошибка. */
@@ -1466,7 +1466,7 @@ MAGNA_API am_bool MAGNA_CALL connection_read_record_text
         goto DONE;
     }
 
-    if (!buffer_write (buffer, line.ptr, line.len)) {
+    if (!buffer_write (buffer, line.start, span_length (line))) {
         goto DONE;
     }
 

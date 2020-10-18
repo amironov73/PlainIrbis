@@ -429,7 +429,7 @@ MAGNA_API am_bool MAGNA_CALL span_array_to_text
 
     span = array->ptr;
     for (index = 0; index < array->len; ++index, ++span) {
-        if (!buffer_write (buffer, span->ptr, span->len)) {
+        if (!buffer_write (buffer, span->start, span_length (*span))) {
             return AM_FALSE;
         }
 

@@ -12,13 +12,13 @@ typedef struct
 
 static int liberationCounter = 0;
 
-static void canary_liberator (void *ptr)
+static void MAGNA_CALL canary_liberator (void *ptr)
 {
     (void) ptr;
     ++liberationCounter;
 }
 
-static am_bool canary_walker_1 (LinkedList *list, ListItem *item, void *data)
+static am_bool MAGNA_CALL canary_walker_1 (LinkedList *list, ListItem *item, void *data)
 {
     int *counter;
     Canary *canary;
@@ -31,7 +31,7 @@ static am_bool canary_walker_1 (LinkedList *list, ListItem *item, void *data)
     return AM_TRUE;
 }
 
-static am_bool canary_walker_2 (LinkedList *list, ListItem *item, void *data)
+static am_bool MAGNA_CALL canary_walker_2 (LinkedList *list, ListItem *item, void *data)
 {
     return AM_FALSE;
 }

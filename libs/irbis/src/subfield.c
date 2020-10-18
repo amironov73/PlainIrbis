@@ -97,7 +97,7 @@ MAGNA_API am_bool MAGNA_CALL subfield_assign
         return AM_FALSE;
     }
 
-    subfield->value.position = value.len;
+    subfield->value.position = span_length (value);
 
     return AM_TRUE;
 }
@@ -139,10 +139,10 @@ MAGNA_API am_bool MAGNA_CALL subfield_decode
 {
     assert (subfield != NULL);
 
-    if (text.len != 0) {
-        subfield->code = subfield_normalize_code (text.ptr[0]);
-        if (--text.len != 0) {
-            ++text.ptr;
+    if (!span_is_empty (text)) {
+        subfield->code = subfield_normalize_code (text.start [0]);
+        ++text.start;
+        if (!span_is_empty (text)) {
             if (!buffer_assign_span (&subfield->value, text)) {
                 return AM_FALSE;
             }
@@ -187,11 +187,11 @@ MAGNA_API am_bool MAGNA_CALL subfield_create
     assert (subfield != NULL);
 
     subfield->code = code;
-    if (!buffer_create (&subfield->value, value.ptr, value.len)) {
+    if (!buffer_create (&subfield->value, value.start, span_length (value))) {
         return AM_FALSE;
     }
 
-    subfield->value.position = value.len;
+    subfield->value.position = span_length (value);
 
     return AM_TRUE;
 }
@@ -217,7 +217,7 @@ MAGNA_API SubField* MAGNA_CALL subfield_init
 
     subfield->code = code;
     buffer_from_span (&subfield->value, value);
-    subfield->value.position = value.len;
+    subfield->value.position = span_length (value);
 
     return subfield;
 }

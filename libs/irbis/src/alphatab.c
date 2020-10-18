@@ -245,22 +245,21 @@ MAGNA_API Span MAGNA_CALL alpha_trim
     assert (table != NULL);
 
     /* Обрезаем символы в начале */
-    while (text.len != 0) {
-        if (alpha_is_good (table, text.ptr[0])) {
+    while (!span_is_empty (text)) {
+        if (alpha_is_good (table, text.start [0])) {
             break;
         }
 
-        --text.len;
-        ++text.ptr;
+        ++text.start;
     }
 
     /* Обрезаем символы в конце */
-    while (text.len != 0) {
-        if (alpha_is_good (table, text.ptr[text.len - 1])) {
+    while (!span_is_empty (text)) {
+        if (alpha_is_good (table, text.end [-1])) {
             break;
         }
 
-        --text.len;
+        --text.end;
     }
 
     return text;
@@ -329,11 +328,11 @@ MAGNA_API am_bool MAGNA_CALL alpha_split
     assert (output != NULL);
 
     nav_from_span (&nav, text);
-    accumulator = span_init (text.ptr, 0);
+    accumulator = span_init (text.start, 0);
     while (!nav_eot (&nav)) {
         chr = nav_read (&nav);
         if (alpha_is_good (table, (am_byte)chr)) {
-            ++accumulator.len;
+            ++accumulator.end;
         }
         else {
             if (!span_is_empty (accumulator)) {
@@ -342,8 +341,7 @@ MAGNA_API am_bool MAGNA_CALL alpha_split
                 }
             }
 
-            accumulator.ptr = text.ptr + nav.position;
-            accumulator.len = 0;
+            accumulator.end = accumulator.start = text.start + nav.position;
         }
     }
 

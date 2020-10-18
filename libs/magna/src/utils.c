@@ -74,7 +74,7 @@ MAGNA_API Span choose_span
     va_list args;
     Span next;
 
-    if (first.len != 0 && first.ptr != NULL) {
+    if (!span_is_empty (first)) {
         return first;
     }
 
@@ -82,7 +82,7 @@ MAGNA_API Span choose_span
 
     while (AM_TRUE) {
         next = va_arg (args, Span);
-        if (next.len != 0 && next.ptr != NULL) {
+        if (!span_is_empty (next)) {
             va_end (args);
             return next;
         }

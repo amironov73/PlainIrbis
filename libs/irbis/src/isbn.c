@@ -209,16 +209,16 @@ MAGNA_API am_bool MAGNA_CALL isbn_check_978
 {
     static int multipliers[] = { 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1 };
     size_t limit = sizeof (multipliers) / sizeof (multipliers[0]);
-    size_t i, j;
+    size_t i, j, length = span_length (isbn);
     int result = 0;
     am_byte c;
 
-    for (i = j = 0; i < isbn.len; ++i) {
+    for (i = j = 0; i < length; ++i) {
         if (j >= limit) {
             return AM_FALSE;
         }
 
-        c = isbn.ptr[i];
+        c = isbn.start[i];
         if (c >= '0' && c <= '9') {
             result += (c - '0') * multipliers[j++];
         }
@@ -239,11 +239,11 @@ MAGNA_API am_bool MAGNA_CALL isbn_check_control_digit
     )
 {
     am_byte c;
-    size_t i, j;
+    size_t i, j, length = span_length (isbn);
     unsigned result = 0, hyphens = 0;
 
-    for (i = j = 0; i < isbn.len; ++i) {
-        c = isbn.ptr[i];
+    for (i = j = 0; i < length; ++i) {
+        c = isbn.start[i];
         if (c >= '0' && c <= '9') {
             result += (unsigned) ((c - '0') * (10 - j));
             ++j;

@@ -403,7 +403,7 @@ MAGNA_API am_bool MAGNA_CALL buffer_write_span
 {
     assert (buffer != NULL);
 
-    return buffer_write (buffer, span.ptr, span.len);
+    return buffer_write (buffer, span.start, span_length (span));
 }
 
 /**
@@ -529,8 +529,8 @@ MAGNA_API Span MAGNA_CALL buffer_to_span
 
     assert (buffer != NULL);
 
-    result.ptr = buffer->ptr;
-    result.len = buffer->position;
+    result.start = buffer->ptr;
+    result.end = buffer->ptr + buffer->position;
 
     return result;
 }
@@ -550,9 +550,9 @@ MAGNA_API Buffer* MAGNA_CALL buffer_from_span
 {
     assert (buffer != NULL);
 
-    buffer->ptr = span.ptr;
+    buffer->ptr = span.start;
     buffer->position = 0;
-    buffer->capacity = span.len;
+    buffer->capacity = span_length (span);
 
     return buffer;
 }
@@ -572,7 +572,7 @@ MAGNA_API am_bool MAGNA_CALL buffer_assign_span
 {
     assert (buffer != NULL);
 
-    return buffer_assign (buffer, span.ptr, span.len);
+    return buffer_assign (buffer, span.start, span_length (span));
 }
 
 static am_byte* find_text
@@ -724,24 +724,24 @@ MAGNA_API int MAGNA_CALL buffer_compare_span
         Span span
     )
 {
-    size_t i;
+    size_t i, spanLength = span_length (span);
     int result;
 
     assert (buffer != NULL);
 
     for (i = 0; ; ++i) {
         if (i == buffer->position) {
-            if (i == span.len) {
+            if (i == spanLength) {
                 return 0;
             }
 
             return -1;
         }
-        else if (i == span.len) {
+        else if (i == spanLength) {
                 return 1;
             }
         else {
-            result = buffer->ptr[i] - span.ptr[i];
+            result = buffer->ptr[i] - span.start[i];
             if (result != 0) {
                 return result;
             }
@@ -763,24 +763,24 @@ MAGNA_API int MAGNA_CALL buffer_compare_span_ignore_case
         Span span
     )
 {
-    size_t i;
+    size_t i, spanLength = span_length (span);
     int result;
 
     assert (buffer != NULL);
 
     for (i = 0; ; ++i) {
         if (i == buffer->position) {
-            if (i == span.len) {
+            if (i == spanLength) {
                 return 0;
             }
 
             return -1;
         }
-        else if (i == span.len) {
+        else if (i == spanLength) {
                 return 1;
             }
         else {
-            result = toupper (buffer->ptr[i]) - toupper (span.ptr[i]);
+            result = toupper (buffer->ptr[i]) - toupper (span.start[i]);
             if (result != 0) {
                 return result;
             }

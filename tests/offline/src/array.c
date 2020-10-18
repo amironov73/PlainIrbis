@@ -12,7 +12,7 @@ typedef struct
 
 static int liberationCounter = 0;
 
-static void canary_liberator (void *ptr)
+static void MAGNA_CALL canary_liberator (void *ptr)
 {
     (void) ptr;
     ++liberationCounter;
@@ -20,7 +20,7 @@ static void canary_liberator (void *ptr)
 
 static int cloningCounter = 0;
 
-static void* canary_cloner (void *ptr)
+static void* MAGNA_CALL canary_cloner (void *ptr)
 {
     Canary *c = ptr;
 
@@ -476,7 +476,7 @@ TESTER(array_grow_1)
     array_destroy (&array);
 }
 
-static int my_int32_comparer (const void *left, const void *right, const void *data)
+static int MAGNA_CALL my_int32_comparer (const void *left, const void *right, const void *data)
 {
     (void) data;
 

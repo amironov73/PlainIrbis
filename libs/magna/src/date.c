@@ -133,11 +133,11 @@ MAGNA_API am_bool MAGNA_CALL date_parse
     int year, month, day;
 
     assert (date != NULL);
-    assert (text.len >= 8);
+    assert (span_length (text) >= 8);
 
-    year  = fastParse32 (text.ptr, 4);
-    month = fastParse32 (text.ptr + 4, 2);
-    day   = fastParse32 (text.ptr + 6, 2);
+    year  = fastParse32 (text.start, 4);
+    month = fastParse32 (text.start + 4, 2);
+    day   = fastParse32 (text.start + 6, 2);
 
     return AM_FALSE;
 }

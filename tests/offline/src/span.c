@@ -7,16 +7,20 @@ TESTER(span_init_1)
 {
     Span span = SPAN_INIT;
 
-    CHECK (span.ptr == NULL);
-    CHECK (span.len == 0);
+    CHECK (span.start == NULL);
+    CHECK (span.end   == NULL);
+    CHECK (span_verify (span));
+    span_assert (span);
 }
 
 TESTER(span_init_2)
 {
     Span span = span_init (NULL, 0);
 
-    CHECK (span.ptr == NULL);
-    CHECK (span.len == 0);
+    CHECK (span.start == NULL);
+    CHECK (span.end   == NULL);
+    CHECK (span_verify (span));
+    span_assert (span);
 }
 
 TESTER(span_init_3)
@@ -24,17 +28,21 @@ TESTER(span_init_3)
     const am_byte data[] = { 1, 2, 3 };
     Span span = span_init (data, sizeof (data));
 
-    CHECK (span.ptr == data);
-    CHECK (span.len == sizeof (data));
+    CHECK (span.start == data);
+    CHECK (span_length (span) == sizeof (data));
+    CHECK (span_verify (span));
+    span_assert (span);
 }
 
 TESTER(span_null_1)
 {
     Span span = span_null();
 
-    CHECK (span.ptr == NULL);
-    CHECK (span.len == 0);
+    CHECK (span.start == NULL);
+    CHECK (span.end   == NULL);
     CHECK (span_is_empty (span));
+    CHECK (span_verify (span));
+    span_assert (span);
 }
 
 TESTER(span_from_text_1)
@@ -42,8 +50,10 @@ TESTER(span_from_text_1)
     const am_byte *text = CBTEXT ("Hello");
     Span span = TEXT_SPAN (text);
 
-    CHECK (span.ptr == text);
-    CHECK (span.len == 5);
+    CHECK (span.start == text);
+    CHECK (span_length (span) == 5);
+    CHECK (span_verify (span));
+    span_assert (span);
 }
 
 TESTER(span_trim_start_1)
@@ -51,8 +61,8 @@ TESTER(span_trim_start_1)
     Span span1 = SPAN_INIT;
     Span span2 = span_trim_start (span1);
 
-    CHECK (span2.ptr == NULL);
-    CHECK (span2.len == 0);
+    CHECK (span2.start == NULL);
+    CHECK (span2.end   == NULL);
 }
 
 TESTER(span_trim_start_2)
@@ -61,8 +71,8 @@ TESTER(span_trim_start_2)
     Span span1 = TEXT_SPAN (text);
     Span span2 = span_trim_start (span1);
 
-    CHECK (span2.ptr == text);
-    CHECK (span2.len == 5);
+    CHECK (span2.start == text);
+    CHECK (span_length (span2) == 5);
 }
 
 TESTER(span_trim_start_3)
@@ -71,8 +81,8 @@ TESTER(span_trim_start_3)
     Span span1 = TEXT_SPAN (text);
     Span span2 = span_trim_start (span1);
 
-    CHECK (span2.ptr == text + 2);
-    CHECK (span2.len == 5);
+    CHECK (span2.start == text + 2);
+    CHECK (span_length (span2) == 5);
 }
 
 TESTER(span_trim_end_1)
@@ -80,8 +90,8 @@ TESTER(span_trim_end_1)
     Span span1 = SPAN_INIT;
     Span span2 = span_trim_end (span1);
 
-    CHECK (span2.ptr == NULL);
-    CHECK (span2.len == 0);
+    CHECK (span2.start == NULL);
+    CHECK (span2.end   == NULL);
 }
 
 TESTER(span_trim_end_2)
@@ -90,8 +100,8 @@ TESTER(span_trim_end_2)
     Span span1 = TEXT_SPAN (text);
     Span span2 = span_trim_end (span1);
 
-    CHECK (span2.ptr == text);
-    CHECK (span2.len == 5);
+    CHECK (span2.start == text);
+    CHECK (span_length (span2) == 5);
 }
 
 TESTER(span_trim_end_3)
@@ -100,8 +110,8 @@ TESTER(span_trim_end_3)
     Span span1 = TEXT_SPAN (text);
     Span span2 = span_trim_end (span1);
 
-    CHECK (span2.ptr == text);
-    CHECK (span2.len == 5);
+    CHECK (span2.start == text);
+    CHECK (span_length (span2) == 5);
 }
 
 TESTER(span_trim_1)
@@ -109,8 +119,8 @@ TESTER(span_trim_1)
     Span span1 = SPAN_INIT;
     Span span2 = span_trim (span1);
 
-    CHECK (span2.ptr == NULL);
-    CHECK (span2.len == 0);
+    CHECK (span2.start == NULL);
+    CHECK (span2.end   == NULL);
 }
 
 TESTER(span_trim_2)
@@ -119,8 +129,8 @@ TESTER(span_trim_2)
     Span span1 = TEXT_SPAN (text);
     Span span2 = span_trim (span1);
 
-    CHECK (span2.ptr == text);
-    CHECK (span2.len == 5);
+    CHECK (span2.start == text);
+    CHECK (span_length (span2) == 5);
 }
 
 TESTER(span_trim_3)
@@ -129,8 +139,8 @@ TESTER(span_trim_3)
     Span span1 = TEXT_SPAN (text);
     Span span2 = span_trim (span1);
 
-    CHECK (span2.ptr == text + 2);
-    CHECK (span2.len == 5);
+    CHECK (span2.start == text + 2);
+    CHECK (span_length (span2) == 5);
 }
 
 TESTER(span_to_int32_1)
@@ -353,7 +363,7 @@ TESTER(span_slice_1)
     Span span1 = SPAN_INIT;
     Span span2 = span_slice (span1, 5, 10);
 
-    CHECK (span2.len == 0);
+    CHECK (span_is_empty (span2));
 }
 
 TESTER(span_slice_2)
@@ -362,8 +372,8 @@ TESTER(span_slice_2)
     Span span1 = TEXT_SPAN (text);
     Span span2 = span_slice (span1, 2, 2);
 
-    CHECK (span2.ptr[0] == '3');
-    CHECK (span2.len == 2);
+    CHECK (span2.start[0] == '3');
+    CHECK (span_length (span2) == 2);
 }
 
 TESTER(span_slice_3)
@@ -372,8 +382,8 @@ TESTER(span_slice_3)
     Span span1 = TEXT_SPAN (text);
     Span span2 = span_slice (span1, 7, 12);
 
-    CHECK (span2.ptr[0] == '8');
-    CHECK (span2.len == 2);
+    CHECK (span2.start[0] == '8');
+    CHECK (span_length (span2) == 2);
 }
 
 TESTER(span_slice_4)
@@ -382,8 +392,8 @@ TESTER(span_slice_4)
     Span span1 = TEXT_SPAN (text);
     Span span2 = span_slice (span1, 3, -1);
 
-    CHECK (span2.ptr[0] == '4');
-    CHECK (span2.len == 6);
+    CHECK (span2.start[0] == '4');
+    CHECK (span_length (span2) == 6);
 }
 
 TESTER(span_to_string_1)
@@ -539,8 +549,8 @@ TESTER(span_split_by_char_2)
 
     CHECK (rc);
     CHECK (parts.len == 1);
-    CHECK (parts.ptr[0].ptr == text);
-    CHECK (parts.ptr[0].len == 9);
+    CHECK (parts.ptr[0].start == text);
+    CHECK (span_length (parts.ptr[0]) == 9);
 
     span_array_free (&parts);
 }
@@ -554,10 +564,10 @@ TESTER(span_split_by_char_3)
 
     CHECK (rc);
     CHECK (parts.len == 2);
-    CHECK (parts.ptr[0].ptr == text);
-    CHECK (parts.ptr[0].len == 4);
-    CHECK (parts.ptr[1].ptr == text + 5);
-    CHECK (parts.ptr[1].len == 4);
+    CHECK (parts.ptr[0].start == text);
+    CHECK (span_length (parts.ptr[0]) == 4);
+    CHECK (parts.ptr[1].start == text + 5);
+    CHECK (span_length (parts.ptr[1]) == 4);
 
     span_array_free (&parts);
 }
@@ -571,12 +581,12 @@ TESTER(span_split_by_char_4)
 
     CHECK (rc);
     CHECK (parts.len == 3);
-    CHECK (parts.ptr[0].ptr == text);
-    CHECK (parts.ptr[0].len == 3);
-    CHECK (parts.ptr[1].ptr == text + 4);
-    CHECK (parts.ptr[1].len == 3);
-    CHECK (parts.ptr[2].ptr == text + 8);
-    CHECK (parts.ptr[2].len == 1);
+    CHECK (parts.ptr[0].start == text);
+    CHECK (span_length (parts.ptr[0]) == 3);
+    CHECK (parts.ptr[1].start == text + 4);
+    CHECK (span_length (parts.ptr[1]) == 3);
+    CHECK (parts.ptr[2].start == text + 8);
+    CHECK (span_length (parts.ptr[2]) == 1);
 
     span_array_free (&parts);
 }
@@ -590,12 +600,12 @@ TESTER(span_split_by_char_5)
 
     CHECK (rc);
     CHECK (parts.len == 3);
-    CHECK (parts.ptr[0].ptr == text + 1);
-    CHECK (parts.ptr[0].len == 3);
-    CHECK (parts.ptr[1].ptr == text + 6);
-    CHECK (parts.ptr[1].len == 3);
-    CHECK (parts.ptr[2].ptr == text + 10);
-    CHECK (parts.ptr[2].len == 1);
+    CHECK (parts.ptr[0].start == text + 1);
+    CHECK (span_length (parts.ptr[0]) == 3);
+    CHECK (parts.ptr[1].start == text + 6);
+    CHECK (span_length (parts.ptr[1]) == 3);
+    CHECK (parts.ptr[2].start == text + 10);
+    CHECK (span_length (parts.ptr[2]) == 1);
 
     span_array_free (&parts);
 }
@@ -621,8 +631,8 @@ TESTER(span_split_by_chars_2)
 
     CHECK (rc);
     CHECK (parts.len == 1);
-    CHECK (parts.ptr[0].ptr == text);
-    CHECK (parts.ptr[0].len == 9);
+    CHECK (parts.ptr[0].start == text);
+    CHECK (span_length (parts.ptr[0]) == 9);
 
     span_array_free (&parts);
 }
@@ -636,10 +646,10 @@ TESTER(span_split_by_chars_3)
 
     CHECK (rc);
     CHECK (parts.len == 2);
-    CHECK (parts.ptr[0].ptr == text);
-    CHECK (parts.ptr[0].len == 4);
-    CHECK (parts.ptr[1].ptr == text + 5);
-    CHECK (parts.ptr[1].len == 4);
+    CHECK (parts.ptr[0].start == text);
+    CHECK (span_length (parts.ptr[0]) == 4);
+    CHECK (parts.ptr[1].start == text + 5);
+    CHECK (span_length (parts.ptr[1]) == 4);
 
     span_array_free (&parts);
 }
@@ -653,12 +663,12 @@ TESTER(span_split_by_chars_4)
 
     CHECK (rc);
     CHECK (parts.len == 3);
-    CHECK (parts.ptr[0].ptr == text);
-    CHECK (parts.ptr[0].len == 3);
-    CHECK (parts.ptr[1].ptr == text + 4);
-    CHECK (parts.ptr[1].len == 3);
-    CHECK (parts.ptr[2].ptr == text + 8);
-    CHECK (parts.ptr[2].len == 1);
+    CHECK (parts.ptr[0].start == text);
+    CHECK (span_length (parts.ptr[0]) == 3);
+    CHECK (parts.ptr[1].start == text + 4);
+    CHECK (span_length (parts.ptr[1]) == 3);
+    CHECK (parts.ptr[2].start == text + 8);
+    CHECK (span_length (parts.ptr[2]) == 1);
 
     span_array_free (&parts);
 }
@@ -672,12 +682,12 @@ TESTER(span_split_by_chars_5)
 
     CHECK (rc);
     CHECK (parts.len == 3);
-    CHECK (parts.ptr[0].ptr == text + 1);
-    CHECK (parts.ptr[0].len == 3);
-    CHECK (parts.ptr[1].ptr == text + 6);
-    CHECK (parts.ptr[1].len == 3);
-    CHECK (parts.ptr[2].ptr == text + 10);
-    CHECK (parts.ptr[2].len == 1);
+    CHECK (parts.ptr[0].start == text + 1);
+    CHECK (span_length (parts.ptr[0]) == 3);
+    CHECK (parts.ptr[1].start == text + 6);
+    CHECK (span_length (parts.ptr[1]) == 3);
+    CHECK (parts.ptr[2].start == text + 10);
+    CHECK (span_length (parts.ptr[2]) == 1);
 
     span_array_free (&parts);
 }
@@ -699,8 +709,8 @@ TESTER(span_split_n_by_char_2)
     size_t count = span_split_n_by_char (span, parts, 2, '?');
 
     CHECK (count == 1);
-    CHECK (parts[0].ptr == text);
-    CHECK (parts[0].len == 9);
+    CHECK (parts[0].start == text);
+    CHECK (span_length (parts[0]) == 9);
 }
 
 TESTER(span_split_n_by_char_3)
@@ -711,10 +721,10 @@ TESTER(span_split_n_by_char_3)
     size_t count = span_split_n_by_char (span, parts, 2, '5');
 
     CHECK (count == 2);
-    CHECK (parts[0].ptr == text);
-    CHECK (parts[0].len == 4);
-    CHECK (parts[1].ptr == text + 5);
-    CHECK (parts[1].len == 4);
+    CHECK (parts[0].start == text);
+    CHECK (span_length (parts[0]) == 4);
+    CHECK (parts[1].start == text + 5);
+    CHECK (span_length (parts[1]) == 4);
 }
 
 TESTER(span_split_n_by_char_4)
@@ -725,10 +735,10 @@ TESTER(span_split_n_by_char_4)
     size_t count = span_split_n_by_char (span, parts, 2, ',');
 
     CHECK (count == 2);
-    CHECK (parts[0].ptr == text);
-    CHECK (parts[0].len == 3);
-    CHECK (parts[1].ptr == text + 4);
-    CHECK (parts[1].len == 5);
+    CHECK (parts[0].start == text);
+    CHECK (span_length (parts[0]) == 3);
+    CHECK (parts[1].start == text + 4);
+    CHECK (span_length (parts[1]) == 5);
 }
 
 TESTER(span_split_n_by_char_5)
@@ -739,12 +749,12 @@ TESTER(span_split_n_by_char_5)
     size_t count = span_split_n_by_char (span, parts, 3, ',');
 
     CHECK (count == 3);
-    CHECK (parts[0].ptr == text + 1);
-    CHECK (parts[0].len == 3);
-    CHECK (parts[1].ptr == text + 6);
-    CHECK (parts[1].len == 3);
-    CHECK (parts[2].ptr == text + 10);
-    CHECK (parts[2].len == 1);
+    CHECK (parts[0].start == text + 1);
+    CHECK (span_length (parts[0]) == 3);
+    CHECK (parts[1].start == text + 6);
+    CHECK (span_length (parts[1]) == 3);
+    CHECK (parts[2].start == text + 10);
+    CHECK (span_length (parts[2]) == 1);
 }
 
 TESTER(span_split_n_by_chars_1)
@@ -764,8 +774,8 @@ TESTER(span_split_n_by_chars_2)
     size_t count = span_split_n_by_chars (span, parts, 2, CBTEXT ("!?"), 2);
 
     CHECK (count == 1);
-    CHECK (parts[0].ptr == text);
-    CHECK (parts[0].len == 9);
+    CHECK (parts[0].start == text);
+    CHECK (span_length (parts[0]) == 9);
 }
 
 TESTER(span_split_n_by_chars_3)
@@ -776,10 +786,10 @@ TESTER(span_split_n_by_chars_3)
     size_t count = span_split_n_by_chars (span, parts, 2, CBTEXT ("5?"), 2);
 
     CHECK (count == 2);
-    CHECK (parts[0].ptr == text);
-    CHECK (parts[0].len == 4);
-    CHECK (parts[1].ptr == text + 5);
-    CHECK (parts[1].len == 4);
+    CHECK (parts[0].start == text);
+    CHECK (span_length (parts[0]) == 4);
+    CHECK (parts[1].start == text + 5);
+    CHECK (span_length (parts[1]) == 4);
 }
 
 TESTER(span_split_n_by_chars_4)
@@ -790,10 +800,10 @@ TESTER(span_split_n_by_chars_4)
     size_t count = span_split_n_by_chars (span, parts, 2, CBTEXT (",."), 2);
 
     CHECK (count == 2);
-    CHECK (parts[0].ptr == text);
-    CHECK (parts[0].len == 3);
-    CHECK (parts[1].ptr == text + 4);
-    CHECK (parts[1].len == 5);
+    CHECK (parts[0].start == text);
+    CHECK (span_length (parts[0]) == 3);
+    CHECK (parts[1].start == text + 4);
+    CHECK (span_length (parts[1]) == 5);
 }
 
 TESTER(span_split_n_by_chars_5)
@@ -804,12 +814,12 @@ TESTER(span_split_n_by_chars_5)
     size_t count = span_split_n_by_chars (span, parts, 3, CBTEXT (",."), 2);
 
     CHECK (count == 3);
-    CHECK (parts[0].ptr == text + 1);
-    CHECK (parts[0].len == 3);
-    CHECK (parts[1].ptr == text + 6);
-    CHECK (parts[1].len == 3);
-    CHECK (parts[2].ptr == text + 10);
-    CHECK (parts[2].len == 1);
+    CHECK (parts[0].start == text + 1);
+    CHECK (span_length (parts[0]) == 3);
+    CHECK (parts[1].start == text + 6);
+    CHECK (span_length (parts[1]) == 3);
+    CHECK (parts[2].start == text + 10);
+    CHECK (span_length (parts[2]) == 1);
 }
 
 TESTER(span_starts_with_1)

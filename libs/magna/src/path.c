@@ -222,28 +222,24 @@ MAGNA_API Span MAGNA_CALL path_get_extension
     assert (path != NULL);
 
     if (path->position <= 2) {
-        result.ptr = path->ptr;
-        result.len = 0;
+        result.end = result.start = path->ptr;
         return result;
     }
 
-    result.ptr = path->ptr + path->position - 1;
-    result.len = 0;
+    result.end = result.start = path->ptr + path->position - 1;
 
-    while (result.ptr >= path->ptr) {
-        c = *result.ptr;
+    while (result.start >= path->ptr) {
+        c = *result.start;
         if (c == '.') {
             break;
         }
 
         if (c == '/' || c == '\\') {
-            result.ptr = path->ptr;
-            result.len = 0;
+            result.end = result.start = path->ptr;
             break;
         }
 
-        --result.ptr;
-        ++result.len;
+        --result.start;
     }
 
     return result;
@@ -266,24 +262,20 @@ MAGNA_API Span MAGNA_CALL path_get_filename
     assert (path != NULL);
 
     if (path->position <= 2) {
-        result.ptr = path->ptr;
-        result.len = 0;
+        result.end = result.start = path->ptr;
         return result;
     }
 
-    result.ptr = path->ptr + path->position - 1;
-    result.len = 0;
+    result.end = result.start = path->ptr + path->position - 1;
 
-    while (result.ptr >= path->ptr) {
-        c = *result.ptr;
+    while (result.start >= path->ptr) {
+        c = *result.start;
         if (c == '/' || c == '\\') {
-            ++result.ptr;
-            --result.len;
+            ++result.start;
             break;
         }
 
-        --result.ptr;
-        ++result.len;
+        --result.start;
     }
 
     return result;
@@ -310,7 +302,7 @@ MAGNA_API Span MAGNA_CALL path_get_directory
         return buffer_to_span (path);
     }
 
-    result.ptr = path->ptr;
+    result.start = path->ptr;
     ptr = path->ptr + path->position - 1;
     if (ptr >= path->ptr) {
         while (AM_TRUE) {
@@ -332,14 +324,14 @@ MAGNA_API Span MAGNA_CALL path_get_directory
 
     if (ptr == path->ptr) {
         if (*ptr == '/' || *ptr == '\\') {
-            result.len = 1;
+            result.end = result.start + 1;
             return result;
         }
 
-        result.len = 0;
+        result.end = result.start;
     }
     else {
-        result.len = ptr - path->ptr + 1;
+        result.end = result.start + (ptr - path->ptr) + 1;
     }
 
     return result;
@@ -470,7 +462,7 @@ MAGNA_API am_bool MAGNA_CALL path_append
     }
 
     if (!span_is_empty (element)) {
-        return buffer_write (path, element.ptr, element.len);
+        return buffer_write (path, element.start, span_length (element));
     }
 
     return AM_TRUE;

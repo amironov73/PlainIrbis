@@ -116,7 +116,7 @@ TESTER(menu_get_comment_1)
             TEXT_SPAN ("first"),
             span_from_text (defaultValue)
         );
-    CHECK (comment.ptr == defaultValue);
+    CHECK (comment.start == defaultValue);
 
     menu_destroy (&menu);
 }

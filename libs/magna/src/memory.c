@@ -553,10 +553,10 @@ static am_bool read_memory_map
         }
         mme->from     = span_hex_to_uint64 (from);
         mme->to       = span_hex_to_uint64 (to);
-        mme->flags[0] = flags.ptr[0];
-        mme->flags[1] = flags.ptr[1];
-        mme->flags[2] = flags.ptr[2];
-        mme->flags[3] = flags.ptr[3];
+        mme->flags[0] = flags.start [0];
+        mme->flags[1] = flags.start [1];
+        mme->flags[2] = flags.start [2];
+        mme->flags[3] = flags.start [3];
     }
 
     result = AM_TRUE;

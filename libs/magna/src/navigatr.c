@@ -69,7 +69,7 @@ MAGNA_API TextNavigator* MAGNA_CALL nav_from_span
 {
     assert (nav != NULL);
 
-    return nav_init (nav, span.ptr, span.len);
+    return nav_init (nav, span.start, span_length (span));
 }
 
 /**
@@ -397,17 +397,18 @@ MAGNA_API Span MAGNA_CALL nav_peek_string
 {
     int c;
     size_t i;
-    Span result = SPAN_INIT;
+    Span result;
 
     assert (nav != NULL);
 
-    result.ptr = (am_byte*) nav_current (nav);
+    result.end = result.start = (am_byte*) nav_current (nav);
     for (i = 0; i < length; ++i) {
         c = nav_look_ahead (nav, i);
         if ((c == NAV_EOT) || (c == '\r') || (c == '\n')) {
             break;
         }
-        ++result.len;
+
+        ++result.end;
     }
 
     return result;
@@ -428,17 +429,16 @@ MAGNA_API Span MAGNA_CALL nav_peek_to
     )
 {
     int c;
-    size_t i, length;
+    size_t distance, length;
     Span result;
 
     assert (nav != NULL);
 
-    result.ptr = (am_byte*) nav->data + nav->position;
-    result.len = 0;
+    result.end = result.start = (am_byte*) nav->data + nav->position;
     length = nav->length - nav->position;
-    for (i = 0; i < length; ++i) {
-        c = nav_look_ahead (nav, i);
-        ++result.len;
+    for (distance = 0; distance < length; ++distance) {
+        c = nav_look_ahead (nav, distance);
+        ++result.end;
         if (c == stopChar) {
             break;
         }
@@ -462,21 +462,20 @@ MAGNA_API Span MAGNA_CALL nav_peek_until
     )
 {
     int c;
-    size_t i, length;
+    size_t distance, length;
     Span result;
 
     assert (nav != NULL);
 
-    result.ptr = (am_byte*) nav->data + nav->position;
-    result.len = 0;
+    result.end = result.start = (am_byte*) nav->data + nav->position;
     length = nav->length - nav->position;
-    for (i = 0; i < length; ++i) {
-        c = nav_look_ahead (nav, i);
+    for (distance = 0; distance < length; ++distance) {
+        c = nav_look_ahead (nav, distance);
         if (c == stopChar) {
             break;
         }
 
-        ++result.len;
+        ++result.end;
     }
 
     return result;
@@ -496,23 +495,20 @@ MAGNA_API Span MAGNA_CALL nav_read_line
     )
 {
     am_byte c;
-    size_t start;
     Span result;
 
     assert (nav != NULL);
 
-    result.ptr = (am_byte*) nav->data + nav->position;
-    result.len = 0;
-    start = nav->position;
+    result.end = result.start = (am_byte*) nav->data + nav->position;
     while (nav->position < nav->length) {
         c = nav->data[nav->position];
         if (c == '\r' || c == '\n') {
             break;
         }
-        (void) nav_read (nav);
-    }
 
-    result.len = nav->position - start;
+        (void) nav_read (nav);
+        ++result.end;
+    }
 
     /* Проглатываем перевод строки */
     if (nav->position < nav->length) {
@@ -549,18 +545,17 @@ MAGNA_API Span MAGNA_CALL nav_read_irbis
 
     assert (nav != NULL);
 
-    result.ptr = (am_byte*) nav->data + nav->position;
-    result.len = 0;
+    result.end = result.start = (am_byte*) nav->data + nav->position;
     start = nav->position;
     while (nav->position < nav->length) {
         c = nav->data[nav->position];
         if (c == '\x1F' || c == '\x1E') {
             break;
         }
-        (void) nav_read (nav);
-    }
 
-    result.len = nav->position - start;
+        (void) nav_read (nav);
+        ++result.end;
+    }
 
     /* Проглатываем перевод строки */
     if (nav->position < nav->length) {
@@ -684,10 +679,9 @@ MAGNA_API Span MAGNA_CALL nav_read_integer
 
     assert (nav != NULL);
 
-    result.ptr = (am_byte*) nav->data + nav->position;
-    result.len = 0;
+    result.end = result.start = (am_byte*) nav->data + nav->position;
     while (nav_is_digit (nav)) {
-        ++result.len;
+        ++result.end;
         (void) nav_read (nav);
     }
 
@@ -737,15 +731,14 @@ MAGNA_API Span MAGNA_CALL nav_read_string
 
     assert (nav != NULL);
 
-    result.ptr = (am_byte*) nav->data + nav->position;
-    result.len = 0;
+    result.end = result.start = (am_byte*) nav->data + nav->position;
     for (i = 0; i < length; ++i) {
         c = nav_read (nav);
         if (c == NAV_EOT) {
             break;
         }
 
-        ++result.len;
+        ++result.end;
     }
 
     return result;
@@ -771,13 +764,13 @@ MAGNA_API Span MAGNA_CALL nav_read_to
 
     assert (nav != NULL);
 
-    result.ptr = (am_byte*) nav->data + nav->position;
+    result.end = result.start = (am_byte*) nav->data + nav->position;
     while (AM_TRUE) {
         c = nav_read (nav);
         if ((c == NAV_EOT) || (c == stopChar)) {
             break;
         }
-        ++result.len;
+        ++result.end;
     }
 
     return result;
@@ -803,7 +796,7 @@ MAGNA_API Span MAGNA_CALL nav_read_until
 
     assert (nav != NULL);
 
-    result.ptr = (am_byte*) nav->data + nav->position;
+    result.end = result.start = (am_byte*) nav->data + nav->position;
     while (AM_TRUE) {
         c = nav_peek (nav);
         if ((c == NAV_EOT) || (c == stopChar)) {
@@ -811,7 +804,7 @@ MAGNA_API Span MAGNA_CALL nav_read_until
         }
 
         (void) nav_read (nav);
-        ++result.len;
+        ++result.end;
     }
 
     return result;
@@ -836,7 +829,7 @@ MAGNA_API Span MAGNA_CALL nav_read_while
 
     assert (nav != NULL);
 
-    result.ptr = (am_byte*) nav->data + nav->position;
+    result.end = result.start = (am_byte*) nav->data + nav->position;
     while (AM_TRUE) {
         c = nav_peek (nav);
         if ((c == NAV_EOT) || (c != goodChar)) {
@@ -844,7 +837,7 @@ MAGNA_API Span MAGNA_CALL nav_read_while
         }
 
         (void) nav_read (nav);
-        ++result.len;
+        ++result.end;
     }
 
     return result;
@@ -866,7 +859,7 @@ MAGNA_API Span MAGNA_CALL nav_read_word
     Span result = SPAN_INIT;
 
     assert (nav != NULL);
-    result.ptr = (am_byte*) nav->data + nav->position;
+    result.end = result.start = (am_byte*) nav->data + nav->position;
     while (AM_TRUE) {
         c = nav_peek (nav);
         if ((c == NAV_EOT) || !isalnum (c)) {
@@ -874,7 +867,7 @@ MAGNA_API Span MAGNA_CALL nav_read_word
         }
 
         (void) nav_read (nav);
-        ++result.len;
+        ++result.end;
     }
 
     return result;
@@ -896,8 +889,8 @@ MAGNA_API Span MAGNA_CALL nav_remaining
 
     assert (nav != NULL);
 
-    result.ptr = (am_byte*) nav->data + nav->position;
-    result.len = nav->length - nav->position;
+    result.start = (am_byte*) nav->data + nav->position;
+    result.end   = (am_byte*) nav->data + nav->length;
 
     return result;
 }
@@ -918,8 +911,8 @@ MAGNA_API Span MAGNA_CALL nav_to_span
 
     assert (nav != NULL);
 
-    result.ptr = (am_byte*) nav->data;
-    result.len = nav->length;
+    result.start = (am_byte*) nav->data;
+    result.end   = (am_byte*) nav->data + nav->length;
 
     return result;
 }
@@ -944,8 +937,8 @@ MAGNA_API Span MAGNA_CALL nav_slice
 
     assert (nav != NULL);
 
-    result.ptr = (am_byte*) nav->data + offset;
-    result.len = size;
+    result.start = (am_byte*) nav->data + offset;
+    result.end   = result.start + size;
 
     return result;
 }

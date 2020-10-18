@@ -109,8 +109,8 @@ TESTER(memory_stream_to_span_1)
 
     span = memory_stream_to_span (&memory);
 
-    CHECK (span.ptr == data);
-    CHECK (span.len == sizeof (data));
+    CHECK (span.start == data);
+    CHECK (span_length (span) == sizeof (data));
     CHECK (stream_close (&memory));
 }
 

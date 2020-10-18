@@ -169,9 +169,9 @@ TESTER(buffer_from_span_1)
 
     buffer_from_span (&buffer, span);
 
-    CHECK (buffer.ptr == span.ptr);
+    CHECK (buffer.ptr == span.start);
     CHECK (buffer.position == 0);
-    CHECK (buffer.capacity == span.len);
+    CHECK (buffer.capacity == span_length (span));
 }
 
 TESTER(buffer_assign_1)

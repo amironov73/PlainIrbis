@@ -131,7 +131,7 @@ TESTER(subfield_to_string_1)
 {
     SubField subfield = SUBFIELD_INIT;
     Buffer output = BUFFER_INIT;
-    Span expected = { BTEXT ("^\0"), 2 };
+    Span expected = span_init (BTEXT ("^\0"), 2);
 
     CHECK (subfield_to_string (&subfield, &output));
     CHECK (buffer_compare_span (&output, expected) == 0);
