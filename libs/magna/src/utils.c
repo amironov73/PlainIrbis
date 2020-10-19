@@ -124,7 +124,7 @@ MAGNA_API Buffer* choose_buffer
     va_list args;
     const Buffer *next;
 
-    if (!buffer_is_empty (first)) {
+    if ((first != NULL) && !buffer_is_empty (first)) {
         return (Buffer*) first;
     }
 

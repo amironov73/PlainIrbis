@@ -5,28 +5,28 @@
 
 TESTER(mem_avail_physical_1)
 {
-    size_t rc = mem_avail_physical ();
+    am_uint64 rc = mem_avail_physical ();
 
     CHECK (rc != 0);
 }
 
 TESTER(mem_avail_virtual_1)
 {
-    size_t rc = mem_avail_virtual ();
+    am_uint64 rc = mem_avail_virtual ();
 
     CHECK (rc != 0);
 }
 
 TESTER(mem_total_installed_1)
 {
-    size_t rc = mem_total_installed ();
+    am_uint64 rc = mem_total_installed ();
 
     CHECK (rc != 0);
 }
 
 TESTER(mem_total_virtual_1)
 {
-    size_t rc = mem_total_virtual ();
+    am_uint64 rc = mem_total_virtual ();
 
     CHECK (rc != 0);
 }
@@ -103,7 +103,7 @@ static int dummy_function (int arg1, int arg2)
 
 TESTER(mem_can_execute_1)
 {
-    CHECK (mem_can_execute (dummy_function));
+    CHECK (mem_can_execute ((void*) dummy_function));
 }
 
 TESTER(mem_can_read_1)

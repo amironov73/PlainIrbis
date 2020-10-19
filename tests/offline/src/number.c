@@ -9,9 +9,7 @@ TESTER(ntc_init_1)
 
     ntc_init (&chunk);
 
-    CHECK (chunk.prefix.start == NULL);
-    CHECK (chunk.prefix.position == 0);
-    CHECK (chunk.prefix.capacity == 0);
+    CHECK (buffer_is_empty (&chunk.prefix));
     CHECK (chunk.value == 0);
     CHECK (chunk.length == 0);
     CHECK (chunk.haveValue == AM_FALSE);
@@ -123,7 +121,7 @@ TESTER(ntc_to_string_1)
     buffer_init (&buffer);
 
     CHECK (ntc_to_string (&chunk, &buffer));
-    CHECK (buffer.position == 0);
+    CHECK (buffer_position (&buffer) == 0);
 
     ntc_destroy (&chunk);
     buffer_destroy (&buffer);
@@ -141,7 +139,7 @@ TESTER(ntc_to_string_2)
     chunk.value = 123;
 
     CHECK (ntc_to_string (&chunk, &buffer));
-    CHECK (buffer.position == 8);
+    CHECK (buffer_position (&buffer) == 8);
     CHECK (buffer_compare_text (&buffer, CBTEXT ("Hello123")) == 0);
 
     ntc_destroy (&chunk);
@@ -158,7 +156,7 @@ TESTER(ntc_to_string_3)
     buffer_assign_text (&chunk.prefix, CBTEXT ("Hello"));
 
     CHECK (ntc_to_string (&chunk, &buffer));
-    CHECK (buffer.position == 5);
+    CHECK (buffer_position (&buffer) == 5);
     CHECK (buffer_compare_text (&buffer, CBTEXT ("Hello")) == 0);
 
     ntc_destroy (&chunk);
@@ -176,7 +174,7 @@ TESTER(ntc_to_string_4)
     chunk.value = 123;
 
     CHECK (ntc_to_string (&chunk, &buffer));
-    CHECK (buffer.position == 3);
+    CHECK (buffer_position (&buffer) == 3);
     CHECK (buffer_compare_text (&buffer, CBTEXT ("123")) == 0);
 
     ntc_destroy (&chunk);

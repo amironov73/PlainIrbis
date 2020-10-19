@@ -401,9 +401,9 @@ TESTER(span_to_string_1)
     const am_byte *text = CBTEXT ("123456789");
     Span span1 = TEXT_SPAN (text);
     Span span2 = span_slice (span1, 7, 12);
-    char *str = span_to_string (span2);
+    am_byte *str = span_to_string (span2);
 
-    CHECK (strcmp (str, "89") == 0);
+    CHECK (strcmp (CCTEXT (str), "89") == 0);
 
     free (str);
 }

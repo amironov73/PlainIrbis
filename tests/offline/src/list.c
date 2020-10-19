@@ -33,6 +33,10 @@ static am_bool MAGNA_CALL canary_walker_1 (LinkedList *list, ListItem *item, voi
 
 static am_bool MAGNA_CALL canary_walker_2 (LinkedList *list, ListItem *item, void *data)
 {
+    (void) list;
+    (void) item;
+    (void) data;
+
     return AM_FALSE;
 }
 
@@ -464,11 +468,11 @@ TESTER(list_insert_after_2)
 {
     LinkedList list;
     Canary c1 = { 1, 2 }, c2 = { 3, 4 }, c3 = { 5, 6 };
-    ListItem *p1, *p2, *p3;
+    ListItem *p2, *p3;
 
     list_init (&list, sizeof (Canary));
 
-    p1 = list_push_back (&list, &c1);
+    (void) list_push_back (&list, &c1);
     p2 = list_push_back (&list, &c2);
     p3 = list_insert_after (&list, p2, &c3);
 
@@ -490,13 +494,13 @@ TESTER(list_insert_after_2)
 TESTER(list_emplace_before_1)
 {
     LinkedList list;
-    Canary c1 = { 1, 2 }, c2 = { 3, 4 }, c3 = { 5, 6 };
-    ListItem *p1, *p2, *p3;
+    Canary c1 = { 1, 2 }, c2 = { 3, 4 };
+    ListItem *p2, *p3;
     Canary *d3;
 
     list_init (&list, sizeof (Canary));
 
-    p1 = list_push_back (&list, &c1);
+    (void) list_push_back (&list, &c1);
     p2 = list_push_back (&list, &c2);
     d3 = (Canary*) list_emplace_before (&list, p2);
     p3 = list_item (d3);
@@ -518,14 +522,14 @@ TESTER(list_emplace_before_1)
 TESTER(list_emplace_before_2)
 {
     LinkedList list;
-    Canary c1 = { 1, 2 }, c2 = { 3, 4 }, c3 = { 5, 6 };
-    ListItem *p1, *p2, *p3;
+    Canary c1 = { 1, 2 }, c2 = { 3, 4 };
+    ListItem *p1, *p3;
     Canary *d3;
 
     list_init (&list, sizeof (Canary));
 
     p1 = list_push_back (&list, &c1);
-    p2 = list_push_back (&list, &c2);
+    (void) list_push_back (&list, &c2);
     d3 = (Canary*) list_emplace_before (&list, p1);
     p3 = list_item (d3);
 
@@ -547,7 +551,7 @@ TESTER(list_emplace_before_2)
 TESTER(list_emplace_after_1)
 {
     LinkedList list;
-    Canary c1 = { 1, 2 }, c2 = { 3, 4 }, c3 = { 5, 6 };
+    Canary c1 = { 1, 2 }, c2 = { 3, 4 };
     ListItem *p1, *p2, *p3;
     Canary *d3;
 
@@ -577,7 +581,7 @@ TESTER(list_emplace_after_1)
 TESTER(list_emplace_after_2)
 {
     LinkedList list;
-    Canary c1 = { 1, 2 }, c2 = { 3, 4 }, c3 = { 5, 6 };
+    Canary c1 = { 1, 2 }, c2 = { 3, 4 };
     ListItem *p1, *p2, *p3;
     Canary *d3;
 

@@ -92,7 +92,7 @@ TESTER(ansi2utf_1)
     CHECK (ansi->name != NULL);
 
     CHECK (ansi2utf (&output, input));
-    CHECK (output.position == sizeof (destination));
+    CHECK (buffer_position (&output) == sizeof (destination));
     CHECK (buffer_compare_span (&output, ethalon) == 0);
 
     buffer_destroy (&output);
@@ -119,7 +119,7 @@ TESTER(utf2ansi_1)
     CHECK (ansi->name != NULL);
 
     CHECK (utf2ansi (&output, input));
-    CHECK (output.position == sizeof (destination));
+    CHECK (buffer_position (&output) == sizeof (destination));
     CHECK (buffer_compare_span (&output, ethalon) == 0);
 
     buffer_destroy (&output);

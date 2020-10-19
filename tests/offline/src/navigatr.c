@@ -37,7 +37,6 @@ TESTER(nav_from_buffer_1)
     TextNavigator nav;
 
     buffer_static (&buffer, data, sizeof (data));
-    buffer.position = sizeof (data);
 
     CHECK (nav_from_buffer (&nav, &buffer) == &nav);
     CHECK (nav.data == data);

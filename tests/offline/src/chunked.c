@@ -300,11 +300,11 @@ TESTER(chunkd_read_2)
     chunked_rewind (&chunked);
 
     CHECK (chunked_read (&chunked, &buffer, sizeof (waste)) == sizeof (waste));
-    CHECK (buffer.position == sizeof (waste));
+    CHECK (buffer_position (&buffer) == sizeof (waste));
     CHECK (chunked_read (&chunked, &buffer, sizeof (waste)) == sizeof (waste));
-    CHECK (buffer.position == sizeof (waste) * 2);
+    CHECK (buffer_position (&buffer) == sizeof (waste) * 2);
     CHECK (chunked_read (&chunked, &buffer, sizeof (waste)) == 0);
-    CHECK (buffer.position == sizeof (waste) * 2);
+    CHECK (buffer_position (&buffer) == sizeof (waste) * 2);
 
     chunked_free (&chunked);
     buffer_destroy(&buffer);
@@ -366,7 +366,7 @@ TESTER(chunked_read_line_2)
     chunked_write_text (&chunked, text);
     chunked_rewind (&chunked);
 
-    CHECK (chunked_read_line (&chunked, &buffer) == strlen (text));
+    CHECK (((size_t) chunked_read_line (&chunked, &buffer)) == strlen (text));
     CHECK (chunked_read_line (&chunked, &buffer) == 0);
 
     chunked_free (&chunked);
@@ -388,8 +388,8 @@ TESTER(chunked_read_line_3)
     chunked_write_text (&chunked, text2);
     chunked_rewind (&chunked);
 
-    CHECK (chunked_read_line (&chunked, &buffer) == strlen (text1));
-    CHECK (chunked_read_line (&chunked, &buffer) == strlen (text2));
+    CHECK (((size_t) chunked_read_line (&chunked, &buffer)) == strlen (text1));
+    CHECK (((size_t) chunked_read_line (&chunked, &buffer)) == strlen (text2));
     CHECK (chunked_read_line (&chunked, &buffer) == 0);
 
     chunked_free (&chunked);
@@ -410,8 +410,8 @@ TESTER(chunked_read_line_4)
     chunked_write_text (&chunked, text2);
     chunked_rewind (&chunked);
 
-    CHECK (chunked_read_line (&chunked, &buffer) == strlen (text1));
-    CHECK (chunked_read_line (&chunked, &buffer) == strlen (text2));
+    CHECK (((size_t) chunked_read_line (&chunked, &buffer)) == strlen (text1));
+    CHECK (((size_t) chunked_read_line (&chunked, &buffer)) == strlen (text2));
     CHECK (chunked_read_line (&chunked, &buffer) == 0);
 
     chunked_free (&chunked);
@@ -460,10 +460,10 @@ TESTER(chunked_read_remaining_2)
     chunked_write_text (&chunked, text2);
     chunked_rewind (&chunked);
 
-    CHECK (chunked_read_line (&chunked, &buffer) == strlen (text1));
-    CHECK (chunked_read_remaining (&chunked, &buffer) == strlen (text2));
-    buffer.position = 0;
-    CHECK (chunked_read_remaining (&chunked, &buffer) == strlen (text2));
+    CHECK (((size_t) chunked_read_line (&chunked, &buffer)) == strlen (text1));
+    CHECK (((size_t) chunked_read_remaining (&chunked, &buffer)) == strlen (text2));
+    buffer.current = buffer.start;
+    CHECK (((size_t) chunked_read_remaining (&chunked, &buffer)) == strlen (text2));
 
     chunked_free (&chunked);
     buffer_destroy(&buffer);
@@ -647,7 +647,7 @@ TESTER(chunked_all_1)
     buffer_init (&buffer);
 
     CHECK (chunked_all (&chunked, &buffer) == 0);
-    CHECK (buffer.position == 0);
+    CHECK (buffer_position (&buffer) == 0);
 
     chunked_free (&chunked);
     buffer_destroy(&buffer);
@@ -665,7 +665,7 @@ TESTER(chunked_all_2)
     chunked_write_byte (&chunked, 3);
 
     CHECK (chunked_all (&chunked, &buffer) == 3);
-    CHECK (buffer.position == 3);
+    CHECK (buffer_position (&buffer) == 3);
 
     chunked_free (&chunked);
     buffer_destroy(&buffer);
@@ -687,8 +687,8 @@ TESTER(chunked_all_3)
     chunked_write_byte (&chunked, 3);
 
     expected = sizeof (waste) * 2 + 3;
-    CHECK (chunked_all (&chunked, &buffer) == expected);
-    CHECK (buffer.position == expected);
+    CHECK (((size_t) chunked_all (&chunked, &buffer)) == expected);
+    CHECK (buffer_position (&buffer) == expected);
 
     chunked_free (&chunked);
     buffer_destroy(&buffer);

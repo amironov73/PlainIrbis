@@ -28,7 +28,6 @@ am_bool where_test_data
     }
 
     buffer_static (&appendix, CBTEXT (testData), strlen (testData));
-    appendix.position = appendix.capacity;
 
     while (AM_TRUE) {
         if (buffer_is_empty(path)) {
@@ -36,6 +35,9 @@ am_bool where_test_data
         }
 
         buffer_clear (&candidate);
+        if (candidate.start != NULL) {
+            mem_clear(candidate.start, buffer_capacity(&candidate));
+        }
         if (!path_combine (&candidate, path, &appendix, NULL)) {
             break;
         }
@@ -51,7 +53,8 @@ am_bool where_test_data
         }
 
         directory = path_get_directory (path);
-        path->position = span_length (directory);
+        path->current = path->start + span_length (directory);
+        mem_clear (path->current, path->end - path->current);
     }
 
     buffer_destroy (&candidate);
@@ -90,14 +93,14 @@ int main (int argc, const char **argv)
 
     if (where_test_data (&tdp)) {
         printf ("test data=");
-        fwrite (tdp.start, 1, tdp.position, stdout);
+        buffer_to_console (&tdp);
         printf ("\n");
         buffer_destroy (&tdp);
     }
 
     if (path_get_temporary_directory (&td)) {
         printf ("temp dir=");
-        fwrite (td.start, 1, td.position, stdout);
+        buffer_to_console (&td);
         printf ("\n");
         buffer_destroy (&td);
     }

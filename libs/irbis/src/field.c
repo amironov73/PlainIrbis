@@ -7,6 +7,12 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable CommentTypo
 
+/*=========================================================*/
+
+#include "warnpush.h"
+
+/*=========================================================*/
+
 /**
  * \file field.c
  *
@@ -151,23 +157,6 @@ MAGNA_API am_bool MAGNA_CALL field_clone
     return AM_TRUE;
 }
 
-#if EXPAND(MAGNA_CALL) == 1
-
-#define subfield_liberator subfield_destroy
-
-#else
-
-/* Тривиальная обертка для случая не пустого `MAGNA_CALL` */
-static void subfield_liberator
-    (
-        SubField *subfield
-    )
-{
-    subfield_destroy (subfield);
-}
-
-#endif
-
 /**
  * Простая инициализация поля.
  *
@@ -181,7 +170,7 @@ MAGNA_API void MAGNA_CALL field_create
     assert (field != NULL);
 
     field->tag = 0;
-    buffer_null (&field->value);
+    buffer_init (&field->value);
     array_init (&field->subfields, sizeof (SubField));
 }
 
@@ -281,11 +270,10 @@ MAGNA_API void MAGNA_CALL field_destroy
         MarcField *field
     )
 {
-    size_t index;
-
     assert (field != NULL);
 
     buffer_destroy (&field->value);
+    /* TODO: liberate subfields */
     array_destroy (&field->subfields);
 }
 
@@ -398,7 +386,7 @@ MAGNA_API Span MAGNA_CALL field_get_first_subfield_value
  * @param index Индекс.
  * @param code Код подполя.
  * @param value Значение подполя.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL field_insert_at
     (
@@ -408,12 +396,23 @@ MAGNA_API am_bool MAGNA_CALL field_insert_at
         Span value
     )
 {
+    SubField *subfield;
+
     assert (field != NULL);
     assert (index <= field->subfields.len);
 
-    /* TODO: implement */
+    subfield = (SubField*) array_emplace_at (&field->subfields, index);
+    if (subfield == NULL) {
+        return AM_FALSE;
+    }
 
-    return AM_FALSE;
+    subfield->code = code;
+    if (!subfield_assign (subfield, value)) {
+        array_remove_index (&field->subfields, index);
+        return AM_FALSE;
+    }
+
+    return AM_TRUE;
 }
 
 /**
@@ -593,3 +592,9 @@ MAGNA_API am_bool MAGNA_CALL field_verify
 
     return result;
 }
+
+/*=========================================================*/
+
+#include "warnpop.h"
+
+/*=========================================================*/

@@ -112,13 +112,11 @@ TESTER(choose_buffer_1)
 
     buffer_static (&first, BTEXT ("Hello"), 5);
     buffer_static (&second, BTEXT ("World"), 5);
-    first.position = first.capacity;
-    second.position = second.capacity;
 
     choosen = choose_buffer (&first, &second);
     CHECK (choosen == &first);
 
-    first.position = 0;
+    first.current = first.start;
     choosen = choose_buffer (&first, &second);
     CHECK (choosen == &second);
 

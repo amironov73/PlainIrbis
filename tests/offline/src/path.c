@@ -9,7 +9,7 @@ TESTER(path_get_current_directory_1)
     am_bool rc = path_get_current_directory (&buffer);
 
     CHECK (rc);
-    CHECK (buffer.position != 0);
+    CHECK (buffer_position (&buffer) != 0);
 
     buffer_destroy(&buffer);
 }
@@ -20,7 +20,7 @@ TESTER(path_get_executable_1)
     am_bool rc = path_get_executable (&buffer);
 
     CHECK (rc);
-    CHECK (buffer.position != 0);
+    CHECK (buffer_position (&buffer) != 0);
 
     buffer_destroy(&buffer);
 }

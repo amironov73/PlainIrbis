@@ -141,8 +141,7 @@ TESTER(texter_init_1)
     CHECK (texter_init (&texter, &memory, 0));
     CHECK (texter.stream == &memory);
     CHECK (texter.position == 0);
-    CHECK (texter.buffer.position == 0);
-    CHECK (texter.buffer.capacity != 0);
+    CHECK (buffer_is_empty (&texter.buffer) == 0);
     CHECK (texter.buffer.start != NULL);
 
     texter_destroy(&texter);
@@ -159,8 +158,7 @@ TESTER(texter_init_2)
     CHECK (texter_init (&texter, &memory, 0));
     CHECK (texter.stream == &memory);
     CHECK (texter.position == 0);
-    CHECK (texter.buffer.position == 0);
-    CHECK (texter.buffer.capacity != 0);
+    CHECK (buffer_is_empty (&texter.buffer) == 0);
     CHECK (texter.buffer.start != NULL);
 
     texter_destroy(&texter);
@@ -218,7 +216,7 @@ TESTER(texter_read_line_1)
     CHECK (texter_init (&texter, &memory, 0));
 
     CHECK (texter_read_line (&texter, &line) == 0);
-    CHECK (line.position == 0);
+    CHECK (buffer_position (&line) == 0);
     CHECK (texter.eot);
 
     texter_destroy(&texter);
@@ -237,7 +235,7 @@ TESTER(texter_read_line_2)
     CHECK (texter_init (&texter, &memory, 0));
 
     CHECK (((size_t) texter_read_line (&texter, &line)) == length);
-    CHECK (line.position == length);
+    CHECK (buffer_position (&line) == length);
 
     texter_destroy(&texter);
     buffer_destroy(&line);
@@ -255,11 +253,11 @@ TESTER(texter_read_line_3)
     CHECK (texter_init (&texter, &memory, 0));
 
     CHECK (texter_read_line (&texter, &line) == 5);
-    CHECK (line.position == 5);
+    CHECK (buffer_position (&line) == 5);
 
     buffer_clear (&line);
     CHECK (texter_read_line (&texter, &line) == 6);
-    CHECK (line.position == 6);
+    CHECK (buffer_position (&line) == 6);
 
     texter_destroy(&texter);
     buffer_destroy(&line);
@@ -277,11 +275,11 @@ TESTER(texter_read_line_4)
     CHECK (texter_init (&texter, &memory, 0));
 
     CHECK (texter_read_line (&texter, &line) == 5);
-    CHECK (line.position == 5);
+    CHECK (buffer_position (&line) == 5);
 
     buffer_clear (&line);
     CHECK (texter_read_line (&texter, &line) == 6);
-    CHECK (line.position == 6);
+    CHECK (buffer_position (&line) == 6);
 
     texter_destroy(&texter);
     buffer_destroy(&line);
@@ -299,11 +297,11 @@ TESTER(texter_read_line_5)
     CHECK (texter_init (&texter, &memory, 0));
 
     CHECK (texter_read_line (&texter, &line) == 5);
-    CHECK (line.position == 5);
+    CHECK (buffer_position (&line) == 5);
 
     buffer_clear (&line);
     CHECK (texter_read_line (&texter, &line) == 6);
-    CHECK (line.position == 6);
+    CHECK (buffer_position (&line) == 6);
 
     texter_destroy(&texter);
     buffer_destroy(&line);
@@ -321,7 +319,7 @@ TESTER(texter_read_line_6)
     CHECK (texter_init (&texter, &memory, 0));
 
     CHECK (texter_read_line (&texter, &line) == 5);
-    CHECK (line.position == 5);
+    CHECK (buffer_position (&line) == 5);
 
     texter_destroy(&texter);
     buffer_destroy(&line);

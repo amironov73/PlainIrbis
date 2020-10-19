@@ -16,7 +16,7 @@ TESTER(file_create_1)
 
     CHECK (path_get_temporary_directory (&tempDirectory));
     CHECK (directory_exist (B2T (&tempDirectory)));
-    CHECK (buffer_from_text (&fileName, CBTEXT ("magna.tmp")) != NULL);
+    CHECK (buffer_from_text (&fileName, CBTEXT ("magna.tmp")));
     CHECK (path_combine (&tempFile, &tempDirectory, &fileName, NULL));
 
     fname = B2T (&tempFile);
@@ -59,7 +59,7 @@ TESTER(file_create_insist_1)
 
     CHECK (path_get_temporary_directory (&tempDirectory));
     CHECK (directory_exist (B2T (&tempDirectory)));
-    CHECK (buffer_from_text (&fileName, CBTEXT ("magna.tmp")) != NULL);
+    CHECK (buffer_from_text (&fileName, CBTEXT ("magna.tmp")));
     CHECK (path_combine (&tempFile, &tempDirectory, &fileName, NULL));
 
     fname = B2T (&tempFile);
@@ -141,7 +141,7 @@ TESTER(file_read_all_1)
     CHECK (path_append (&path, TEXT_SPAN ("TEST1.ISO")));
 
     CHECK (file_read_all (B2T (&path), &all));
-    CHECK (all.position == 78096);
+    CHECK (buffer_position (&all) == 78096);
 
     buffer_destroy (&path);
     buffer_destroy (&all);
@@ -323,10 +323,11 @@ TESTER(file_write_int64_1)
 TESTER(file_write_buffer_1)
 {
     Buffer path = BUFFER_INIT;
-    Buffer output = { BTEXT ("Hello, world!"), 13, 13 };
+    Buffer output;
     const char *fname;
     am_handle handle;
 
+    buffer_from_text (&output, BTEXT ("Hello, world!"));
     CHECK (path_get_temporary_directory (&path));
     CHECK (path_append (&path, TEXT_SPAN ("writebuf.tmp")));
 
@@ -344,6 +345,7 @@ TESTER(file_write_buffer_1)
     CHECK (file_delete (fname));
 
     buffer_destroy (&path);
+    buffer_destroy (&output);
 }
 
 TESTER(file_write_span_1)

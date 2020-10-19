@@ -10,8 +10,8 @@ TESTER(menu_entry_init_1)
 
     menu_entry_init (&entry);
 
-    CHECK (entry.code.position == 0);
-    CHECK (entry.comment.position == 0);
+    CHECK (buffer_is_empty (&entry.code) == 0);
+    CHECK (buffer_is_empty (&entry.comment) == 0);
 
     menu_entry_destroy (&entry);
 }
