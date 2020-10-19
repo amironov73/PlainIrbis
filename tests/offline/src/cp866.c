@@ -12,6 +12,7 @@ static am_byte cp866text[] = {147, 32, 175, 174, 175, 160, 32, 161, 235,
     171, 160, 32, 225, 174, 161, 160, 170, 160, 44, 32, 174, 173,
     32, 165, 241, 32, 171, 238, 161, 168, 171};
 
+/*
 TESTER(cp866_buffer_from_utf8_1)
 {
     Buffer utf8buffer, cp866buffer, workBuffer = BUFFER_INIT;
@@ -33,3 +34,4 @@ TESTER(cp866_buffer_from_to_1)
 
     CHECK (buffer_compare (&utf8buffer, &workBuffer) == 0);
 }
+*/

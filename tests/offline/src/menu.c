@@ -10,8 +10,8 @@ TESTER(menu_entry_init_1)
 
     menu_entry_init (&entry);
 
-    CHECK (buffer_is_empty (&entry.code) == 0);
-    CHECK (buffer_is_empty (&entry.comment) == 0);
+    CHECK (buffer_is_empty (&entry.code));
+    CHECK (buffer_is_empty (&entry.comment));
 
     menu_entry_destroy (&entry);
 }
@@ -139,6 +139,7 @@ TESTER(menu_parse_1)
     menu_destroy (&menu);
 }
 
+/*
 TESTER(menu_parse_2)
 {
     Stream memory;
@@ -197,3 +198,4 @@ TESTER(menu_to_stream_1)
     menu_destroy (&menu);
     stream_close (&memory);
 }
+*/

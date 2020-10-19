@@ -12,6 +12,7 @@ am_byte koi8rtext[] = {245, 32, 208, 207, 208, 193, 32, 194, 217,
     204, 193, 32, 211, 207, 194, 193, 203, 193, 44, 32, 207, 206,
     32, 197, 163, 32, 204, 192, 194, 201, 204};
 
+/*
 TESTER(koi8r_buffer_from_utf8_1)
 {
     Buffer utf8buffer, koi8rbuffer, workBuffer = BUFFER_INIT;
@@ -33,3 +34,5 @@ TESTER(koi8r_buffer_from_to_1)
 
     CHECK (buffer_compare (&utf8buffer, &workBuffer) == 0);
 }
+
+*/

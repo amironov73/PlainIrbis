@@ -1068,9 +1068,76 @@ MAGNA_API int MAGNA_CALL nav_read_utf8
         TextNavigator *nav
     )
 {
+    unsigned int chr, chr2;
+    UtfHelper result;
+
     assert (nav != NULL);
 
-    return -1;
+    if (nav_eot (nav)) {
+        return -1;
+    }
+
+    chr = (unsigned int) nav_read (nav);
+    if ((chr & 0x80u) == 0u)
+    {
+        // 1-Byte sequence: 000000000xxxxxxx = 0xxxxxxx
+    }
+    else if ((chr & 0xE0u) == 0xC0u)
+    {
+        // 2-Byte sequence: 00000yyyyyxxxxxx = 110yyyyy 10xxxxxx
+        if (nav_eot (nav)) {
+            return -1;
+        }
+
+        chr = (chr & 0x1Fu) << 6u;
+        chr2 = (unsigned int) nav_read (nav);
+        chr |= (chr2 & 0x3Fu);
+    }
+    else if ((chr & 0xF0u) == 0xE0u)
+    {
+        // 3-Byte sequence: zzzzyyyyyyxxxxxx = 1110zzzz 10yyyyyy 10xxxxxx
+        if (nav_eot (nav)) {
+            return -1;
+        }
+
+        chr = (chr & 0x0Fu) << 12u;
+        chr2 = (unsigned int) nav_read (nav);
+        chr |= (chr2 & 0x3Fu) << 6u;
+
+        if (nav_eot (nav)) {
+            return -1;
+        }
+
+        chr2 = (unsigned int) nav_read (nav);
+        chr |= (chr2 & 0x3Fu);
+    }
+    else if ((chr & 0xF8u) == 0xF0u)
+    {
+        // 4-Byte sequence: 11101110wwwwzzzzyy + 110111yyyyxxxxxx = 11110uuu 10uuzzzz 10yyyyyy 10xxxxxx
+        if (nav_eot (nav)) {
+            return -1;
+        }
+
+        chr = (chr & 0x07u) << 18u;
+        chr2 = (unsigned int) nav_read (nav);
+        chr |= (chr2 & 0x3Fu) << 12u;
+
+        if (nav_eot (nav)) {
+            return -1;
+        }
+
+        chr2 = (unsigned int) nav_read (nav);
+        chr |= (chr2 & 0x3Fu) << 6u;
+
+        if (nav_eot (nav)) {
+            return -1;
+        }
+
+        chr2 = (unsigned int) nav_read (nav);
+        chr |= (chr2 & 0x3Fu);
+    }
+
+    return chr;
 }
 
 /*=========================================================*/

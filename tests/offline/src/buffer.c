@@ -164,9 +164,10 @@ TESTER(buffer_from_span_1)
 
     buffer_from_span (&buffer, span);
 
-    CHECK (buffer.start == span.start);
-    CHECK (buffer.current == buffer.start);
-    CHECK (buffer.end == span.end);
+    CHECK (buffer_length (&buffer) == span_length (span));
+    CHECK (memcmp (buffer.start, span.start, span_length (span)) == 0);
+
+    buffer_destroy (&buffer);
 }
 
 TESTER(buffer_assign_1)

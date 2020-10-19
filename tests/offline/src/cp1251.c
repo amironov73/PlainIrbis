@@ -12,6 +12,7 @@ static am_byte cp1251text[] = {211, 32, 239, 238, 239, 224, 32, 225,
     251, 235, 224, 32, 241, 238, 225, 224, 234, 224, 44, 32, 238,
     237, 32, 229, 184, 32, 235, 254, 225, 232, 235};
 
+/*
 TESTER(cp1251_buffer_from_utf8_1)
 {
     Buffer utf8buffer, cp1251buffer, workBuffer = BUFFER_INIT;
@@ -33,3 +34,5 @@ TESTER(cp1251_buffer_from_to_1)
 
     CHECK (buffer_compare (&utf8buffer, &workBuffer) == 0);
 }
+
+*/
