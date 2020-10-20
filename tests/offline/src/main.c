@@ -108,6 +108,7 @@ int main (int argc, const char **argv)
     printf ("memory available=%lld\n", mem_avail_physical());
     printf ("sizeof (void*)         = %d\n", (int) sizeof (void*));
     printf ("sizeof (Span)          = %d\n", (int) sizeof (Span));
+    printf ("sizeof (ChainSpan)     = %d\n", (int) sizeof (ChainSpan));
     printf ("sizeof (Buffer)        = %d\n", (int) sizeof (Buffer));
     printf ("sizeof (Array)         = %d\n", (int) sizeof (Array));
     printf ("sizeof (Vector)        = %d\n", (int) sizeof (Vector));

@@ -528,6 +528,9 @@ struct MagnaSpan
 
 };
 
+typedef am_bool (MAGNA_CALL *SpanForEach) (am_byte, void*);
+typedef am_bool (MAGNA_CALL *SpanForEachPtr) (am_byte*, void*);
+
 #define SPAN_INIT { NULL, NULL }
 
 extern MAGNA_API MAGNA_INLINE void       MAGNA_CALL span_assert                   (Span span);
@@ -538,6 +541,10 @@ extern MAGNA_API              size_t     MAGNA_CALL span_count                  
 extern MAGNA_API              am_bool    MAGNA_CALL span_ends_with                (Span span, Span suffix);
 extern MAGNA_API              Span       MAGNA_CALL span_fill                     (Span span, am_byte value);
 extern MAGNA_API              am_byte*   MAGNA_CALL span_find_byte                (Span span, am_byte value);
+extern MAGNA_API              am_byte*   MAGNA_CALL span_for_each                 (Span span, SpanForEach routine, void *extraData);
+extern MAGNA_API              am_byte*   MAGNA_CALL span_for_each_ptr             (Span span, SpanForEachPtr routine, void *extraData);
+extern MAGNA_API              am_byte*   MAGNA_CALL span_for_each_reverse         (Span span, SpanForEach routine, void *extraData);
+extern MAGNA_API              am_byte*   MAGNA_CALL span_for_each_ptr_reverse     (Span span, SpanForEachPtr routine, void *extraData);
 extern MAGNA_API MAGNA_INLINE Span       MAGNA_CALL span_from_text                (const am_byte *str);
 extern MAGNA_API              am_uint64  MAGNA_CALL span_hex_to_uint64            (Span span);
 extern MAGNA_API MAGNA_INLINE Span       MAGNA_CALL span_init                     (const am_byte *ptr, size_t length);
@@ -573,6 +580,76 @@ extern MAGNA_API MAGNA_INLINE am_bool    MAGNA_CALL span_verify                 
 #define CBTEXT(__s) ((const am_byte*)(__s))
 #define CTEXT(__s) ((char*)(__s))
 #define CCTEXT(__s) ((const char*)(__s))
+
+/*=========================================================*/
+
+/* Невладеющая цепочка фрагментов */
+
+typedef struct MagnaChainSpan ChainSpan;
+
+struct MagnaChainSpan
+{
+    am_byte *start;
+    am_byte *end;
+    ChainSpan *next;
+};
+
+/* Итератор по цепочке фрагментов */
+
+typedef struct
+{
+    ChainSpan *chain;
+    ChainSpan *current;
+    am_byte *ptr;
+
+} ChainIterator;
+
+typedef am_bool (MAGNA_CALL *ChainWalker) (ChainSpan*, void*);
+
+#define CHAIN_INIT { NULL, NULL, NULL }
+
+extern MAGNA_API              am_bool       MAGNA_CALL chain_append               (ChainSpan *chain, Span span);
+extern MAGNA_API              ChainSpan*    MAGNA_CALL chain_before               (const ChainSpan *chain, const ChainSpan *item);
+extern MAGNA_API              am_byte       MAGNA_CALL chain_clone                (ChainSpan *target, const ChainSpan *source);
+extern MAGNA_API              int           MAGNA_CALL chain_compare              (const ChainSpan *first, const ChainSpan *second);
+extern MAGNA_API              int           MAGNA_CALL chain_compare_ignore_case  (const ChainSpan *first, const ChainSpan *second);
+extern MAGNA_API              int           MAGNA_CALL chain_compare_span         (const ChainSpan *chain, Span span);
+extern MAGNA_API              int           MAGNA_CALL chain_compare_text         (const ChainSpan *chain, const am_byte *text);
+extern MAGNA_API              void          MAGNA_CALL chain_concat               (ChainSpan *target, const ChainSpan *source);
+extern MAGNA_API              void          MAGNA_CALL chain_destroy              (ChainSpan *chain);
+extern MAGNA_API              am_bool       MAGNA_CALL chain_ends_with            (ChainSpan *chain, ChainSpan *suffix);
+extern MAGNA_API              void          MAGNA_CALL chain_fill                 (ChainSpan *chain, am_byte value);
+extern MAGNA_API              am_byte*      MAGNA_CALL chain_for_each             (ChainSpan *chain, SpanForEach routine, void *extraData);
+extern MAGNA_API              am_byte*      MAGNA_CALL chain_for_each_ptr         (ChainSpan *chain, SpanForEachPtr routine, void *extraData);
+extern MAGNA_API              am_byte*      MAGNA_CALL chain_for_each_reverse     (ChainSpan *chain, SpanForEach routine, void *extraData);
+extern MAGNA_API              am_byte*      MAGNA_CALL chain_for_each_ptr_reverse (ChainSpan *chain, SpanForEachPtr routine, void *extraData);
+extern MAGNA_API              ChainSpan     MAGNA_CALL chain_from_text            (const am_byte *text);
+extern MAGNA_API              ChainIterator MAGNA_CALL chain_get_forward_iterator (const ChainSpan *chain);
+extern MAGNA_API              ChainIterator MAGNA_CALL chain_get_reverse_iterator (const ChainSpan *chain);
+extern MAGNA_API              void          MAGNA_CALL chain_init                 (ChainSpan *chain, Span span);
+extern MAGNA_API              am_bool       MAGNA_CALL chain_is_empty             (const ChainSpan *chain);
+extern MAGNA_API              ChainSpan*    MAGNA_CALL chain_last                 (const ChainSpan *chain);
+extern MAGNA_API MAGNA_INLINE size_t        MAGNA_CALL chain_length               (ChainSpan *link);
+extern MAGNA_API MAGNA_INLINE ChainSpan                chain_null                 (void);
+extern MAGNA_API              void          MAGNA_CALL chain_optimize             (ChainSpan *chain);
+extern MAGNA_API              am_bool       MAGNA_CALL chain_starts_with          (ChainSpan *chain, ChainSpan *prefix);
+extern MAGNA_API              void          MAGNA_CALL chain_to_console           (const ChainSpan *chain);
+extern MAGNA_API              am_bool       MAGNA_CALL chain_to_file              (const ChainSpan *chain, am_handle handle);
+extern MAGNA_API              am_int32      MAGNA_CALL chain_to_int32             (const ChainSpan *chain);
+extern MAGNA_API              am_int64      MAGNA_CALL chain_to_int64             (const ChainSpan *chain);
+extern MAGNA_API              am_byte*      MAGNA_CALL chain_to_string            (const ChainSpan *chain);
+extern MAGNA_API              am_uint32     MAGNA_CALL chain_to_uint32            (const ChainSpan *chain);
+extern MAGNA_API              am_uint64     MAGNA_CALL chain_to_uint64            (const ChainSpan *chain);
+extern MAGNA_API              am_byte*      MAGNA_CALL chain_to_vector            (const ChainSpan *chain);
+extern MAGNA_API              void          MAGNA_CALL chain_tolower              (ChainSpan *chain);
+extern MAGNA_API              size_t        MAGNA_CALL chain_total_length         (const ChainSpan *chain);
+extern MAGNA_API              void          MAGNA_CALL chain_toupper              (ChainSpan *chain);
+extern MAGNA_API              void          MAGNA_CALL chain_trim                 (ChainSpan *chain);
+extern MAGNA_API              void          MAGNA_CALL chain_trim_end             (ChainSpan *chain);
+extern MAGNA_API              void          MAGNA_CALL chain_trim_start           (ChainSpan *chain);
+extern MAGNA_API              am_bool       MAGNA_CALL chain_verify               (const ChainSpan *chain);
+extern MAGNA_API              ChainSpan*    MAGNA_CALL chain_walk                 (ChainSpan *chain, ChainWalker walker, void *extraData);
+extern MAGNA_API              ChainSpan*    MAGNA_CALL chain_walk_reverse         (ChainSpan *chain, ChainWalker walker, void *extraData);
 
 /*=========================================================*/
 

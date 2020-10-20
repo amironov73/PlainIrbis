@@ -44,6 +44,7 @@
     <ClCompile Include="src\magna.c" />
     <ClCompile Include="src\map.c" />
     <ClCompile Include="src\memory.c" />
+    <ClCompile Include="src\multspan.c" />
     <ClCompile Include="src\navigatr.c" />
     <ClCompile Include="src\number.c" />
     <ClCompile Include="src\object.c" />

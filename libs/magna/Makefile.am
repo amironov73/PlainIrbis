@@ -25,6 +25,7 @@ libmagna_a_SOURCES = \
     src/magna.c      \
     src/map.c        \
     src/memory.c     \
+    src/multspan.c   \
     src/navigatr.c   \
     src/number.c     \
     src/object.c     \

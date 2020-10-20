@@ -9,6 +9,7 @@ project(offline C)
 set(CFiles
     src/array.c
     src/buffer.c
+    src/chain.c
     src/chunked.c
     src/connect.c
     src/cp1251.c

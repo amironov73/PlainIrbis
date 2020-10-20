@@ -2,14 +2,17 @@
 # Safe tests
 #
 
-sources = [ 'src/varray.c',
+sources = [ 'src/array.c',
     'src/buffer.c',
+    'src/chain.c',
     'src/chunked.c',
     'src/connect.c',
     'src/cp1251.c',
     'src/cp866.c',
     'src/ean.c',
+    'src/encoding.c',
     'src/enumertr.c',
+    'src/field.c',
     'src/file.c',
     'src/intarray.c',
     'src/io.c',

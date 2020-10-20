@@ -86,7 +86,7 @@ MAGNA_API Span MAGNA_CALL span_from_text
     assert (str != NULL);
 
     result.start = (am_byte*) str;
-    result.end = (am_byte*) (str + strlen (CCTEXT (str)));
+    result.end   = (am_byte*) (str + strlen (CCTEXT (str)));
 
     return result;
 }
@@ -174,6 +174,124 @@ MAGNA_API Span MAGNA_CALL span_trim
         (
             span_trim_start (span)
         );
+}
+
+/**
+ * Проход по каждому символу в фрагменте в прямом направлении.
+ *
+ * @param span Спан.
+ * @param routine Функция-обработчик. Возвращает
+ * `AM_FALSE`, если выполнение должно быть прервано.
+ * @param extraData Произвольные пользовательские данные (допускается `NULL`).
+ * @return Символ, на котором выполнение было прервано, либо `NULL`.
+ */
+MAGNA_API am_byte* MAGNA_CALL span_for_each
+    (
+        Span span,
+        SpanForEach routine,
+        void *extraData
+    )
+{
+    am_byte *ptr;
+
+    assert (routine != NULL);
+
+    for (ptr = span.start; ptr != span.end; ++ptr) {
+        if (!routine (*ptr, extraData)) {
+            return ptr;
+        }
+    }
+
+    return NULL;
+}
+
+/**
+ * Проход по каждому символу в фрагменте в прямом направлении.
+ *
+ * @param span Спан.
+ * @param routine Функция-обработчик. Возвращает
+ * `AM_FALSE`, если выполнение должно быть прервано.
+ * @param extraData Произвольные пользовательские данные (допускается `NULL`).
+ * @return Символ, на котором выполнение было прервано, либо `NULL`.
+ */
+MAGNA_API am_byte* MAGNA_CALL span_for_each_ptr
+    (
+        Span span,
+        SpanForEachPtr routine,
+        void *extraData
+    )
+{
+    am_byte *ptr;
+
+    assert (routine != NULL);
+
+    for (ptr = span.start; ptr != span.end; ++ptr) {
+        if (!routine (ptr, extraData)) {
+            return ptr;
+        }
+    }
+
+    return NULL;
+}
+
+/**
+ * Проход по каждому символу в фрагменте в обратном направлении.
+ *
+ * @param span Спан.
+ * @param routine Функция-обработчик. Возвращает
+ * `AM_FALSE`, если выполнение должно быть прервано.
+ * @param extraData Произвольные пользовательские данные (допускается `NULL`).
+ * @return Символ, на котором выполнение было прервано, либо `NULL`.
+ */
+MAGNA_API am_byte* MAGNA_CALL span_for_each_reverse
+    (
+        Span span,
+        SpanForEach routine,
+        void *extraData
+    )
+{
+    am_byte *ptr, *prev;
+
+    assert (routine != NULL);
+
+    for (ptr = span.end; ptr != span.start; ptr = prev) {
+        prev = ptr - 1;
+        if (!routine (*prev, extraData)) {
+            return prev;
+        }
+    }
+
+    return AM_FALSE;
+}
+
+/**
+ * Проход по каждому символу в фрагменте в прямом направлении.
+ *
+ * @param span Спан.
+ * @param routine Функция-обработчик. Возвращает
+ * `AM_FALSE`, если выполнение должно быть прервано.
+ * @param extraData Произвольные пользовательские данные (допускается `NULL`).
+ * @return Символ, на котором выполнение было прервано, либо `NULL`.
+ */
+MAGNA_API am_byte* MAGNA_CALL span_for_each_ptr_reverse
+    (
+        Span span,
+        SpanForEachPtr routine,
+        void *extraData
+    )
+{
+    am_byte *ptr, *prev;
+
+    assert (routine != NULL);
+
+    for (ptr = span.end; ptr != span.start; ptr = prev) {
+        prev = ptr - 1;
+        if (!routine (prev, extraData)) {
+            return prev;
+        }
+    }
+
+    return NULL;
 }
 
 /**
@@ -489,7 +607,7 @@ MAGNA_API Span MAGNA_CALL span_slice
  * Выделяет память под строку в куче.
  *
  * @param span Спан для преобразования.
- * @return Размещенная в куче копия строки.
+ * @return Размещенная в куче копия строки (с завершающим нулем).
  */
 MAGNA_API am_byte* MAGNA_CALL span_to_string
     (
@@ -517,7 +635,7 @@ MAGNA_API am_byte* MAGNA_CALL span_to_string
  * Выделяет память под вектор в куче.
  *
  * @param span Спан для преобразования.
- * @return Размещенный в куче вектор байтов (копия).
+ * @return Размещенный в куче вектор байтов (копия данных).
  */
 MAGNA_API am_byte* MAGNA_CALL span_to_vector
     (

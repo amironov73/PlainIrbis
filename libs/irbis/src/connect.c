@@ -75,6 +75,9 @@ MAGNA_API void MAGNA_CALL connection_destroy
 {
     assert (connection != NULL);
 
+    /* Если забыли отключиться, отключимся сейчас. */
+    connection_disconnect (connection);
+
     buffer_destroy (&connection->host);
     buffer_destroy (&connection->username);
     buffer_destroy (&connection->password);

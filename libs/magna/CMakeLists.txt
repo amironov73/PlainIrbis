@@ -40,6 +40,7 @@ set(CFiles
     src/map.c
     src/mapfile.c
     src/memory.c
+        src/chain.c
     src/navigatr.c
     src/number.c
     src/object.c
