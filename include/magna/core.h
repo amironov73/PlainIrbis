@@ -600,6 +600,7 @@ typedef struct
 {
     ChainSpan *chain;
     ChainSpan *current;
+    ChainSpan *end;
     am_byte *ptr;
 
 } ChainIterator;
@@ -609,7 +610,10 @@ typedef am_bool (MAGNA_CALL *ChainWalker) (ChainSpan*, void*);
 #define CHAIN_INIT { NULL, NULL, NULL }
 
 extern MAGNA_API              am_bool       MAGNA_CALL chain_append               (ChainSpan *chain, Span span);
-extern MAGNA_API              ChainSpan*    MAGNA_CALL chain_before               (const ChainSpan *chain, const ChainSpan *item);
+extern MAGNA_API              void          MAGNA_CALL chain_assert               (const ChainSpan *chain);
+extern MAGNA_API              int           MAGNA_CALL chain_back                 (ChainIterator *iterator);
+extern MAGNA_API              ChainSpan*    MAGNA_CALL chain_before               (const ChainSpan *chain, const ChainSpan *link);
+extern MAGNA_API              am_bool       MAGNA_CALL chain_bot                  (const ChainIterator *iterator);
 extern MAGNA_API              am_byte       MAGNA_CALL chain_clone                (ChainSpan *target, const ChainSpan *source);
 extern MAGNA_API              int           MAGNA_CALL chain_compare              (const ChainSpan *first, const ChainSpan *second);
 extern MAGNA_API              int           MAGNA_CALL chain_compare_ignore_case  (const ChainSpan *first, const ChainSpan *second);
@@ -618,6 +622,7 @@ extern MAGNA_API              int           MAGNA_CALL chain_compare_text       
 extern MAGNA_API              void          MAGNA_CALL chain_concat               (ChainSpan *target, const ChainSpan *source);
 extern MAGNA_API              void          MAGNA_CALL chain_destroy              (ChainSpan *chain);
 extern MAGNA_API              am_bool       MAGNA_CALL chain_ends_with            (ChainSpan *chain, ChainSpan *suffix);
+extern MAGNA_API              am_bool       MAGNA_CALL chain_eot                  (const ChainIterator *iterator);
 extern MAGNA_API              void          MAGNA_CALL chain_fill                 (ChainSpan *chain, am_byte value);
 extern MAGNA_API              am_byte*      MAGNA_CALL chain_for_each             (ChainSpan *chain, SpanForEach routine, void *extraData);
 extern MAGNA_API              am_byte*      MAGNA_CALL chain_for_each_ptr         (ChainSpan *chain, SpanForEachPtr routine, void *extraData);
@@ -632,7 +637,10 @@ extern MAGNA_API              ChainSpan*    MAGNA_CALL chain_last               
 extern MAGNA_API MAGNA_INLINE size_t        MAGNA_CALL chain_length               (ChainSpan *link);
 extern MAGNA_API MAGNA_INLINE ChainSpan                chain_null                 (void);
 extern MAGNA_API              void          MAGNA_CALL chain_optimize             (ChainSpan *chain);
+extern MAGNA_API              int           MAGNA_CALL chain_read                 (ChainIterator *iterator);
+extern MAGNA_API              int           MAGNA_CALL chain_read_utf8            (ChainIterator *iterator);
 extern MAGNA_API              am_bool       MAGNA_CALL chain_starts_with          (ChainSpan *chain, ChainSpan *prefix);
+extern MAGNA_API              am_bool       MAGNA_CALL chain_to_buffer            (const ChainSpan *chain, Buffer *output);
 extern MAGNA_API              void          MAGNA_CALL chain_to_console           (const ChainSpan *chain);
 extern MAGNA_API              am_bool       MAGNA_CALL chain_to_file              (const ChainSpan *chain, am_handle handle);
 extern MAGNA_API              am_int32      MAGNA_CALL chain_to_int32             (const ChainSpan *chain);

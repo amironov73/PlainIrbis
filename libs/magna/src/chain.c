@@ -50,15 +50,19 @@
  *
  * \struct ChainIterator
  *      \brief Итератор по цепочке фрагментов памяти.
+ *      \details Не владеет памятью, освобождение ресурсов не требуется.
  *
  * \var ChainIterator::chain
  *      \brief Указатель на начало цепочки.
  *
  * \var ChainIterator::current
- *      \brief Указатель на текущий фрагмент.
+ *      \brief Указатель на текущее звено.
+ *
+ * \var ChainIterator::end
+ *      \brief Указатель на последнее звено.
  *
  * \var ChainIterator::ptr
- *      \brief Указатель на текущий символ в фрагменте.
+ *      \brief Указатель на текущий символ в звене.
  */
 
 /*=========================================================*/
@@ -78,6 +82,7 @@ MAGNA_API void MAGNA_CALL chain_init
 {
     assert (chain != NULL);
 
+    /* Все элементы равны NULL. */
     chain->start = span.start;
     chain->end   = span.end;
     chain->next  = NULL;
@@ -91,7 +96,7 @@ MAGNA_API void MAGNA_CALL chain_init
  */
 MAGNA_API MAGNA_INLINE ChainSpan chain_null (void)
 {
-    ChainSpan result = CHAIN_INIT;
+    ChainSpan result = CHAIN_INIT; /* все элементы равны NULL */
 
     return result;
 }
@@ -106,15 +111,17 @@ MAGNA_API void MAGNA_CALL chain_destroy
         ChainSpan *chain
     )
 {
-    ChainSpan *span, *next;
+    ChainSpan *link; /* переменная цикла */
+    ChainSpan *next; /* указатель на следующее звено */
 
     assert (chain != NULL);
 
-    for (span = chain->next; span != NULL; span = next) {
-        next = span->next;
-        mem_free (span);
+    for (link = chain->next; link != NULL; link = next) {
+        next = link->next;
+        mem_free (link);
     }
 
+    /* Сбрасываем до пустого (для безопасности). */
     chain->start = NULL;
     chain->end   = NULL;
     chain->next  = NULL;
@@ -133,27 +140,33 @@ MAGNA_API am_byte MAGNA_CALL chain_clone
         const ChainSpan *source
     )
 {
-    ChainSpan *current, *last, *next;
+    ChainSpan *link; /* переменная цикла */
+    ChainSpan *last; /* последнее добавленное звено */
+    ChainSpan *next; /* следующее (конструируемое) звено */
 
     assert (target != NULL);
     assert (source != NULL);
 
+    /* Первое звено обрабатываем отдельно. */
     target->start = source->start;
     target->end   = source->end;
     target->next  = NULL;
-
     last = target;
-    for (current = source->next; current != NULL; current = current->next) {
+
+    /* Остальные звенья обрабатываем в цикле. */
+    for (link = source->next; link != NULL; link = link->next) {
         next = mem_alloc (sizeof (*next));
         if (next == NULL) {
+            /* При неудаче уничтожаем цепочку назначения. */
             chain_destroy (target);
 
             return AM_FALSE;
         }
 
+        /* Последние штрихи. */
         last->next  = next;
-        next->start = current->start;
-        next->end   = current->end;
+        next->start = link->start;
+        next->end   = link->end;
         next->next  = NULL;
         last        = next;
     }
@@ -162,17 +175,17 @@ MAGNA_API am_byte MAGNA_CALL chain_clone
 }
 
 /**
- * Получение указателя на последний фрагмент цепочки.
+ * Получение указателя на последнее звено цепочки.
  *
  * @param chain Начало цепочки.
- * @return Последний фрагмент цепочки (не может быть `NULL`).
+ * @return Указзатель на последнее звено цепочки (не может быть `NULL`).
  */
 MAGNA_API ChainSpan* MAGNA_CALL chain_last
     (
         const ChainSpan *chain
     )
 {
-    ChainSpan *result;
+    ChainSpan *result; /* результат */
 
     assert (chain != NULL);
 
@@ -184,42 +197,46 @@ MAGNA_API ChainSpan* MAGNA_CALL chain_last
 }
 
 /**
- * Получение элемента цепочки, предшествующего указанному.
+ * Получение звена цепочки, предшествующего указанному.
  *
  * @param chain Начало цепочки.
- * @param item Исследуемый элемент цепочки.
- * @return Указатель на предыдущий элемент либо `NULL`.
+ * @param link Исследуемое звено цепочки.
+ * @return Указатель на предыдущее звено либо `NULL`.
  */
 MAGNA_API ChainSpan* MAGNA_CALL chain_before
     (
         const ChainSpan *chain,
-        const ChainSpan *item
+        const ChainSpan *link
     )
 {
-    ChainSpan *result;
+    ChainSpan *result; /* результат */
 
     assert (chain != NULL);
-    assert (item != NULL);
+    assert (link != NULL);
 
-    if (item == chain) {
+    if (link == chain) {
+        /* У начального звена нет предшественника. */
         return NULL;
     }
 
     for (result = (ChainSpan*) chain; result->next != NULL; result = result->next) {
-        if (result->next == item) {
+        if (result->next == link) {
             return result;
         }
     }
+
+    /* Неожиданно: звено не принадлежит цепочке! */
+    LOG_ERROR ("link doesn't belongs to the chain")
 
     return NULL;
 }
 
 /**
- * Добавление фрагмента в конец цепочки.
- * Выделяет память в куче для добавляемого фрагмента.
+ * Добавление звена в конец цепочки.
+ * Выделяет память в куче для добавляемого звена.
  *
  * @param chain Начало цепочки.
- * @param span Добавляемый фрагмент.
+ * @param span Добавляемое звено.
  * @return Признак успеха завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL chain_append
@@ -228,7 +245,8 @@ MAGNA_API am_bool MAGNA_CALL chain_append
         Span span
     )
 {
-    ChainSpan *last, *next;
+    ChainSpan *last; /* последнее имеющееся звено */
+    ChainSpan *next; /* размещенное в куче новое звено */
 
     assert (chain != NULL);
 
@@ -262,7 +280,7 @@ MAGNA_API MAGNA_INLINE size_t MAGNA_CALL chain_length
 }
 
 /**
- * Вычисление общей длины цепочки фрагментов.
+ * Вычисление общей длины цепочки.
  *
  * @param chain Начало цепочки.
  * @return Общая длина цепочки в байтах.
@@ -272,10 +290,11 @@ MAGNA_API size_t MAGNA_CALL chain_total_length
         const ChainSpan *chain
     )
 {
-    size_t result = 0; /* Результат */
-    ChainSpan *link; /* Переменная цикла */
+    size_t result = 0; /* результат */
+    ChainSpan *link;   /* переменная цикла */
 
     assert (chain != NULL);
+
     for (link = (ChainSpan*) chain; link != NULL; link = link->next) {
         result += chain_length (link);
     }
@@ -285,7 +304,8 @@ MAGNA_API size_t MAGNA_CALL chain_total_length
 
 /**
  * Проверка, не пустая ли цепочка.
- * Цепочка считается пустой, если все ее элементы пусты.
+ * Цепочка считается пустой, если все ее звенья пусты.
+ * Звено считается пустым, если `start == end`.
  *
  * @param chain Начало цепочки.
  * @return Результат проверки.
@@ -295,12 +315,12 @@ MAGNA_API am_bool MAGNA_CALL chain_is_empty
         const ChainSpan *chain
     )
 {
-    const ChainSpan *span;
+    const ChainSpan *link; /* переменная цикла */
 
     assert (chain != NULL);
 
-    for (span = chain; span != NULL; span = span->next) {
-        if (span->start != span->end) {
+    for (link = chain; link != NULL; link = link->next) {
+        if (link->start != link->end) {
             return AM_FALSE;
         }
     }
@@ -320,7 +340,7 @@ MAGNA_API ChainSpan MAGNA_CALL chain_from_text
         const am_byte *text
     )
 {
-    ChainSpan result;
+    ChainSpan result; /* результат */
 
     assert (text != NULL);
 
@@ -343,17 +363,17 @@ MAGNA_API void MAGNA_CALL chain_trim_start
         ChainSpan *chain
     )
 {
-    ChainSpan *current;
+    ChainSpan *link; /* переменная цикла */
 
     assert (chain != NULL);
 
-    for (current = chain; current != NULL; current = current->next) {
-        while (current->start != current->end) {
-            if (!isspace (*current->start)) {
+    for (link = chain; link != NULL; link = link->next) {
+        while (link->start != link->end) {
+            if (!isspace (*link->start)) {
                 return;
             }
 
-            ++current->start;
+            ++link->start;
         }
     }
 
@@ -373,21 +393,20 @@ MAGNA_API void MAGNA_CALL chain_trim_end
         ChainSpan *chain
     )
 {
-    ChainSpan *current;
+    ChainSpan *link; /* переменная цикла */
 
     assert (chain != NULL);
 
-    for (current = chain_last (chain); current != NULL;
-        current = chain_before (chain, current)) {
-            while (current->start != current->end) {
-                if (!isspace(current->end[-1])) {
+    for (link = chain_last (chain); link != NULL; ) {
+            while (link->start != link->end) {
+                if (!isspace(link->end[-1])) {
                     return;
                 }
 
-                --current->end;
+                --link->end;
             }
 
-            current = chain_before(chain, current);
+        link = chain_before (chain, link);
     }
 
     /* Возможно, потребуется оптимизация цепочки. */
@@ -399,7 +418,7 @@ MAGNA_API void MAGNA_CALL chain_trim_end
  * Не производит никаких изменений в данных,
  * на которые ссылается цепочка.
  *
- * @param chain Цепочка.
+ * @param chain Начало цепочки.
  */
 MAGNA_API void MAGNA_CALL chain_trim
     (
@@ -428,14 +447,14 @@ MAGNA_API am_byte* MAGNA_CALL chain_for_each
         void *extraData
     )
 {
-    ChainSpan *current;
-    am_byte *ptr;
+    ChainSpan *link; /* переменная внешнего цикла */
+    am_byte *ptr;    /* переменная внутреннего цикла */
 
     assert (chain != NULL);
     assert (routine != NULL);
 
-    for (current = chain; current != NULL; current = current->next) {
-        for (ptr = current->start; ptr != current->end; ++ptr) {
+    for (link = chain; link != NULL; link = link->next) {
+        for (ptr = link->start; ptr != link->end; ++ptr) {
             if (!routine (*ptr, extraData)) {
                 return ptr;
             }
@@ -461,14 +480,14 @@ MAGNA_API am_byte* MAGNA_CALL chain_for_each_ptr
         void *extraData
     )
 {
-    ChainSpan *current;
-    am_byte *ptr;
+    ChainSpan *link; /* переменная внешнего цикла */
+    am_byte *ptr;    /* переменная внутреннего цикла */
 
     assert (chain != NULL);
     assert (routine != NULL);
 
-    for (current = chain; current != NULL; current = current->next) {
-        for (ptr = current->start; ptr != current->end; ++ptr) {
+    for (link = chain; link != NULL; link = link->next) {
+        for (ptr = link->start; ptr != link->end; ++ptr) {
             if (!routine (ptr, extraData)) {
                 return ptr;
             }
@@ -494,19 +513,22 @@ MAGNA_API am_byte* MAGNA_CALL chain_for_each_reverse
         void *extraData
     )
 {
-    ChainSpan *current;
-    am_byte *ptr;
+    ChainSpan *link; /* переменная внешнего цикла */
+    am_byte *ptr;    /* переменная внутреннего цикла */
+    am_byte *prev;   /* указатель на предшествующий байт */
 
     assert (chain != NULL);
     assert (routine != NULL);
 
-    for (current = chain_last (chain); current != NULL;
-        current = chain_before (chain, current)) {
-        for (ptr = current->end; ptr != current->start; --ptr) {
-            if (!routine (ptr [-1], extraData)) {
-                return ptr;
+    for (link = chain_last (chain); link != NULL; ) {
+        for (ptr = link->end; ptr != link->start; ptr = prev) {
+            prev = ptr - 1;
+            if (!routine (*prev, extraData)) {
+                return prev;
             }
         }
+
+        link = chain_before (chain, link);
     }
 
     return NULL;
@@ -528,19 +550,22 @@ MAGNA_API am_byte* MAGNA_CALL chain_for_each_ptr_reverse
         void *extraData
     )
 {
-    ChainSpan *current;
-    am_byte *ptr, *prev;
+    ChainSpan *link; /* переменная внешнего цикла */
+    am_byte *ptr;    /* переменная внутреннего цикла */
+    am_byte *prev;   /* указатель на предшествующий байт */
 
     assert (chain != NULL);
     assert (routine != NULL);
 
-    for (current = chain; current != NULL; current = current->next) {
-        for (ptr = current->end; ptr != current->start; ptr = prev) {
+    for (link = chain_last (chain); link != NULL; ) {
+        for (ptr = link->end; ptr != link->start; ptr = prev) {
             prev = ptr - 1;
             if (!routine (prev, extraData)) {
                 return prev;
             }
         }
+
+        link = chain_before (chain, link);
     }
 
     return NULL;
@@ -557,12 +582,57 @@ MAGNA_API am_int32 MAGNA_CALL chain_to_int32
         const ChainSpan *chain
     )
 {
-    am_int32 result = 0;
-    /* am_bool sign = AM_FALSE; */
+    am_int32 result = 0;     /* результат */
+    ChainSpan *link;         /* переменная внешнего цикла */
+    am_byte *ptr;            /* перменная внутреннего цикла */
+    am_bool sign = AM_FALSE; /* знак числа, AM_TRUE = отрицательный */
+    am_byte chr;             /* прочитанный символ */
 
     assert (chain != NULL);
 
-    /* TODO: implement */
+    /* Сначала разбираемся со знаком и начальными пробелами */
+    for (link = (ChainSpan*) chain; link != NULL; link = link->next) {
+        for (ptr = link->start; ptr != link->end; ++ptr) {
+            chr = *ptr;
+            if (chr == '-') {
+                sign = !sign;
+            }
+            else if (chr == '+' || chr <= ' ') {
+                /* ничего не делаем */
+            }
+            else {
+                goto SIGN_PARSED;
+            }
+        }
+    }
+
+    SIGN_PARSED:
+
+    /* Знак числа разобран, разбираем текущее звено */
+    for ( ; ptr != link->end; ++ptr) {
+        chr = *ptr;
+        if (chr < '0' || chr > '9') {
+            /* Цифры закончились */
+            goto DONE;
+        }
+
+        result = result * 10 + chr - '0';
+    }
+
+    /* Оставшиеся звенья */
+    for ( ; link != NULL; link = link->next) {
+        for (ptr = link->start; ptr != link->end; ++ptr) {
+            chr = *ptr;
+            if (chr < '0' || chr > '9') {
+                /* Цифры закончились */
+                goto DONE;
+            }
+
+            result = result * 10 + chr - '0';
+        }
+    }
+
+    DONE:
 
     return result;
 }
@@ -578,12 +648,57 @@ MAGNA_API am_int64 MAGNA_CALL chain_to_int64
         const ChainSpan *chain
     )
 {
-    am_int64 result = 0;
-    /* am_bool sign = AM_FALSE; */
+    am_int64 result = 0;     /* результат */
+    ChainSpan *link;         /* переменная внешнего цикла */
+    am_byte *ptr;            /* перменная внутреннего цикла */
+    am_bool sign = AM_FALSE; /* знак числа, AM_TRUE = отрицательный */
+    am_byte chr;             /* прочитанный символ */
 
     assert (chain != NULL);
 
-    /* TODO: implement */
+    /* Сначала разбираемся со знаком и начальными пробелами */
+    for (link = (ChainSpan*) chain; link != NULL; link = link->next) {
+        for (ptr = link->start; ptr != link->end; ++ptr) {
+            chr = *ptr;
+            if (chr == '-') {
+                sign = !sign;
+            }
+            else if (chr == '+' || chr <= ' ') {
+                /* ничего не делаем */
+            }
+            else {
+                goto SIGN_PARSED;
+            }
+        }
+    }
+
+    SIGN_PARSED:
+
+    /* Знак числа разобран, разбираем текущее звено */
+    for ( ; ptr != link->end; ++ptr) {
+        chr = *ptr;
+        if (chr < '0' || chr > '9') {
+            /* Цифры закончились */
+            goto DONE;
+        }
+
+        result = result * 10 + chr - '0';
+    }
+
+    /* Оставшиеся звенья */
+    for ( ; link != NULL; link = link->next) {
+        for (ptr = link->start; ptr != link->end; ++ptr) {
+            chr = *ptr;
+            if (chr < '0' || chr > '9') {
+                /* Цифры закончились */
+                goto DONE;
+            }
+
+            result = result * 10 + chr - '0';
+        }
+    }
+
+    DONE:
 
     return result;
 }
@@ -599,15 +714,19 @@ MAGNA_API am_uint32 MAGNA_CALL chain_to_uint32
         const ChainSpan *chain
     )
 {
-    am_uint32 result = 0;
-    ChainSpan *current;
-    am_byte *ptr;
+    am_uint32 result = 0; /* результат */
+    ChainSpan *link;      /* переменная внешнего цикла */
+    am_byte *ptr;         /* перменная внутреннего цикла */
+    am_byte chr;          /* прочитанный символ */
 
     assert (chain != NULL);
 
-    for (current = (ChainSpan*) chain; current != NULL; current = current->next) {
-        for (ptr = current->start; ptr != current->end; ++ptr) {
-            result = result * 10 + *ptr - '0';
+    for (link = (ChainSpan*) chain; link != NULL; link = link->next) {
+        for (ptr = link->start; ptr != link->end; ++ptr) {
+            chr = *ptr;
+            if (chr >= '0' && chr <= '9') {
+                result = result * 10 + chr - '0';
+            }
         }
     }
 
@@ -625,15 +744,19 @@ MAGNA_API am_uint64 MAGNA_CALL chain_to_uint64
         const ChainSpan *chain
     )
 {
-    am_uint64 result = 0;
-    ChainSpan *current;
-    am_byte *ptr;
+    am_uint64 result = 0; /* результат */
+    ChainSpan *link;      /* переменная внешнего цикла */
+    am_byte *ptr;         /* переменная внутреннего цикла */
+    am_byte chr;          /* прочитанный символ */
 
     assert (chain != NULL);
 
-    for (current = (ChainSpan*) chain; current != NULL; current = current->next) {
-        for (ptr = current->start; ptr != current->end; ++ptr) {
-            result = result * 10 + *ptr - '0';
+    for (link = (ChainSpan*) chain; link != NULL; link = link->next) {
+        for (ptr = link->start; ptr != link->end; ++ptr) {
+            chr = *ptr;
+            if (chr >= '0' && chr <= '9') {
+                result = result * 10 + chr - '0';
+            }
         }
     }
 
@@ -650,13 +773,13 @@ MAGNA_API void MAGNA_CALL chain_toupper
         ChainSpan *chain
     )
 {
-    ChainSpan *current;
-    am_byte *ptr;
+    ChainSpan *link; /* переменная внешнего цикла */
+    am_byte *ptr;    /* переменная внутреннего цикла */
 
     assert (chain != NULL);
 
-    for (current = chain; current != NULL; current = current->next) {
-        for (ptr = current->start; ptr != current->end; ++ptr) {
+    for (link = chain; link != NULL; link = link->next) {
+        for (ptr = link->start; ptr != link->end; ++ptr) {
             *ptr = toupper (*ptr);
         }
     }
@@ -672,13 +795,13 @@ MAGNA_API void MAGNA_CALL chain_tolower
         ChainSpan *chain
     )
 {
-    ChainSpan *current;
-    am_byte *ptr;
+    ChainSpan *link; /* переменная внешнего цикла */
+    am_byte *ptr;    /* переменная внутреннего цикла */
 
     assert (chain != NULL);
 
-    for (current = chain; current != NULL; current = current->next) {
-        for (ptr = current->start; ptr != current->end; ++ptr) {
+    for (link = chain; link != NULL; link = link->next) {
+        for (ptr = link->start; ptr != link->end; ++ptr) {
             *ptr = tolower (*ptr);
         }
     }
@@ -696,13 +819,13 @@ MAGNA_API void MAGNA_CALL chain_fill
         am_byte value
     )
 {
-    ChainSpan *current;
-    am_byte *ptr;
+    ChainSpan *link; /* переменная внешнего цикла */
+    am_byte *ptr;    /* переменная внутреннего цикла */
 
     assert (chain != NULL);
 
-    for (current = chain; current != NULL; current = current->next) {
-        for (ptr = current->start; ptr != current->end; ++ptr) {
+    for (link = chain; link != NULL; link = link->next) {
+        for (ptr = link->start; ptr != link->end; ++ptr) {
             *ptr = value;
         }
     }
@@ -726,8 +849,8 @@ MAGNA_API void MAGNA_CALL chain_slice
     ChainSpan *link; /* текущее звено */
     ChainSpan *next; /* указатель на следующее звено */
     ChainSpan *tmp;  /* Переменная в цикле */
-    am_byte *where; /* до куда домотали */
-    size_t delta;   /* длина текущего звена */
+    am_byte *where;  /* до куда домотали */
+    size_t delta;    /* длина текущего звена */
 
     assert (chain != NULL);
 
@@ -820,7 +943,7 @@ MAGNA_API ChainSpan* MAGNA_CALL chain_walk
         void *extraData
     )
 {
-    ChainSpan *link; /* Переменная цикла */
+    ChainSpan *link; /* переменная цикла */
 
     assert (chain != NULL);
     assert (walker != NULL);
@@ -1039,6 +1162,8 @@ MAGNA_API int MAGNA_CALL chain_compare_span
 {
     assert (chain != NULL);
 
+    (void) span;
+
     /* TODO: implement */
 
     return 0;
@@ -1075,9 +1200,13 @@ MAGNA_API void MAGNA_CALL chain_to_console
         const ChainSpan *chain
     )
 {
+    ChainSpan *link; /* переменная цикла */
+
     assert (chain != NULL);
 
-    /* TODO: implement */
+    for (link = (ChainSpan*) chain; link != NULL; link = link->next) {
+        fwrite (link->start, 1, chain_length (link), stdout);
+    }
 }
 
 /**
@@ -1093,12 +1222,58 @@ MAGNA_API am_bool MAGNA_CALL chain_to_file
         am_handle handle
     )
 {
+    ChainSpan *link; /* переменная цикла */
+
     assert (chain != NULL);
     assert (handle_is_good (handle));
 
-    /* TODO: implement */
+    for (link = (ChainSpan*) chain; link != NULL; link = link->next) {
+        if (!file_write (handle, link->start, chain_length (link))) {
+            return AM_FALSE;
+        }
+    }
 
-    return AM_FALSE;
+    return AM_TRUE;
+}
+
+/**
+ * Оптимальная сборка цепочки фрагментов в буфер.
+ *
+ * @param chain Начало цепочки.
+ * @param output
+ * @return
+ */
+MAGNA_API am_bool MAGNA_CALL chain_to_buffer
+    (
+        const ChainSpan *chain,
+        Buffer *output
+    )
+{
+    size_t length;   /* общая длина данных */
+    size_t delta;    /* длина звена */
+    am_byte *ptr;    /* временный указатель */
+    ChainSpan *link; /* переменная цикла */
+
+    assert (chain != NULL);
+    assert (output != NULL);
+
+    buffer_clear (output);
+    length = chain_total_length (chain);
+    if (!buffer_grow (output, length + 1)) {
+        return AM_FALSE;
+    }
+
+    ptr = output->start;
+    for (link = (ChainSpan*) chain; link != NULL; link = link->next) {
+        delta = chain_length (link);
+        mem_copy (ptr, link->start, delta);
+        ptr += delta;
+    }
+
+    *ptr = 0; /* завершающий 0 для совместимости с ASCIIZ */
+    output->current = ptr; /* устанавливаем длину */
+
+    return AM_TRUE;
 }
 
 /**
@@ -1141,7 +1316,28 @@ MAGNA_API void MAGNA_CALL chain_optimize
 
 /**
  * Верификация цепочки.
- * Каждый элемент цепочки должен удовлетворять условию
+ * Каждое звено цепочки должно удовлетворять условию
+ * `start &lt;= end`.
+ *
+ * @param chain Начало цепочки.
+ */
+MAGNA_API void MAGNA_CALL chain_assert
+    (
+        const ChainSpan *chain
+    )
+{
+    assert (chain != NULL);
+
+    while (chain != NULL) {
+        assert (chain->start <= chain->end);
+
+        chain = chain->next;
+    }
+}
+
+/**
+ * Верификация цепочки.
+ * Каждое звено цепочки должно удовлетворять условию
  * `start &lt;= end`.
  *
  * @param chain Начало цепочки.
@@ -1176,12 +1372,13 @@ MAGNA_API ChainIterator MAGNA_CALL chain_get_forward_iterator
         const ChainSpan *chain
     )
 {
-    ChainIterator result;
+    ChainIterator result; /* результат */
 
     assert (chain != NULL);
 
     result.chain   = (ChainSpan*) chain;
     result.current = (ChainSpan*) chain;
+    result.end     = chain_last (chain);
     result.ptr     = chain->start;
 
     return result;
@@ -1198,15 +1395,112 @@ MAGNA_API ChainIterator MAGNA_CALL chain_get_reverse_iterator
         const ChainSpan *chain
     )
 {
-    ChainIterator result;
+    ChainIterator result; /* результат */
 
     assert (chain != NULL);
 
     result.chain   = (ChainSpan*) chain;
     result.current = chain_last (chain);
+    result.end     = (ChainSpan*) chain;
     result.ptr     = result.current->end;
 
     return result;
+}
+
+/**
+ * Реверсный итератор достиг начала цепочки?
+ *
+ * @param iterator Итератор.
+ * @return Результат проверки.
+ */
+MAGNA_API am_bool MAGNA_CALL chain_bot
+    (
+        const ChainIterator *iterator
+    )
+{
+    assert (iterator != NULL);
+
+    return (iterator->current == iterator->end
+            && iterator->ptr == iterator->current->start);
+}
+
+/**
+ * Прямой итератор достиг конца цепочки?
+ *
+ * @param iterator Итератор.
+ * @return Результат проверки.
+ */
+MAGNA_API am_bool MAGNA_CALL chain_eot
+    (
+        const ChainIterator *iterator
+    )
+{
+    assert (iterator != NULL);
+
+    return (iterator->current == iterator->end
+            && iterator->ptr == iterator->current->end);
+}
+
+/**
+ * Считывание предыдущего символа из реверсного итератора.
+ *
+ * @param iterator Итератор.
+ * @return Прочитанный символ либо -1.
+ */
+MAGNA_API int MAGNA_CALL chain_back
+    (
+        ChainIterator *iterator
+    )
+{
+    assert (iterator != NULL);
+
+    return -1;
+}
+
+/**
+ * Считывание следующего символа из прямого итератора.
+ *
+ * @param iterator Итератор.
+ * @return Прочитанный символ либо -1.
+ */
+MAGNA_API int MAGNA_CALL chain_read
+    (
+        ChainIterator *iterator
+    )
+{
+    ChainSpan *next; /* следующее звено */
+
+    assert (iterator != NULL);
+
+    while (iterator->ptr == iterator->current->end) {
+        next = iterator->current->next;
+        if (next == NULL) {
+            return -1;
+        }
+
+        iterator->current = next;
+        iterator->ptr = next->start;
+    }
+
+   return *iterator->ptr++;
+}
+
+/**
+ * Считывание следующего символа в кодировке UTF-8 из прямого итератора.
+ *
+ * @param iterator Итератор.
+ * @return Прочитанный символ либо -1.
+ */
+MAGNA_API int MAGNA_CALL chain_read_utf8
+    (
+        ChainIterator *iterator
+    )
+{
+    assert (iterator != NULL);
+
+    /* TODO: implement */
+
+    return -1;
 }
 
 /*=========================================================*/

@@ -434,7 +434,7 @@ MAGNA_API am_bool MAGNA_CALL buffer_putc
  * Дописывает строку в конец буфера.
  *
  * @param buffer Инициализированный буфер.
- * @param str ASCIZ-строка для записи.
+ * @param str ASCIIZ-строка для записи.
  * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL buffer_puts
