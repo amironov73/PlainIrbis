@@ -13,22 +13,6 @@
 
 /*=========================================================*/
 
-#ifdef _MSC_VER
-
-#include <intrin.h>
-
-#pragma intrinsic(_rotl16, _rotl, _rotr)
-
-#endif
-
-#if defined(__GCC__) || defined(__GNUC__) || defined(__CLANG__)
-
-#include <x86intrin.h>
-
-#endif
-
-/*=========================================================*/
-
 /**
  * \file io.c
  *
@@ -37,7 +21,6 @@
  * 32-битные целые записываются в сетевом формате (Big Endian).
  * 64-битные записываются как пара 32-битных, причем сначала идет младшее,
  * затем старшее.
- *
  */
 
 /*=========================================================*/
@@ -54,33 +37,8 @@ MAGNA_API MAGNA_INLINE am_uint16 MAGNA_CALL magna_ntohs
         am_uint16 value
     )
 {
-#undef IMPLEMENTED
-
-#ifdef _MSC_VER
-
-    return _rotl16 (value, 8);
-
-#define IMPLEMENTED
-
-#endif
-
-#if defined(__GCC__) || defined(__GNUC__) || defined(__CLANG__)
-
-#ifndef __APPLE__
-
-    return __rolw (value, 8);
-
-#define IMPLEMENTED
-
-#endif
-
-#endif
-
-#ifndef IMPLEMENTED
-
-    return ((value & 0x00FFu) << 8u) + ((value & 0xFF00u) >> 8u);
-
-#endif
+    return ((value & 0x00FFu) << 8u)
+        |  ((value & 0xFF00u) >> 8u);
 }
 
 /**
@@ -94,28 +52,10 @@ MAGNA_API MAGNA_INLINE am_uint32 MAGNA_CALL magna_ntohl
         am_uint32 value
     )
 {
-#undef IMPLEMENTED
-
-#if defined(_MSC_VER) || defined(__GCC__) || defined(__GNUC__) || defined(__CLANG__)
-
-#ifndef __APPLE__
-
-    return _rotr (value & 0x00FF00FFu, 8) | _rotl (value &0xFF00FF00u, 8);
-
-#define IMPLEMENTED
-
-#endif
-
-#endif
-
-#ifndef IMPLEMENTED
-
     return ((value & 0x000000FFu) << 24u)
         |  ((value & 0x0000FF00u) << 8u)
         |  ((value & 0x00FF0000u) >> 8u)
         |  ((value & 0xFF000000u) >> 24u);
-
-#endif
 }
 
 /**
