@@ -866,13 +866,13 @@ MAGNA_API size_t MAGNA_CALL arena_total
 /*=========================================================*/
 
 #ifdef MAGNA_64BIT
-typedef am_uint64 uintptr_t;
+typedef am_uint64 am_uintptr_t;
 #else
-typedef am_uint32 uintptr_t;
+typedef am_uint32 am_uintptr_t;
 #endif
 
-typedef am_uint16 offset_t;
-#define PTR_OFFSET_SZ sizeof(offset_t)
+typedef am_uint16 am_offset_t;
+#define PTR_OFFSET_SZ sizeof(am_offset_t)
 
 #ifndef align_up
 #define align_up(num, align) \
@@ -931,12 +931,12 @@ MAGNA_API void* MAGNA_CALL mem_aligned_alloc
              * Then align the resulting value to the
              * target alignment
              */
-            result = (void*) align_up (((uintptr_t) p + PTR_OFFSET_SZ), alignment);
+            result = (void*) align_up (((am_uintptr_t) p + PTR_OFFSET_SZ), alignment);
 
             /* Calculate the offset and store it
                behind our aligned pointer */
-            *((offset_t*) result - 1) =
-                    (offset_t) ((uintptr_t) result - (uintptr_t) p);
+            *((am_offset_t*) result - 1) =
+                    (am_offset_t) ((am_uintptr_t) result - (am_uintptr_t) p);
 
         } /* else NULL, could not malloc */
     } /* else NULL, invalid arguments */
@@ -953,7 +953,7 @@ MAGNA_API void MAGNA_CALL mem_aligned_free
         void *ptr
     )
 {
-    offset_t offset;
+    am_offset_t offset;
     void *p;
 
     assert (ptr);
@@ -963,7 +963,7 @@ MAGNA_API void MAGNA_CALL mem_aligned_free
     * to get the pointer offset. We convert to an offset_t
     * pointer and rely on pointer math to get the data
     */
-    offset = *((offset_t *) ptr - 1);
+    offset = *((am_offset_t *) ptr - 1);
 
     /*
     * Once we have the offset, we can get our
@@ -973,8 +973,6 @@ MAGNA_API void MAGNA_CALL mem_aligned_free
 
     mem_free (p);
 }
-
-
 
 /*=========================================================*/
 
