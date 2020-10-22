@@ -69,11 +69,28 @@ set(CFiles
     src/xrf.c
 )
 
-add_library(${PROJECT_NAME}
-    STATIC
-    ${HeaderFiles}
-    ${CFiles}
-)
+if(WITH_SHARED_LIBRARIES)
+
+    add_library(${PROJECT_NAME}
+        SHARED
+        ${HeaderFiles}
+        ${CFiles}
+    )
+
+    target_compile_definitions(${PROJECT_NAME}
+        PRIVATE
+        -DMAGNA_DYNAMIC_LIBRARY
+    )
+
+else()
+
+    add_library(${PROJECT_NAME}
+        STATIC
+        ${HeaderFiles}
+        ${CFiles}
+    )
+
+endif()
 
 target_include_directories(${PROJECT_NAME}
     PRIVATE
@@ -91,4 +108,4 @@ if(MINGW)
     target_link_libraries(${PROJECT_NAME} libws2_32.a)
 endif(MINGW)
 
-install(TARGETS ${PROJECT_NAME} DESTINATION ${ARTIFACTS})
+install(TARGETS ${PROJECT_NAME} DESTINATION ${ARTIFACTS}/lib)

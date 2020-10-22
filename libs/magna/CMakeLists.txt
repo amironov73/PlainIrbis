@@ -17,6 +17,7 @@ set(CFiles
     src/array.c
     src/beep.c
     src/buffer.c
+    src/chain.c
     src/chunked.c
     src/cp1251.c
     src/cp866.c
@@ -40,7 +41,6 @@ set(CFiles
     src/map.c
     src/mapfile.c
     src/memory.c
-        src/chain.c
     src/navigatr.c
     src/number.c
     src/object.c
@@ -60,11 +60,28 @@ set(CFiles
     src/vector.c
 )
 
-add_library(${PROJECT_NAME}
-    STATIC
-    ${HeaderFiles}
-    ${CFiles}
-)
+if(WITH_SHARED_LIBRARIES)
+
+    add_library(${PROJECT_NAME}
+        SHARED
+        ${HeaderFiles}
+        ${CFiles}
+        )
+
+    target_compile_definitions(${PROJECT_NAME}
+        PRIVATE
+        -DMAGNA_DYNAMIC_LIBRARY
+        )
+
+else()
+
+    add_library(${PROJECT_NAME}
+        STATIC
+        ${HeaderFiles}
+        ${CFiles}
+    )
+
+endif()
 
 target_include_directories(${PROJECT_NAME}
     PRIVATE
@@ -80,4 +97,4 @@ if(MINGW)
     target_link_libraries(${PROJECT_NAME} libws2_32.a)
 endif(MINGW)
 
-install(TARGETS ${PROJECT_NAME} DESTINATION ${ARTIFACTS})
+install(TARGETS ${PROJECT_NAME} DESTINATION ${ARTIFACTS}/lib)

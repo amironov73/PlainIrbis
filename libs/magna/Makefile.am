@@ -3,6 +3,7 @@ libmagna_a_CPPFLAGS = -I../include -I../../include
 libmagna_a_SOURCES = \
     src/beep.c       \
     src/buffer.c     \
+    src/chain.c      \
     src/chunked.c    \
     src/cp1251.c     \
     src/cp866.c      \
@@ -25,7 +26,6 @@ libmagna_a_SOURCES = \
     src/magna.c      \
     src/map.c        \
     src/memory.c     \
-    src/multspan.c   \
     src/navigatr.c   \
     src/number.c     \
     src/object.c     \

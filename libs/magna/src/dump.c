@@ -45,7 +45,7 @@ MAGNA_API void MAGNA_CALL dump_bytes
 
     for (offset = 0; offset < length; offset += 16) {
         fprintf (file, "%08lX: ", (unsigned long) offset);
-        run = min (length - offset, 16);
+        run = min_size_t (length - offset, 16);
         for (i = 0; i < run; ++i) {
             fprintf (file, " %02X", bytes [offset + i]);
         }

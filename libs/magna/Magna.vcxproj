@@ -22,6 +22,7 @@
     <ClCompile Include="src\array.c" />
     <ClCompile Include="src\beep.c" />
     <ClCompile Include="src\buffer.c" />
+    <ClCompile Include="src\chain.c" />
     <ClCompile Include="src\chunked.c" />
     <ClCompile Include="src\cp1251.c" />
     <ClCompile Include="src\cp866.c" />
@@ -44,7 +45,6 @@
     <ClCompile Include="src\magna.c" />
     <ClCompile Include="src\map.c" />
     <ClCompile Include="src\memory.c" />
-    <ClCompile Include="src\multspan.c" />
     <ClCompile Include="src\navigatr.c" />
     <ClCompile Include="src\number.c" />
     <ClCompile Include="src\object.c" />

@@ -154,7 +154,7 @@ MAGNA_API am_bool MAGNA_CALL ini_section_init
 {
     assert (section != NULL);
 
-    buffer_null (&section->name);
+    buffer_init (&section->name);
 
     return array_create (&section->lines, sizeof (IniLine), 4);
 }
