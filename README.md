@@ -23,6 +23,7 @@ Universal client software for IRBIS64 library automation system (ManagedClient p
 * MSVS 2013/2015/2017/2019 Community Edition on Windows;
 * GCC 4.8 or higher both on Windows (MinGW) and Linux/OS X;
 * Clang compiler 9 both on Windows and Linux;
+* Open Watcom 1.9 on Windows;
 * Intel C compiler 19 on Windows, Linux/OS X.
 
 ### Simple example

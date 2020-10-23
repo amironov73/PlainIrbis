@@ -170,9 +170,11 @@ MAGNA_API int server_guard_close (void)
  */
 MAGNA_API int check_other_server_running (void)
 {
+    HRESULT hr;
+
     assert (startHandle != NULL);
 
-    HRESULT hr = WaitForSingleObject
+    hr = WaitForSingleObject
         (
             startHandle, /* handle */
             1 /* milliseconds */
@@ -188,9 +190,11 @@ MAGNA_API int check_other_server_running (void)
  */
 MAGNA_API int check_server_stop_requested (void)
 {
+    HRESULT hr;
+
     assert (stopHandle != NULL);
 
-    HRESULT hr = WaitForSingleObject
+    hr = WaitForSingleObject
         (
             stopHandle, /* handle */
             1 /* milliseconds */
@@ -207,9 +211,11 @@ MAGNA_API int check_server_stop_requested (void)
  */
 MAGNA_API void say_i_am_running (void)
 {
+    BOOL hr;
+
     assert (startHandle != NULL);
 
-    BOOL hr = SetEvent(startHandle);
+    hr = SetEvent(startHandle);
     assert (hr == TRUE);
 }
 
@@ -221,9 +227,11 @@ MAGNA_API void say_i_am_running (void)
  */
 MAGNA_API void say_i_am_stopped (void)
 {
+    BOOL hr;
+
     assert (startHandle != NULL);
 
-    BOOL hr = ResetEvent (startHandle);
+    hr = ResetEvent (startHandle);
     assert (hr == TRUE);
 }
 
@@ -234,9 +242,11 @@ MAGNA_API void say_i_am_stopped (void)
  */
 MAGNA_API void request_server_stop (void)
 {
+    BOOL hr;
+
     assert (stopHandle != NULL);
 
-    BOOL hr = SetEvent (stopHandle);
+    hr = SetEvent (stopHandle);
     assert (hr == TRUE);
 }
 

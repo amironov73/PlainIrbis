@@ -5,7 +5,7 @@
 #define MAGNA_CORE_H
 
 #ifdef HAVE_CONFIG_H
-#include "magna/config/config.h"
+#include "config.h"
 #endif
 
 #define WIN32_LEAN_AND_MEAN /* Exclude rarely-used stuff from Windows headers */
@@ -199,9 +199,9 @@
 
 #elif defined(_MSC_VER)
 
-#define MAGNA_RESTRICT __declspec(restrict)
+#define MAGNA_RESTRICT __restrict
 
-#elif defined(__GNUC__)
+#elif defined(__GNUC__) || defined(__clang__)
 
 #define MAGNA_RESTRICT __restrict__
 
@@ -249,6 +249,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <stdarg.h>
 
 /*=========================================================*/
 
@@ -288,6 +289,14 @@ typedef long long int ssize_t;
 typedef int ssize_t;
 
 #endif
+
+#endif
+
+#ifdef 	__WATCOMC__
+
+/* OpenWatcom doesn't have `ssize_t` */
+
+typedef int ssize_t;
 
 #endif
 
@@ -450,7 +459,7 @@ MAGNA_API const char* choose_string (const char *first, ...);
 MAGNA_API Span        choose_span   (Span first, ...);
 MAGNA_API Buffer*     choose_buffer (const Buffer *first, ...);
 
-extern MAGNA_API MAGNA_INLINE const char* newline       (void);
+extern MAGNA_API MAGNA_INLINE const char* newline (void);
 
 /*=========================================================*/
 
@@ -470,7 +479,7 @@ typedef void* (MAGNA_CALL *AllocationHandler) (size_t size);
 MAGNA_API void*             MAGNA_CALL mem_alloc            (size_t size);
 MAGNA_API void*             MAGNA_CALL mem_alloc_ex         (size_t size);
 MAGNA_API void              MAGNA_CALL mem_clear            (void *ptr, size_t size);
-MAGNA_API void              MAGNA_CALL mem_copy             (void *destination, const void *source, size_t size);
+MAGNA_API void              MAGNA_CALL mem_copy             (void *MAGNA_RESTRICT destination, const void *MAGNA_RESTRICT source, size_t size);
 MAGNA_API void              MAGNA_CALL mem_free             (void *ptr);
 MAGNA_API void*             MAGNA_CALL mem_realloc          (void *ptr, size_t newSize);
 MAGNA_API AllocationHandler MAGNA_CALL mem_set_handler      (AllocationHandler newHandler);
@@ -497,10 +506,10 @@ typedef struct {
 
 } Arena;
 
-MAGNA_API void*     MAGNA_CALL arena_alloc (Arena *arena, size_t length);
-MAGNA_API void      MAGNA_CALL arena_destroy  (Arena *arena);
-MAGNA_API am_bool   MAGNA_CALL arena_init  (Arena *arena, size_t chunkSize);
-MAGNA_API size_t    MAGNA_CALL arena_total (const Arena *arena);
+MAGNA_API void*     MAGNA_CALL arena_alloc    (Arena *MAGNA_RESTRICT arena, size_t length);
+MAGNA_API void      MAGNA_CALL arena_destroy  (Arena *MAGNA_RESTRICT arena);
+MAGNA_API am_bool   MAGNA_CALL arena_init     (Arena *MAGNA_RESTRICT arena, size_t chunkSize);
+MAGNA_API size_t    MAGNA_CALL arena_total    (const Arena *MAGNA_RESTRICT arena);
 
 /*=========================================================*/
 
@@ -535,7 +544,7 @@ typedef am_bool (MAGNA_CALL *SpanForEachPtr) (am_byte*, void*);
 
 extern MAGNA_API MAGNA_INLINE void       MAGNA_CALL span_assert                   (Span span);
 extern MAGNA_API              int        MAGNA_CALL span_compare                  (Span first, Span second);
-extern MAGNA_API              int        MAGNA_CALL span_compare_ignore_case      (Span first, Span second    );
+extern MAGNA_API              int        MAGNA_CALL span_compare_ignore_case      (Span first, Span second);
 extern MAGNA_API              am_bool    MAGNA_CALL span_contains                 (Span span, am_byte value);
 extern MAGNA_API              size_t     MAGNA_CALL span_count                    (Span span, am_byte value);
 extern MAGNA_API              am_bool    MAGNA_CALL span_ends_with                (Span span, Span suffix);
@@ -609,9 +618,9 @@ typedef am_bool (MAGNA_CALL *ChainWalker) (ChainSpan*, void*);
 
 #define CHAIN_INIT { NULL, NULL, NULL }
 
-extern MAGNA_API              am_bool       MAGNA_CALL chain_append               (ChainSpan *chain, Span span);
-extern MAGNA_API              void          MAGNA_CALL chain_assert               (const ChainSpan *chain);
-extern MAGNA_API              int           MAGNA_CALL chain_back                 (ChainIterator *iterator);
+extern MAGNA_API              am_bool       MAGNA_CALL chain_append               (ChainSpan *MAGNA_RESTRICT chain, Span span);
+extern MAGNA_API              void          MAGNA_CALL chain_assert               (const ChainSpan *MAGNA_RESTRICT chain);
+extern MAGNA_API              int           MAGNA_CALL chain_back                 (ChainIterator *MAGNA_RESTRICT iterator);
 extern MAGNA_API              ChainSpan*    MAGNA_CALL chain_before               (const ChainSpan *chain, const ChainSpan *link);
 extern MAGNA_API              am_bool       MAGNA_CALL chain_bot                  (const ChainIterator *iterator);
 extern MAGNA_API              am_byte       MAGNA_CALL chain_clone                (ChainSpan *target, const ChainSpan *source);
@@ -637,7 +646,7 @@ extern MAGNA_API              ChainSpan*    MAGNA_CALL chain_last               
 extern MAGNA_API MAGNA_INLINE size_t        MAGNA_CALL chain_length               (ChainSpan *link);
 extern MAGNA_API MAGNA_INLINE ChainSpan                chain_null                 (void);
 extern MAGNA_API              void          MAGNA_CALL chain_optimize             (ChainSpan *chain);
-extern MAGNA_API              int           MAGNA_CALL chain_read                 (ChainIterator *iterator);
+extern MAGNA_API              int           MAGNA_CALL chain_read                 (ChainIterator *MAGNA_RESTRICT iterator);
 extern MAGNA_API              int           MAGNA_CALL chain_read_utf8            (ChainIterator *iterator);
 extern MAGNA_API              am_bool       MAGNA_CALL chain_starts_with          (ChainSpan *chain, ChainSpan *prefix);
 extern MAGNA_API              am_bool       MAGNA_CALL chain_to_buffer            (const ChainSpan *chain, Buffer *output);

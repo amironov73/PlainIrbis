@@ -9,6 +9,9 @@
 
 #include <assert.h>
 
+#define STR(x)   #x
+#define SHOW_DEFINE(x) printf ("%s=%s\n", #x, STR(x))
+
 am_bool where_test_data
     (
         Buffer *path
@@ -91,6 +94,9 @@ int main (int argc, const char **argv)
     Buffer tdp = BUFFER_INIT;
     Buffer td = BUFFER_INIT;
 
+    SHOW_DEFINE (CMAKE_C_COMPILER_ID);
+    SHOW_DEFINE (CMAKE_SYSTEM_NAME);
+
     if (where_test_data (&tdp)) {
         printf ("test data=");
         buffer_to_console (&tdp);
@@ -105,7 +111,8 @@ int main (int argc, const char **argv)
         buffer_destroy (&td);
     }
 
-    printf ("memory available=%lld\n", mem_avail_physical());
+    printf ("memory available       = %lld\n", mem_avail_physical());
+    printf ("size of size_t         = %d\n", (int) SIZEOF_SIZE_T);
     printf ("sizeof (void*)         = %d\n", (int) sizeof (void*));
     printf ("sizeof (Span)          = %d\n", (int) sizeof (Span));
     printf ("sizeof (ChainSpan)     = %d\n", (int) sizeof (ChainSpan));

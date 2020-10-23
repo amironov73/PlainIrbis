@@ -198,8 +198,8 @@ MAGNA_API void MAGNA_CALL mem_clear
  */
 MAGNA_API void MAGNA_CALL mem_copy
     (
-        void *destination,
-        const void *source,
+        void *MAGNA_RESTRICT destination,
+        const void *MAGNA_RESTRICT source,
         size_t size
     )
 {
@@ -759,7 +759,7 @@ static am_byte append_chunk
  */
 MAGNA_API am_bool MAGNA_CALL arena_init
     (
-        Arena *arena,
+        Arena *MAGNA_RESTRICT arena,
         size_t chunkSize
     )
 {
@@ -782,7 +782,7 @@ MAGNA_API am_bool MAGNA_CALL arena_init
  */
 MAGNA_API void MAGNA_CALL arena_destroy
     (
-        Arena *arena
+        Arena *MAGNA_RESTRICT arena
     )
 {
     ArenaChunk *chunk, *next;
@@ -809,7 +809,7 @@ MAGNA_API void MAGNA_CALL arena_destroy
  */
 MAGNA_API void* MAGNA_CALL arena_alloc
     (
-        Arena *arena,
+        Arena *MAGNA_RESTRICT arena,
         size_t length
     )
 {
@@ -848,7 +848,7 @@ MAGNA_API void* MAGNA_CALL arena_alloc
  */
 MAGNA_API size_t MAGNA_CALL arena_total
     (
-        const Arena *arena
+        const Arena *MAGNA_RESTRICT arena
     )
 {
     size_t result = 0;
@@ -908,6 +908,7 @@ MAGNA_API void* MAGNA_CALL mem_aligned_alloc
 
     am_uint32 headerSize;
     void *result = NULL;
+    void *p;
 
     /* We want it to be a power of two since
        align_up operates on powers of two */
@@ -921,7 +922,7 @@ MAGNA_API void* MAGNA_CALL mem_aligned_alloc
          * can meet the alignment
          */
         headerSize = PTR_OFFSET_SZ + (alignment - 1);
-        void *p = mem_alloc (size + headerSize);
+        p = mem_alloc (size + headerSize);
 
         if (p)
         {

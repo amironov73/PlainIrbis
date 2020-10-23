@@ -241,7 +241,7 @@ MAGNA_API ChainSpan* MAGNA_CALL chain_before
  */
 MAGNA_API am_bool MAGNA_CALL chain_append
     (
-        ChainSpan *chain,
+        ChainSpan *MAGNA_RESTRICT chain,
         Span span
     )
 {
@@ -1323,7 +1323,7 @@ MAGNA_API void MAGNA_CALL chain_optimize
  */
 MAGNA_API void MAGNA_CALL chain_assert
     (
-        const ChainSpan *chain
+        const ChainSpan *MAGNA_RESTRICT chain
     )
 {
     assert (chain != NULL);
@@ -1449,7 +1449,7 @@ MAGNA_API am_bool MAGNA_CALL chain_eot
  */
 MAGNA_API int MAGNA_CALL chain_back
     (
-        ChainIterator *iterator
+        ChainIterator *MAGNA_RESTRICT iterator
     )
 {
     assert (iterator != NULL);
@@ -1465,7 +1465,7 @@ MAGNA_API int MAGNA_CALL chain_back
  */
 MAGNA_API int MAGNA_CALL chain_read
     (
-        ChainIterator *iterator
+        ChainIterator *MAGNA_RESTRICT iterator
     )
 {
     ChainSpan *next; /* следующее звено */

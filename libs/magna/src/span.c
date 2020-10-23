@@ -51,7 +51,10 @@ MAGNA_API Span MAGNA_CALL span_init
         size_t length
     )
 {
-    Span result = { (am_byte*) ptr, (am_byte*) (ptr + length) };
+    Span result;
+
+    result.start = (am_byte*) ptr;
+    result.end   = (am_byte*) (ptr + length);
 
     return result;
 }

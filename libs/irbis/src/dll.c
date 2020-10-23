@@ -194,13 +194,15 @@ static void *IrbisInit = NULL;
  */
 MAGNA_API void* irbis64_dll_init (void)
 {
+    FARPROC function;
+
     IrbisInit = get_irbis64_function
         (
             "Irbisinit", // sic!
             IrbisInit
         );
 
-    FARPROC function = (FARPROC) IrbisInit;
+    function = (FARPROC) IrbisInit;
 
     return (void*) function ();
 }

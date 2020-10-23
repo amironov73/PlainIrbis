@@ -22,6 +22,71 @@ project(PlainIrbis C)
 
 set(CMAKE_C_STANDARD 90)
 
+# config.h related stuff
+
+INCLUDE (CheckIncludeFiles)
+CHECK_INCLUDE_FILES (malloc.h HAVE_MALLOC_H)
+
+INCLUDE (CheckSymbolExists)
+CHECK_SYMBOL_EXISTS (alloca "malloc.h" HAVE_ALLOCA)
+
+INCLUDE(CheckTypeSize)
+SET(CMAKE_EXTRA_INCLUDE_FILES "stdlib.h;stdint.h")
+CHECK_TYPE_SIZE (void*    SIZEOF_VOID_P)
+CHECK_TYPE_SIZE (uint16_t SIZEOF_UINT16_T)
+CHECK_TYPE_SIZE (uint32_t SIZEOF_UINT32_T)
+CHECK_TYPE_SIZE (uint64_t SIZEOF_UINT64_T)
+CHECK_TYPE_SIZE (int16_t  SIZEOF_INT16_T)
+CHECK_TYPE_SIZE (int32_t  SIZEOF_INT32_T)
+CHECK_TYPE_SIZE (int64_t  SIZEOF_INT64_T)
+CHECK_TYPE_SIZE (size_t   SIZEOF_SIZE_T)
+SET(CMAKE_EXTRA_INCLUDE_FILES)
+
+if(SIZEOF_SIZE_T)
+    set(HAVE_SIZE_T 1)
+else()
+    set(size_t int)
+endif()
+
+if(SIZEOF_INT16_T)
+    set(HAVE_INT16_T 1)
+else()
+    set (int16_t short)
+endif()
+
+if(SIZEOF_INT32_T)
+    set(HAVE_INT32_T 1)
+else()
+    set (int32_t int)
+endif()
+
+if(SIZEOF_INT64_T)
+    set(HAVE_INT64_T 1)
+else()
+    set (int64_t "long long")
+endif()
+
+if(SIZEOF_UINT16_T)
+    set(HAVE_UINT16_T 1)
+else()
+    set (uint16_t "unsigned short")
+endif()
+
+if(SIZEOF_UINT32_T)
+    set(HAVE_UINT32_T 1)
+else()
+    set (uint32_t "unsigned int")
+endif()
+
+if(SIZEOF_UINT64_T)
+    set(HAVE_UINT64_T 1)
+else()
+    set (int64_t "unsigned long long")
+endif()
+
+CONFIGURE_FILE (${CMAKE_CURRENT_SOURCE_DIR}/include/magna/config.h.in
+        ${CMAKE_CURRENT_BINARY_DIR}/config.h)
+
 if(MSVC)
 
     add_compile_options(/UTF-8 /Wall)
@@ -79,6 +144,10 @@ endif()
 
 # headers of irbis and third-party libraries
 include_directories (${PROJECT_SOURCE_DIR}/include)
+
+# dynamic config.h
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
+add_definitions(-DHAVE_CONFIG_H)
 
 # where artifacts will be gathered
 set (ARTIFACTS ${PROJECT_SOURCE_DIR}/artifacts)
