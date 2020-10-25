@@ -180,6 +180,8 @@ MAGNA_API am_bool MAGNA_CALL response_remaining_lines
 {
     assert (response != NULL);
     assert (lines != NULL);
+
+    return AM_FALSE;
 }
 
 MAGNA_API am_bool MAGNA_CALL response_remaining_ansi_lines

@@ -3,9 +3,9 @@
 
 #include "magna/core.h"
 
-/* ReSharper disable StringLiteralTypo */
-/* ReSharper disable IdentifierTypo */
-/* ReSharper disable CommentTypo */
+// ReSharper disable StringLiteralTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable CommentTypo
 
 /*=========================================================*/
 
@@ -175,9 +175,17 @@ MAGNA_API am_bool MAGNA_CALL tcp4_disconnect
 {
     assert (handle >= 0);
 
+#ifdef MAGNA_MSDOS
+
+    /* TODO: implement */
+
+#else
+
     closesocket (handle);
 
     /* TODO: handle return code */
+
+#endif
 
     return AM_TRUE;
 }
@@ -202,7 +210,17 @@ MAGNA_API ssize_t MAGNA_CALL tcp4_send
     assert (handle >= 0);
     assert (data != NULL);
 
+#ifdef MAGNA_MSDOS
+
+    /* TODO: implement */
+
+    result = -1;
+
+#else
+
     result = send (handle, (const char*) data, dataLength, 0);
+
+#endif
 
     return result;
 }
@@ -231,7 +249,19 @@ MAGNA_API ssize_t MAGNA_CALL tcp4_receive_with_limit
         return -1;
     }
 
+#ifdef MAGNA_MSDOS
+
+    /* TODO: implement */
+
+    result = -1;
+
+#else
+
     result = recv (handle, (char*) (buffer->current), limit, 0);
+
+#endif
+
+
     if (result > 0) {
         buffer->current += result;
     }
@@ -258,7 +288,17 @@ MAGNA_API ssize_t MAGNA_CALL tcp4_receive_all
     assert (buffer != NULL);
 
     while (AM_TRUE) {
+#ifdef MAGNA_MSDOS
+
+        /* TODO: implement */
+        rc = -1;
+
+#else
+
         rc = recv (handle, (char*) temp, sizeof (temp), 0);
+
+#endif
+
         if (rc < 0) {
             return -1;
         }
@@ -315,7 +355,17 @@ MAGNA_API ssize_t MAGNA_CALL tcp4_read_function
     handle = *(am_int32*) &stream->data;
     assert (handle != -1);
 
+#ifdef MAGNA_MSDOS
+
+    /* TODO: implement */
+
+    return -1;
+
+#else
+
     return recv (handle, (char*) data, length, 0);
+
+#endif
 }
 
 MAGNA_API ssize_t MAGNA_CALL tcp4_write_function
@@ -333,7 +383,17 @@ MAGNA_API ssize_t MAGNA_CALL tcp4_write_function
     handle = *(am_int32*) &stream->data;
     assert (handle != -1);
 
+#ifdef MAGNA_MSDOS
+
+    /* TODO: implement */
+
+    return -1;
+
+#else
+
     return send (handle, (const char*) data, length, 0);
+
+#endif
 }
 
 
@@ -348,7 +408,16 @@ MAGNA_API am_bool MAGNA_CALL tcp4_close_function
 
     handle = *(am_int32*) &stream->data;
     if (handle != -1) {
+#ifdef MAGNA_MSDOS
+
+        /* TODO: implement */
+
+#else
+
         closesocket (handle);
+
+#endif
+
         stream->data = NULL;
     }
 

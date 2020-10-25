@@ -20,7 +20,7 @@
  *
  */
 
-#if defined(_M_IX86) && !defined(__MINGW32__)
+#if defined(_M_IX86) && !defined(__MINGW32__) && defined(MAGNA_WINDOWS)
 
 #include <windows.h>
 #include <assert.h>

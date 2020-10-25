@@ -94,8 +94,10 @@ int main (int argc, const char **argv)
     Buffer tdp = BUFFER_INIT;
     Buffer td = BUFFER_INIT;
 
+#ifdef HAVE_CONFIG_H
     SHOW_DEFINE (CMAKE_C_COMPILER_ID);
     SHOW_DEFINE (CMAKE_SYSTEM_NAME);
+#endif
 
     if (where_test_data (&tdp)) {
         printf ("test data=");

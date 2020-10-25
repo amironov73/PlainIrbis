@@ -22,12 +22,14 @@
 #include <stdio.h>
 #include <io.h>
 
-typdef unsigned mode_t;
+#ifdef NOTDEF
+    typdef unsigned mode_t;
 
-#define S_IRUSR 0
-#define S_IWUSR 0
-#define S_IRGRP 0
-#define S_IWGRP 0
+    #define S_IRUSR 0
+    #define S_IWUSR 0
+    #define S_IRGRP 0
+    #define S_IWGRP 0
+#endif
 
 #else
 
@@ -146,6 +148,10 @@ MAGNA_API am_handle MAGNA_CALL file_create
 
     result.value = open (fileName, flags, mode);
 
+#elif defined (MAGNA_MSDOS)
+
+    result.value = open (fileName, flags, mode);
+
 #else
 
     result.value = open64 (fileName, flags, mode);
@@ -236,6 +242,10 @@ MAGNA_API am_handle MAGNA_CALL file_open_read
 
     result.value = open (fileName, flags);
 
+#elif defined (MAGNA_MSDOS)
+
+    result.value = open (fileName, flags);
+
 #else
 
     result.value = open64 (fileName, flags);
@@ -323,6 +333,10 @@ MAGNA_API am_handle MAGNA_CALL file_open_write
     assert (fileName != NULL);
 
 #if defined (MAGNA_APPLE) || defined (MAGNA_FREEBSD) || defined (MAGNA_ANDROID)
+
+    result.value = open (fileName, flags);
+
+#elif defined (MAGNA_MSDOS)
 
     result.value = open (fileName, flags);
 

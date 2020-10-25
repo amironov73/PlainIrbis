@@ -74,7 +74,7 @@ MAGNA_API am_handle MAGNA_CALL thread_create
 
 #elif defined(MAGNA_MSDOS)
 
-    return -1;
+    return handle_from_value (-1);
 
 #else
 

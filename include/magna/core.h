@@ -18,7 +18,7 @@
 
         #define MAGNA_WINDOWS
 
-    #elif defined(__MSDOS__)
+    #elif defined(__MSDOS__) || defined(__DOS__) || defined(_DOS) || defined(__DOS) || defined(MSDOS) || defined(__386__)
 
         #define MAGNA_MSDOS
 

@@ -5,6 +5,9 @@
 
 /*=========================================================*/
 
+#define MAKE_STR_IMPL(__x) #__x
+#define MAKE_STR(__x) MAKE_STR_IMPL(__x)
+
 int main (int argc, char **argv)
 {
 /*    char buffer [128];
@@ -19,6 +22,11 @@ int main (int argc, char **argv)
 
     (void) argc;
     (void) argv;
+
+#ifdef HAVE_CONFIG_H
+    printf ("Compiler: %s\n", MAKE_STR (CMAKE_C_COMPILER_ID));
+    printf ("System: %s\n", MAKE_STR (CMAKE_SYSTEM_NAME));
+#endif
 
     srand (time (NULL));
 

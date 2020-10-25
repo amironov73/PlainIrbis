@@ -41,18 +41,25 @@
     #pragma warning(pop)
     #endif
 
-#elif defined (MAGNA_MSDOS)
+#endif
+
+#ifdef MAGNA_MSDOS
 
 #include <stdio.h>
 #include <fcntl.h>
 #include <io.h>
+#include <direct.h>
 
-#elif defined (MAGNA_APPLE)
+#endif
+
+#ifdef MAGNA_APPLE
 
 #include <mach-o/dyld.h>
 #include <unistd.h>
 
-#else
+#endif
+
+#ifdef MAGNA_UNIX
 
 #include <unistd.h>
 #include <sys/socket.h>
@@ -87,7 +94,7 @@ MAGNA_API am_bool MAGNA_CALL path_get_current_directory
 
     assert (path != NULL);
 
-    memset (temporary, 0, sizeof (temporary));
+    mem_clear (temporary, sizeof (temporary));
 
 #ifdef MAGNA_WINDOWS
 
@@ -126,8 +133,8 @@ MAGNA_API am_bool MAGNA_CALL path_set_current_directory
         return AM_FALSE;
     }
 
-    memset (temporary, 0, sizeof (temporary));
-    memcpy (temporary, path->start, buffer_length (path));
+    mem_clear (temporary, sizeof (temporary));
+    mem_copy (temporary, path->start, buffer_length (path));
 
 #ifdef MAGNA_WINDOWS
 
@@ -509,12 +516,12 @@ MAGNA_API am_bool MAGNA_CALL path_get_executable
 
     assert (buffer != NULL);
 
-    memset (temp, 0, sizeof (temp));
+    mem_clear (temp, sizeof (temp));
     if (!GetModuleFileNameA (NULL, temp, MAX_PATH)) {
         return AM_FALSE;
     }
 
-    return buffer_puts (buffer, temp);
+    return buffer_puts (buffer, CBTEXT (temp));
 
 #elif defined (MAGNA_LINUX)
 
