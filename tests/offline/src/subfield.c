@@ -26,7 +26,7 @@ TESTER(subfield_init_2)
     CHECK (buffer_compare_span (&subfield.value, text) == 0);
     CHECK (!subfield_is_empty (&subfield));
 
-    /* subfield_destroy (&subfield); не надо */
+    subfield_destroy (&subfield);
 }
 
 TESTER(subfield_create_1)
@@ -164,7 +164,7 @@ TESTER(subfield_to_string_3)
     CHECK (subfield_to_string (&subfield, &output));
     CHECK (buffer_compare_span (&output, expected) == 0);
 
-    /* subfield_destroy (&subfield); не надо */
+    subfield_destroy (&subfield);
     buffer_destroy (&output);
 }
 
@@ -242,5 +242,5 @@ TESTER(subfield_verify_5)
     subfield_init (&subfield, 'a', TEXT_SPAN ("Hello"));
     CHECK (subfield_verify (&subfield));
 
-    /* subfield_destroy (&subfield); не надо */
+    subfield_destroy (&subfield);
 }

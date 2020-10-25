@@ -169,18 +169,10 @@ MAGNA_API void MAGNA_CALL ini_section_destroy
         IniSection *section
     )
 {
-    size_t index;
-    IniLine *line;
-
     assert (section != NULL);
 
     buffer_destroy(&section->name);
-    for (index = 0; index < section->lines.len; ++index) {
-        line = (IniLine*) array_get (&section->lines, index);
-        ini_line_destroy (line);
-    }
-
-    array_destroy (&section->lines);
+    array_destroy (&section->lines, (Liberator) ini_line_destroy);
 }
 
 /**
@@ -423,17 +415,9 @@ MAGNA_API void MAGNA_CALL ini_file_destroy
         IniFile *file
     )
 {
-    size_t index;
-    IniSection *section;
-
     assert (file != NULL);
 
-    for (index = 0; index < file->sections.len; ++index) {
-        section = (IniSection*) array_get (&file->sections, index);
-        ini_section_destroy (section);
-    }
-
-    array_destroy (&file->sections);
+    array_destroy (&file->sections, (Liberator) ini_section_destroy);
 }
 
 /**

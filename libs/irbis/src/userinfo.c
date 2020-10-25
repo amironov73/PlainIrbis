@@ -90,17 +90,9 @@ MAGNA_API void MAGNA_CALL userinfo_destroy_array
         Array *users
     )
 {
-    size_t index;
-    UserInfo *user;
-
     assert (users != NULL);
 
-    for (index = 0; index < users->len; ++index) {
-        user = (UserInfo*) array_get (users, index);
-        userinfo_destroy (user);
-    }
-
-    array_destroy (users);
+    array_destroy (users, (Liberator) userinfo_destroy);
 }
 
 /**

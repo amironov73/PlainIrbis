@@ -102,17 +102,9 @@ MAGNA_API void MAGNA_CALL term_destroy_array
         Array *terms
     )
 {
-    size_t index;
-    TermInfo *term;
-
     assert (terms != NULL);
 
-    for (index = 0; index < terms->len; ++index) {
-        term = (TermInfo*) array_get (terms, index);
-        term_destroy (term);
-    }
-
-    array_destroy (terms);
+    array_destroy (terms, (Liberator) term_destroy);
     mem_clear (terms, sizeof (*terms));
 }
 
@@ -292,17 +284,9 @@ MAGNA_API void MAGNA_CALL posting_destroy_array
         Array *postings
     )
 {
-    size_t index;
-    TermPosting *posting;
-
     assert (postings != NULL);
 
-    for (index = 0; index < postings->len; ++index) {
-        posting = (TermPosting*) array_get (postings, index);
-        posting_destroy (posting);
-    }
-
-    array_destroy (postings);
+    array_destroy (postings, (Liberator) posting_destroy);
 }
 
 /**

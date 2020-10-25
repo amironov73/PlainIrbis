@@ -241,17 +241,9 @@ MAGNA_API void MAGNA_CALL number_destroy
         NumberText *number
     )
 {
-    size_t index;
-    NumberTextChunk *chunk;
-
     assert (number != NULL);
 
-    for (index = 0; index < number->chunks.len; ++index) {
-        chunk = (NumberTextChunk*) array_get (&number->chunks, index);
-        ntc_destroy (chunk);
-    }
-
-    array_destroy (&number->chunks);
+    array_destroy (&number->chunks, (Liberator) ntc_destroy);
 }
 
 /**

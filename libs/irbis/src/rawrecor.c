@@ -51,17 +51,9 @@ MAGNA_API void MAGNA_CALL raw_record_destroy
         RawRecord *record
     )
 {
-    size_t index;
-    Buffer *field;
-
     assert (record != NULL);
 
-    for (index = 0; index < record->fields.len; ++index) {
-        field = (Buffer*) array_get (&record->fields, index);
-        buffer_destroy (field);
-    }
-
-    array_destroy (&record->fields);
+    array_destroy (&record->fields, (Liberator) buffer_destroy);
 }
 
 /**

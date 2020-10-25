@@ -138,17 +138,9 @@ MAGNA_API void MAGNA_CALL menu_destroy
         MenuFile *menu
     )
 {
-    size_t index;
-    MenuEntry *entry;
-
     assert (menu != NULL);
 
-    for (index = 0; index < menu->entries.len; ++index) {
-        entry = (MenuEntry*) array_get (&menu->entries, index);
-        menu_entry_destroy (entry);
-    }
-
-    array_destroy (&menu->entries);
+    array_destroy (&menu->entries, (Liberator) menu_entry_destroy);
 }
 
 /**

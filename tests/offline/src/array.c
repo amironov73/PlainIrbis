@@ -42,7 +42,7 @@ TESTER(array_init_1)
     CHECK (array.capacity == 0);
     CHECK (array.ptr == NULL);
 
-    array_destroy (&array);
+    array_destroy (&array, NULL);
 }
 
 TESTER(array_create_1)
@@ -56,7 +56,7 @@ TESTER(array_create_1)
     CHECK (array.capacity == 4);
     CHECK (array.ptr != NULL);
 
-    array_destroy (&array);
+    array_destroy (&array, NULL);
 
     CHECK (array.len == 0);
     CHECK (array.capacity == 0);
@@ -75,7 +75,7 @@ TESTER(array_liberate_1)
     CHECK (array_push_back (&array, &c1));
     CHECK (array_push_back (&array, &c2));
 
-    array_liberate (&array, canary_liberator);
+    array_destroy (&array, canary_liberator);
 
     CHECK (liberationCounter == 2);
 }
@@ -102,7 +102,7 @@ TESTER(array_push_back_1)
     CHECK (p2->first == c2.first);
     CHECK (p2->second == c2.second);
 
-    array_destroy (&array);
+    array_destroy (&array, NULL);
 }
 
 TESTER(array_push_back_2)
@@ -126,7 +126,7 @@ TESTER(array_push_back_2)
     CHECK (p2->first == c2.first);
     CHECK (p2->second == c2.second);
 
-    array_destroy (&array);
+    array_destroy (&array, NULL);
 }
 
 TESTER(array_pop_back_1)
@@ -153,7 +153,7 @@ TESTER(array_pop_back_1)
     CHECK (p2->first == c1.first);
     CHECK (p2->second == c1.second);
 
-    array_destroy (&array);
+    array_destroy (&array, NULL);
 }
 
 TESTER(array_pop_front_1)
@@ -182,7 +182,7 @@ TESTER(array_pop_front_1)
     CHECK (p2->first == c2.first);
     CHECK (p2->second == c2.second);
 
-    array_destroy (&array);
+    array_destroy (&array, NULL);
 }
 
 TESTER(array_push_front_1)
@@ -211,7 +211,7 @@ TESTER(array_push_front_1)
     CHECK (p2->first == c1.first);
     CHECK (p2->second == c1.second);
 
-    array_destroy (&array);
+    array_destroy (&array, NULL);
 }
 
 TESTER(array_truncate_1)
@@ -233,7 +233,7 @@ TESTER(array_truncate_1)
     CHECK (array.len == 0);
     CHECK (array.offset == 0);
 
-    array_destroy (&array);
+    array_destroy (&array, NULL);
 }
 
 TESTER(array_clone_1)
@@ -251,8 +251,8 @@ TESTER(array_clone_1)
     CHECK (array_clone (&target, &source, NULL));
     CHECK (target.len == source.len);
 
-    array_destroy (&target);
-    array_destroy (&source);
+    array_destroy (&target, NULL);
+    array_destroy (&source, NULL);
 }
 
 TESTER(array_clone_2)
@@ -281,8 +281,8 @@ TESTER(array_clone_2)
     CHECK (p2->first == c2.first * 10);
     CHECK (p2->second == c2.second * 20);
 
-    array_destroy (&target);
-    array_destroy (&source);
+    array_destroy (&target, NULL);
+    array_destroy (&source, NULL);
 }
 
 TESTER(array_copy_1)
@@ -300,8 +300,8 @@ TESTER(array_copy_1)
     CHECK (array_copy (&target, &source));
     CHECK (target.len == source.len);
 
-    array_destroy (&target);
-    array_destroy (&source);
+    array_destroy (&target, NULL);
+    array_destroy (&source, NULL);
 }
 
 TESTER(array_concat_1)
@@ -319,8 +319,8 @@ TESTER(array_concat_1)
     CHECK (array_concat (&target, &source));
     CHECK (target.len == source.len);
 
-    array_destroy (&target);
-    array_destroy (&source);
+    array_destroy (&target, NULL);
+    array_destroy (&source, NULL);
 }
 
 TESTER(array_set_1)
@@ -340,7 +340,7 @@ TESTER(array_set_1)
     CHECK (p1->first == c2.first);
     CHECK (p1->second == c2.second);
 
-    array_destroy (&array);
+    array_destroy (&array, NULL);
 
 }
 
@@ -370,7 +370,7 @@ TESTER(array_emplace_back_1)
     CHECK (p4->first == c2.first);
     CHECK (p4->second == c2.second);
 
-    array_destroy (&array);
+    array_destroy (&array, NULL);
 }
 
 TESTER(array_remove_index_1)
@@ -397,7 +397,7 @@ TESTER(array_remove_index_1)
     CHECK (p2 != NULL);
     CHECK (p2->first == c3.first);
 
-    array_destroy (&array);
+    array_destroy (&array, NULL);
 }
 
 TESTER(array_remove_index_2)
@@ -424,7 +424,7 @@ TESTER(array_remove_index_2)
     CHECK (p2 != NULL);
     CHECK (p2->first == c3.first);
 
-    array_destroy (&array);
+    array_destroy (&array, NULL);
 }
 
 TESTER(array_remove_index_3)
@@ -451,7 +451,7 @@ TESTER(array_remove_index_3)
     CHECK (p2 != NULL);
     CHECK (p2->first == c2.first);
 
-    array_destroy (&array);
+    array_destroy (&array, NULL);
 }
 
 TESTER(array_grow_1)
@@ -473,7 +473,7 @@ TESTER(array_grow_1)
     CHECK (array_grow (&array, 3));
     CHECK (array.offset == 0);
 
-    array_destroy (&array);
+    array_destroy (&array, NULL);
 }
 
 static int MAGNA_CALL my_int32_comparer (const void *left, const void *right, const void *data)
@@ -498,7 +498,7 @@ TESTER(array_sort_1)
     CHECK (*(const am_int32*) array_get (&array, 1) == 2);
     CHECK (*(const am_int32*) array_get (&array, 2) == 3);
 
-    array_destroy (&array);
+    array_destroy (&array, NULL);
 }
 
 TESTER(array_sort_2)
@@ -516,7 +516,7 @@ TESTER(array_sort_2)
     CHECK (*(const am_int32*) array_get (&array, 1) == 2);
     CHECK (*(const am_int32*) array_get (&array, 2) == 3);
 
-    array_destroy (&array);
+    array_destroy (&array, NULL);
 }
 
 TESTER(array_sort_3)
@@ -542,7 +542,7 @@ TESTER(array_sort_3)
     CHECK (*(const am_int32*) array_get (&array, 5) == 5);
     CHECK (*(const am_int32*) array_get (&array, 6) == 6);
 
-    array_destroy (&array);
+    array_destroy (&array, NULL);
 }
 
 TESTER(array_sort_4)
@@ -554,7 +554,7 @@ TESTER(array_sort_4)
 
     CHECK (array.len == 0);
 
-    array_destroy (&array);
+    array_destroy (&array, NULL);
 }
 
 TESTER(array_bsearch_1)
@@ -568,7 +568,7 @@ TESTER(array_bsearch_1)
 
     CHECK (found == NULL);
 
-    array_destroy (&array);
+    array_destroy (&array, NULL);
 }
 
 TESTER(array_bsearch_2)
@@ -608,6 +608,5 @@ TESTER(array_bsearch_2)
     found = (const am_int32*) array_bsearch (&array, &value, my_int32_comparer, NULL);
     CHECK (found == NULL);
 
-    array_destroy (&array);
+    array_destroy (&array, NULL);
 }
-

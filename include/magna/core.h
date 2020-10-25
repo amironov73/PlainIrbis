@@ -726,7 +726,7 @@ MAGNA_API              am_bool MAGNA_CALL array_create         (Array *array, si
 MAGNA_API              void*   MAGNA_CALL array_emplace_at     (Array *array, size_t index);
 MAGNA_API              void*   MAGNA_CALL array_emplace_back   (Array *array);
 MAGNA_API              void*   MAGNA_CALL array_emplace_before (Array *array, size_t index);
-MAGNA_API              void    MAGNA_CALL array_destroy        (Array *array);
+MAGNA_API              void    MAGNA_CALL array_destroy        (Array *array, Liberator liberator);
 MAGNA_API MAGNA_INLINE void*   MAGNA_CALL array_get            (const Array *array, size_t index);
 MAGNA_API              am_bool MAGNA_CALL array_grow           (Array *array, size_t newSize);
 MAGNA_API              void    MAGNA_CALL array_init           (Array *array, size_t itemSize);

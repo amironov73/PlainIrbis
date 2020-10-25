@@ -273,8 +273,7 @@ MAGNA_API void MAGNA_CALL field_destroy
     assert (field != NULL);
 
     buffer_destroy (&field->value);
-    /* TODO: liberate subfields */
-    array_destroy (&field->subfields);
+    array_destroy (&field->subfields, (Liberator) subfield_destroy);
 }
 
 /**
@@ -591,6 +590,30 @@ MAGNA_API am_bool MAGNA_CALL field_verify
     }
 
     return result;
+}
+
+MAGNA_API void MAGNA_CALL field_to_console
+    (
+        const MarcField *field
+    )
+{
+    char tmp [10];
+    size_t index;
+    const SubField *subfield;
+
+    assert (field != NULL);
+
+    sprintf (tmp, "%u", (unsigned int) field->tag);
+    fputs (tmp, stdout);
+    putc ('#', stdout);
+    buffer_to_console (&field->value);
+
+    for (index = 0; index < field->subfields.len; ++index) {
+        subfield = field_get_subfield_by_index (field, index);
+        subfield_to_console (subfield);
+    }
+
+    fputs ("\n", stdout);
 }
 
 /*=========================================================*/

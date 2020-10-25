@@ -602,7 +602,7 @@ static am_bool check_memory_map
     }
 
     if (!read_memory_map (&memmap)) {
-        array_destroy (&memmap);
+        array_destroy (&memmap, NULL);
         return AM_FALSE;
     }
 
@@ -619,7 +619,7 @@ static am_bool check_memory_map
         }
     }
 
-    array_destroy (&memmap);
+    array_destroy (&memmap, NULL);
 
     return result;
 }

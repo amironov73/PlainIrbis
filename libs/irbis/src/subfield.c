@@ -301,6 +301,18 @@ MAGNA_API am_bool MAGNA_CALL subfield_verify
         && !subfield_is_empty (subfield);
 }
 
+MAGNA_API void MAGNA_CALL subfield_to_console
+    (
+        const SubField *subfield
+    )
+{
+    assert (subfield != NULL);
+
+    putc ('^', stdout);
+    putc (subfield->code, stdout);
+    buffer_to_console (&subfield->value);
+}
+
 /*=========================================================*/
 
 #include "warnpop.h"

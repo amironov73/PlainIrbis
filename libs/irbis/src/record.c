@@ -41,6 +41,7 @@ MAGNA_API void MAGNA_CALL record_init
     assert (record != NULL);
 
     mem_clear (record, sizeof (*record));
+    array_init (&record->fields, sizeof (MarcField));
 }
 
 /**
@@ -53,17 +54,9 @@ MAGNA_API void MAGNA_CALL record_destroy
         MarcRecord *record
     )
 {
-    size_t index;
-    MarcField *field;
-
     assert (record != NULL);
 
-    for (index = 0; index < record->fields.len; ++index) {
-        field = (MarcField*) array_get (&record->fields, index);
-        field_destroy (field);
-    }
-
-    array_destroy (&record->fields);
+    array_destroy (&record->fields, (Liberator) field_destroy);
 }
 
 /**
@@ -520,6 +513,22 @@ MAGNA_API am_bool MAGNA_CALL record_verify
     }
 
     return result;
+}
+
+MAGNA_API void MAGNA_CALL record_to_console
+    (
+        const MarcRecord *record
+    )
+{
+    size_t index;
+    const MarcField *field;
+
+    assert (record != NULL);
+
+    for (index = 0; index < record->fields.len; ++index) {
+        field = (const MarcField *) array_get (&record->fields, index);
+        field_to_console (field);
+    }
 }
 
 /*=========================================================*/

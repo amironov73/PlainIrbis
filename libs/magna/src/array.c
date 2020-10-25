@@ -85,28 +85,9 @@ MAGNA_API am_bool MAGNA_CALL array_create
  * Освобождение ресурсов, занятых массивом.
  *
  * @param array Массив, подлежащий освобождению.
+ * @param liberator Функция для освобождения памяти, занятой элементом массива (может быть `NULL`).
  */
 MAGNA_API void MAGNA_CALL array_destroy
-    (
-        Array *array
-    )
-{
-    assert (array != NULL);
-
-    array->len = 0;
-    array->capacity = 0;
-    array->offset = 0;
-    mem_free (array->ptr);
-    array->ptr = NULL;
-}
-
-/**
- * Освобождение ресурсов, занятых массивом.
- *
- * @param array Массив, подлежащий освобождению.
- * @param liberator Функция для освобождения памяти, занятой элементом массива.
- */
-MAGNA_API void MAGNA_CALL array_liberate
     (
         Array *array,
         Liberator liberator
@@ -116,14 +97,19 @@ MAGNA_API void MAGNA_CALL array_liberate
     void *ptr;
 
     assert (array != NULL);
-    assert (liberator != NULL);
 
-    for (index = 0; index < array->len; ++index) {
-        ptr = array_get (array, index);
-        liberator (ptr);
+    if (liberator != NULL) {
+        for (index = 0; index < array->len; ++index) {
+            ptr = array_get(array, index);
+            liberator(ptr);
+        }
     }
 
-    array_destroy (array);
+    array->len = 0;
+    array->capacity = 0;
+    array->offset = 0;
+    mem_free (array->ptr);
+    array->ptr = NULL;
 }
 
 /**
@@ -336,7 +322,7 @@ MAGNA_API void* MAGNA_CALL array_emplace_back
 
     assert (array != NULL);
 
-    if (!array_grow(array, array->len + 1)) {
+    if (!array_grow (array, array->len + 1)) {
         return NULL;
     }
 

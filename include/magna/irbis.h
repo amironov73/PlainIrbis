@@ -236,6 +236,7 @@ MAGNA_API am_bool   MAGNA_CALL subfield_is_empty       (const SubField *subfield
 MAGNA_API void      MAGNA_CALL subfield_destroy        (SubField *subfield);
 MAGNA_API SubField* MAGNA_CALL subfield_init           (SubField *subfield, am_byte code, Span value);
 MAGNA_API am_byte   MAGNA_CALL subfield_normalize_code (am_byte code);
+MAGNA_API void      MAGNA_CALL subfield_to_console     (const SubField *subfield);
 MAGNA_API am_bool   MAGNA_CALL subfield_to_string      (const SubField *subfield, Buffer *output);
 MAGNA_API am_bool   MAGNA_CALL subfield_verify         (const SubField *subfield);
 
@@ -268,6 +269,7 @@ MAGNA_API MarcField* MAGNA_CALL field_remove_at                (MarcField *field
 MAGNA_API MarcField* MAGNA_CALL field_remove_subfield          (MarcField *field, am_byte code);
 MAGNA_API am_bool    MAGNA_CALL field_set_subfield             (MarcField *field, am_byte code, Span value);
 MAGNA_API am_bool    MAGNA_CALL field_set_value                (MarcField *field, Span value);
+MAGNA_API void       MAGNA_CALL field_to_console               (const MarcField *field);
 MAGNA_API am_bool    MAGNA_CALL field_to_string                (const MarcField *field, Buffer *buffer);
 MAGNA_API am_bool    MAGNA_CALL field_verify                   (const MarcField *field);
 
@@ -299,6 +301,7 @@ MAGNA_API MarcField*  MAGNA_CALL record_get_field    (const MarcRecord *record, 
 MAGNA_API void        MAGNA_CALL record_init         (MarcRecord *record);
 MAGNA_API am_bool     MAGNA_CALL record_parse_single (MarcRecord *record, Response *response);
 MAGNA_API am_bool     MAGNA_CALL record_set_field    (MarcRecord *record, am_uint32 tag, Span value);
+MAGNA_API void        MAGNA_CALL record_to_console   (const MarcRecord *record);
 
 /*=========================================================*/
 

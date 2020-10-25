@@ -60,6 +60,7 @@ int main (int argc, char **argv)
     printf ("\n\nMFN=1:\n\n");
     record_init (&record);
     connection_read_record (&connection, 1, &record);
+    record_to_console (&record);
     record_destroy (&record);
 
     printf ("\n\nFormatted:\n\n");
