@@ -211,7 +211,7 @@ MAGNA_API void MAGNA_CALL search_parameters_destroy
 MAGNA_API am_bool MAGNA_CALL search_parameters_encode
     (
         const SearchParameters *parameters,
-        Connection *connection,
+        const Connection *connection,
         Query *query
     )
 {
@@ -434,13 +434,15 @@ MAGNA_API am_bool MAGNA_CALL found_decode_response
             break;
         }
 
-        found = array_emplace_back (array);
+        found = (FoundLine*) array_emplace_back (array);
         if (found == NULL) {
             return AM_FALSE;
         }
 
         found_init (found);
-
+        if (!found_decode_line (found, line)) {
+            return AM_FALSE;
+        }
     }
 
     return AM_TRUE;

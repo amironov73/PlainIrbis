@@ -20,29 +20,21 @@
 /**
  * \file term.c
  *
- * Работа с терминами словаря.
- *
- * \struct TermPosting
- * \brief Постинг термина.
- *
- * \var TermPosting::mfn
- *      \brief MFN записи с искомым термином.
- *
- * \var TermPosting::tag
- *      \brief Метка поля с искомым термином.
- *
- * \var TermPosting::occurrence
- *      \brief Номер повторения поля.
- *
- * \var TermPosting::count
- *      \brief Смещение (номер слова) в повторении поля.
- *
- * \var TermPosting::text
- *      \brief Результат расформатирования (если есть).
- *
+ * Работа с терминами словаря и их постингами.
  */
 
 /*=========================================================*/
+
+/**
+ * \struct TermInfo
+ *      \brief Информация о термине поискового словаря.
+ *
+ * \var TermInfo::count
+ *      \brief Количество постингов (вхождений) термина в поисковом словаре.
+ *
+ * \var TermInfo::text
+ *      \brief Собственно значение термина.
+ */
 
 /**
  * Простая инициализация структуры.
@@ -193,6 +185,147 @@ MAGNA_API am_bool MAGNA_CALL term_to_string
 }
 
 /**
+ * Инициализация массива терминов.
+ *
+ * @param array Указатель на неинициализированный массив.
+ */
+MAGNA_API void MAGNA_CALL term_array_init
+    (
+        Array *array
+    )
+{
+    assert (array != NULL);
+
+    array_init (array, sizeof (TermInfo));
+}
+
+/**
+ * Освобождение ресурсов, занятых массивом терминов.
+ *
+ * @param array Указатель на массив, подлежащий освобождению.
+ */
+MAGNA_API void MAGNA_CALL term_array_destroy
+    (
+        Array *array
+    )
+{
+    assert (array != NULL);
+
+    array_destroy (array, (Liberator) term_destroy);
+}
+
+/**
+ * Разбор одной строки из ответа сервера.
+ *
+ * @param term Указатель на инициализированную структуру термина.
+ * @param line Строка с текстовым представлением термина.
+ * @return Признак успешного завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL term_decode_line
+    (
+        TermInfo *term,
+        Span line
+    )
+{
+    Span parts[2];
+
+    assert (term != NULL);
+
+    if (span_split_n_by_char (line, parts, 2, '#') == 2) {
+        if (!buffer_assign_span (&term->text, parts[1])) {
+            return AM_FALSE;
+        }
+    }
+
+    term->count = span_to_uint32 (parts[0]);
+
+    return AM_TRUE;
+}
+
+/**
+ * Полное декодирование ответа сервера.
+ *
+ * @param array Инициализированный массив для заполнения.
+ * @param response Ответ сервера.
+ * @return Признак успешного завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL term_decode_response
+    (
+        Array *array,
+        Response *response
+    )
+{
+    Span line;
+    TermInfo *term;
+
+    assert (array != NULL);
+    assert (response != NULL);
+
+    while (!response_eot (response)) {
+        line = response_get_line (response);
+        if (span_is_empty (line)) {
+            break;
+        }
+
+        term = (TermInfo*) array_emplace_back (array);
+        if (term == NULL) {
+            return AM_FALSE;
+        }
+
+        term_init (term);
+        if (!term_parse_line (term, line)) {
+            return AM_FALSE;
+        }
+    }
+
+    return AM_TRUE;
+}
+
+/*=========================================================*/
+
+/**
+ * \struct TermParameters
+ *      \brief Параметры для запроса терминов с сервера.
+ *
+ * \var TermParameters::database
+ *      \brief Имя базы данных.
+ *
+ * \var TermParameters::number
+ *      \brief Количество затребуемых терминов.
+ *
+ * \var TermParameters::reverseOrder
+ *      \brief Выдавать термины в обратном порядке?
+ *
+ * \var TermParameters::format
+ *      \brief Опциональный формат.
+ *
+ * \var TermParameters::startTerm
+ *      \brief Стартовый термин. Обязательное поле.
+ */
+
+/**
+ * Инициализация параметров с указанием стартового термина.
+ * Размещает в куче копию заданного терма.
+ *
+ * @param parameters Указатель на неинициализированную структуру.
+ * @param startTerm Стартовый термин.
+ * @return Признак успешного завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL term_parameters_create
+    (
+        TermParameters *parameters,
+        const am_byte *startTerm
+    )
+{
+    assert (parameters != NULL);
+    assert (startTerm != NULL);
+
+    term_parameters_init (parameters);
+
+    return buffer_assign_text (&parameters->startTerm, startTerm);
+}
+
+/**
  * Простая инициализация структуры.
  * Не выделяет памяти в куче.
  *
@@ -227,6 +360,77 @@ MAGNA_API void MAGNA_CALL term_parameters_destroy
 }
 
 /**
+ * Кодирование параметров терминов в клиентском запросе.
+ *
+ * @param parameters Параметры терминов.
+ * @param connection Активное подключение к серверу.
+ * @param query Указзатель на структуру клиентского запроса.
+ * @return Признак успешности завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL term_parameters_encode
+    (
+        const TermParameters *parameters,
+        const Connection *connection,
+        Query *query
+    )
+{
+    const Buffer *database; /* имя базы данных */
+
+    assert (parameters != NULL);
+    assert (connection != NULL);
+    assert (query != NULL);
+
+    /* Если база данных не указана явно, используем текущую. */
+    database = choose_buffer (&parameters->database, &connection->database, NULL);
+
+    return query_add_ansi_buffer (query, database)
+        && query_add_utf_buffer (query, &parameters->startTerm)
+        && query_add_uint32 (query, parameters->number)
+           /* TODO: сделать правильное добавление формата */
+        && query_add_ansi_buffer (query, &parameters->format);
+}
+
+/**
+ * Верификация параметров терминов.
+ *
+ * @param parameters Проверяемые параметры.
+ * @return Результат проверки.
+ */
+MAGNA_API am_bool MAGNA_CALL term_parameters_verify
+    (
+        const TermParameters *parameters
+    )
+{
+    assert (parameters != NULL);
+
+    /* TODO: implement */
+
+    return AM_TRUE;
+}
+
+/*=========================================================*/
+
+/**
+ * \struct TermPosting
+ *      \brief Постинг (вхождение) термина в поисковом индексе.
+ *
+ * \var TermPosting::mfn
+ *      \brief MFN записи с искомым термином.
+ *
+ * \var TermPosting::tag
+ *      \brief Метка поля с искомым термином.
+ *
+ * \var TermPosting::occurrence
+ *      \brief Номер повторения поля.
+ *
+ * \var TermPosting::count
+ *      \brief Смещение (номер слова) в повторении поля.
+ *
+ * \var TermPosting::text
+ *      \brief Результат расформатирования (если есть).
+ */
+
+/**
  * Простая инициализация структуры.
  * Не выделяет памяти в куче.
  *
@@ -248,7 +452,7 @@ MAGNA_API void MAGNA_CALL posting_init
  *
  * @param postings Указатель на неинициализированный массив.
  */
-MAGNA_API void MAGNA_CALL posting_init_array
+MAGNA_API void MAGNA_CALL posting_array_init
     (
         Array *postings
     )
@@ -279,7 +483,7 @@ MAGNA_API void MAGNA_CALL posting_destroy
  *
  * @param postings Массив постингов, подлежащий освобождению.
  */
-MAGNA_API void MAGNA_CALL posting_destroy_array
+MAGNA_API void MAGNA_CALL posting_array_destroy
     (
         Array *postings
     )
@@ -328,7 +532,7 @@ MAGNA_API am_bool MAGNA_CALL posting_parse_line
  *
  * @param postings Массив (инициализированный), подлежащий заполнению.
  * @param response Ответ сервера.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL posting_parse_response
     (
@@ -336,12 +540,30 @@ MAGNA_API am_bool MAGNA_CALL posting_parse_response
         Response *response
     )
 {
+    Span line;
+    TermPosting *posting;
+
     assert (postings != NULL);
     assert (response != NULL);
 
-    /* TODO: implement */
+    while (!response_eot (response)) {
+        line = response_get_line (response);
+        if (span_is_empty (line)) {
+            break;
+        }
 
-    return AM_FALSE;
+        posting = array_emplace_back (postings);
+        if (posting == NULL) {
+            return AM_FALSE;
+        }
+
+        posting_init (posting);
+        if (!posting_parse_line (posting, line)) {
+            return AM_FALSE;
+        }
+    }
+
+    return AM_TRUE;
 }
 
 /**
@@ -369,6 +591,124 @@ MAGNA_API am_bool MAGNA_CALL posting_to_string
         && buffer_put_uint32 (output, posting->count)
         && buffer_putc (output, '#')
         && buffer_concat (output, &posting->text);
+}
+
+/*=========================================================*/
+
+/**
+ * \struct PostingParameters
+ *      \brief Параметры для запроса постингов с сервера.
+ *
+ * \var PostingParameters::terms
+ *      \brief Массив терминов, для которых требуются постинги.
+ *
+ * \var PostingParameters::database
+ *      \brief Имя базы данных.
+ *
+ * \var PostingParameters::format
+ *      \brief Опциональный формат.
+ *
+ * \var PostingParameters::first
+ *      \brief Номер первого постинга (нумерация с 1).
+ *
+ * \var PostingParameters::number
+ *      \brief Количество затребуемых постингов.
+ */
+
+/**
+ * Простая инициализация параметров постингов.
+ * Не выделяет памяти в куче.
+ *
+ * @param parameters Указатель на неинициализированную структуру.
+ */
+MAGNA_API void MAGNA_CALL posting_parameters_init
+    (
+        PostingParameters *parameters
+    )
+{
+    assert (parameters != NULL);
+
+    mem_clear (parameters, sizeof (*parameters));
+    array_init (&parameters->terms, sizeof (TermInfo));
+    parameters->first = 1;
+}
+
+/**
+ * Освобождение памяти, занятой структурой.
+ *
+ * @param parameters Указатель на структуру, подлежащую освобождению.
+ */
+MAGNA_API void MAGNA_CALL posting_parameters_destroy
+    (
+        PostingParameters *parameters
+    )
+{
+    array_destroy  (&parameters->terms, (Liberator) term_destroy);
+    buffer_destroy (&parameters->database);
+    buffer_destroy (&parameters->format);
+    mem_clear (parameters, sizeof (*parameters));
+}
+
+/**
+ * Кодирование параметров терминов в клиентском запросе.
+ *
+ * @param parameters Параметры терминов.
+ * @param connection Активное подключение к серверу.
+ * @param query Указзатель на структуру клиентского запроса.
+ * @return Признак успешности завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL posting_parameters_encode
+    (
+        const PostingParameters *parameters,
+        const Connection *connection,
+        Query *query
+    )
+{
+    const Buffer *database; /* имя базы данных */
+    size_t index;           /* переменная цикла */
+    const TermInfo *term;   /* текущий термин */
+
+    assert (parameters != NULL);
+    assert (connection != NULL);
+    assert (query != NULL);
+
+    /* Если база данных не указана явно, используем текущую. */
+    database = choose_buffer (&parameters->database, &connection->database, NULL);
+
+    if (!query_add_ansi_buffer (query, database)
+           || !query_add_uint32 (query, parameters->number)
+           || !query_add_uint32 (query, parameters->first)
+           /* TODO: сделать правильное добавление формата */
+           || !query_add_ansi_buffer (query, &parameters->format)) {
+        return AM_FALSE;
+    }
+
+    for (index = 0; index < parameters->terms.len; ++index) {
+        term = (const TermInfo*) array_get (&parameters->terms, index);
+        if (!query_add_utf_buffer (query, &term->text)) {
+            return AM_FALSE;
+        }
+    }
+
+    return AM_TRUE;
+}
+
+/**
+ * Верификация параметров постингов.
+ *
+ * @param parameters Параметры постингов, подлежащие проверке.
+ * @return Результат проверки.
+ */
+MAGNA_API am_bool MAGNA_CALL posting_parameters_verify
+    (
+        const PostingParameters *parameters
+    )
+{
+    assert (parameters != NULL);
+
+    /* TODO: implement */
+
+    return AM_TRUE;
 }
 
 /*=========================================================*/

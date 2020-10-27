@@ -792,7 +792,7 @@ MAGNA_API am_bool MAGNA_CALL span_array_clone      (SpanArray *target, const Spa
 MAGNA_API am_bool MAGNA_CALL span_array_copy       (SpanArray *target, const SpanArray *source);
 MAGNA_API am_bool MAGNA_CALL span_array_concat     (SpanArray *target, const SpanArray *source);
 MAGNA_API am_bool MAGNA_CALL span_array_create     (SpanArray *array, size_t capacity);
-MAGNA_API void    MAGNA_CALL span_array_free       (SpanArray *array);
+MAGNA_API void    MAGNA_CALL span_array_destroy    (SpanArray *array);
 MAGNA_API am_bool MAGNA_CALL span_array_from_text  (SpanArray *array, const char **text, size_t count);
 MAGNA_API Span    MAGNA_CALL span_array_get        (const SpanArray *array, size_t index);
 MAGNA_API am_bool MAGNA_CALL span_array_grow       (SpanArray *array, size_t newSize);

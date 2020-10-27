@@ -546,7 +546,7 @@ TESTER(span_split_by_char_1)
     CHECK (rc);
     CHECK (parts.len == 0);
 
-    span_array_free (&parts);
+    span_array_destroy (&parts);
 }
 
 TESTER(span_split_by_char_2)
@@ -561,7 +561,7 @@ TESTER(span_split_by_char_2)
     CHECK (parts.ptr[0].start == text);
     CHECK (span_length (parts.ptr[0]) == 9);
 
-    span_array_free (&parts);
+    span_array_destroy (&parts);
 }
 
 TESTER(span_split_by_char_3)
@@ -578,7 +578,7 @@ TESTER(span_split_by_char_3)
     CHECK (parts.ptr[1].start == text + 5);
     CHECK (span_length (parts.ptr[1]) == 4);
 
-    span_array_free (&parts);
+    span_array_destroy (&parts);
 }
 
 TESTER(span_split_by_char_4)
@@ -597,7 +597,7 @@ TESTER(span_split_by_char_4)
     CHECK (parts.ptr[2].start == text + 8);
     CHECK (span_length (parts.ptr[2]) == 1);
 
-    span_array_free (&parts);
+    span_array_destroy (&parts);
 }
 
 TESTER(span_split_by_char_5)
@@ -616,7 +616,7 @@ TESTER(span_split_by_char_5)
     CHECK (parts.ptr[2].start == text + 10);
     CHECK (span_length (parts.ptr[2]) == 1);
 
-    span_array_free (&parts);
+    span_array_destroy (&parts);
 }
 
 TESTER(span_split_by_chars_1)
@@ -628,7 +628,7 @@ TESTER(span_split_by_chars_1)
     CHECK (rc);
     CHECK (parts.len == 0);
 
-    span_array_free (&parts);
+    span_array_destroy (&parts);
 }
 
 TESTER(span_split_by_chars_2)
@@ -643,7 +643,7 @@ TESTER(span_split_by_chars_2)
     CHECK (parts.ptr[0].start == text);
     CHECK (span_length (parts.ptr[0]) == 9);
 
-    span_array_free (&parts);
+    span_array_destroy (&parts);
 }
 
 TESTER(span_split_by_chars_3)
@@ -660,7 +660,7 @@ TESTER(span_split_by_chars_3)
     CHECK (parts.ptr[1].start == text + 5);
     CHECK (span_length (parts.ptr[1]) == 4);
 
-    span_array_free (&parts);
+    span_array_destroy (&parts);
 }
 
 TESTER(span_split_by_chars_4)
@@ -679,7 +679,7 @@ TESTER(span_split_by_chars_4)
     CHECK (parts.ptr[2].start == text + 8);
     CHECK (span_length (parts.ptr[2]) == 1);
 
-    span_array_free (&parts);
+    span_array_destroy (&parts);
 }
 
 TESTER(span_split_by_chars_5)
@@ -698,7 +698,7 @@ TESTER(span_split_by_chars_5)
     CHECK (parts.ptr[2].start == text + 10);
     CHECK (span_length (parts.ptr[2]) == 1);
 
-    span_array_free (&parts);
+    span_array_destroy (&parts);
 }
 
 TESTER(span_split_n_by_char_1)

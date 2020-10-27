@@ -19,7 +19,7 @@ TESTER(span_array_create_1)
     span_array_create(&a1, 10);
     CHECK (a1.capacity == 10);
     CHECK (a1.len == 0);
-    span_array_free (&a1);
+    span_array_destroy (&a1);
 }
 
 
@@ -39,7 +39,7 @@ TESTER(span_array_push_back_1)
     CHECK (g1.start == c1.start);
     g2 = span_array_get (&a1, 1);
     CHECK (g2.start == c2.start);
-    span_array_free (&a1);
+    span_array_destroy (&a1);
 }
 
 
@@ -58,7 +58,7 @@ TESTER(span_array_push_front_1)
     span_array_push_front (&a1, c2);
     g2 = span_array_get (&a1, 0);
     CHECK (g2.start == c2.start);
-    span_array_free (&a1);
+    span_array_destroy (&a1);
 }
 
 TESTER(span_array_pop_back_1)
@@ -79,7 +79,7 @@ TESTER(span_array_pop_back_1)
     g2 = span_array_pop_back (&a1);
     CHECK (a1.len == 0);
     CHECK (g2.start == c1.start);
-    span_array_free (&a1);
+    span_array_destroy (&a1);
 }
 
 TESTER(span_array_pop_front_1)
@@ -100,7 +100,7 @@ TESTER(span_array_pop_front_1)
     g2 = span_array_pop_front (&a1);
     CHECK (a1.len == 0);
     CHECK (g2.start == c2.start);
-    span_array_free (&a1);
+    span_array_destroy (&a1);
 }
 
 TESTER(span_array_set_1)
@@ -121,7 +121,7 @@ TESTER(span_array_set_1)
     CHECK (g1.start == c3.start);
     g2 = span_array_get (&a1, 1);
     CHECK (g2.start == c2.start);
-    span_array_free (&a1);
+    span_array_destroy (&a1);
 }
 
 TESTER(span_array_clone_1)
@@ -142,8 +142,8 @@ TESTER(span_array_clone_1)
     CHECK (g1.start == c1.start);
     g2 = span_array_get (&a2, 1);
     CHECK (g2.start == c2.start);
-    span_array_free (&a1);
-    span_array_free (&a2);
+    span_array_destroy (&a1);
+    span_array_destroy (&a2);
 }
 
 TESTER(span_array_clone_2)
@@ -154,8 +154,8 @@ TESTER(span_array_clone_2)
     CHECK (a1.len == 0);
     span_array_clone (&a2, &a1);
     CHECK (a1.len == a2.len);
-    span_array_free (&a1);
-    span_array_free (&a2);
+    span_array_destroy (&a1);
+    span_array_destroy (&a2);
 }
 
 TESTER(span_array_copy_1)
@@ -178,8 +178,8 @@ TESTER(span_array_copy_1)
     CHECK (g1.start == c1.start);
     g2 = span_array_get (&a2, 1);
     CHECK (g2.start == c2.start);
-    span_array_free (&a1);
-    span_array_free (&a2);
+    span_array_destroy (&a1);
+    span_array_destroy (&a2);
 }
 
 TESTER(span_array_concat_1)
@@ -203,8 +203,8 @@ TESTER(span_array_concat_1)
     CHECK (g1.start == c1.start);
     g2 = span_array_get (&a1, 1);
     CHECK (g2.start == c2.start);
-    span_array_free (&a1);
-    span_array_free (&a2);
+    span_array_destroy (&a1);
+    span_array_destroy (&a2);
 }
 
 TESTER(span_array_shrink_1)
@@ -225,7 +225,7 @@ TESTER(span_array_shrink_1)
     CHECK (g1.start == c1.start);
     g2 = span_array_get (&a1, 1);
     CHECK (g2.start == c2.start);
-    span_array_free (&a1);
+    span_array_destroy (&a1);
 }
 
 TESTER(span_array_shrink_2)
@@ -235,7 +235,7 @@ TESTER(span_array_shrink_2)
     span_array_create (&a1, 10);
     span_array_shrink (&a1);
     CHECK (a1.capacity == 0);
-    span_array_free (&a1);
+    span_array_destroy (&a1);
 }
 
 TESTER(span_array_truncate_1)
@@ -256,7 +256,7 @@ TESTER(span_array_truncate_1)
     CHECK (g1.start == c1.start);
     span_array_truncate (&a1, 0);
     CHECK (a1.len == 0);
-    span_array_free (&a1);
+    span_array_destroy (&a1);
 }
 
 TESTER(span_array_grow_1)
@@ -267,7 +267,7 @@ TESTER(span_array_grow_1)
     CHECK (a1.capacity == 10);
     span_array_grow (&a1, 100);
     CHECK (a1.capacity >= 100);
-    span_array_free (&a1);
+    span_array_destroy (&a1);
 }
 
 TESTER(span_array_grow_2)
@@ -278,7 +278,7 @@ TESTER(span_array_grow_2)
     CHECK (a1.capacity == 10);
     span_array_grow (&a1, 11);
     CHECK (a1.capacity >= 11);
-    span_array_free (&a1);
+    span_array_destroy (&a1);
 }
 
 TESTER(span_array_grow_3)
@@ -293,5 +293,5 @@ TESTER(span_array_grow_3)
     span_array_grow (&a1, 11);
     CHECK (a1.capacity >= 11);
     CHECK (a1.len == 2);
-    span_array_free (&a1);
+    span_array_destroy (&a1);
 }

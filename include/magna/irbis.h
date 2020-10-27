@@ -583,51 +583,74 @@ MAGNA_API void    MAGNA_CALL ini_file_not_modified (IniFile *file);
 /* Информация об одном термине поискового словаря */
 typedef struct
 {
-    Buffer text;
-    am_int32 count;
+    Buffer text;     /* Собственно значение термина. */
+    am_uint32 count; /* Количество постингов (вхождений) термина в поисковом словаре. */
 
 } TermInfo;
 
-MAGNA_API void    MAGNA_CALL term_destroy        (TermInfo *term);
-MAGNA_API void    MAGNA_CALL term_destroy_array  (Array *terms);
-MAGNA_API void    MAGNA_CALL term_init           (TermInfo *term);
-MAGNA_API void    MAGNA_CALL term_init_array     (Array *terms);
-MAGNA_API am_bool MAGNA_CALL term_parse_line     (TermInfo *term, Span line);
-MAGNA_API am_bool MAGNA_CALL term_parse_response (Array *terms, Response *response);
-MAGNA_API am_bool MAGNA_CALL term_to_string      (const TermInfo *term, Buffer *output);
+MAGNA_API void    MAGNA_CALL term_array_destroy   (Array *array);
+MAGNA_API void    MAGNA_CALL term_array_init      (Array *array);
+MAGNA_API am_bool MAGNA_CALL term_decode_line     (TermInfo *term, Span line);
+MAGNA_API am_bool MAGNA_CALL term_decode_response (Array *array, Response *response);
+MAGNA_API void    MAGNA_CALL term_destroy         (TermInfo *term);
+MAGNA_API void    MAGNA_CALL term_destroy_array   (Array *terms);
+MAGNA_API void    MAGNA_CALL term_init            (TermInfo *term);
+MAGNA_API void    MAGNA_CALL term_init_array      (Array *terms);
+MAGNA_API am_bool MAGNA_CALL term_parse_line      (TermInfo *term, Span line);
+MAGNA_API am_bool MAGNA_CALL term_parse_response  (Array *terms, Response *response);
+MAGNA_API am_bool MAGNA_CALL term_to_string       (const TermInfo *term, Buffer *output);
 
 /* Параметры извлечения терминов из поискового словаря */
 typedef struct
 {
-    Buffer database;
-    Buffer startTerm;
-    Buffer format;
-    am_uint32 number;
-    am_bool reverseOrder;
+    Buffer database;      /* Имя базы данных. */
+    Buffer startTerm;     /* Стартовый термин. Обязательное поле. */
+    Buffer format;        /* Опциональный формат. */
+    am_uint32 number;     /* Количество затребуемых терминов. */
+    am_bool reverseOrder; /* Выдавать термины в обратном порядке? */
 
 } TermParameters;
 
-MAGNA_API void MAGNA_CALL term_parameters_destroy (TermParameters *parameters);
-MAGNA_API void MAGNA_CALL term_parameters_init    (TermParameters *parameters);
+MAGNA_API am_bool MAGNA_CALL term_parameters_create  (TermParameters *parameters, const am_byte *startTerm);
+MAGNA_API void    MAGNA_CALL term_parameters_destroy (TermParameters *parameters);
+MAGNA_API am_bool MAGNA_CALL term_parameters_encode  (const TermParameters *parameters, const Connection *connection, Query *query);
+MAGNA_API void    MAGNA_CALL term_parameters_init    (TermParameters *parameters);
+MAGNA_API am_bool MAGNA_CALL term_parameters_verify  (const TermParameters *parameters);
 
 /* Постинг термина */
 typedef struct
 {
-    Buffer text;
-    am_uint32 mfn;
-    am_uint32 tag;
-    am_uint32 occurrence;
-    am_uint32 count;
+    Buffer text;          /* Опциональный результат расформатирования. */
+    am_uint32 mfn;        /* MFN записи. */
+    am_uint32 tag;        /* Метка поля. */
+    am_uint32 occurrence; /* Повторение поля. */
+    am_uint32 count;      /* Позиция в поле. */
 
 } TermPosting;
 
+MAGNA_API void    MAGNA_CALL posting_array_destroy  (Array *postings);
+MAGNA_API void    MAGNA_CALL posting_array_init     (Array *postings);
 MAGNA_API void    MAGNA_CALL posting_destroy        (TermPosting *posting);
-MAGNA_API void    MAGNA_CALL posting_destroy_array  (Array *postings);
 MAGNA_API void    MAGNA_CALL posting_init           (TermPosting *posting);
-MAGNA_API void    MAGNA_CALL posting_init_array     (Array *postings);
 MAGNA_API am_bool MAGNA_CALL posting_parse_line     (TermPosting *posting, Span line);
 MAGNA_API am_bool MAGNA_CALL posting_parse_response (Array *postings, Response *response);
 MAGNA_API am_bool MAGNA_CALL posting_to_string      (const TermPosting *posting, Buffer *output);
+
+/* Параметры для запроса постингов с сервера. */
+typedef struct
+{
+    Array terms;      /* Массив терминов, для которых требуются постинги. */
+    Buffer database;  /* Имя базы данных. */
+    Buffer format;    /* Опциональный формат. */
+    am_uint32 first;  /* Номер первого постинга (нумерация с 1). */
+    am_uint32 number; /* Количество затребуемых постингов. */
+
+} PostingParameters;
+
+MAGNA_API void    MAGNA_CALL posting_parameters_destroy (PostingParameters *parameters);
+MAGNA_API am_bool MAGNA_CALL posting_parameters_encode  (const PostingParameters *parameters, const Connection *connection, Query *query);
+MAGNA_API void    MAGNA_CALL posting_parameters_init    (PostingParameters *parameters);
+MAGNA_API am_bool MAGNA_CALL posting_parameters_verify  (const PostingParameters *parameters);
 
 /*=========================================================*/
 
@@ -661,7 +684,7 @@ typedef struct
 
 MAGNA_API am_bool MAGNA_CALL search_parameters_create  (SearchParameters *parameters, const am_byte *expression);
 MAGNA_API void    MAGNA_CALL search_parameters_destroy (SearchParameters *parameters);
-MAGNA_API am_bool MAGNA_CALL search_parameters_encode  (const SearchParameters *parameters, Connection *connection, Query *query);
+MAGNA_API am_bool MAGNA_CALL search_parameters_encode  (const SearchParameters *parameters, const Connection *connection, Query *query);
 MAGNA_API void    MAGNA_CALL search_parameters_init    (SearchParameters *parameters);
 MAGNA_API am_bool MAGNA_CALL search_parameters_verify  (const SearchParameters *parameters);
 

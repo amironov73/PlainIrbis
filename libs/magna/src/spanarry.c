@@ -24,7 +24,7 @@
  * для разбиения строки).
  *
  * Владеет собственной памятью. Для освобождения
- * ресурсов используйте `span_array_free`.
+ * ресурсов используйте `span_array_destroy`.
  */
 
 /*=========================================================*/
@@ -132,7 +132,7 @@ MAGNA_API am_bool MAGNA_CALL span_array_create
  *
  * @param array Массив, подлежащий освобождению.
  */
-MAGNA_API void MAGNA_CALL span_array_free
+MAGNA_API void MAGNA_CALL span_array_destroy
     (
         SpanArray *array
     )
