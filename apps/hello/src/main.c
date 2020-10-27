@@ -19,6 +19,9 @@ int main (int argc, char **argv)
     Buffer formatted = BUFFER_INIT;
     MarcRecord record;
     am_mfn maxMfn;
+    am_int32 count;
+    SearchParameters parameters;
+    Int32Array found;
 
     (void) argc;
     (void) argv;
@@ -50,6 +53,27 @@ int main (int argc, char **argv)
 
     connection_no_operation (&connection);
     printf ("NOP\n");
+
+    count = connection_search_count (&connection, CBTEXT ("K=БЕТОН$"));
+    printf ("Found record count=%d\n", count);
+
+    int32_array_create (&found, 10);
+    if (!search_parameters_create (&parameters, CBTEXT ("K=БЕТОН$"))) {
+        fputs ("Can't create search parameters\n", stderr);
+    }
+    else {
+        if (!connection_search_simple (&connection, &found, CBTEXT ("K=БЕТОН$"))) {
+            fputs ("Error during search\n", stderr);
+        }
+        else {
+            int32_array_to_console (&found, CBTEXT (", "));
+            puts ("\n");
+        }
+
+        search_parameters_destroy (&parameters);
+    }
+    int32_array_destroy (&found);
+
 
     printf ("\n\nbrief.pft:\n\n");
     spec_init (&spec, PATH_MASTER, "IBIS", "brief.pft");

@@ -770,6 +770,7 @@ MAGNA_API am_int32 MAGNA_CALL int32_array_pop_front  (Int32Array *array);
 MAGNA_API am_bool  MAGNA_CALL int32_array_push_back  (Int32Array *array, am_int32 value);
 MAGNA_API am_bool  MAGNA_CALL int32_array_push_front (Int32Array *array, am_int32 value);
 MAGNA_API void     MAGNA_CALL int32_array_set        (Int32Array *array, size_t index, am_int32 value);
+MAGNA_API am_bool  MAGNA_CALL int32_array_to_console (const Int32Array *array, const am_byte *delimiter);
 MAGNA_API am_bool  MAGNA_CALL int32_array_to_text    (const Int32Array *array, struct MagnaBuffer *buffer, const am_byte *delimiter);
 MAGNA_API void     MAGNA_CALL int32_array_truncate   (Int32Array *array, size_t newSize);
 

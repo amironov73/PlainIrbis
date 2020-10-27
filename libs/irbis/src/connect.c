@@ -218,7 +218,7 @@ MAGNA_API am_bool MAGNA_CALL connection_actualize_record
         return AM_FALSE;
     }
 
-    response_null (&response);
+    response_init (&response);
     if (!query_create (&query, connection, CBTEXT (ACTUALIZE_RECORD))) {
         return AM_FALSE;
     }
@@ -305,7 +305,7 @@ MAGNA_API am_bool MAGNA_CALL connection_connect
     AGAIN:
     connection->clientId = 100000 + (rand() % 900000);
     connection->queryId = 1;
-    response_null (&response);
+    response_init (&response);
 
     if (!query_create (&query, connection, CBTEXT(REGISTER_CLIENT))) {
         LOG_LEAVE;
@@ -618,13 +618,11 @@ MAGNA_API am_bool MAGNA_CALL connection_execute
     assert (query != NULL);
     assert (response != NULL);
 
-    if (!response_create (connection, response)) {
-        goto DONE;
-    }
-
+    response_init (response);
+    response->connection = connection;
     hostname = buffer_to_text (&connection->host);
     if (hostname == NULL) {
-        /* TODO: document the code */
+        /* TODO: document the error code */
         connection->lastError = 100501;
         goto DONE;
     }
@@ -763,7 +761,7 @@ MAGNA_API am_bool MAGNA_CALL connection_format_mfn
         return AM_FALSE;
     }
 
-    response_null (&response);
+    response_init (&response);
     if (!query_create (&query, connection, CBTEXT (FORMAT_RECORD))) {
         return AM_FALSE;
     }
@@ -982,7 +980,7 @@ MAGNA_API am_bool MAGNA_CALL connection_print_table
         return AM_FALSE;
     }
 
-    response_null (&response);
+    response_init (&response);
     if (!query_create (&query, connection, CBTEXT (PRINT))) {
         return AM_FALSE;
     }
@@ -996,6 +994,187 @@ MAGNA_API am_bool MAGNA_CALL connection_print_table
     }
 
     result = table_definition_decode (definition, &response, output);
+
+    DONE:
+    query_destroy (&query);
+    response_destroy (&response);
+
+    return result;
+}
+
+
+/**
+ * Чтение записи с сервера. Запись разделяется на отдельные строки.
+ *
+ * @param connection Активное соединение.
+ * @param mfn MFN записи.
+ * @param record Проинициализированная структура.
+ * @return Признак успешного завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL connection_read_raw_record
+    (
+        Connection *connection,
+        am_mfn mfn,
+        RawRecord *record
+    )
+{
+    Query query;
+    Response response;
+    am_bool result = AM_FALSE;
+    Span line;
+
+    assert (connection != NULL);
+    assert (mfn > 0);
+
+    if (!connection_check (connection)) {
+        return AM_FALSE;
+    }
+
+    response_init (&response);
+    if (!query_create (&query, connection, CBTEXT (READ_RECORD))) {
+        return AM_FALSE;
+    }
+
+    if (!query_add_ansi_buffer (&query, &connection->database)
+        || !query_add_int32 (&query, mfn)) {
+        goto DONE;
+    }
+
+    if (!connection_execute (connection, &query, &response)) {
+        goto DONE;
+    }
+
+    if (!response_check (&response, -201, -600, -602, -603, 0)) {
+        goto DONE;
+    }
+
+    if (!raw_record_parse_single (record, &response)) {
+        goto DONE;
+    }
+
+    result = AM_TRUE;
+
+    DONE:
+    query_destroy (&query);
+    response_destroy (&response);
+
+    return result;
+}
+
+/**
+ * Чтение записи с сервера.
+ *
+ * @param connection Активное соединение.
+ * @param mfn MFN записи.
+ * @param record Проинициализированная структура.
+ * @return Признак успешного завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL connection_read_record
+    (
+        Connection *connection,
+        am_mfn mfn,
+        MarcRecord *record
+    )
+{
+    Query query;
+    Response response;
+    am_bool result = AM_FALSE;
+    Span line;
+
+    assert (connection != NULL);
+    assert (mfn > 0);
+
+    if (!connection_check (connection)) {
+        return AM_FALSE;
+    }
+
+    response_init (&response);
+    if (!query_create (&query, connection, CBTEXT (READ_RECORD))) {
+        return AM_FALSE;
+    }
+
+    if (!query_add_ansi_buffer (&query, &connection->database)
+        || !query_add_int32 (&query, mfn)) {
+        goto DONE;
+    }
+
+    if (!connection_execute (connection, &query, &response)) {
+        goto DONE;
+    }
+
+    if (!response_check (&response, -201, -600, -602, -603, 0)) {
+        goto DONE;
+    }
+
+    if (!record_parse_single (record, &response)) {
+        goto DONE;
+    }
+
+    result = AM_TRUE;
+
+    DONE:
+    query_destroy (&query);
+    response_destroy (&response);
+
+    return result;
+}
+
+/**
+ * Чтение записи с сервера. Запись никак не раскодируется и возвращается
+ * в виде текста.
+ *
+ * @param connection Активное соединение.
+ * @param mfn MFN записи.
+ * @param buffer Буфер для размещения записи.
+ * @return Признак успешного завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL connection_read_record_text
+    (
+        Connection *connection,
+        am_mfn mfn,
+        Buffer *buffer
+    )
+{
+    Query query;
+    Response response;
+    am_bool result = AM_FALSE;
+    Span line;
+
+    assert (connection != NULL);
+    assert (mfn > 0);
+
+    if (!connection_check (connection)) {
+        return AM_FALSE;
+    }
+
+    response_init (&response);
+    if (!query_create (&query, connection, CBTEXT (READ_RECORD))) {
+        return AM_FALSE;
+    }
+
+    if (!query_add_ansi_buffer (&query, &connection->database)
+        || !query_add_int32 (&query, mfn)) {
+        goto DONE;
+    }
+
+    if (!connection_execute (connection, &query, &response)) {
+        goto DONE;
+    }
+
+    if (!response_check (&response, -201, -600, -602, -603, 0)) {
+        goto DONE;
+    }
+
+    line = response_remaining_utf_text (&response);
+    if (span_is_empty (line)) {
+        goto DONE;
+    }
+
+    if (!buffer_write (buffer, line.start, span_length (line))) {
+        goto DONE;
+    }
+
+    result = AM_TRUE;
 
     DONE:
     query_destroy (&query);
@@ -1031,7 +1210,7 @@ MAGNA_API am_bool MAGNA_CALL connection_read_text_file
         return AM_FALSE;
     }
 
-    response_null (&response);
+    response_init (&response);
     if (!query_create (&query, connection, CBTEXT (READ_DOCUMENT))) {
         return AM_FALSE;
     }
@@ -1158,6 +1337,157 @@ MAGNA_API am_bool MAGNA_CALL connection_restart_server
 }
 
 /**
+ * Число найденных записей.
+ *
+ * @param connection
+ * @param expression
+ * @return Число найденных записей.
+ */
+MAGNA_API am_int32 MAGNA_CALL connection_search_count
+    (
+        Connection *connection,
+        const am_byte *expression
+    )
+{
+    am_int32 result = -1;
+    SearchParameters parameters;
+    Response response;
+
+    assert (connection != NULL);
+    assert (expression != NULL);
+
+    if (search_parameters_create (&parameters, expression)) {
+        if (connection_search_ex (connection, &parameters, &response)) {
+            result = response_read_int32 (&response);
+        }
+
+        response_destroy (&response);
+    }
+
+    return result;
+}
+
+/**
+ * Расширенный поиск.
+ *
+ * @param connection Активное подключение.
+ * @param parameters Параметры поиска.
+ * @param response Ответ сервера.
+ * @return Признак успешного завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL connection_search_ex
+    (
+        Connection *connection,
+        const SearchParameters *parameters,
+        Response *response
+    )
+{
+    am_bool result = AM_FALSE;
+    Query query;
+
+    assert (connection != NULL);
+    assert (parameters != NULL);
+    assert (response != NULL);
+
+    response_init (response);
+
+    if (!connection_check (connection)
+        || !search_parameters_verify (parameters)
+        || !query_create (&query, connection, CBTEXT (SEARCH))) {
+        return AM_FALSE;
+    }
+
+    if (!search_parameters_encode (parameters, connection, &query)
+        || !connection_execute (connection, &query, response)) {
+        goto DONE;
+    }
+
+    result = response_get_return_code (response) >= 0;
+
+    DONE:
+    query_destroy (&query);
+
+    return result;
+}
+
+MAGNA_API am_bool MAGNA_CALL connection_search_mfn
+    (
+        Connection *connection,
+        SearchParameters *parameters
+    )
+{
+    am_bool result = AM_FALSE;
+    Response response;
+
+    assert (connection != NULL);
+    assert (parameters != NULL);
+
+    return result;
+}
+
+MAGNA_API am_bool MAGNA_CALL connection_search_simple
+    (
+        Connection *connection,
+        Int32Array *array,
+        const am_byte *expression
+    )
+{
+    am_bool result = AM_FALSE;
+    SearchParameters parameters;
+    Response response;
+
+    assert (connection != NULL);
+    assert (expression != NULL);
+
+    if (search_parameters_create (&parameters, expression)) {
+        if (connection_search_ex (connection, &parameters, &response)) {
+            (void) response_read_int32 (&response);
+            result = found_decode_response_mfn (array, &response);
+        }
+
+        response_destroy (&response);
+    }
+
+    return result;
+}
+
+/**
+ * Формирование строки подключения по текущим настройкам.
+ *
+ * @param connection Подключение (не обязательно активное).
+ * @param output Буфер для размещения результата.
+ * @return Признак успешности завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL connection_to_string
+    (
+        const Connection *connection,
+        Buffer *output
+    )
+{
+    assert (connection != NULL);
+    assert (output != NULL);
+
+    return buffer_puts (output, CBTEXT ("host="))
+           && buffer_concat (output, &connection->host)
+           && buffer_putc (output, ';')
+           && buffer_puts (output, CBTEXT ("port="))
+           && buffer_put_uint32 (output, connection->port)
+           && buffer_putc (output, ';')
+           && buffer_puts (output, CBTEXT ("username="))
+           && buffer_concat (output, &connection->username)
+           && buffer_putc (output, ';')
+           && buffer_puts (output, CBTEXT ("password="))
+           && buffer_concat (output, &connection->password)
+           && buffer_putc (output, ';')
+           && buffer_puts (output, CBTEXT ("database="))
+           && buffer_concat (output, &connection->database)
+           && buffer_putc (output, ';')
+           && buffer_puts (output, CBTEXT ("workstation="))
+           && buffer_putc (output, connection->workstation)
+           && buffer_putc (output, ';');
+}
+
+/**
  * Опустошение указанной базы данных.
  *
  * @param connection Активное подключение.
@@ -1190,6 +1520,7 @@ MAGNA_API am_bool MAGNA_CALL connection_truncate_database
 
     return result;
 }
+
 
 /**
  * Разблокирование указанной базы данных.
@@ -1225,262 +1556,6 @@ MAGNA_API am_bool MAGNA_CALL connection_unlock_database
     return result;
 }
 
-/**
- * Число найденных записей.
- *
- * @param connection
- * @param expression
- * @return Число найденных записей.
- */
-MAGNA_API am_int32 MAGNA_CALL connection_search_count
-    (
-        Connection *connection,
-        const char *expression
-    )
-{
-    assert (connection != NULL);
-    assert (expression != NULL);
-
-    return -1;
-}
-
-/**
- * Расширенный поиск.
- *
- * @param connection
- * @param parameters
- * @param response
- * @return Признак успешности завершения операции.
- */
-MAGNA_API am_bool MAGNA_CALL connection_search_ex
-    (
-        Connection *connection,
-        const SearchParameters *parameters,
-        Response *response
-    )
-{
-    assert (connection != NULL);
-    assert (parameters != NULL);
-    assert (response != NULL);
-
-    return AM_FALSE;
-}
-
-/**
- * Формирование строки подключения по текущим настройкам.
- *
- * @param connection Подключение (не обязательно активное).
- * @param output Буфер для размещения результата.
- * @return Признак успешности завершения операции.
- */
-MAGNA_API am_bool MAGNA_CALL connection_to_string
-    (
-        const Connection *connection,
-        Buffer *output
-    )
-{
-    assert (connection != NULL);
-    assert (output != NULL);
-
-    return buffer_puts (output, CBTEXT ("host="))
-        && buffer_concat (output, &connection->host)
-        && buffer_putc (output, ';')
-        && buffer_puts (output, CBTEXT ("port="))
-        && buffer_put_uint32 (output, connection->port)
-        && buffer_putc (output, ';')
-        && buffer_puts (output, CBTEXT ("username="))
-        && buffer_concat (output, &connection->username)
-        && buffer_putc (output, ';')
-        && buffer_puts (output, CBTEXT ("password="))
-        && buffer_concat (output, &connection->password)
-        && buffer_putc (output, ';')
-        && buffer_puts (output, CBTEXT ("database="))
-        && buffer_concat (output, &connection->database)
-        && buffer_putc (output, ';')
-        && buffer_puts (output, CBTEXT ("workstation="))
-        && buffer_putc (output, connection->workstation)
-        && buffer_putc (output, ';');
-}
-
-/**
- * Чтение записи с сервера. Запись разделяется на отдельные строки.
- *
- * @param connection Активное соединение.
- * @param mfn MFN записи.
- * @param record Проинициализированная структура.
- * @return Признак успешного завершения операции.
- */
-MAGNA_API am_bool MAGNA_CALL connection_read_raw_record
-    (
-        Connection *connection,
-        am_mfn mfn,
-        RawRecord *record
-    )
-{
-    Query query;
-    Response response;
-    am_bool result = AM_FALSE;
-    Span line;
-
-    assert (connection != NULL);
-    assert (mfn > 0);
-
-    if (!connection_check (connection)) {
-        return AM_FALSE;
-    }
-
-    response_null (&response);
-    if (!query_create (&query, connection, CBTEXT (READ_RECORD))) {
-        return AM_FALSE;
-    }
-
-    if (!query_add_ansi_buffer (&query, &connection->database)
-        || !query_add_int32 (&query, mfn)) {
-        goto DONE;
-    }
-
-    if (!connection_execute (connection, &query, &response)) {
-        goto DONE;
-    }
-
-    if (!response_check (&response, -201, -600, -602, -603, 0)) {
-        goto DONE;
-    }
-
-    if (!raw_record_parse_single (record, &response)) {
-        goto DONE;
-    }
-
-    result = AM_TRUE;
-
-    DONE:
-    query_destroy (&query);
-    response_destroy (&response);
-
-    return result;
-}
-
-/**
- * Чтение записи с сервера.
- *
- * @param connection Активное соединение.
- * @param mfn MFN записи.
- * @param record Проинициализированная структура.
- * @return Признак успешного завершения операции.
- */
-MAGNA_API am_bool MAGNA_CALL connection_read_record
-    (
-        Connection *connection,
-        am_mfn mfn,
-        MarcRecord *record
-    )
-{
-    Query query;
-    Response response;
-    am_bool result = AM_FALSE;
-    Span line;
-
-    assert (connection != NULL);
-    assert (mfn > 0);
-
-    if (!connection_check (connection)) {
-        return AM_FALSE;
-    }
-
-    response_null (&response);
-    if (!query_create (&query, connection, CBTEXT (READ_RECORD))) {
-        return AM_FALSE;
-    }
-
-    if (!query_add_ansi_buffer (&query, &connection->database)
-        || !query_add_int32 (&query, mfn)) {
-        goto DONE;
-    }
-
-    if (!connection_execute (connection, &query, &response)) {
-        goto DONE;
-    }
-
-    if (!response_check (&response, -201, -600, -602, -603, 0)) {
-        goto DONE;
-    }
-
-    if (!record_parse_single (record, &response)) {
-        goto DONE;
-    }
-
-    result = AM_TRUE;
-
-    DONE:
-    query_destroy (&query);
-    response_destroy (&response);
-
-    return result;
-}
-
-/**
- * Чтение записи с сервера. Запись никак не раскодируется и возвращается
- * в виде текста.
- *
- * @param connection Активное соединение.
- * @param mfn MFN записи.
- * @param buffer Буфер для размещения записи.
- * @return Признак успешного завершения операции.
- */
-MAGNA_API am_bool MAGNA_CALL connection_read_record_text
-    (
-        Connection *connection,
-        am_mfn mfn,
-        Buffer *buffer
-    )
-{
-    Query query;
-    Response response;
-    am_bool result = AM_FALSE;
-    Span line;
-
-    assert (connection != NULL);
-    assert (mfn > 0);
-
-    if (!connection_check (connection)) {
-        return AM_FALSE;
-    }
-
-    response_null (&response);
-    if (!query_create (&query, connection, CBTEXT (READ_RECORD))) {
-        return AM_FALSE;
-    }
-
-    if (!query_add_ansi_buffer (&query, &connection->database)
-        || !query_add_int32 (&query, mfn)) {
-        goto DONE;
-    }
-
-    if (!connection_execute (connection, &query, &response)) {
-        goto DONE;
-    }
-
-    if (!response_check (&response, -201, -600, -602, -603, 0)) {
-        goto DONE;
-    }
-
-    line = response_remaining_utf_text (&response);
-    if (span_is_empty (line)) {
-        goto DONE;
-    }
-
-    if (!buffer_write (buffer, line.start, span_length (line))) {
-        goto DONE;
-    }
-
-    result = AM_TRUE;
-
-    DONE:
-    query_destroy (&query);
-    response_destroy (&response);
-
-    return result;
-}
 
 /*=========================================================*/
 

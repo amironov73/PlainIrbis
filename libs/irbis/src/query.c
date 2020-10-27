@@ -21,6 +21,12 @@
  * \file query.c
  *
  * Клиентский запрос.
+ *
+ * \struct Query
+ *      \brief Клиентский запрос.
+ *
+ * \var Query::buffer
+ *      \brief Буфер для накопления данных запроса.
  */
 
  /*=========================================================*/
@@ -171,7 +177,7 @@ MAGNA_API am_bool MAGNA_CALL query_new_line
 MAGNA_API am_bool MAGNA_CALL query_create
     (
         Query *query,
-        struct IrbisConnection *connection,
+        Connection *connection,
         const am_byte *command
     )
 {

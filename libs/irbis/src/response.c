@@ -22,23 +22,56 @@
  * \file response.c
  *
  * Ответ сервера.
+ *
+ * \struct Response
+ *      \brief Ответ сервера.
+ *
+ * \var Response::answer
+ *      \brief Содержимое ответа, помещенное в буфер.
+ *
+ * \var Response::command
+ *      \brief Код команды, присланный в ответе.
+ *
+ * \var Response clientId
+ *      \brief Идентификатор клиента, присланный в ответе.
+ *
+ * \var Response::queryId
+ *      \brief Идентификатор запроса, присланный в ответе.
+ *
+ * \var Response::returnCode
+ *      \brief Код ошибки (не всегда доступен).
+ *
+ * \var Response::answerSize
+ *      \brief Размер ответа сервера в байтах (может высылаться сервером).
+ *
+ * \var Response::serverVersion
+ *      \brief Версия сервера (может высылаться в ответ на команду `A`.
+ *
+ * \var Response::connection
+ *      \brief Указатель на подключение для выставления
+ *      в нем кода ошибки при сбоях декодирования ответа.
+ *
+ * \var Response::navigator
+ *      \brief Навигатор для считывания строк.
+ *
  */
 
 /*=========================================================*/
 
-MAGNA_API am_bool MAGNA_CALL response_create
+/**
+ * Простая инициализация структуры ответа сервера.
+ * Не выделяет память в куче.
+ *
+ * @param response Указатель на неинициализированную структуру.
+ */
+MAGNA_API void MAGNA_CALL response_init
     (
-        Connection *connection,
         Response *response
     )
 {
-    assert (connection != NULL);
     assert (response != NULL);
 
     mem_clear (response, sizeof (*response));
-    response->connection = connection;
-
-    return AM_TRUE;
 }
 
 /**
@@ -54,7 +87,7 @@ MAGNA_API void MAGNA_CALL response_destroy
     assert (response != NULL);
 
     buffer_destroy (&response->answer);
-    mem_clear (response, sizeof (Response));
+    mem_clear (response, sizeof (*response));
 }
 
 /**
@@ -187,7 +220,7 @@ MAGNA_API am_bool MAGNA_CALL response_remaining_lines
 MAGNA_API am_bool MAGNA_CALL response_remaining_ansi_lines
     (
         Response *response,
-        Vector *array
+        SpanArray *array
     )
 {
     assert (response != NULL);
@@ -211,7 +244,7 @@ MAGNA_API Span MAGNA_CALL response_remaining_ansi_text
 MAGNA_API am_bool MAGNA_CALL response_remaining_utf_lines
     (
         Response *response,
-        Vector *array
+        SpanArray *array
     )
 {
     assert (response != NULL);
@@ -232,16 +265,6 @@ MAGNA_API Span MAGNA_CALL response_remaining_utf_text
     result = nav_remaining (&response->navigator);
 
     return result;
-}
-
-MAGNA_API void MAGNA_CALL response_null
-    (
-        Response *response
-    )
-{
-    assert (response != NULL);
-
-    mem_clear (response, sizeof (Response));
 }
 
 /*=========================================================*/

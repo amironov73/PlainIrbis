@@ -409,7 +409,7 @@ MAGNA_API void    MAGNA_CALL table_definition_init    (TableDefinition *table);
 
 struct IrbisQuery
 {
-    Buffer buffer;
+    Buffer buffer; /* Буфер для накопления данных запроса. */
 };
 
 MAGNA_API am_bool MAGNA_CALL query_add_ansi          (Query *query, const am_byte *text);
@@ -431,31 +431,30 @@ MAGNA_API am_bool MAGNA_CALL query_new_line          (Query *query);
 
 struct IrbisResponse
 {
-    Buffer answer;
-    Span command;
-    am_int32 clientId;
-    am_int32 queryId;
-    am_int32 returnCode;
-    am_int32 answerSize;
-    Span serverVersion;
-    struct IrbisConnection *connection;
-    TextNavigator navigator;
+    Buffer answer;           /* Содержимое ответа, помещенное в буфер. */
+    Span command;            /* Код команды, присланный в ответе. */
+    am_int32 clientId;       /* Идентификатор клиента, присланный в ответе. */
+    am_int32 queryId;        /* Идентификатор запроса, присланный в ответе. */
+    am_int32 returnCode;     /* Код ошибки (не всегда доступен). */
+    am_int32 answerSize;     /* Размер ответа сервера в байтах (может высылаться сервером). */
+    Span serverVersion;      /* Интервал автоматического подтверждения в минутах. */
+    Connection *connection;  /* Указатель на подключение */
+    TextNavigator navigator; /* Навигатор для считывания строк */
 
 };
 
-MAGNA_API am_bool  MAGNA_CALL response_create                (Connection *connection, Response *response);
 MAGNA_API am_bool             response_check                 (Response *response, ...);
 MAGNA_API void     MAGNA_CALL response_destroy               (Response *response);
 MAGNA_API am_bool  MAGNA_CALL response_eot                   (const Response *response);
 MAGNA_API Span     MAGNA_CALL response_get_line              (Response *response);
 MAGNA_API am_int32 MAGNA_CALL response_get_return_code       (Response *response);
-MAGNA_API void     MAGNA_CALL response_null                  (Response *response);
+MAGNA_API void     MAGNA_CALL response_init                  (Response *response);
 MAGNA_API Span     MAGNA_CALL response_read_ansi             (Response *response);
 MAGNA_API am_int32 MAGNA_CALL response_read_int32            (Response *response);
 MAGNA_API Span     MAGNA_CALL response_read_utf              (Response *response);
-MAGNA_API am_bool  MAGNA_CALL response_remaining_ansi_lines  (Response *response, Vector *array);
+MAGNA_API am_bool  MAGNA_CALL response_remaining_ansi_lines  (Response *response, SpanArray *array);
 MAGNA_API Span     MAGNA_CALL response_remaining_ansi_text   (Response *response);
-MAGNA_API am_bool  MAGNA_CALL response_remaining_utf_lines   (Response *response, Vector *array);
+MAGNA_API am_bool  MAGNA_CALL response_remaining_utf_lines   (Response *response, SpanArray *array);
 MAGNA_API Span     MAGNA_CALL response_remaining_utf_text    (Response *response);
 
 /*=========================================================*/
@@ -648,41 +647,61 @@ MAGNA_API am_bool MAGNA_CALL search_equals  (Search *search, Span prefix, Span v
 /* Параметры для поиска записей */
 typedef struct
 {
-    Buffer expression;
-    Buffer database;
-    Buffer format;
-    Buffer sequential;
-    Buffer filter;
-    am_mfn firstRecord;
-    am_mfn minMfn;
-    am_mfn maxMfn;
-    am_mfn number;
+    Buffer expression;  /* Выражение для поиска по словарю (быстрый поиск) */
+    Buffer database;    /* Имя базы данных (опционально). */
+    Buffer format;      /* Опциональный формат для найденных записей. */
+    Buffer sequential;  /* Выражение для последовательного поиска (опционально). */
+    Buffer filter;      /* Фильтр для записей (фильтрация на клиенте) (опционально). */
+    am_mfn firstRecord; /* Индекс первой из возвращаемых записей (по умолчанию 1). */
+    am_mfn minMfn;      /* Минимальный MFN (опционально). */
+    am_mfn maxMfn;      /* Максимальный MFN (опционально). */
+    am_mfn number;      /* Количество возвращаемых записей (0 = все). */
 
 } SearchParameters;
 
-MAGNA_API void    MAGNA_CALL search_destroy_parameters (SearchParameters *parameters);
-MAGNA_API void    MAGNA_CALL search_init_parameters    (SearchParameters *parameters);
+MAGNA_API am_bool MAGNA_CALL search_parameters_create  (SearchParameters *parameters, const am_byte *expression);
+MAGNA_API void    MAGNA_CALL search_parameters_destroy (SearchParameters *parameters);
+MAGNA_API am_bool MAGNA_CALL search_parameters_encode  (const SearchParameters *parameters, Connection *connection, Query *query);
+MAGNA_API void    MAGNA_CALL search_parameters_init    (SearchParameters *parameters);
+MAGNA_API am_bool MAGNA_CALL search_parameters_verify  (const SearchParameters *parameters);
 
 /* Сценарий поиска */
 typedef struct
 {
-    Buffer name;
-    Buffer prefix;
-    Buffer menuName;
-    Buffer oldFormat;
-    Buffer correction;
-    Buffer truncation;
-    Buffer hint;
-    Buffer modByDicAuto;
-    Buffer logic;
-    Buffer advance;
-    Buffer format;
-    am_int32 dictionaryType;
+    Buffer name;             /* Наименование поискового атрибута (автор, заглавие и т. п.). */
+    Buffer prefix;           /* Префикс соответствующих терминов в поисковом словаре. */
+    Buffer menuName;         /* Имя файла справочника (меню). */
+    Buffer oldFormat;        /* Имя формата (без расширения). */
+    Buffer correction;       /* Способ корректировки по словарю. */
+    Buffer truncation;       /* Исходное положение переключателя "усечение". */
+    Buffer hint;             /* Текст подсказки/предупреждения. */
+    Buffer modByDicAuto;     /* Параметр пока не задействован. */
+    Buffer logic;            /* Применимые логические операторы. */
+    Buffer advance;          /* Правила автоматического расширения поиска. */
+    Buffer format;           /* Имя формата показа документов. */
+    am_int32 dictionaryType; /* Тип словаря для соответствующего поиска. */
 
 } SearchScenario;
 
-MAGNA_API am_bool MAGNA_CALL scenario_init    (SearchScenario *scenario);
+MAGNA_API void    MAGNA_CALL scenario_init    (SearchScenario *scenario);
 MAGNA_API void    MAGNA_CALL scenario_destroy (SearchScenario *scenario);
+
+/* Одна строка из списка найденных записей */
+
+typedef struct
+{
+    Buffer description; /* Опциональный текст. */
+    am_mfn mfn;         /* MFN найденной записи. */
+
+} FoundLine;
+
+MAGNA_API void    MAGNA_CALL found_array_init          (Array *array);
+MAGNA_API void    MAGNA_CALL found_array_destroy       (Array *array);
+MAGNA_API am_bool MAGNA_CALL found_decode_line         (FoundLine *found, Span line);
+MAGNA_API am_bool MAGNA_CALL found_decode_response     (Array *array, Response *response);
+MAGNA_API am_bool MAGNA_CALL found_decode_response_mfn (Int32Array *array, Response *response);
+MAGNA_API void    MAGNA_CALL found_destroy             (FoundLine *found);
+MAGNA_API void    MAGNA_CALL found_init                (FoundLine *found);
 
 /*=========================================================*/
 
@@ -755,46 +774,48 @@ struct IrbisConnection
 
 };
 
-MAGNA_API am_bool MAGNA_CALL connection_actualize_database (Connection *connection, const am_byte *database);
-MAGNA_API am_bool MAGNA_CALL connection_actualize_record   (Connection *connection, const am_byte *database, am_mfn mfn);
-MAGNA_API am_bool MAGNA_CALL connection_check              (Connection *connection);
-MAGNA_API am_bool MAGNA_CALL connection_create             (Connection *connection);
-MAGNA_API am_bool MAGNA_CALL connection_connect            (Connection *connection);
-MAGNA_API am_bool MAGNA_CALL connection_create_database    (Connection *connection, const am_byte *database, const am_byte *description, am_bool readerAccess);
-MAGNA_API am_bool MAGNA_CALL connection_create_dictionary  (Connection *connection, const am_byte *database);
-MAGNA_API am_bool MAGNA_CALL connection_delete_database    (Connection *connection, const am_byte *database);
-MAGNA_API am_bool MAGNA_CALL connection_delete_file        (Connection *connection, const am_byte *fileName);
-MAGNA_API am_bool MAGNA_CALL connection_delete_record      (Connection *connection, am_mfn mfn);
-MAGNA_API am_bool MAGNA_CALL connection_disconnect         (Connection *connection);
-MAGNA_API am_bool MAGNA_CALL connection_execute            (Connection *connection, Query *query, Response *response);
-MAGNA_API am_bool            connection_execute_simple     (Connection *connection, Response *response, const am_byte *command, int argCount, ...);
-MAGNA_API void    MAGNA_CALL connection_destroy            (Connection *connection);
-MAGNA_API am_bool MAGNA_CALL connection_format_mfn         (Connection *connection, const am_byte *format, am_mfn mfn, Buffer *output);
-MAGNA_API am_mfn  MAGNA_CALL connection_get_max_mfn        (Connection *connection, const am_byte *database);
-MAGNA_API am_bool MAGNA_CALL connection_get_server_version (Connection *connection, ServerVersion *version);
-MAGNA_API am_bool MAGNA_CALL connection_no_operation       (Connection *connection);
-MAGNA_API am_bool MAGNA_CALL connection_parse_string       (Connection *connection, Span connectionString);
-MAGNA_API am_bool MAGNA_CALL connection_print_table        (Connection *connection, TableDefinition *definition, Buffer *output);
-MAGNA_API am_bool MAGNA_CALL connection_read_raw_record    (Connection *connection, am_mfn mfn, RawRecord *record);
-MAGNA_API am_bool MAGNA_CALL connection_read_record        (Connection *connection, am_mfn mfn, MarcRecord *record);
-MAGNA_API am_bool MAGNA_CALL connection_read_record_text   (Connection *connection, am_mfn mfn, Buffer *buffer);
-MAGNA_API am_bool MAGNA_CALL connection_read_text_file     (Connection *connection, const Specification *specification, Buffer *buffer);
-MAGNA_API am_bool MAGNA_CALL connection_reload_dictionary  (Connection *connection, const am_byte *database);
-MAGNA_API am_bool MAGNA_CALL connection_reload_master_file (Connection *connection, const am_byte *database);
-MAGNA_API am_bool MAGNA_CALL connection_restart_server     (Connection *connection);
-MAGNA_API am_bool MAGNA_CALL connection_search_ex          (Connection *connection, const SearchParameters *parameters, Response *response);
-MAGNA_API am_bool MAGNA_CALL connection_set_database       (Connection *connection, const am_byte *database);
-MAGNA_API am_bool MAGNA_CALL connection_set_host           (Connection *connection, const am_byte *host);
-MAGNA_API am_bool MAGNA_CALL connection_set_password       (Connection *connection, const am_byte *password);
-MAGNA_API am_bool MAGNA_CALL connection_set_username       (Connection *connection, const am_byte *username);
-MAGNA_API am_bool MAGNA_CALL connection_to_string          (const Connection *connection, Buffer *output);
-MAGNA_API am_bool MAGNA_CALL connection_truncate_database  (Connection *connection, const am_byte *database);
-MAGNA_API am_bool MAGNA_CALL connection_unlock_database    (Connection *connection, const am_byte *database);
+MAGNA_API am_bool  MAGNA_CALL connection_actualize_database (Connection *connection, const am_byte *database);
+MAGNA_API am_bool  MAGNA_CALL connection_actualize_record   (Connection *connection, const am_byte *database, am_mfn mfn);
+MAGNA_API am_bool  MAGNA_CALL connection_check              (Connection *connection);
+MAGNA_API am_bool  MAGNA_CALL connection_create             (Connection *connection);
+MAGNA_API am_bool  MAGNA_CALL connection_connect            (Connection *connection);
+MAGNA_API am_bool  MAGNA_CALL connection_create_database    (Connection *connection, const am_byte *database, const am_byte *description, am_bool readerAccess);
+MAGNA_API am_bool  MAGNA_CALL connection_create_dictionary  (Connection *connection, const am_byte *database);
+MAGNA_API am_bool  MAGNA_CALL connection_delete_database    (Connection *connection, const am_byte *database);
+MAGNA_API am_bool  MAGNA_CALL connection_delete_file        (Connection *connection, const am_byte *fileName);
+MAGNA_API am_bool  MAGNA_CALL connection_delete_record      (Connection *connection, am_mfn mfn);
+MAGNA_API am_bool  MAGNA_CALL connection_disconnect         (Connection *connection);
+MAGNA_API am_bool  MAGNA_CALL connection_execute            (Connection *connection, Query *query, Response *response);
+MAGNA_API am_bool             connection_execute_simple     (Connection *connection, Response *response, const am_byte *command, int argCount, ...);
+MAGNA_API void     MAGNA_CALL connection_destroy            (Connection *connection);
+MAGNA_API am_bool  MAGNA_CALL connection_format_mfn         (Connection *connection, const am_byte *format, am_mfn mfn, Buffer *output);
+MAGNA_API am_mfn   MAGNA_CALL connection_get_max_mfn        (Connection *connection, const am_byte *database);
+MAGNA_API am_bool  MAGNA_CALL connection_get_server_version (Connection *connection, ServerVersion *version);
+MAGNA_API am_bool  MAGNA_CALL connection_no_operation       (Connection *connection);
+MAGNA_API am_bool  MAGNA_CALL connection_parse_string       (Connection *connection, Span connectionString);
+MAGNA_API am_bool  MAGNA_CALL connection_print_table        (Connection *connection, TableDefinition *definition, Buffer *output);
+MAGNA_API am_bool  MAGNA_CALL connection_read_raw_record    (Connection *connection, am_mfn mfn, RawRecord *record);
+MAGNA_API am_bool  MAGNA_CALL connection_read_record        (Connection *connection, am_mfn mfn, MarcRecord *record);
+MAGNA_API am_bool  MAGNA_CALL connection_read_record_text   (Connection *connection, am_mfn mfn, Buffer *buffer);
+MAGNA_API am_bool  MAGNA_CALL connection_read_text_file     (Connection *connection, const Specification *specification, Buffer *buffer);
+MAGNA_API am_bool  MAGNA_CALL connection_reload_dictionary  (Connection *connection, const am_byte *database);
+MAGNA_API am_bool  MAGNA_CALL connection_reload_master_file (Connection *connection, const am_byte *database);
+MAGNA_API am_bool  MAGNA_CALL connection_restart_server     (Connection *connection);
+MAGNA_API am_int32 MAGNA_CALL connection_search_count       (Connection *connection, const am_byte *expression);
+MAGNA_API am_bool  MAGNA_CALL connection_search_ex          (Connection *connection, const SearchParameters *parameters, Response *response);
+MAGNA_API am_bool  MAGNA_CALL connection_search_simple      (Connection *connection,  Int32Array *array, const am_byte *expression);
+MAGNA_API am_bool  MAGNA_CALL connection_set_database       (Connection *connection, const am_byte *database);
+MAGNA_API am_bool  MAGNA_CALL connection_set_host           (Connection *connection, const am_byte *host);
+MAGNA_API am_bool  MAGNA_CALL connection_set_password       (Connection *connection, const am_byte *password);
+MAGNA_API am_bool  MAGNA_CALL connection_set_username       (Connection *connection, const am_byte *username);
+MAGNA_API am_bool  MAGNA_CALL connection_to_string          (const Connection *connection, Buffer *output);
+MAGNA_API am_bool  MAGNA_CALL connection_truncate_database  (Connection *connection, const am_byte *database);
+MAGNA_API am_bool  MAGNA_CALL connection_unlock_database    (Connection *connection, const am_byte *database);
 
 /* Синонимы */
 
-MAGNA_API am_bool MAGNA_CALL irbis_connect                 (Connection *connection);
-MAGNA_API am_bool MAGNA_CALL irbis_disconnect              (Connection *connection);
+MAGNA_API am_bool  MAGNA_CALL irbis_connect                 (Connection *connection);
+MAGNA_API am_bool  MAGNA_CALL irbis_disconnect              (Connection *connection);
 
 
 /*=========================================================*/

@@ -443,6 +443,26 @@ MAGNA_API am_bool MAGNA_CALL int32_array_to_text
     return AM_TRUE;
 }
 
+MAGNA_API am_bool MAGNA_CALL int32_array_to_console
+    (
+        const Int32Array *array,
+        const am_byte *delimiter
+    )
+{
+    size_t index;
+    am_int32 *item;
+
+    assert (array != NULL);
+
+    item = array->ptr;
+    for (index = 0; index < array->len; ++index, ++item) {
+        printf ("%d", *item);
+        puts (CCTEXT (delimiter));
+    }
+
+    return AM_TRUE;
+}
+
 static am_bool format_range
     (
         struct MagnaBuffer *buffer,
