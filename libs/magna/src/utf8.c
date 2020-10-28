@@ -30,7 +30,7 @@
  *
  * @param buffer Инициализированный буфер.
  * @param chr Символ.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL buffer_putc_utf8
     (

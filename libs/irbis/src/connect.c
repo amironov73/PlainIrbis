@@ -24,12 +24,102 @@
  *
  * Работа с подключением к серверу ИРБИС64.
  *
- * Перед использованием структура `Connection` должна быть
- * проинициализирована. Для инициализации используйте
- * `connection_init`.
+ * \struct Connection
+ *      \brief Структура, хранящая все необходимые настройки
+ *      для обмена данными с сервером ИРБИС64.
+ *
+ * \details Перед использованием структура `Connection`
+ *  должна быть проинициализирована с помощью `connection_create`.
  *
  * Структура `Connection` владеет собственной памятью.
- * Для освобождения ресурсов используйте `connection_free`.
+ * Для освобождения ресурсов используйте `connection_destroy`.
+ *
+ * \var Connection;:host
+ *      \brief Имя или адрес хоста с сервером ИРБИС64.
+ *      \details Значение по умолчанию "127.0.0.1".
+ *
+ * \var Connection::port
+ *      \brief Номер порта на сервере ИРБИС64.
+ *      \details По умолчанию `6666`.
+ *
+ * \var Connection::username
+ *      \brief Имя пользователя системы ИРБИС64 (логин).
+ *      \details Нечувствителен к регистру символов.
+ *      По умолчанию пустая строка.
+ *
+ * \var Connection::password
+ *      \brief Пароль пользователя системы ИРБИС64.
+ *      \details Чувствителен к регистру символов.
+ *      По умолчанию пустая строка.
+ *
+ * \var Connection::database
+ *      \brief Имя текущей базы данных.
+ *      \details Нечувствителен к регистру символов.
+ *      По умолчанию "IBIS".
+ *      Значение не должно быть пустым
+ *      и должно представлять имя какой-либо из баз данных,
+ *      имеющихся на сервере.
+ *
+ * \var Connection::workstation
+ *      \brief Тип АРМ.
+ *      \details По умолчанию 'C' (АРМ Каталогизатор).
+ *      Значение должно быть кодом одного из разрешенных
+ *      для данного пользователя АРМов.
+ *
+ * \var Connection::serverVersion
+ *      \bfief Версия сервера (присылается при входе в систему).
+ *      \details При некоторых сценариях сервер не присылвает свою версию.
+ *
+ * \var Connection::clientId
+ *      \brief Идентификатор клиента -- случайное целое число.
+ *
+ * \var Connection::queryId
+ *      \brief Порядковый номер запроса к серверу (нумерация с 1).
+ *
+ * \var Connection::lastError
+ *      \brief Код ошибки последней выполненной операции.
+ *      \details Значение больше или равное 0 означает отсутствие ошибки.
+ *      Впрочем, некоторые отрицательные значения тоже могут означать
+ *      отсутствие ошибки.
+ *
+ * \var Connection::interval
+ *      \brief Рекомендуемый интервал подтверждения активности в минутах.
+ *      \details Присылается сервером при регистрации в системе.
+ *
+ * \var Connection::connected
+ *      \brief Признак активного подключения (устанавливается автоматически).
+ *
+ * \code
+ * Connection connection;
+ *
+ * // Создаем подключение
+ * if (!connection_create (&connection)) {
+ *      fputs ("Can't create connection\n", stderr);
+ *      return 1;
+ *  }
+ *
+ * // Настраиваем параметры подключения
+ * connection_set_host     (&connection, CBTEXT ("myhost"));
+ * connection_set_username (&connection, CBTEXT ("librarian"));
+ * connection_set_password (&connection, CBTEXT ("secret"));
+ * connection_set_database (&connection, CBTEXT ("IStU"));
+ * connection.workstation = CATALOGER;
+ * connection.port = 6667; // Нестандартный порт
+ *
+ * // Пытаемся подключиться к серверу
+ * if (!irbis_connect (&connection)) {
+ *      fputs ("Connection failed\n", stderr);
+ *      connection_destroy (&connection);
+ *      return 1;
+ *  }
+ *
+ * // Некие действия по обмену данными с сервером
+ *
+ * // Отключаемся от сервера и освобождаем ресурсы, занятые подключением.
+ * irbis_disconnect (&connection);
+ * connection_destroy (&connection);
+ *
+ * \endcode
  */
 
 /*=========================================================*/
@@ -39,24 +129,21 @@
  * Выделяет память в куче.
  *
  * @param connection Структура, подлежащая инициализации.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL connection_create
     (
         Connection *connection
     )
 {
-    am_bool result;
-
     assert (connection != NULL);
 
     mem_clear (connection, sizeof (Connection));
-    result = buffer_assign_text (&connection->host, CBTEXT ("127.0.0.1"))
-        && buffer_assign_text (&connection->database, CBTEXT ("IBIS"));
     connection->port = 6666;
     connection->workstation = CATALOGER;
 
-    return result;
+    return buffer_assign_text (&connection->host, CBTEXT ("127.0.0.1"))
+        && buffer_assign_text (&connection->database, CBTEXT ("IBIS"));
 }
 
 /*=========================================================*/
@@ -84,6 +171,10 @@ MAGNA_API void MAGNA_CALL connection_destroy
     buffer_destroy (&connection->database);
     buffer_destroy (&connection->serverVersion);
     mem_clear (connection, sizeof (*connection));
+
+    /* В принципе, после этого подключение
+     * можно вновь инициализировать и снова использовать.
+     */
 }
 
 /*=========================================================*/
@@ -94,7 +185,7 @@ MAGNA_API void MAGNA_CALL connection_destroy
  *
  * @param connection Подключение.
  * @param host Имя или адрес удаленного хоста.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL connection_set_host
     (
@@ -114,8 +205,8 @@ MAGNA_API am_bool MAGNA_CALL connection_set_host
  * Выполняется до установки соединения с сервером.
  *
  * @param connection Подключение.
- * @param username Имя (логин)  пользователя. Не чувствительно к регистру символов.
- * @return Признак успешности завершения операции.
+ * @param username Имя (логин)  пользователя в системе ИРБИС64. Не чувствительно к регистру символов.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL connection_set_username
     (
@@ -136,7 +227,7 @@ MAGNA_API am_bool MAGNA_CALL connection_set_username
  *
  * @param connection Подключение.
  * @param password Пароль пользователя. Чувствителен к регистру символов.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL connection_set_password
     (
@@ -157,7 +248,7 @@ MAGNA_API am_bool MAGNA_CALL connection_set_password
  *
  * @param connection Подключения.
  * @param database Имя базы данных. Не чувствительно к регистру символов.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL connection_set_database
     (
@@ -174,11 +265,34 @@ MAGNA_API am_bool MAGNA_CALL connection_set_database
 /*=========================================================*/
 
 /**
+ * Прерывает программу при обнаружении ошибки.
+ *
+ * @param connection Активное подключение.
+ */
+MAGNA_API void MAGNA_CALL connection_abort_on_error
+    (
+        const Connection *connection
+    )
+{
+    assert (connection != NULL);
+
+    if (connection->lastError < 0) {
+        fputs ("\n\n", stderr);
+        fputs ("ERROR: ", stderr);
+        fputs (irbis_describe_error (connection->lastError), stderr);
+        fputs ("\n\n", stderr);
+        abort ();
+    }
+}
+
+/*=========================================================*/
+
+/**
  * Актуализация всех неактуализированных записей в указанной базе данных.
  *
  * @param connection Активное подключение.
  * @param database Имя базы данных.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL connection_actualize_database
     (
@@ -198,7 +312,7 @@ MAGNA_API am_bool MAGNA_CALL connection_actualize_database
  * @param connection Активное подключение.
  * @param database Имя базы данных.
  * @param mfn MFN, подлежащий актуализации.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL connection_actualize_record
     (
@@ -266,7 +380,7 @@ MAGNA_API am_bool MAGNA_CALL connection_check
  * Синоним для функции `connection_connect`.
  *
  * @param connection Неактивное подключение.
- * @return Признак успешности подключения.
+ * @return Признак успешного подключения.
  */
 MAGNA_API am_bool MAGNA_CALL irbis_connect
     (
@@ -281,7 +395,7 @@ MAGNA_API am_bool MAGNA_CALL irbis_connect
  * Если подключене уже было установлено, функция ничего не делает.
  *
  * @param connection Неактивное подключение.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  * Если подключение не удалось, код ошибки можно
  * посмотреть в `connection-&gt;lastError`.
  */
@@ -290,9 +404,9 @@ MAGNA_API am_bool MAGNA_CALL connection_connect
         Connection *connection
     )
 {
-    Query query;
-    Response response;
-    am_bool result = AM_FALSE;
+    Query query;               /* клиентский запрос */
+    Response response;         /* ответ сервера */
+    am_bool result = AM_FALSE; /* признак успеха */
 
     LOG_ENTER;
     assert (connection != NULL);
@@ -354,7 +468,7 @@ MAGNA_API am_bool MAGNA_CALL connection_connect
  * @param database Имя создаваемой базы данных.
  * @param description Описание в свободной форме (опционально).
  * @param readerAccess Читатель будет иметь доступ?
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL connection_create_database
     (
@@ -364,9 +478,9 @@ MAGNA_API am_bool MAGNA_CALL connection_create_database
         am_bool readerAccess
     )
 {
-    am_bool result;
-    Response response;
-    const am_byte *accessString;
+    am_bool result;              /* признак успеха */
+    Response response;           /* ответ сервера */
+    const am_byte *accessString; /* строка для ИРБИС-протокола */
 
     if (!database) {
         database = B2B (&connection->database);
@@ -394,7 +508,7 @@ MAGNA_API am_bool MAGNA_CALL connection_create_database
  *
  * @param connection Активное подключение.
  * @param database Имя базы данных.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL connection_create_dictionary
     (
@@ -428,7 +542,7 @@ MAGNA_API am_bool MAGNA_CALL connection_create_dictionary
  *
  * @param connection Активное подключение.
  * @param database Имя базы данных.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL connection_delete_database
     (
@@ -437,7 +551,7 @@ MAGNA_API am_bool MAGNA_CALL connection_delete_database
     )
 {
     am_bool result;
-    Response response;
+    Response response; /* ответ сервера */
 
     if (!database) {
         database = B2B (&connection->database);
@@ -462,7 +576,7 @@ MAGNA_API am_bool MAGNA_CALL connection_delete_database
  *
  * @param connection Активное подключение.
  * @param fileName Имя базы файла.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL connection_delete_file
     (
@@ -484,7 +598,7 @@ MAGNA_API am_bool MAGNA_CALL connection_delete_file
  *
  * @param connection Активное подключение.
  * @param mfn MFN записи, подлежащей удалению.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL connection_delete_record
     (
@@ -505,7 +619,7 @@ MAGNA_API am_bool MAGNA_CALL connection_delete_record
  * Синоним для `connection_disconnect`.
  *
  * @param connection Активное подключение.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL irbis_disconnect
     (
@@ -524,7 +638,7 @@ MAGNA_API am_bool MAGNA_CALL irbis_disconnect
  * уменьшается.
  *
  * @param connection Активное подключение.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL connection_disconnect
     (
@@ -532,7 +646,7 @@ MAGNA_API am_bool MAGNA_CALL connection_disconnect
     )
 {
     am_bool result;
-    Response response;
+    Response response; /* ответ сервера */
 
     LOG_ENTER;
     assert (connection != NULL);
@@ -570,8 +684,8 @@ MAGNA_API am_mfn MAGNA_CALL connection_get_max_mfn
         const am_byte *database
     )
 {
-    am_mfn result = 0;
-    Response response;
+    am_mfn result = 0; /* результат: максимальный MFN или код ошибки */
+    Response response; /* ответ сервера */
 
     if (!database) {
         database = B2B (&connection->database);
@@ -600,7 +714,7 @@ MAGNA_API am_mfn MAGNA_CALL connection_get_max_mfn
  * @param connection Активное подключение.
  * @param query Клиентский запрос.
  * @param response Ответ сервера.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL connection_execute
     (
@@ -679,7 +793,7 @@ MAGNA_API am_bool MAGNA_CALL connection_execute
  * @param connection Активное подключение.
  * @param command Код команды, посылаемой на сервер.
  * @param ... Строки запроса (будут закодированы в ANSI).
- * @return Признак успешности выполнения операции.
+ * @return Признак успешного выполнения операции.
  */
 MAGNA_API am_bool connection_execute_simple
     (
@@ -736,7 +850,7 @@ MAGNA_API am_bool connection_execute_simple
  * @param format Формат.
  * @param mfn MFN записи.
  * @param output Буфер для размещения результата.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL connection_format_mfn
     (
@@ -808,7 +922,7 @@ MAGNA_API am_bool MAGNA_CALL connection_format_mfn
  * подтверждения подключения клиента).
  *
  * @param connection Активное подключение.
- * @return Признак успешности заврешения операции.
+ * @return Признак успешного заврешения операции.
  */
 MAGNA_API am_bool MAGNA_CALL connection_get_server_version
     (
@@ -844,7 +958,7 @@ MAGNA_API am_bool MAGNA_CALL connection_get_server_version
  * подтверждения подключения клиента).
  *
  * @param connection Активное подключение.
- * @return Признак успешности заврешения операции.
+ * @return Признак успешного заврешения операции.
  */
 MAGNA_API am_bool MAGNA_CALL connection_no_operation
     (
@@ -874,7 +988,7 @@ MAGNA_API am_bool MAGNA_CALL connection_no_operation
  *
  * @param connection Неактивное подключение.
  * @param connectionString Строка с параметрами подключения.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL connection_parse_string
     (
@@ -1002,6 +1116,27 @@ MAGNA_API am_bool MAGNA_CALL connection_print_table
     return result;
 }
 
+/**
+ * Чтение постингов для указанных терминов из поискового словаря.
+ *
+ * @param connection Активное подключение.
+ * @param parameters Параметры постингов.
+ * @param postings Массив для заполнения прочитанными постингами.
+ * @return Признак успешного завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL connection_read_postings
+    (
+        Connection *connection,
+        const PostingParameters *parameters,
+        Array *postings
+    )
+{
+    assert (connection != NULL);
+    assert (parameters != NULL);
+    assert (postings != NULL);
+
+    return AM_FALSE;
+}
 
 /**
  * Чтение записи с сервера. Запись разделяется на отдельные строки.
@@ -1184,12 +1319,34 @@ MAGNA_API am_bool MAGNA_CALL connection_read_record_text
 }
 
 /**
+ * Чтение терминов поискового словаря.
+ *
+ * @param connection Активное подключение.
+ * @param parameters Параметры.
+ * @param terms Массив для заполнения прочитанными терминами.
+ * @return Признак успешного завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL connection_read_terms
+    (
+        Connection *connection,
+        const TermParameters *parameters,
+        Array *terms
+    )
+{
+    assert (connection != NULL);
+    assert (parameters != NULL);
+    assert (terms != NULL);
+
+    return AM_FALSE;
+}
+
+/**
  * Чтение текстового файла с сервера.
  *
  * @param connection Активное подключение.
  * @param specification Спецификация.
  * @param buffer Инициализированный буфер для размещения результата.
- * @return Признак успешности выполнения операции.
+ * @return Признак успешного выполнения операции.
  */
 MAGNA_API am_bool MAGNA_CALL connection_read_text_file
     (
@@ -1246,7 +1403,7 @@ MAGNA_API am_bool MAGNA_CALL connection_read_text_file
  *
  * @param connection Активное подключение.
  * @param database Имя базы данных. `NULL` означает "текущая база данных".
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL connection_reload_dictionary
     (
@@ -1280,7 +1437,7 @@ MAGNA_API am_bool MAGNA_CALL connection_reload_dictionary
  *
  * @param connection Активное подключение.
  * @param database Имя базы данных. `NULL` означает "текущая база данных".
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL connection_reload_master_file
     (
@@ -1313,7 +1470,7 @@ MAGNA_API am_bool MAGNA_CALL connection_reload_master_file
  * Реорганизация мастер-файла указанной базы данных.
  *
  * @param connection Активное подключение.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL connection_restart_server
     (
@@ -1456,7 +1613,7 @@ MAGNA_API am_bool MAGNA_CALL connection_search_simple
  *
  * @param connection Подключение (не обязательно активное).
  * @param output Буфер для размещения результата.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL connection_to_string
     (
@@ -1492,7 +1649,7 @@ MAGNA_API am_bool MAGNA_CALL connection_to_string
  *
  * @param connection Активное подключение.
  * @param database Имя базы данных. `NULL` означает "текущая база данных".
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL connection_truncate_database
     (
@@ -1521,13 +1678,31 @@ MAGNA_API am_bool MAGNA_CALL connection_truncate_database
     return result;
 }
 
+/**
+ * Восстановление записи по ее MFN.
+ *
+ * @param connection Активное подключение.
+ * @param mfn MFN восстанавливаемой записи.
+ * @return Признак успешного выполнения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL connection_undelete_record
+    (
+        Connection *connection,
+        am_mfn mfn
+    )
+{
+    assert (connection != NULL);
+    assert (mfn > 0u);
+
+    return AM_FALSE;
+}
 
 /**
  * Разблокирование указанной базы данных.
  *
  * @param connection Активное подключение.
  * @param database Имя базы данных. `NULL` означает "текущая база данных".
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL connection_unlock_database
     (
@@ -1535,11 +1710,12 @@ MAGNA_API am_bool MAGNA_CALL connection_unlock_database
         const am_byte *database
     )
 {
-    am_bool result;
-    Response response;
+    am_bool result;    /* результат */
+    Response response; /* ответ сервера */
 
     if (!database) {
         database = B2B (&connection->database);
+        assert (database != NULL);
     }
 
     result = connection_execute_simple
@@ -1556,6 +1732,130 @@ MAGNA_API am_bool MAGNA_CALL connection_unlock_database
     return result;
 }
 
+/**
+ * Разблокирование нескольких записей в указанной базе данных.
+ *
+ * @param connection Активное подключение.
+ * @param database Имя базы данных (`NULL` означает текущую базу).
+ * @param records Массив MFN записей.
+ * @return Признак успешного завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL connection_unlock_records
+    (
+        Connection *connection,
+        const am_byte *database,
+        Int32Array *records
+    )
+{
+    assert (connection != NULL);
+    assert (records != NULL);
+
+    if (!database) {
+        database = B2B (&connection->database);
+        assert (database != NULL);
+    }
+
+    return AM_FALSE;
+}
+
+/**
+ * Обновление строк серверного INI-файла.
+ *
+ * @param connection Активное подключение.
+ * @param lines Измененные строки (допускается пустой массив).
+ * @return Признак успешного завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL connection_update_ini_file
+    (
+        Connection *connection,
+        const Array *lines
+    )
+{
+    assert (connection != NULL);
+    assert (lines != NULL);
+
+    return AM_FALSE;
+}
+
+/**
+ * Обновление списка пользователей на сервере.
+ *
+ * @param connection Активное подключение.
+ * @param users Массив пользователей.
+ * @return Признак успешного завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL connection_update_user_list
+    (
+        Connection *connection,
+        const Array *users
+    )
+{
+    assert (connection != NULL);
+    assert (users != NULL);
+
+    return AM_FALSE;
+}
+
+/**
+ * Сохранение записи на сервере.
+ *
+ * @param connection Активное подключение.
+ * @param record Запись, подлежащая сохранению.
+ * @param reparse Перегружать запись согласно полученной от сервера версии?
+ * @return Признак успешного выполнения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL connection_write_raw_record
+    (
+        Connection *connection,
+        RawRecord *record,
+        am_bool reparse
+    )
+{
+    assert (connection != NULL);
+    assert (record != NULL);
+
+    return AM_FALSE;
+}
+
+/**
+ * Сохранение записи на сервере.
+ *
+ * @param connection Активное подключение.
+ * @param record Запись, подлежащая сохранению.
+ * @param reparse Перегружать запись согласно полученной от сервера версии?
+ * @return Признак успешного выполнения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL connection_write_record
+    (
+        Connection *connection,
+        MarcRecord *record,
+        am_bool reparse
+    )
+{
+    assert (connection != NULL);
+    assert (record != NULL);
+
+    return AM_FALSE;
+}
+
+/**
+ * Сохранение текстового файла на сервере.
+ *
+ * @param connection Активное подключение.
+ * @param specification Спецификация (включая текст для сохранения).
+ * @return Признак успешного выполнения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL connection_write_text_file
+    (
+        Connection *connection,
+        const Specification *specification
+    )
+{
+    assert (connection != NULL);
+    assert (specification != NULL);
+
+    return AM_FALSE;
+}
 
 /*=========================================================*/
 

@@ -34,7 +34,7 @@
  *
  * @param target Неиницализированный массив назначения.
  * @param source Массив-источник.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL int32_array_clone
     (
@@ -59,7 +59,7 @@ MAGNA_API am_bool MAGNA_CALL int32_array_clone
  *
  * @param target Инициализированный массив назначения.
  * @param source Массив-источник.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL int32_array_copy
     (
@@ -80,7 +80,7 @@ MAGNA_API am_bool MAGNA_CALL int32_array_copy
  *
  * @param target Инициализированный массив назначения.
  * @param source Массив-источник.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL int32_array_concat
     (
@@ -106,7 +106,7 @@ MAGNA_API am_bool MAGNA_CALL int32_array_concat
  *
  * @param array Указатель на структуру, подлежащую инициализации.
  * @param capacity Требуемая емкость массива (больше нуля).
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL int32_array_create
     (
@@ -173,7 +173,7 @@ MAGNA_API am_int32 MAGNA_CALL int32_array_get
  *
  * @param array Массив.
  * @param newSize Требуемая емкость массива.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL int32_array_grow
     (
@@ -222,7 +222,7 @@ MAGNA_API am_bool MAGNA_CALL int32_array_grow
  * Если массив пустой, возврщается вся память, занятая массивом.
  *
  * @param array Массив.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL int32_array_shrink
     (
@@ -319,7 +319,7 @@ MAGNA_API am_int32 MAGNA_CALL int32_array_pop_front
  *
  * @param array Массив.
  * @param value Помещаемый элемент.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL int32_array_push_back
     (
@@ -345,7 +345,7 @@ MAGNA_API am_bool MAGNA_CALL int32_array_push_back
  *
  * @param array Массив.
  * @param value ПОмещаемый элемент.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL int32_array_push_front
     (
@@ -412,7 +412,7 @@ MAGNA_API void MAGNA_CALL int32_array_truncate
  * @param array Массив.
  * @param buffer Буфер для вывода.
  * @param delimiter Разделитель между элементами массива (может быть NULL).
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL int32_array_to_text
     (

@@ -37,7 +37,7 @@
  *
  * @param target Вектор назначения.
  * @param source Источник.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL vector_clone
     (
@@ -71,7 +71,7 @@ MAGNA_API am_bool MAGNA_CALL vector_clone
  *
  * @param target Вектор назначения.
  * @param source Источник.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL vector_copy
     (
@@ -92,7 +92,7 @@ MAGNA_API am_bool MAGNA_CALL vector_copy
  *
  * @param target Вектор назначения.
  * @param source Исходный вектор.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL vector_concat
     (
@@ -122,7 +122,7 @@ MAGNA_API am_bool MAGNA_CALL vector_concat
  *
  * @param vector Вектор, подлежащий инициализации.
  * @param capacity Требуемая емкость вектора.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL vector_create
     (
@@ -202,7 +202,7 @@ MAGNA_API MAGNA_INLINE void* MAGNA_CALL vector_get
  *
  * @param vector Вектор, емкость которого необходимо увеличить.
  * @param newSize Требуемая емкость вектора.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL vector_grow
     (
@@ -288,7 +288,7 @@ MAGNA_API void* MAGNA_CALL vector_pop_front
  *
  * @param vector Вектор.
  * @param item Помещаемый элемент.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL vector_push_back
     (
@@ -314,7 +314,7 @@ MAGNA_API am_bool MAGNA_CALL vector_push_back
  *
  * @param vector Вектор.
  * @param item Помещаемый элемент.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL vector_push_front
     (

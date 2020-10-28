@@ -36,7 +36,7 @@
  *
  * @param query Клиентский запрос.
  * @param text Добавляемая строка (может быть пустой).
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL query_add_ansi
     (
@@ -61,7 +61,7 @@ MAGNA_API am_bool MAGNA_CALL query_add_ansi
  *
  * @param query Клиентский запрос.
  * @param text Добавляемая строка формата (может быть пустой).
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL query_add_format
     (
@@ -87,7 +87,7 @@ MAGNA_API am_bool MAGNA_CALL query_add_format
  *
  * @param query Клиентский запрос
  * @param value Целое число.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL query_add_int32
     (
@@ -109,7 +109,7 @@ MAGNA_API am_bool MAGNA_CALL query_add_int32
  *
  * @param query Клиентский запрос
  * @param value Целое число.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL query_add_uint32
     (
@@ -131,7 +131,7 @@ MAGNA_API am_bool MAGNA_CALL query_add_uint32
  *
  * @param query Клиентский запрос.
  * @param text Добавляемая строка (может быть пустой).
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL query_add_utf
     (
@@ -155,7 +155,7 @@ MAGNA_API am_bool MAGNA_CALL query_add_utf
  * для создания в буфере пустой строки).
  *
  * @param query Клиентский запрос.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL query_new_line
     (
@@ -225,7 +225,7 @@ MAGNA_API void MAGNA_CALL query_destroy
  *
  * @param query Клиентский запрос.
  * @param prefix Инициализированный буфер для размещения префикса запроса.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL query_encode
     (
@@ -248,7 +248,7 @@ MAGNA_API am_bool MAGNA_CALL query_encode
  *
  * @param query Клиентский запрос.
  * @param text Добавляемые данные.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL query_add_ansi_buffer
     (
@@ -272,7 +272,7 @@ MAGNA_API am_bool MAGNA_CALL query_add_ansi_buffer
  *
  * @param query Клиентский запрос.
  * @param text Добавляемые данные.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL query_add_utf_buffer
     (

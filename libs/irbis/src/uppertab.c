@@ -89,7 +89,7 @@ static UpperCaseTable defaultTable =
  *
  * @param table Указатель на неинициализированную таблицу.
  * @param characters Указатель на символы.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL upper_init
     (

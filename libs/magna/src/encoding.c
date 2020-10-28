@@ -64,7 +64,7 @@ static void register_builtin_encodings()
  * Регистрация кодировки.
  *
  * @param encoding Кодировка.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL encoding_register
     (
@@ -171,7 +171,7 @@ MAGNA_API ssize_t MAGNA_CALL search_for_unicode
  *
  * @param output Буфер для размещения результата.
  * @param input Исходный текст.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL ansi2utf
     (
@@ -203,7 +203,7 @@ MAGNA_API am_bool MAGNA_CALL ansi2utf
  *
  * @param output Буфер для размещения результата.
  * @param input Исходный текст.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL utf2ansi
     (

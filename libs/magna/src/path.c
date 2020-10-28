@@ -83,7 +83,7 @@
  * Получение текущей директории.
  *
  * @param path Буфер для результата.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL path_get_current_directory
     (
@@ -117,7 +117,7 @@ MAGNA_API am_bool MAGNA_CALL path_get_current_directory
  * Смена текущей директории.
  *
  * @param path Буфер с новой директорией.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL path_set_current_directory
     (
@@ -157,7 +157,7 @@ MAGNA_API am_bool MAGNA_CALL path_set_current_directory
  * Получение пути директории для временных файлов.
  *
  * @param path Буфер для размещения результата.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL path_get_temporary_directory
     (
@@ -382,7 +382,7 @@ MAGNA_API void MAGNA_CALL path_convert_slashes
  *
  * @param output Инициализированный буфер для результата.
  * @param ... Компоненты пути, последний должен быть `NULL`.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool path_combine
     (
@@ -503,7 +503,7 @@ MAGNA_API void MAGNA_CALL path_trim_trailing_slashes
  * Путь к исполняемому файлу.
  *
  * @param buffer Проинициализированный буфер.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL path_get_executable
     (

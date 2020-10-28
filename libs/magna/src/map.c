@@ -50,7 +50,7 @@ static am_bool MAGNA_CALL trivial_comparer
  * @param hasher Хэш-функция (обязательно!).
  * @param keyLiberator Освободитель ключей (опционально).
  * @param valueLiberator Освободитель значений (опционально).
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL map_create
     (
@@ -163,7 +163,7 @@ MAGNA_API void* MAGNA_CALL map_get
  * @param map Массив.
  * @param key Ключ.
  * @param value Значение.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL map_set
     (

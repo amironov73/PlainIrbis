@@ -849,7 +849,7 @@ MAGNA_API size_t MAGNA_CALL span_count
  * @param span Спан для разбиения.
  * @param array Инициализированный динамический массив для помещения результата.
  * @param value Символ-разделитель.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL span_split_by_char
     (
@@ -905,7 +905,7 @@ MAGNA_API am_bool MAGNA_CALL span_split_by_char
  * @param array Инициализированный динамический массив для помещения результата.
  * @param values Указатель на символы-разделители.
  * @param valueCount Количество символов-разделителей.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL span_split_by_chars
     (

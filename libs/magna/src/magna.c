@@ -15,6 +15,28 @@ MAGNA_API am_int32 magna_get_version (void)
 }
 
 /**
+ * Версия библиотеки в виде строки.
+ *
+ * @return Версия библиотеки.
+ */
+MAGNA_API const am_byte* magna_get_version_string (void)
+{
+    am_int32 version;       /* версия как число (чтобы не запрашивать дважды) */
+    static am_byte text[6]; /* разбита на мажор и минор версия */
+
+    version = magna_get_version ();
+    sprintf
+        (
+            (char*) text,
+            "%u.%02u",
+            (version & 0xFF00u) >> 16u,
+            version & 0x00FFu
+        );
+
+    return text;
+}
+
+/**
  * Требуем библиотеку не ниже указанной версии
  *
  * @param version Минимально допустимая версия.

@@ -555,7 +555,7 @@ MAGNA_API am_bool MAGNA_CALL buffer_assign_span
  *
  * @param buffer Инициализированный буфер.
  * @param text Текстовая строка.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL buffer_assign_text
     (
@@ -704,7 +704,7 @@ static am_byte* find_text
  * @param buffer Буфер.
  * @param from Заменяемый текст.
  * @param to Заменяющий текст.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL buffer_replace_text
     (
@@ -999,7 +999,7 @@ MAGNA_API am_byte* MAGNA_CALL buffer_find_text
  *
  * @param target Инициализированный буфер назначения.
  * @param source Буфер с исходными данными.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL buffer_utf8_to_ansi
     (
@@ -1025,7 +1025,7 @@ MAGNA_API am_bool MAGNA_CALL buffer_utf8_to_ansi
  *
  * @param target Инициализированный буфер назначения.
  * @param source Буфер с исходными данными.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL buffer_ansi_to_utf8
     (
@@ -1108,7 +1108,7 @@ MAGNA_API Buffer* MAGNA_CALL buffer_swap
  * Добавление перевода на новую строку.
  *
  * @param buffer Буфер.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL buffer_new_line
     (
@@ -1125,7 +1125,7 @@ MAGNA_API am_bool MAGNA_CALL buffer_new_line
  *
  * @param buffer Буфер.
  * @param value Целое число.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL buffer_put_uint32
     (
@@ -1148,7 +1148,7 @@ MAGNA_API am_bool MAGNA_CALL buffer_put_uint32
  *
  * @param buffer Буфер.
  * @param value Целое число.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL buffer_put_uint64
     (
@@ -1206,7 +1206,7 @@ MAGNA_API am_bool MAGNA_CALL buffer_is_empty
  * @param buffer Буфер для вывода.
  * @param format Строка формата.
  * @param ... Прочие аргументы.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool buffer_format
     (

@@ -112,7 +112,7 @@ MAGNA_API MAGNA_INLINE am_bool MAGNA_CALL ntc_have_prefix
  * @param chunk Указатель на чанк.
  * @param prefix Префиксная часть
  * @param number Значение.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL ntc_setup
     (
@@ -148,7 +148,7 @@ MAGNA_API am_bool MAGNA_CALL ntc_setup
  *
  * @param chunk Указатель на чанк.
  * @param output Буфер для результата.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL ntc_to_string
     (
@@ -276,7 +276,7 @@ MAGNA_API NumberTextChunk* MAGNA_CALL number_append_chunk
  * @param prefix Префикс (может быть пустым).
  * @param value Значение.
  * @param length Длина (допускается 0).
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL number_append
     (
@@ -458,7 +458,7 @@ MAGNA_API NumberText* MAGNA_CALL number_increment_ex
  *
  * @param number Текст с фрагментами.
  * @param output Буфер для размещения результата.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL number_to_string
     (

@@ -83,7 +83,7 @@
  *
  * @param subfield Проинициализированное поле, значение которого необходимо задать.
  * @param value Значение подполя (может быть пустым).
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL subfield_assign
     (
@@ -127,7 +127,7 @@ MAGNA_API am_bool MAGNA_CALL subfield_clone
  *
  * @param subfield Указатель на инициализированную структуру.
  * @param text Текстовое представление подполя (без символа-разделителя).
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL subfield_decode
     (
@@ -173,7 +173,7 @@ MAGNA_API am_bool MAGNA_CALL subfield_is_empty
  * @param subfield Указатель на неинициализированное подполе.
  * @param code Код подполя.
  * @param value Спан с данными (может быть пустым).
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL subfield_create
     (
@@ -237,7 +237,7 @@ MAGNA_API void MAGNA_CALL subfield_destroy
  *
  * @param subfield Подполе.
  * @param output Буфер для размещения результата.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL subfield_to_string
     (

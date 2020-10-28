@@ -767,7 +767,7 @@ MAGNA_API am_byte* MAGNA_CALL chunked_at
  *
  * @param chunked Указатель на буфер.
  * @param newSize Предполагаемая новая емкость буфера.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL chunked_grow
     (
@@ -827,7 +827,7 @@ MAGNA_API am_bool MAGNA_CALL chunked_grow
  * @param chunked Указатель на буфер.
  * @param data Данные.
  * @param dataSize Размер данных в байтах.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL chunked_write
     (
@@ -942,7 +942,7 @@ MAGNA_API int MAGNA_CALL chunked_read_utf8
  *
  * @param chunked Указатель на буфер.
  * @param chr Записываемый символ.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL chunked_write_utf8
     (
@@ -982,7 +982,7 @@ MAGNA_API am_bool MAGNA_CALL chunked_write_utf8
  *
  * @param chunked Указатель на буфер.
  * @param text Текст.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL chunked_write_text
     (
@@ -1000,7 +1000,7 @@ MAGNA_API am_bool MAGNA_CALL chunked_write_text
  * Добавление перевода на новую строку.
  *
  * @param chunked Указатель на буфер.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL chunked_new_line
     (
@@ -1017,7 +1017,7 @@ MAGNA_API am_bool MAGNA_CALL chunked_new_line
  *
  * @param target Инициализированный буфер назначения.
  * @param source Буфер с исходными данными.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL chunked_utf8_to_ansi
     (
@@ -1045,7 +1045,7 @@ MAGNA_API am_bool MAGNA_CALL chunked_utf8_to_ansi
  *
  * @param target Инициализированный буфер назначения.
  * @param source Буфер с исходными данными.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL chunked_ansi_to_utf8
     (

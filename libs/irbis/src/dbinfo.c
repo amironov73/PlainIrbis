@@ -114,7 +114,7 @@ MAGNA_API void MAGNA_CALL dbinfo_destroy
  *
  * @param menu Меню.
  * @param array Массив для размещения результата.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL dbinfo_parse_menu
     (
@@ -157,7 +157,7 @@ MAGNA_API am_bool MAGNA_CALL dbinfo_parse_menu
  *
  * @param dbinfo Указатель на инициализированную структуру.
  * @param response Ответ сервера.
- * @return Признак успешности операции.
+ * @return Признак успешного операции.
  */
 MAGNA_API am_bool MAGNA_CALL dbinfo_parse_response
     (

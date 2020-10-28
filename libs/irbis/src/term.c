@@ -105,7 +105,7 @@ MAGNA_API void MAGNA_CALL term_destroy_array
  *
  * @param term Термин, подлежащий заполнению.
  * @param line Строка с текстовым представлением.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL term_parse_line
     (
@@ -131,7 +131,7 @@ MAGNA_API am_bool MAGNA_CALL term_parse_line
  *
  * @param terms Массив (инициализированный), подлежащий заполнению.
  * @param response Ответ сервера.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL term_parse_response
     (
@@ -168,7 +168,7 @@ MAGNA_API am_bool MAGNA_CALL term_parse_response
  *
  * @param term Термин.
  * @param output Буффер для размещения результата.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL term_to_string
     (
@@ -365,7 +365,7 @@ MAGNA_API void MAGNA_CALL term_parameters_destroy
  * @param parameters Параметры терминов.
  * @param connection Активное подключение к серверу.
  * @param query Указзатель на структуру клиентского запроса.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL term_parameters_encode
     (
@@ -498,7 +498,7 @@ MAGNA_API void MAGNA_CALL posting_array_destroy
  *
  * @param posting Постинг (инициализированный), подлежащий заполнению.
  * @param line Текстовое представление постинга.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL posting_parse_line
     (
@@ -571,7 +571,7 @@ MAGNA_API am_bool MAGNA_CALL posting_parse_response
  *
  * @param posting Постинг.
  * @param output Буфер для размещения результата.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL posting_to_string
     (
@@ -655,7 +655,7 @@ MAGNA_API void MAGNA_CALL posting_parameters_destroy
  * @param parameters Параметры терминов.
  * @param connection Активное подключение к серверу.
  * @param query Указзатель на структуру клиентского запроса.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL posting_parameters_encode
     (

@@ -501,7 +501,7 @@ MAGNA_API int MAGNA_CALL file_read_byte
  *
  * @param fileName Имя файла.
  * @param buffer Буфер, в который должен быть помещен результат.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL file_read_all
     (
@@ -602,7 +602,7 @@ MAGNA_API am_uint64 MAGNA_CALL file_read_int64
  *
  * @param handle Файловый дескриптор.
  * @param buffer Буфер, в который должна быть помещена строка.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL file_read_line
     (
@@ -750,7 +750,7 @@ MAGNA_API am_uint64 MAGNA_CALL file_size
  *
  * @param handle Файловый дескриптор.
  * @param offset Смещение в байтах от начала файла.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL file_seek
     (
@@ -796,7 +796,7 @@ MAGNA_API am_bool MAGNA_CALL file_seek
  * @param handle Файловый дескриптор.
  * @param data Указатель на данные.
  * @param size Размер данных в байтах.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL file_write
     (
@@ -847,7 +847,7 @@ MAGNA_API am_bool MAGNA_CALL file_write
  *
  * @param handle Файловый дескриптор.
  * @param value Записываемое значение.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL file_write_byte
     (
@@ -865,7 +865,7 @@ MAGNA_API am_bool MAGNA_CALL file_write_byte
  *
  * @param handle Файловый дескриптор.
  * @param value Записываемое значение.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL file_write_int32
     (
@@ -885,7 +885,7 @@ MAGNA_API am_bool MAGNA_CALL file_write_int32
  *
  * @param handle Файловый дескриптор.
  * @param value Записываемое значение.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL file_write_int64
     (
@@ -908,7 +908,7 @@ MAGNA_API am_bool MAGNA_CALL file_write_int64
  *
  * @param handle Файловый дескриптор.
  * @param buffer Буфер, содержимое которого должно быть записано.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL file_write_buffer
     (
@@ -936,7 +936,7 @@ MAGNA_API am_bool MAGNA_CALL file_write_buffer
  *
  * @param handle Файловый дескриптор.
  * @param buffer Фрагмент, содержимое которого должно быть записано.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL file_write_span
     (
@@ -963,7 +963,7 @@ MAGNA_API am_bool MAGNA_CALL file_write_span
  *
  * @param handle Файловый дескриптор.
  * @param text Текст в нативной кодировке.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL file_write_text
     (
@@ -1033,7 +1033,7 @@ MAGNA_API am_bool MAGNA_CALL file_exist
  * Удаление файла с указанным именем.
  *
  * @param filename Имя файла в нативной кодировке.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  * Если файла не существует, считается, что функция отработала успешно.
  */
 MAGNA_API am_bool MAGNA_CALL file_delete
@@ -1229,7 +1229,7 @@ MAGNA_API am_bool MAGNA_CALL file_copy
  * Синхронизирует состояние файла в памяти с диском.
  *
  * @param handle Файловый дескриптор.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL file_sync
     (
@@ -1423,7 +1423,7 @@ MAGNA_API am_bool MAGNA_CALL file_stream_open_write
  * @param texter Указатель на неинициализированную структуру.
  * @param stream Указатель на неинициализированную структуру.
  * @param filename Имя файла.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL file_texter
     (

@@ -85,7 +85,7 @@ static AlphabetTable defaultTable =
  * @param table Указатель на неинициализированную структуру.
  * @param characters Указатель на символы.
  * @param charCount Количество символов (от 1 до 256 включительно).
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL alpha_create
     (
@@ -173,7 +173,7 @@ MAGNA_API am_bool MAGNA_CALL alpha_is_good
  *
  * @param table Указатель на неинициализированную структуру.
  * @param text Текст с кодами символов в десятиричной системе.
- * @return Признак успешности завершеня операции.
+ * @return Признак успешного завершеня операции.
  */
 MAGNA_API am_bool MAGNA_CALL alpha_parse
     (
@@ -270,7 +270,7 @@ MAGNA_API Span MAGNA_CALL alpha_trim
  *
  * @param table Таблица символов.
  * @param output Буфер для размещения результата.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL alpha_to_string
     (
@@ -311,7 +311,7 @@ MAGNA_API am_bool MAGNA_CALL alpha_to_string
  * @param table Таблица символов.
  * @param output Массив для помещения результатов.
  * @param text Текст для обработки.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL alpha_split
     (

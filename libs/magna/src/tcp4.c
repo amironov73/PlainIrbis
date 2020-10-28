@@ -69,7 +69,7 @@ static am_bool initialized = AM_FALSE;
  * Инициализация сетевой подсистемы.
  * По факту нужна только в Windows.
  *
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool tcp4_initialize (void)
 {
@@ -166,7 +166,7 @@ MAGNA_API am_int32 MAGNA_CALL tcp4_connect
  * Отключение от сервера.
  *
  * @param handle Дескриптор сокета.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL tcp4_disconnect
     (

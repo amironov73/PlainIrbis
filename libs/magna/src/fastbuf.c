@@ -135,7 +135,7 @@ MAGNA_API am_bool MAGNA_CALL fastbuf_empty
  *
  * @param buffer Буфер.
  * @param newSize Предполагаемая емкость.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL fastbuf_grow
     (
@@ -160,7 +160,7 @@ MAGNA_API am_bool MAGNA_CALL fastbuf_grow
  * @param buffer Буфер.
  * @param data Данные для записи.
  * @param dataSize Размер данных в байтах.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL fastbuf_write
     (

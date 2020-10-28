@@ -55,7 +55,7 @@ MAGNA_API void MAGNA_CALL ini_line_destroy
  *
  * @param line Строка.
  * @param key Новое значение ключа (может быть пустым).
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL ini_line_set_key
     (
@@ -81,7 +81,7 @@ MAGNA_API am_bool MAGNA_CALL ini_line_set_key
  *
  * @param line Строка.
  * @param value Новое значение (может быть пустым).
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL ini_line_set_value
     (
@@ -107,7 +107,7 @@ MAGNA_API am_bool MAGNA_CALL ini_line_set_value
  *
  * @param line Строка INI-файла.
  * @param output Буфер для размещения результата.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL ini_line_to_string
     (
@@ -145,7 +145,7 @@ MAGNA_API am_bool MAGNA_CALL ini_line_verify
  * Инициализация секции INI-файла.
  *
  * @param section Указатель на неинициализированную структуру.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL ini_section_init
     (
@@ -345,7 +345,7 @@ MAGNA_API IniLine* MAGNA_CALL ini_section_append_line
  * @param section Секция.
  * @param key Ключ.
  * @param value Новое значение.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL ini_section_set_value
     (
@@ -376,7 +376,7 @@ MAGNA_API am_bool MAGNA_CALL ini_section_set_value
  *
  * @param section Секция INI-файла.
  * @param output Буфер для размещения результата.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL ini_section_to_string
     (
@@ -393,7 +393,7 @@ MAGNA_API am_bool MAGNA_CALL ini_section_to_string
  * Инициализация INI-файла в памяти.
  *
  * @param file Указатель на неинициализированную структуру.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL ini_file_init
     (

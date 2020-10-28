@@ -63,7 +63,7 @@ MAGNA_API void MAGNA_CALL version_destroy
  *
  * @param version Информация о версии сервера.
  * @param response Ответ сервера.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL version_parse_response
     (
@@ -108,7 +108,7 @@ MAGNA_API am_bool MAGNA_CALL version_parse_response
  *
  * @param version Информация о версии.
  * @param output Буфер, в который должно быть помещено текстовое представление.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL version_to_string
     (

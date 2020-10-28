@@ -54,26 +54,27 @@
 /*=========================================================*/
 
 /**
- * Инициализация.
+ * Инициализация структуры указанными значениями.
+ * Выделяет память в куче для сохранения копий значений.
  *
- * @param spec
- * @param path
- * @param database
- * @param filename
- * @return
+ * @param spec Указатель на структуру, подлежащую инициализации.
+ * @param path Код ИРБИС-пути.
+ * @param database Имя базы данных (в некоторых сценариях должно быть пустым).
+ * @param filename Имя файла (не должно быть пустым.
+ * @return Признак успешного завершения операции.
  */
-MAGNA_API am_bool MAGNA_CALL spec_init
+MAGNA_API am_bool MAGNA_CALL spec_create
     (
         Specification *spec,
         int path,
-        const char *database,
-        const char *filename
+        const am_byte *database,
+        const am_byte *filename
     )
 {
     assert (spec != NULL);
     assert (filename != NULL);
 
-    mem_clear (spec, sizeof (Specification));
+    mem_clear (spec, sizeof (*spec));
     spec->path = path;
     if (database != NULL) {
         if (!buffer_from_text (&spec->database, CBTEXT (database))) {
@@ -81,21 +82,60 @@ MAGNA_API am_bool MAGNA_CALL spec_init
         }
     }
 
-    if (!buffer_from_text (&spec->filename, CBTEXT (filename))) {
-        return AM_FALSE;
-    }
-
-    return AM_TRUE;
+    return buffer_from_text (&spec->filename, CBTEXT (filename));
 }
 
+/**
+ * Простая инцииализация структуры.
+ * Не выделяет память в куче.
+ *
+ * @param spec Указатель на структуру, подлежащую инициализации.
+ */
+MAGNA_API void MAGNA_CALL spec_init
+    (
+        Specification *spec
+    )
+{
+    assert (spec != NULL);
+
+    mem_clear (spec, sizeof (*spec));
+}
+
+/**
+ * Освобождение ресурсов, занимаемых структурой.
+ *
+ * @param spec Указатель на структуру, подлежащую освобождению.
+ */
+MAGNA_API void MAGNA_CALL spec_destroy
+    (
+        Specification *spec
+    )
+{
+    assert (spec != NULL);
+
+    buffer_destroy (&spec->database);
+    buffer_destroy (&spec->filename);
+    buffer_destroy (&spec->content);
+    mem_clear (spec, sizeof (*spec));
+}
+
+/**
+ * Разбор текстового представления спецификации файла.
+ *
+ * @param spec Указатель на инициализированную структуру.
+ * @param buffer
+ * @return
+ */
 MAGNA_API am_bool MAGNA_CALL spec_parse
     (
         Specification *spec,
-        Buffer *buffer
+        const Buffer *buffer
     )
 {
     assert (spec != NULL);
     assert (buffer != NULL);
+
+    /* TODO: implement */
 
     return AM_FALSE;
 }
@@ -105,7 +145,7 @@ MAGNA_API am_bool MAGNA_CALL spec_parse
  *
  * @param spec Спецификация.
  * @param output Буфер для размещения результата.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL spec_to_string
     (

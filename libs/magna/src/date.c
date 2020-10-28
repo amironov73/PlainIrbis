@@ -59,7 +59,7 @@
  * @param year Год (4 цифры).
  * @param month Месяц (1-12).
  * @param day День месяца (1-31).
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL date_init
     (
@@ -89,7 +89,7 @@ MAGNA_API am_bool MAGNA_CALL date_init
  * @param year Указатель на год (может быть `NULL`).
  * @param month Указатель на месяц (может быть `NULL`).
  * @param day Указатель на день месяца (может быть `NULL`).
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL date_decode
     (
@@ -122,7 +122,7 @@ MAGNA_API am_bool MAGNA_CALL date_decode
  *
  * @param date Дата, в которую должен быть помещен результат.
  * @param text Представление даты в виде YYYYMMDD (8 символов минимумм).
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL date_parse
     (
@@ -173,7 +173,7 @@ MAGNA_API am_byte* MAGNA_CALL date_to_text
  * Получение сегодняшней даты.
  *
  * @param date Куда должен быть помещен результат.
- * @return Признак успешности заверешения операции.
+ * @return Признак успешного заверешения операции.
  */
 MAGNA_API am_bool MAGNA_CALL date_today
     (

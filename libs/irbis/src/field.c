@@ -70,7 +70,7 @@
  * @param field Указатель на инициализированную структуру поля.
  * @param code Код подполя.
  * @param value Значение подполя (может быть пустым).
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL field_add
     (
@@ -127,7 +127,7 @@ MAGNA_API MarcField* MAGNA_CALL field_clear
  *
  * @param target Указатель не неинициализированную структуру поля.
  * @param source Указатель на поле, подлежащее клонированию.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL field_clone
     (
@@ -180,7 +180,7 @@ MAGNA_API void MAGNA_CALL field_create
  *
  * @param field Указатель на инициализированную структуру поля.
  * @param span Текст для декодирования (не должен быть пустым).
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL field_decode
     (
@@ -217,7 +217,7 @@ MAGNA_API am_bool MAGNA_CALL field_decode
  *
  * @param field Указатель на инициализированную структуру поля.
  * @param span Текст для декодирования (может быть пустым).
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL field_decode_body
     (
@@ -481,7 +481,7 @@ MAGNA_API MarcField* MAGNA_CALL field_remove_subfield
  * @param field Поле.
  * @param code Искомый код подполя. При сравнении регистр символов не учитывается.
  * @param value Новое значение подполя (может быть пустым, тогда происходит удаление подполя).
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL field_set_subfield
     (
@@ -513,7 +513,7 @@ MAGNA_API am_bool MAGNA_CALL field_set_subfield
  *
  * @param field Указатель на инициализированную структуру поля.
  * @param value Устанавливаемое значение (может быть пустым).
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL field_set_value
     (

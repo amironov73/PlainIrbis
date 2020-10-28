@@ -33,7 +33,7 @@
  * @param handler Функция вывода.
  * @param format Спецификация формата.
  * @param args Аргументы.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL format_generic
     (

@@ -59,7 +59,7 @@ MAGNA_API void MAGNA_CALL array_init
  * @param array Указатель на неинициализированную структуру.
  * @param itemSize Размер элемента в байтах.
  * @param capacity Начальная емкость массива.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL array_create
     (
@@ -164,7 +164,7 @@ MAGNA_API void MAGNA_CALL array_set
  *
  * @param array Массив.
  * @param newSize Требуемая емкость в элементах.
- * @return Признак успешности операции.
+ * @return Признак успешного операции.
  */
 MAGNA_API am_bool MAGNA_CALL array_grow
     (
@@ -283,7 +283,7 @@ MAGNA_API void* MAGNA_CALL array_pop_front
  *
  * @param array Массив.
  * @param item Указатель на помещаемый элемент.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL array_push_back
     (
@@ -338,7 +338,7 @@ MAGNA_API void* MAGNA_CALL array_emplace_back
  *
  * @param array Массив.
  * @param item Указатель на помещаемый элемент.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL array_push_front
     (
@@ -400,7 +400,7 @@ MAGNA_API void MAGNA_CALL array_truncate
  * @param target Массив назначения (инициализированный).
  * @param source Массив-источник.
  * @param cloner Функция, клонирующая элементы (опционально).
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL array_clone
     (
@@ -442,7 +442,7 @@ MAGNA_API am_bool MAGNA_CALL array_clone
  *
  * @param target Массив назначения (инициализированный).
  * @param source Массив-источник.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL array_copy
     (
@@ -464,7 +464,7 @@ MAGNA_API am_bool MAGNA_CALL array_copy
  *
  * @param target Массив назначения (инициализированный).
  * @param source Массив-источник.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL array_concat
     (
@@ -516,7 +516,7 @@ MAGNA_API void MAGNA_CALL array_clear
  * @param array Массив.
  * @param index Индекс.
  * @param item Размещаемый элемент (происходит копирование).
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL array_insert_at
     (

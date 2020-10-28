@@ -366,9 +366,10 @@ typedef union {
 
 /*=========================================================*/
 
-MAGNA_API am_int32            magna_get_version     (void);
-MAGNA_API am_bool  MAGNA_CALL magna_require_version (am_int32 version);
-MAGNA_API am_bool             magna_on_windows      (void);
+MAGNA_API am_int32            magna_get_version        (void);
+MAGNA_API const am_byte*      magna_get_version_string (void);
+MAGNA_API am_bool  MAGNA_CALL magna_require_version    (am_int32 version);
+MAGNA_API am_bool             magna_on_windows         (void);
 
 /*=========================================================*/
 

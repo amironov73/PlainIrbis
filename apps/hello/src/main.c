@@ -33,8 +33,13 @@ int main (int argc, char **argv)
 
     srand (time (NULL));
 
-    printf ("Library version: %d\n", magna_get_version());
-    connection_create       (&connection);
+    printf ("Library version: %s\n", magna_get_version_string ());
+    if (!connection_create (&connection)) {
+        fputs ("Can't create connection\n", stderr);
+        return 1;
+    }
+
+    /* Настройка параметров подключения. */
     connection_set_host     (&connection, CBTEXT ("localhost"));
     connection_set_username (&connection, CBTEXT ("librarian"));
     connection_set_password (&connection, CBTEXT ("secret"));
@@ -48,15 +53,19 @@ int main (int argc, char **argv)
         return 1;
     }
 
+    /* Получение максимального MFN. */
     maxMfn = connection_get_max_mfn (&connection, NULL);
     printf ("Max MFN=%u\n", maxMfn);
 
+    /* Пустая операция NOP. */
     connection_no_operation (&connection);
     printf ("NOP\n");
 
+    /* Подсчет количества записей, удовлетворяющих поисковому запросу. */
     count = connection_search_count (&connection, CBTEXT ("K=БЕТОН$"));
     printf ("Found record count=%d\n", count);
 
+    /* Поиск записей. */
     int32_array_create (&found, 10);
     if (!search_parameters_create (&parameters, CBTEXT ("K=БЕТОН$"))) {
         fputs ("Can't create search parameters\n", stderr);
@@ -74,22 +83,30 @@ int main (int argc, char **argv)
     }
     int32_array_destroy (&found);
 
+    /* Чтение текстового файла с сервера. */
+    if (spec_create (&spec, PATH_MASTER, CBTEXT ("IBIS"), CBTEXT ("brief.pft"))) {
+        if (connection_read_text_file (&connection, &spec, &fileContent)) {
+            printf ("\n\nbrief.pft:\n\n");
+            buffer_to_console(&fileContent);
+            printf ("\n\n");
+        }
 
-    printf ("\n\nbrief.pft:\n\n");
-    spec_init (&spec, PATH_MASTER, "IBIS", "brief.pft");
-    connection_read_text_file (&connection, &spec, &fileContent);
-    buffer_to_console (&fileContent);
-    buffer_destroy (&fileContent);
+        buffer_destroy (&fileContent);
+        spec_destroy (&spec);
+    }
 
-    printf ("\n\nMFN=1:\n\n");
     record_init (&record);
-    connection_read_record (&connection, 1, &record);
-    record_to_console (&record);
+    if (connection_read_record (&connection, 1, &record)) {
+        printf ("\n\nMFN=1:\n\n");
+        record_to_console (&record);
+        printf ("\n\n");
+    }
     record_destroy (&record);
 
-    printf ("\n\nFormatted:\n\n");
-    connection_format_mfn (&connection, CBTEXT ("@brief"), 1, &formatted);
-    buffer_to_console (&formatted);
+    if (connection_format_mfn (&connection, CBTEXT ("@brief"), 1, &formatted)) {
+        printf ("\n\nFormatted:\n\n");
+        buffer_to_console (&formatted);
+    }
     buffer_destroy (&formatted);
 
     irbis_disconnect (&connection);

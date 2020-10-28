@@ -755,7 +755,7 @@ static am_byte append_chunk
  *
  * @param arena Указатель на неинициализированную структуру.
  * @param chunkSize Размер чанка. 0 означает "определяется системой".
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL arena_init
     (

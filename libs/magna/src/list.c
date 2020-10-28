@@ -691,7 +691,7 @@ MAGNA_API ListItem* MAGNA_CALL list_pop_back
  *
  * @param list Список.
  * @param place Указатель на место для размещения данных (происходит копирование).
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL list_extract_back
     (
@@ -749,7 +749,7 @@ MAGNA_API ListItem* MAGNA_CALL list_pop_front
  *
  * @param list Список.
  * @param place Место для размещения данных (происходит копирование).
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL list_extract_front
     (
@@ -847,7 +847,7 @@ static void list_qsort
  *
  * @param list Список.
  * @param vector Вектор для размещения результата.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL list_to_vector
     (
@@ -885,7 +885,7 @@ MAGNA_API am_bool MAGNA_CALL list_to_vector
  * @param list Список.
  * @param comparer Функция сравнения.
  * @param userData Произвольные пользовательские данные (могут быть NULL).
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL list_sort
     (
@@ -967,7 +967,7 @@ MAGNA_API am_bool MAGNA_CALL list_sort
  * @param buffer Буфер для размещения результата.
  * @param outputer Функция форматирования элемента списка.
  * @param separator Разделитель (может быть `NULL`).
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL list_to_string
     (

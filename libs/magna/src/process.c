@@ -152,7 +152,7 @@ MAGNA_API am_handle MAGNA_CALL process_start
  *
  * @param process Процесс.
  * @param seconds Сколько секунд ждать. &lt=0 означает "ждать вечно".
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL process_wait
     (
@@ -193,7 +193,7 @@ MAGNA_API am_bool MAGNA_CALL process_wait
  * Немедленное завершение процесса.
  *
  * @param process Процесс.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL process_terminate
     (

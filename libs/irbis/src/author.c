@@ -117,7 +117,7 @@ MAGNA_API void MAGNA_CALL author_destroy
  *
  * @param author Структура автора.
  * @param field Поле, подлежащее заполнению элементами ФИО автора.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL author_apply
     (
@@ -146,7 +146,7 @@ MAGNA_API am_bool MAGNA_CALL author_apply
  *
  * @param author Структура автора, подлежащая заполнению.
  * @param field Поле для разбора.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL author_parse_field
     (
@@ -176,7 +176,7 @@ MAGNA_API am_bool MAGNA_CALL author_parse_field
  * @param record Библиографическая запись.
  * @param tag Метка поля.
  * @param authors Массив для размещения результата.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL author_parse_record
     (

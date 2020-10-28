@@ -367,16 +367,18 @@ MAGNA_API am_bool MAGNA_CALL upper_init (UpperCaseTable *table, const am_byte *c
 
 typedef struct
 {
-    int path;
-    Buffer database;
-    Buffer filename;
-    Buffer content;
-    am_bool binary;
+    Buffer database; /* Имя базы данных (может быть пустым в некоторых сценариях). */
+    Buffer filename; /* Имя файла. */
+    Buffer content;  /* Содержимое файла (может потребоваться в некоторых сценариях). */
+    int path;        /* Код ИРБИС-пути. */
+    am_bool binary;  /* Признак двоичного (не текстового) файла. */
 
 } Specification;
 
-MAGNA_API am_bool MAGNA_CALL spec_init      (Specification *spec, int path, const char *database, const char *filename);
-MAGNA_API am_bool MAGNA_CALL spec_parse     (Specification *spec, Buffer *buffer);
+MAGNA_API am_bool MAGNA_CALL spec_create    (Specification *spec, int path, const am_byte *database, const am_byte *filename);
+MAGNA_API void    MAGNA_CALL spec_destroy   (Specification *spec);
+MAGNA_API void    MAGNA_CALL spec_init      (Specification *spec);
+MAGNA_API am_bool MAGNA_CALL spec_parse     (Specification *spec, const Buffer *buffer);
 MAGNA_API am_bool MAGNA_CALL spec_to_string (const Specification *spec, Buffer *buffer);
 MAGNA_API am_bool MAGNA_CALL spec_verify    (const Specification *spec);
 
@@ -782,21 +784,22 @@ typedef struct
 
 struct IrbisConnection
 {
-    Buffer host;
-    Buffer username;
-    Buffer password;
-    Buffer database;
-    Buffer serverVersion;
-    am_int32 clientId;
-    am_int32 queryId;
-    am_int32 lastError;
-    am_int32 interval;
-    am_bool connected;
-    am_int16 port;
-    am_byte workstation;
+    Buffer host;          /* Имя или адрес хоста с сервером ИРБИС64. */
+    Buffer username;      /* Имя пользователя системы ИРБИС64 (логин). */
+    Buffer password;      /* Пароль пользователя системы ИРБИС64. */
+    Buffer database;      /* Имя текущей базы данных. */
+    Buffer serverVersion; /* Версия сервера (присылается при входе в систему). */
+    am_int32 clientId;    /* Идентификатор клиента -- случайное целое число. */
+    am_int32 queryId;     /* Порядковый номер запроса к серверу (нумерация с 1). */
+    am_int32 lastError;   /* Код ошибки последней выпоненной операции. */
+    am_int32 interval;    /* Рекомендуемый интервал подтверждения активности в минутах. */
+    am_bool connected;    /* Признак активного подключени (устанавливается автоматически). */
+    am_int16 port;        /* Номер порта на сервере ИРБИС64. По умолчанию 6666. */
+    am_byte workstation;  /* Тип АРМ. По умолчанию 'C'. */
 
 };
 
+MAGNA_API void     MAGNA_CALL connection_abort_on_error     (const Connection *connection);
 MAGNA_API am_bool  MAGNA_CALL connection_actualize_database (Connection *connection, const am_byte *database);
 MAGNA_API am_bool  MAGNA_CALL connection_actualize_record   (Connection *connection, const am_byte *database, am_mfn mfn);
 MAGNA_API am_bool  MAGNA_CALL connection_check              (Connection *connection);
@@ -817,9 +820,11 @@ MAGNA_API am_bool  MAGNA_CALL connection_get_server_version (Connection *connect
 MAGNA_API am_bool  MAGNA_CALL connection_no_operation       (Connection *connection);
 MAGNA_API am_bool  MAGNA_CALL connection_parse_string       (Connection *connection, Span connectionString);
 MAGNA_API am_bool  MAGNA_CALL connection_print_table        (Connection *connection, TableDefinition *definition, Buffer *output);
+MAGNA_API am_bool  MAGNA_CALL connection_read_postings      (Connection *connection, const PostingParameters *parameters, Array *postings);
 MAGNA_API am_bool  MAGNA_CALL connection_read_raw_record    (Connection *connection, am_mfn mfn, RawRecord *record);
 MAGNA_API am_bool  MAGNA_CALL connection_read_record        (Connection *connection, am_mfn mfn, MarcRecord *record);
 MAGNA_API am_bool  MAGNA_CALL connection_read_record_text   (Connection *connection, am_mfn mfn, Buffer *buffer);
+MAGNA_API am_bool  MAGNA_CALL connection_read_terms         (Connection *connection, const TermParameters *parameters, Array *terms);
 MAGNA_API am_bool  MAGNA_CALL connection_read_text_file     (Connection *connection, const Specification *specification, Buffer *buffer);
 MAGNA_API am_bool  MAGNA_CALL connection_reload_dictionary  (Connection *connection, const am_byte *database);
 MAGNA_API am_bool  MAGNA_CALL connection_reload_master_file (Connection *connection, const am_byte *database);
@@ -833,7 +838,14 @@ MAGNA_API am_bool  MAGNA_CALL connection_set_password       (Connection *connect
 MAGNA_API am_bool  MAGNA_CALL connection_set_username       (Connection *connection, const am_byte *username);
 MAGNA_API am_bool  MAGNA_CALL connection_to_string          (const Connection *connection, Buffer *output);
 MAGNA_API am_bool  MAGNA_CALL connection_truncate_database  (Connection *connection, const am_byte *database);
+MAGNA_API am_bool  MAGNA_CALL connection_undelete_record    (Connection *connection, am_mfn mfn);
 MAGNA_API am_bool  MAGNA_CALL connection_unlock_database    (Connection *connection, const am_byte *database);
+MAGNA_API am_bool  MAGNA_CALL connection_unlock_records     (Connection *connection, const am_byte *database, Int32Array *records);
+MAGNA_API am_bool  MAGNA_CALL connection_update_ini_file    (Connection *connection, const Array *lines);
+MAGNA_API am_bool  MAGNA_CALL connection_update_user_list   (Connection *connection, const Array *users);
+MAGNA_API am_bool  MAGNA_CALL connection_write_raw_record   (Connection *connection, RawRecord *record, am_bool reparse);
+MAGNA_API am_bool  MAGNA_CALL connection_write_record       (Connection *connection, MarcRecord *record, am_bool reparse);
+MAGNA_API am_bool  MAGNA_CALL connection_write_text_file    (Connection *connection, const Specification *specification);
 
 /* Синонимы */
 

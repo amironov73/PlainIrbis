@@ -110,7 +110,7 @@ MAGNA_API void MAGNA_CALL address_destroy
  *
  * @param address Структура адреса.
  * @param field Поле, подлежащее заполнению элементами адреса.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL address_apply
     (
@@ -137,7 +137,7 @@ MAGNA_API am_bool MAGNA_CALL address_apply
  *
  * @param address Структура адреса, подлежащая заполнению.
  * @param field Поле для разбора.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL address_parse_field
     (

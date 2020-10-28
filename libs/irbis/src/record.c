@@ -158,7 +158,7 @@ MAGNA_API MarcRecord* MAGNA_CALL record_clone
  *
  * @param record Инициализированная запись.
  * @param lines Массив строк.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL record_decode_lines
     (
@@ -178,7 +178,7 @@ MAGNA_API am_bool MAGNA_CALL record_decode_lines
  * @param record Запись.
  * @param delimiter Разделитель строк (может быть `NULL`).
  * @param buffer Буфер для результата.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL record_encode
     (
@@ -246,7 +246,7 @@ MAGNA_API Span MAGNA_CALL record_fm
  * @param array Массив, в который должен быть помещен результат.
  * @param tag Искомая метка поля.
  * @param code Код подполя.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL record_fma
     (
@@ -320,7 +320,7 @@ MAGNA_API MarcField* MAGNA_CALL record_get_field
  * @param record Запись.
  * @param array Массив, заполняемый ссылками на поля.
  * @param tag Искомая метка поля.
- * @return Признак успешности выполнения операции.
+ * @return Признак успешного выполнения операции.
  */
 MAGNA_API am_bool MAGNA_CALL record_get_fields
     (

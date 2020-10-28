@@ -87,7 +87,7 @@ MAGNA_API void MAGNA_CALL menu_entry_destroy
  *
  * @param entry Пункт меню.
  * @param output Буфер для размещения результата.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL menu_entry_to_string
     (
@@ -116,7 +116,7 @@ MAGNA_API am_bool MAGNA_CALL menu_entry_to_string
  * Инициализация меню.
  *
  * @param menu Указатель на неинициализированную структуру.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API void MAGNA_CALL menu_init
     (
@@ -149,7 +149,7 @@ MAGNA_API void MAGNA_CALL menu_destroy
  * @param menu Меню.
  * @param code Код (может быть пустым).
  * @param comment Комментарий (может быть пустым).
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL menu_append
     (
@@ -312,7 +312,7 @@ MAGNA_API am_bool MAGNA_CALL menu_parse
  *
  * @param menu Меню.
  * @param output Поток для вывода.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL menu_to_stream
     (

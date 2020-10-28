@@ -29,7 +29,7 @@
  * Базовая инициализация потока.
  *
  * @param stream Указатель на неинициализированную структуру.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL stream_init
     (
@@ -70,7 +70,7 @@ MAGNA_API ssize_t MAGNA_CALL stream_read
  * @param stream
  * @param buffer
  * @param length
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL stream_write
     (
@@ -125,7 +125,7 @@ MAGNA_API ssize_t MAGNA_CALL stream_tell
  * Закрытие Потока.
  *
  * @param stream Поток.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL stream_close
     (
@@ -146,7 +146,7 @@ MAGNA_API am_bool MAGNA_CALL stream_close
  *
  * @param stream Поток.
  * @param text Некий текст.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL stream_write_text
     (
@@ -165,7 +165,7 @@ MAGNA_API am_bool MAGNA_CALL stream_write_text
  *
  * @param stream Поток.
  * @param buffer Буфер.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL stream_write_buffer
     (
@@ -184,7 +184,7 @@ MAGNA_API am_bool MAGNA_CALL stream_write_buffer
  *
  * @param stream Поток.
  * @param value Символ.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL stream_write_char
     (
@@ -646,7 +646,7 @@ MAGNA_API am_bool MAGNA_CALL broken_stream_open
  * @param texter Указатель на неинициализированную структуру.
  * @param stream Поток.
  * @param bufsize Размер буфера (0 означает "использовать значение по умолчанию).
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL texter_init
     (

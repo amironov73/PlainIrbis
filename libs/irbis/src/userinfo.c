@@ -121,7 +121,7 @@ MAGNA_API am_bool MAGNA_CALL userinfo_parse_lines
  *
  * @param users Массив пользователей, который должен быть заполнен.
  * @param response Ответ сервера.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL userinfo_parse_menu
     (

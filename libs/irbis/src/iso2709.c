@@ -93,7 +93,7 @@
  *
  * @param handle Файловый дескриптор.
  * @param record Указатель на запись, которую нужно заполнить данными.
- * @return Признак успешности завершения операции.
+ * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL iso_read_record
     (
@@ -112,7 +112,7 @@ MAGNA_API am_bool MAGNA_CALL iso_read_record
  *
  * @param handle Файловый дескриптор.
  * @param record Указатель на запись, подлежащую сохранению.
- * @return Признак успешности завршения операции.
+ * @return Признак успешного завршения операции.
  */
 MAGNA_API am_bool MAGNA_CALL iso_write_record
     (
