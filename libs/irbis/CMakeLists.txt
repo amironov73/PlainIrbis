@@ -31,6 +31,7 @@ set(CFiles
     src/field.c
     src/field203.c
     src/format.c
+    src/fst.c
     src/gbl.c
     src/guard.c
     src/ilf.c
@@ -66,6 +67,7 @@ set(CFiles
     src/userinfo.c
     src/version.c
     src/visit.c
+    src/worksht.c
     src/xrf.c
 )
 

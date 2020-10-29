@@ -13,6 +13,7 @@ libsome_a_SOURCES =  src/address.c \
     src/field.c    \
     src/field203.c \
     src/format.c   \
+    src/fst.c      \
     src/gbl.c      \
     src/guard.c    \
     src/ilf.c      \
@@ -48,5 +49,6 @@ libsome_a_SOURCES =  src/address.c \
     src/userinfo.c \
     src/version.c  \
     src/visit.c    \
+    src/worksht.c  \
     src/xrfc
 libsome_a_CPPFLAGS = -I../include -I../../include

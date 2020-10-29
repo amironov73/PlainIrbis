@@ -17,6 +17,7 @@ sources = [ 'src/address.c',
     'src/field.c',
     'src/field203.c',
     'src/format.c',
+    'src/fst.c',
     'src/gbl.c',
     'src/guard.c',
     'src/ilf.c',
@@ -52,6 +53,7 @@ sources = [ 'src/address.c',
     'src/userinfo.c',
     'src/version.c',
     'src/visit.c',
+    'src/worksht.c',
     'src/xrf.c'
     ]
 

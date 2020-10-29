@@ -18,6 +18,7 @@ objects = obj\address.obj  &
 	obj\field.obj      &
 	obj\field203.obj   &
 	obj\format.obj     &
+	obj\fst.obj        &
 	obj\gbl.obj        &
 	obj\guard.obj      &
 	obj\ilf.obj        &
@@ -53,6 +54,7 @@ objects = obj\address.obj  &
 	obj\userinfo.obj   &
 	obj\version.obj    &
 	obj\visit.obj      &
+	obj\worksht.obj    &
 	obj\xrf.obj
 
 all: $(library)
@@ -100,6 +102,9 @@ obj\field203.obj: src\field203.c
 	$(CC) $(CFLAGS) -fo=$@ $<
 
 obj\format.obj: src\format.c
+	$(CC) $(CFLAGS) -fo=$@ $<
+
+obj\fst.obj: src\fst.c
 	$(CC) $(CFLAGS) -fo=$@ $<
 
 obj\gbl.obj: src\gbl.c
@@ -205,6 +210,9 @@ obj\version.obj: src\version.c
 	$(CC) $(CFLAGS) -fo=$@ $<
 
 obj\visit.obj: src\visit.c
+	$(CC) $(CFLAGS) -fo=$@ $<
+
+obj\worksht.obj: src\worksht.c
 	$(CC) $(CFLAGS) -fo=$@ $<
 
 obj\xrf.obj: src\xrf.c

@@ -34,6 +34,7 @@
     <ClCompile Include="src\field.c" />
     <ClCompile Include="src\field203.c" />
     <ClCompile Include="src\format.c" />
+    <ClCompile Include="src\fst.c" />
     <ClCompile Include="src\gbl.c" />
     <ClCompile Include="src\guard.c" />
     <ClCompile Include="src\ilf.c" />
@@ -69,6 +70,7 @@
     <ClCompile Include="src\userinfo.c" />
     <ClCompile Include="src\version.c" />
     <ClCompile Include="src\visit.c" />
+    <ClCompile Include="src\worksht.c" />
     <ClCompile Include="src\xrf.c" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

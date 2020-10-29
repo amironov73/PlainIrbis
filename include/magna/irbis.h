@@ -730,6 +730,38 @@ MAGNA_API void    MAGNA_CALL found_init                (FoundLine *found);
 
 /*=========================================================*/
 
+/* Работа с FST-файлами (ТВП). */
+
+/* Строка FST-файла. */
+
+typedef struct
+{
+    Buffer format;        /* Формат. */
+    am_uint32 lineNumber; /* Номер строки. */
+    am_uint32 tag;        /* Метка поля. */
+    am_uint32 method;     /* Метод индексирования. */
+    void *userData;       /* Произвольные пользовательские данные. */
+
+} FstLine;
+
+MAGNA_API void MAGNA_CALL fst_line_array_init    (Array *lines);
+MAGNA_API void MAGNA_CALL fst_line_array_destroy (Array *lines);
+MAGNA_API void MAGNA_CALL fst_line_destroy       (FstLine *line);
+MAGNA_API void MAGNA_CALL fst_line_init          (FstLine *line);
+
+/* Собственно FST-файл. */
+
+typedef struct
+{
+    Array lines; /* Строки. */
+
+} FstFile;
+
+MAGNA_API void MAGNA_CALL fst_file_destroy (FstFile *fst);
+MAGNA_API void MAGNA_CALL fst_file_init    (FstFile *fst);
+
+/*=========================================================*/
+
 /* Глобальная корректировка */
 
 /* Параметр глобальной корректировки */
