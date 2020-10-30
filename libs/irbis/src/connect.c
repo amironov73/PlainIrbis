@@ -417,7 +417,7 @@ MAGNA_API am_bool MAGNA_CALL connection_connect
     }
 
     AGAIN:
-    connection->clientId = 100000 + (rand() % 900000);
+    connection->clientId = 100000 + (random_get() % 900000);
     connection->queryId = 1;
     response_init (&response);
 

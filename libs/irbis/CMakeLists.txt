@@ -55,9 +55,11 @@ set(CFiles
     src/resource.c
     src/response.c
     src/search.c
+    src/serializ.c
     src/servstat.c
     src/spec.c
     src/subfield.c
+    src/stw.c
     src/tabledef.c
     src/term.c
     src/title.c

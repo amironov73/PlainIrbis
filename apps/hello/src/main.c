@@ -31,8 +31,6 @@ int main (int argc, char **argv)
     printf ("System: %s\n", MAKE_STR (CMAKE_SYSTEM_NAME));
 #endif
 
-    srand (time (NULL));
-
     printf ("Library version: %s\n", magna_get_version_string ());
     if (!connection_create (&connection)) {
         fputs ("Can't create connection\n", stderr);

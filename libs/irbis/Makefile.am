@@ -37,9 +37,11 @@ libsome_a_SOURCES =  src/address.c \
     src/response.c \
     src/resource.c \
     src/search.c   \
+    src/serializ.c \
     src/servstat.c \
     src/spec.c     \
     src/subfield.c \
+    src/stw.c      \
     src/tabledef.c \
     src/term.c     \
     src/title.c    \

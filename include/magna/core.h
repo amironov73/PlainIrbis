@@ -456,11 +456,16 @@ MAGNA_API MAGNA_INLINE int       MAGNA_CALL magna_sign_int   (int value);
 MAGNA_API MAGNA_INLINE int       MAGNA_CALL magna_sign_int32 (am_int32 value);
 MAGNA_API MAGNA_INLINE int       MAGNA_CALL magna_sign_int64 (am_int64 value);
 
-MAGNA_API const char* choose_string (const char *first, ...);
-MAGNA_API Span        choose_span   (Span first, ...);
-MAGNA_API Buffer*     choose_buffer (const Buffer *first, ...);
+MAGNA_API const am_byte* choose_string (const am_byte *first, ...);
+MAGNA_API Span           choose_span   (Span first, ...);
+MAGNA_API Buffer*        choose_buffer (const Buffer *first, ...);
 
-extern MAGNA_API MAGNA_INLINE const char* newline (void);
+extern MAGNA_API MAGNA_INLINE const am_byte* newline (void);
+
+MAGNA_API am_uint32 MAGNA_CALL mersenne_get  (void);
+MAGNA_API void      MAGNA_CALL mersenne_init (am_uint32 s);
+MAGNA_API am_uint32 MAGNA_CALL random_get    (void);
+MAGNA_API void      MAGNA_CALL random_init   (am_uint32 seed);
 
 /*=========================================================*/
 
@@ -468,8 +473,13 @@ extern MAGNA_API MAGNA_INLINE const char* newline (void);
 
 extern MAGNA_API MAGNA_INLINE am_uint16 MAGNA_CALL magna_ntohs     (am_uint16 value);
 extern MAGNA_API MAGNA_INLINE am_uint32 MAGNA_CALL magna_ntohl     (am_uint32 value);
-extern MAGNA_API              am_uint64 MAGNA_CALL irbis_decode_64 (am_uint32 junior, am_uint32 senior);
-extern MAGNA_API              void      MAGNA_CALL irbis_encode_64 (am_uint32 *buffer, am_uint64 value);
+
+extern MAGNA_API am_uint64 MAGNA_CALL irbis_decode_64 (am_uint32 junior, am_uint32 senior);
+extern MAGNA_API void      MAGNA_CALL irbis_encode_64 (am_uint32 *buffer, am_uint64 value);
+
+extern MAGNA_API              int          MAGNA_CALL fastpack_32     (am_uint32 value, am_byte *bytes);
+extern MAGNA_API MAGNA_INLINE unsigned int MAGNA_CALL fastlength_32   (am_byte firstByte);
+extern MAGNA_API              am_uint32    MAGNA_CALL fastunpack_32   (const am_byte *bytes);
 
 /*=========================================================*/
 

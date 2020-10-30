@@ -4,6 +4,7 @@ platform: x64
 image: Visual Studio 2013
 
 before_build:
+  - cmd: C:\Python36-x64\python -m pip install --upgrade pip
   - cmd: C:\Python36-x64\Scripts\pip install --upgrade pygount
   - cmd: C:\Python36-x64\Scripts\pygount libs -f summary -s c
 

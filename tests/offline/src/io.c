@@ -32,3 +32,18 @@ TESTER(irbis_encode_64_1)
     CHECK (buffer[0] == 0x12345678);
     CHECK (buffer[1] == 0x9ABCDEF0);
 }
+
+TESTER(irbis_fastpack_uint32_1)
+{
+    am_byte bytes[4];
+
+    CHECK (fastpack_32 (0, bytes) == 1);
+    CHECK (bytes [3] == 0);
+    CHECK (fastlength_32 (bytes [0]) == 0);
+    CHECK (fastunpack_32 (bytes) == 0);
+
+    CHECK (fastpack_32 (33, bytes) == 1);
+    CHECK (bytes [3] == 33);
+    CHECK (fastlength_32 (bytes [3]) == 0);
+    CHECK (fastunpack_32 (bytes + 3) == 33);
+}

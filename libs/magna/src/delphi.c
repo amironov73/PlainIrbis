@@ -27,7 +27,7 @@
 
 /*=========================================================*/
 
-#if defined(_M_IX86) && !defined(__MINGW32__)
+#if defined(_M_IX86) && !defined(__MINGW32__) && ! (defined(__MSDOS__) || defined(__DOS__) || defined(_DOS) || defined(__DOS) || defined(MSDOS))
 
 /**
  * Вызов функции с одним 32-битным аргументом.

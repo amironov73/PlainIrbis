@@ -1,5 +1,5 @@
-CC = wcc386
-CFLAGS = -zq -bt=dos4g -IC:\irbis\include -IC:\irbis\libs\include
+CC = wcc
+CFLAGS = -zq -bt=dos -IC:\irbis\include -IC:\irbis\libs\include
 
 library = irbis.lib
 
@@ -18,7 +18,6 @@ objects = obj\address.obj  &
 	obj\field.obj      &
 	obj\field203.obj   &
 	obj\format.obj     &
-	obj\fst.obj        &
 	obj\gbl.obj        &
 	obj\guard.obj      &
 	obj\ilf.obj        &
@@ -42,7 +41,6 @@ objects = obj\address.obj  &
 	obj\resource.obj   &
 	obj\response.obj   &
 	obj\search.obj     &
-	obj\serializ.obj   &
 	obj\servstat.obj   &
 	obj\spec.obj       &
 	obj\subfield.obj   &
@@ -55,7 +53,6 @@ objects = obj\address.obj  &
 	obj\userinfo.obj   &
 	obj\version.obj    &
 	obj\visit.obj      &
-	obj\worksht.obj    &
 	obj\xrf.obj
 
 all: $(library)
@@ -103,9 +100,6 @@ obj\field203.obj: src\field203.c
 	$(CC) $(CFLAGS) -fo=$@ $<
 
 obj\format.obj: src\format.c
-	$(CC) $(CFLAGS) -fo=$@ $<
-
-obj\fst.obj: src\fst.c
 	$(CC) $(CFLAGS) -fo=$@ $<
 
 obj\gbl.obj: src\gbl.c
@@ -177,9 +171,6 @@ obj\response.obj: src\response.c
 obj\search.obj: src\search.c
 	$(CC) $(CFLAGS) -fo=$@ $<
 
-obj\serializ.obj: src\serializ.c
-	$(CC) $(CFLAGS) -fo=$@ $<
-
 obj\servstat.obj: src\servstat.c
 	$(CC) $(CFLAGS) -fo=$@ $<
 
@@ -187,9 +178,6 @@ obj\spec.obj: src\spec.c
 	$(CC) $(CFLAGS) -fo=$@ $<
 
 obj\subfield.obj: src\subfield.c
-	$(CC) $(CFLAGS) -fo=$@ $<
-
-obj\stw.obj: src\stw.c
 	$(CC) $(CFLAGS) -fo=$@ $<
 
 obj\tabledef.obj: src\tabledef.c
@@ -217,9 +205,6 @@ obj\version.obj: src\version.c
 	$(CC) $(CFLAGS) -fo=$@ $<
 
 obj\visit.obj: src\visit.c
-	$(CC) $(CFLAGS) -fo=$@ $<
-
-obj\worksht.obj: src\worksht.c
 	$(CC) $(CFLAGS) -fo=$@ $<
 
 obj\xrf.obj: src\xrf.c

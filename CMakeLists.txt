@@ -24,6 +24,9 @@ set(CMAKE_C_STANDARD 90)
 
 # config.h related stuff
 
+INCLUDE(TestBigEndian)
+TEST_BIG_ENDIAN(BIG_ENDIAN)
+
 INCLUDE (CheckIncludeFiles)
 CHECK_INCLUDE_FILES (malloc.h HAVE_MALLOC_H)
 

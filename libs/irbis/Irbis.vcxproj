@@ -58,9 +58,11 @@
     <ClCompile Include="src\resource.c" />
     <ClCompile Include="src\response.c" />
     <ClCompile Include="src\search.c" />
+    <ClCompile Include="src\serializ.c" />
     <ClCompile Include="src\servstat.c" />
     <ClCompile Include="src\spec.c" />
     <ClCompile Include="src\subfield.c" />
+    <ClCompile Include="src\stw.c" />
     <ClCompile Include="src\tabledef.c" />
     <ClCompile Include="src\term.c" />
     <ClCompile Include="src\title.c" />
