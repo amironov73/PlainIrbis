@@ -23,6 +23,7 @@ libsome_a_SOURCES =  src/address.c \
     src/isbn.c     \
     src/isbninfo.c \
     src/iso2709.c  \
+    src/magazine.c \
     src/menu.c     \
     src/mst.c      \
     src/opt.c      \

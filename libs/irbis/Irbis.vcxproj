@@ -44,6 +44,7 @@
     <ClCompile Include="src\isbn.c" />
     <ClCompile Include="src\isbninfo.c" />
     <ClCompile Include="src\iso2709.c" />
+    <ClCompile Include="src\magazine.c" />
     <ClCompile Include="src\menu.c" />
     <ClCompile Include="src\mst.c" />
     <ClCompile Include="src\opt.c" />

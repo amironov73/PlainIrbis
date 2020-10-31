@@ -42,7 +42,7 @@ MAGNA_API MAGNA_INLINE am_uint16 MAGNA_CALL magna_ntohs
         am_uint16 value
     )
 {
-#ifdef BIG_ENDIAN
+#ifdef MAGNA_BIG_ENDIAN
 
     return value;
 
@@ -65,7 +65,7 @@ MAGNA_API MAGNA_INLINE am_uint32 MAGNA_CALL magna_ntohl
         am_uint32 value
     )
 {
-#ifdef BIG_ENDIAN
+#ifdef MAGNA_BIG_ENDIAN
 
     return value;
 

@@ -477,10 +477,10 @@ typedef struct
 
 } UserInfo;
 
+MAGNA_API void    MAGNA_CALL userinfo_array_destroy (Array *users);
+MAGNA_API void    MAGNA_CALL userinfo_array_init    (Array *users);
 MAGNA_API void    MAGNA_CALL userinfo_destroy       (UserInfo *userinfo);
-MAGNA_API void    MAGNA_CALL userinfo_destroy_array (Array *users);
 MAGNA_API void    MAGNA_CALL userinfo_init          (UserInfo *userinfo);
-MAGNA_API void    MAGNA_CALL userinfo_init_array    (Array *users);
 MAGNA_API am_bool MAGNA_CALL userinfo_parse_lines   (UserInfo *userinfo, const Span *lines);
 
 /*=========================================================*/

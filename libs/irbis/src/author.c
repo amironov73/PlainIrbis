@@ -73,7 +73,8 @@
 /*=========================================================*/
 
 /**
- * Инициализация структуры.
+ * Простая инициализация структуры.
+ * Не выделяет память в куче.
  *
  * @param author Указатель на неиницализированную структуру.
  */
@@ -110,6 +111,37 @@ MAGNA_API void MAGNA_CALL author_destroy
     buffer_destroy (&author->variant);
     buffer_destroy (&author->workplace);
     mem_clear (author, sizeof (*author));
+}
+
+/**
+ * Простая инициализация массива авторов.
+ * Не выделяет память в куче.
+ *
+ * @param authors Указатель на неинициализированный массив.
+ */
+MAGNA_API void MAGNA_CALL author_array_init
+    (
+        Array *authors
+    )
+{
+    assert (authors != NULL);
+
+    array_init (authors, sizeof (Author));
+}
+
+/**
+ * Освобождение ресурсов, занятых массивом авторов.
+ *
+ * @param authors Указатель на массив, подлежащий освобождению.
+ */
+MAGNA_API void MAGNA_CALL author_array_destroy
+    (
+        Array *authors
+    )
+{
+    assert (authors != NULL);
+
+    array_destroy (authors, (Liberator) author_destroy);
 }
 
 /**

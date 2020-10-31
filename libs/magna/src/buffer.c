@@ -407,6 +407,46 @@ MAGNA_API am_bool MAGNA_CALL buffer_concat
 }
 
 /**
+ * Дописывает один буфер в конец другого
+ * с опциональными префиксом и суффиксом.
+ *
+ * @param output Буфер назначения.
+ * @param prefix Опциональный префикс.
+ * @param source Буфер-источник.
+ * @param suffix Опциональный суффикс.
+ * @return Признак успешного завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL buffer_combine
+    (
+        Buffer *output,
+        const am_byte *prefix,
+        const Buffer *source,
+        const am_byte *suffix
+    )
+{
+    assert (output != NULL);
+    assert (source != NULL);
+
+    if (prefix != NULL) {
+        if (!buffer_puts (output, prefix)) {
+            return AM_FALSE;
+        }
+    }
+
+    if (!buffer_concat (output, source)) {
+        return AM_FALSE;
+    }
+
+    if (suffix != NULL) {
+        if (!buffer_puts (output, suffix)) {
+            return  AM_FALSE;
+        }
+    }
+
+    return AM_TRUE;
+}
+
+/**
  * Дописывает байт в конец буфера.
  *
  * @param buffer Инициализированный буфер.

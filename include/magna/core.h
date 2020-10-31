@@ -923,6 +923,7 @@ extern MAGNA_API              size_t         MAGNA_CALL buffer_calculate_size   
 extern MAGNA_API MAGNA_INLINE size_t         MAGNA_CALL buffer_capacity                  (const Buffer *buffer);
 extern MAGNA_API              Buffer*        MAGNA_CALL buffer_clear                     (Buffer *buffer);
 extern MAGNA_API              am_bool        MAGNA_CALL buffer_clone                     (Buffer *target, const Buffer *source);
+extern MAGNA_API              am_bool        MAGNA_CALL buffer_combine                   (Buffer *output, const am_byte *prefix, const Buffer *source, const am_byte *suffix);
 extern MAGNA_API              int            MAGNA_CALL buffer_compare                   (const Buffer *first, const Buffer *second);
 extern MAGNA_API              int            MAGNA_CALL buffer_compare_span              (const Buffer *buffer, Span span);
 extern MAGNA_API              int            MAGNA_CALL buffer_compare_span_ignore_case  (const Buffer *buffer, Span span);

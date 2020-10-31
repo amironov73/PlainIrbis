@@ -27,6 +27,7 @@ objects = obj\address.obj  &
 	obj\isbn.obj       &
 	obj\isbninfo.obj   &
 	obj\iso2709.obj    &
+	obj\magazine.obj   &
 	obj\menu.obj       &
 	obj\mst.obj        &
 	obj\opt.obj        &
@@ -41,9 +42,11 @@ objects = obj\address.obj  &
 	obj\resource.obj   &
 	obj\response.obj   &
 	obj\search.obj     &
+	obj\serializ.obj   &
 	obj\servstat.obj   &
 	obj\spec.obj       &
 	obj\subfield.obj   &
+	obj\stw.obj        &
 	obj\tabledef.obj   &
 	obj\term.obj       &
 	obj\title.obj      &
@@ -129,6 +132,9 @@ obj\isbninfo.obj: src\isbninfo.c
 obj\iso2709.obj: src\iso2709.c
 	$(CC) $(CFLAGS) -fo=$@ $<
 
+obj\magazine.obj: src\magazine.c
+	$(CC) $(CFLAGS) -fo=$@ $<
+
 obj\menu.obj: src\menu.c
 	$(CC) $(CFLAGS) -fo=$@ $<
 
@@ -171,10 +177,16 @@ obj\response.obj: src\response.c
 obj\search.obj: src\search.c
 	$(CC) $(CFLAGS) -fo=$@ $<
 
+obj\serializ.obj: src\serializ.c
+	$(CC) $(CFLAGS) -fo=$@ $<
+
 obj\servstat.obj: src\servstat.c
 	$(CC) $(CFLAGS) -fo=$@ $<
 
 obj\spec.obj: src\spec.c
+	$(CC) $(CFLAGS) -fo=$@ $<
+
+obj\stw.obj: src\stw.c
 	$(CC) $(CFLAGS) -fo=$@ $<
 
 obj\subfield.obj: src\subfield.c

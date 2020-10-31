@@ -28,6 +28,7 @@ objects = obj\address.obj  &
 	obj\isbn.obj       &
 	obj\isbninfo.obj   &
 	obj\iso2709.obj    &
+	obj\magazine.obj   &
 	obj\menu.obj       &
 	obj\mst.obj        &
 	obj\opt.obj        &
@@ -44,6 +45,7 @@ objects = obj\address.obj  &
 	obj\search.obj     &
 	obj\serializ.obj   &
 	obj\servstat.obj   &
+	obj\stw.obj        &
 	obj\spec.obj       &
 	obj\subfield.obj   &
 	obj\tabledef.obj   &
@@ -133,6 +135,9 @@ obj\isbninfo.obj: src\isbninfo.c
 	$(CC) $(CFLAGS) -fo=$@ $<
 
 obj\iso2709.obj: src\iso2709.c
+	$(CC) $(CFLAGS) -fo=$@ $<
+
+obj\magazine.obj: src\magazine.c
 	$(CC) $(CFLAGS) -fo=$@ $<
 
 obj\menu.obj: src\menu.c

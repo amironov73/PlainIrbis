@@ -59,11 +59,40 @@ typedef struct
 
 } Author;
 
-MAGNA_API am_bool MAGNA_CALL author_apply        (const Author *author, MarcField *field);
-MAGNA_API void    MAGNA_CALL author_destroy      (Author *author);
-MAGNA_API void    MAGNA_CALL author_init         (Author *author);
-MAGNA_API am_bool MAGNA_CALL author_parse_field  (Author *author, const MarcField *field);
-MAGNA_API am_bool MAGNA_CALL author_parse_record (const MarcRecord *record, am_uint32 tag, Array *authors);
+MAGNA_API am_bool MAGNA_CALL author_apply         (const Author *author, MarcField *field);
+MAGNA_API void    MAGNA_CALL author_array_destroy (Array *authors);
+MAGNA_API void    MAGNA_CALL author_array_init    (Array *authors);
+MAGNA_API void    MAGNA_CALL author_destroy       (Author *author);
+MAGNA_API void    MAGNA_CALL author_init          (Author *author);
+MAGNA_API am_bool MAGNA_CALL author_parse_field   (Author *author, const MarcField *field);
+MAGNA_API am_bool MAGNA_CALL author_parse_record  (const MarcRecord *record, am_uint32 tag, Array *authors);
+
+/*=========================================================*/
+
+/* Информация о заглавии, поле 200. */
+
+typedef struct
+{
+    Buffer number;    /* Обозначение и номер тома, подполе V. */
+    Buffer title;     /* Собственно заглавие, подполе A. */
+    Buffer specific;  /* Нехарактерное заглавие, подполе U. */
+    Buffer general;   /* Общее обозначение материала, подполе B. */
+    Buffer subtitle;  /* Сведения, относящиеся к заглавию, подполе E. */
+    Buffer first;     /* Первые сведения об ответственности, подполе F. */
+    Buffer other;     /* Последующие сведения об ответственности, подполе G. */
+    MarcField *field; /* Поле, из которого была извлечена информация. */
+
+} TitleInfo;
+
+#define TITLE_TAG 200
+
+MAGNA_API am_bool MAGNA_CALL title_apply       (const TitleInfo *title, MarcField *field);
+MAGNA_API void    MAGNA_CALL title_destroy     (TitleInfo *title);
+MAGNA_API void    MAGNA_CALL title_init        (TitleInfo *title);
+MAGNA_API am_bool MAGNA_CALL title_parse_field (TitleInfo *title, const MarcField *field);
+MAGNA_API void    MAGNA_CALL title_to_console  (const TitleInfo *title);
+MAGNA_API am_bool MAGNA_CALL title_to_string   (const TitleInfo *title, Buffer *output);
+MAGNA_API am_bool MAGNA_CALL title_verify      (const TitleInfo *title);
 
 /*=========================================================*/
 
@@ -333,6 +362,42 @@ MAGNA_API am_bool MAGNA_CALL reader_apply        (const ReaderInfo *reader, Marc
 MAGNA_API void    MAGNA_CALL reader_destroy      (ReaderInfo *reader);
 MAGNA_API void    MAGNA_CALL reader_init         (ReaderInfo *reader);
 MAGNA_API am_bool MAGNA_CALL reader_parse_record (ReaderInfo *reader, const MarcRecord *record);
+
+/*=========================================================*/
+
+/* Работа с журналами/газетами/подшивками и статьями. */
+
+/* Информация о статье из журнала/сборника. */
+
+typedef struct
+{
+    Array authors;   /* Авторы, поля 70x, */
+    TitleInfo title; /* Завглавие, поле 200. */
+
+} ArticleInfo;
+
+MAGNA_API void MAGNA_CALL article_array_destroy (Array *articles);
+MAGNA_API void MAGNA_CALL article_array_init    (Array *articles);
+MAGNA_API void MAGNA_CALL article_destroy       (ArticleInfo *article);
+MAGNA_API void MAGNA_CALL article_init          (ArticleInfo *article);
+
+/* Информация о выпуске журнала/газеты. */
+
+typedef struct
+{
+    Buffer index;        /* Шифр записи. Поле 903. */
+    Buffer description;  /* Библиографическое описание. */
+    Buffer magazineCode; /* Шифр журнала. Поле 933. */
+    Buffer year;         /* Год. Поле 934. */
+    Buffer volume;       /* Том. Поле 935. */
+    Buffer number;       /* Номер, часть. Поле 936. */
+
+} IssueInfo;
+
+MAGNA_API void MAGNA_CALL issue_array_destroy (Array *issues);
+MAGNA_API void MAGNA_CALL issue_array_init    (Array *issues);
+MAGNA_API void MAGNA_CALL issue_destroy       (IssueInfo *issue);
+MAGNA_API void MAGNA_CALL issue_init          (IssueInfo *issue);
 
 /*=========================================================*/
 

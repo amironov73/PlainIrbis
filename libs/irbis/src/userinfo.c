@@ -46,7 +46,7 @@ MAGNA_API void MAGNA_CALL userinfo_init
  *
  * @param users Указатель не неинициализированный массив.
  */
-MAGNA_API void MAGNA_CALL userinfo_init_array
+MAGNA_API void MAGNA_CALL userinfo_array_init
     (
         Array *users
     )
@@ -85,7 +85,7 @@ MAGNA_API void MAGNA_CALL userinfo_destroy
  *
  * @param users Массив пользователей, подлежащий освобождению.
  */
-MAGNA_API void MAGNA_CALL userinfo_destroy_array
+MAGNA_API void MAGNA_CALL userinfo_array_destroy
     (
         Array *users
     )
