@@ -429,7 +429,7 @@ MAGNA_API ssize_t MAGNA_CALL chunked_read_line
     assert (chunked != NULL);
     assert (buffer != NULL);
 
-    while (AM_TRUE) {
+    for (;;) {
         c = chunked_read_byte (chunked);
         if (c < 0) {
             break;

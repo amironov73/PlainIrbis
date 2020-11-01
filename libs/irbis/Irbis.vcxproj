@@ -61,6 +61,7 @@
     <ClCompile Include="src\search.c" />
     <ClCompile Include="src\serializ.c" />
     <ClCompile Include="src\servstat.c" />
+    <ClCompile Include="src\source.c" />
     <ClCompile Include="src\spec.c" />
     <ClCompile Include="src\subfield.c" />
     <ClCompile Include="src\stw.c" />

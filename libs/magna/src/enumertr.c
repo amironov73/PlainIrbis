@@ -3,9 +3,9 @@
 
 #include "magna/core.h"
 
-/* ReSharper disable StringLiteralTypo */
-/* ReSharper disable IdentifierTypo */
-/* ReSharper disable CommentTypo */
+// ReSharper disable StringLiteralTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable CommentTypo
 
 /*=========================================================*/
 
@@ -46,7 +46,7 @@ MAGNA_API am_bool MAGNA_CALL enum_for_all
     assert (enumerator->next != NULL);
     assert (action != NULL);
 
-    while (AM_TRUE) {
+    for (;;) {
         item = enum_next (enumerator);
         if (item == NULL) {
             break;

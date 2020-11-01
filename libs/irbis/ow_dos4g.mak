@@ -45,8 +45,9 @@ objects = obj\address.obj  &
 	obj\search.obj     &
 	obj\serializ.obj   &
 	obj\servstat.obj   &
-	obj\stw.obj        &
+	obj\source.obj     &
 	obj\spec.obj       &
+	obj\stw.obj        &
 	obj\subfield.obj   &
 	obj\tabledef.obj   &
 	obj\term.obj       &
@@ -188,13 +189,16 @@ obj\serializ.obj: src\serializ.c
 obj\servstat.obj: src\servstat.c
 	$(CC) $(CFLAGS) -fo=$@ $<
 
+obj\source.obj: src\source.c
+	$(CC) $(CFLAGS) -fo=$@ $<
+
 obj\spec.obj: src\spec.c
 	$(CC) $(CFLAGS) -fo=$@ $<
 
-obj\subfield.obj: src\subfield.c
+obj\stw.obj: src\stw.c
 	$(CC) $(CFLAGS) -fo=$@ $<
 
-obj\stw.obj: src\stw.c
+obj\subfield.obj: src\subfield.c
 	$(CC) $(CFLAGS) -fo=$@ $<
 
 obj\tabledef.obj: src\tabledef.c

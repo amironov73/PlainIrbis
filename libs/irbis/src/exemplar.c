@@ -25,6 +25,9 @@
 
    \struct Exemplar
        \brief Сведения об экземпляре книги/журнала, поле 910.
+       \details Структура владеет собственной памятью
+       (кроме поля `field`), для освобождения ресурсов
+       необходимо вызвать `exemplar_destroy`.
 
    \var Exemplar::status
        \brief Статус экземпляра. Подполе `a`.
@@ -109,6 +112,7 @@
 
    \var Exemplar::field
        \brief Поле, из которого извлечена информация.
+       \warning Структура не владеет этим указателем!
 
    \def EXEMPLAR_TAG
         \brief Метка для поля "Экземпляры"
@@ -219,6 +223,36 @@ MAGNA_API void MAGNA_CALL exemplar_destroy
     buffer_destroy (&exemplar->realPlace);
     buffer_destroy (&exemplar->bindingIndex);
     exemplar->field = NULL;
+}
+
+/**
+ * Инициализация массива экземпляров.
+ *
+ * @param exemplars Указатель на неинициализированный массив.
+ */
+MAGNA_API void MAGNA_CALL exemplar_array_init
+    (
+        Array *exemplars
+    )
+{
+    assert (exemplars != NULL);
+
+    array_init (exemplars, sizeof (Exemplar));
+}
+
+/**
+ * Освобождение ресурсов, занятых массивом экземпляров.
+ *
+ * @param exemplars Указатель на массив, подлежащий освобождению.
+ */
+MAGNA_API void MAGNA_CALL exemplay_array_destroy
+    (
+        Array *exemplars
+    )
+{
+    assert (exemplars != NULL);
+
+    array_destroy (exemplars, (Liberator) exemplar_destroy);
 }
 
 /**

@@ -287,7 +287,7 @@ MAGNA_API ssize_t MAGNA_CALL tcp4_receive_all
 
     assert (buffer != NULL);
 
-    while (AM_TRUE) {
+    for (;;) {
 #ifdef MAGNA_MSDOS
 
         /* TODO: implement */

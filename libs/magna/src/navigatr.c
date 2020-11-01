@@ -314,7 +314,7 @@ MAGNA_API int MAGNA_CALL nav_peek_no_crlf
 
     assert (nav != NULL);
 
-    while (AM_TRUE) {
+    for (;;) {
         result = nav_at (nav, nav->position + distance);
         if (result != '\r' && result != '\n') {
             break;
@@ -371,7 +371,7 @@ MAGNA_API int MAGNA_CALL nav_read_no_crlf
 
     assert (nav != NULL);
 
-    while (AM_TRUE) {
+    for (;;) {
         result = nav_read (nav);
         if (result != '\r' && result != '\n') {
             break;
@@ -765,7 +765,7 @@ MAGNA_API Span MAGNA_CALL nav_read_to
     assert (nav != NULL);
 
     result.end = result.start = (am_byte*) nav->data + nav->position;
-    while (AM_TRUE) {
+    for (;;) {
         c = nav_read (nav);
         if ((c == NAV_EOT) || (c == stopChar)) {
             break;
@@ -797,7 +797,7 @@ MAGNA_API Span MAGNA_CALL nav_read_until
     assert (nav != NULL);
 
     result.end = result.start = (am_byte*) nav->data + nav->position;
-    while (AM_TRUE) {
+    for (;;) {
         c = nav_peek (nav);
         if ((c == NAV_EOT) || (c == stopChar)) {
             break;
@@ -830,7 +830,7 @@ MAGNA_API Span MAGNA_CALL nav_read_while
     assert (nav != NULL);
 
     result.end = result.start = (am_byte*) nav->data + nav->position;
-    while (AM_TRUE) {
+    for (;;) {
         c = nav_peek (nav);
         if ((c == NAV_EOT) || (c != goodChar)) {
             break;
@@ -860,7 +860,7 @@ MAGNA_API Span MAGNA_CALL nav_read_word
 
     assert (nav != NULL);
     result.end = result.start = (am_byte*) nav->data + nav->position;
-    while (AM_TRUE) {
+    for (;;) {
         c = nav_peek (nav);
         if ((c == NAV_EOT) || !isalnum (c)) {
             break;
@@ -995,7 +995,7 @@ MAGNA_API void MAGNA_CALL nav_skip_non_word
 
     assert (nav != NULL);
 
-    while (AM_TRUE) {
+    for (;;) {
         c = nav_peek (nav);
         if ((c == NAV_EOT) || isalnum (c)) {
             break;
@@ -1020,7 +1020,7 @@ MAGNA_API void MAGNA_CALL nav_skip_whitespace
 
     assert (nav != NULL);
 
-    while (AM_TRUE) {
+    for (;;) {
         c = nav_peek (nav);
         if ((c == NAV_EOT) || !isspace (c)) {
             break;
@@ -1045,7 +1045,7 @@ MAGNA_API void MAGNA_CALL nav_skip_punctuation
 
     assert (nav != NULL);
 
-    while (AM_TRUE) {
+    for (;;) {
         c = nav_peek (nav);
         if ((c == NAV_EOT) || !ispunct (c)) {
             break;
@@ -1069,7 +1069,6 @@ MAGNA_API int MAGNA_CALL nav_read_utf8
     )
 {
     unsigned int chr, chr2;
-    UtfHelper result;
 
     assert (nav != NULL);
 
@@ -1137,7 +1136,7 @@ MAGNA_API int MAGNA_CALL nav_read_utf8
         chr |= (chr2 & 0x3Fu);
     }
 
-    return chr;
+    return (int) chr;
 }
 
 /*=========================================================*/

@@ -780,7 +780,7 @@ MAGNA_API void MAGNA_CALL chain_toupper
 
     for (link = chain; link != NULL; link = link->next) {
         for (ptr = link->start; ptr != link->end; ++ptr) {
-            *ptr = toupper (*ptr);
+            *ptr = (am_byte) toupper (*ptr);
         }
     }
 }
@@ -802,7 +802,7 @@ MAGNA_API void MAGNA_CALL chain_tolower
 
     for (link = chain; link != NULL; link = link->next) {
         for (ptr = link->start; ptr != link->end; ++ptr) {
-            *ptr = tolower (*ptr);
+            *ptr = (am_byte) tolower (*ptr);
         }
     }
 }

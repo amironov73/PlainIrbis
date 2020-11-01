@@ -767,40 +767,58 @@ MAGNA_API void MAGNA_CALL fst_file_init    (FstFile *fst);
 /* Параметр глобальной корректировки */
 typedef struct
 {
-    Buffer title;
-    Buffer value;
+    Buffer title; /* Наименование параметра. */
+    Buffer value; /* Значение параметра. */
 
 } GblParameter;
+
+MAGNA_API void    MAGNA_CALL gbl_parameter_array_destroy (Array *parameters);
+MAGNA_API void    MAGNA_CALL gbl_parameter_array_init    (Array *parameters);
+MAGNA_API void    MAGNA_CALL gbl_parameter_destroy       (GblParameter *parameter);
+MAGNA_API void    MAGNA_CALL gbl_parameter_init          (GblParameter *parameter);
+MAGNA_API am_bool MAGNA_CALL gbl_parameter_verify        (const GblParameter *parameter);
 
 /* Оператор глобальной корректировки */
 typedef struct
 {
-    Buffer command;
-    Buffer parameter1;
-    Buffer parameter2;
-    Buffer format1;
-    Buffer format2;
+    Buffer command;    /* Команда, например, ADD или DEL. */
+    Buffer parameter1; /* Первый параметр, как правило, спецификация поля/подполя. */
+    Buffer parameter2; /* Второй параметр, как правило, спецификация повторения. */
+    Buffer format1;    /* Первый формат, например, выражение для замены. */
+    Buffer format2;    /* Второй формат, например, заменяющее выражение. */
 
 } GblStatement;
+
+MAGNA_API void    MAGNA_CALL gbl_statement_array_destroy (Array *statements);
+MAGNA_API void    MAGNA_CALL gbl_statement_array_init    (Array *statements);
+MAGNA_API void    MAGNA_CALL gbl_statement_destroy       (GblStatement *statement);
+MAGNA_API void    MAGNA_CALL gbl_statement_init          (GblStatement *statement);
+MAGNA_API am_bool MAGNA_CALL gbl_statement_verify        (const GblStatement *statement);
 
 /* Настройки для глобальной корректировки */
 typedef struct
 {
-    Buffer database;
-    Buffer fileName;
-    Int32Array mfnList;
-    Buffer searchExpression;
-    Buffer sequentialSearch;
-    Vector statements;
-    Vector parameters;
-    am_bool actualize;
-    am_bool autoin;
-    am_mfn firstRecord;
-    am_mfn maxMfn;
-    am_mfn minMfn;
-    am_mfn numberOfRecords;
+    Buffer database;         /* Имя базы данных. */
+    Buffer fileName;         /* Имя файла. */
+    Int32Array mfnList;      /* Список MFN для обработки. */
+    Buffer searchExpression; /* Поисковое выражение отбора записей по словарю. */
+    Buffer sequentialSearch; /* Поисковое выражение последовательного поиска. */
+    Array statements;        /* Массив операторов. */
+    Array parameters;        /* Массив параметров. */
+    am_bool actualize;       /* Актуализировать записи? */
+    am_bool autoin;          /* Запускать AUTOIN.GBL? */
+    am_mfn firstRecord;      /* Нижняя граница MFN для поиска обрабатываемых записей. */
+    am_mfn maxMfn;           /* Максимальный MFN. 0 означает "все записи в базе". */
+    am_mfn minMfn;           /* Минимальный MFN. 0 означает "все записи в базе". */
+    am_mfn numberOfRecords;  /* Верхняя граница MFN для поиска обрабатываемых записей. */
 
 } GblSettings;
+
+MAGNA_API void    MAGNA_CALL gbl_settings_destroy    (GblSettings *settings);
+MAGNA_API am_bool MAGNA_CALL gbl_settings_encode     (const GblSettings *settings, Query *query);
+MAGNA_API void    MAGNA_CALL gbl_settings_init       (GblSettings *settings);
+MAGNA_API am_bool MAGNA_CALL gbl_settings_substitute (const GblSettings *settings, Buffer *text);
+MAGNA_API am_bool MAGNA_CALL gbl_settings_verify     (const GblSettings *settings);
 
 /* Результат глобальной корректировки */
 typedef struct
@@ -809,6 +827,10 @@ typedef struct
     int unused;
 
 } GblResult;
+
+MAGNA_API am_bool MAGNA_CALL gbl_result_decode  (GblResult *result, Response *response);
+MAGNA_API void    MAGNA_CALL gbl_result_destroy (GblResult *result);
+MAGNA_API void    MAGNA_CALL gbl_result_init    (GblResult *result);
 
 /*=========================================================*/
 

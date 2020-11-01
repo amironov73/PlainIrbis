@@ -313,7 +313,7 @@ MAGNA_API Span MAGNA_CALL path_get_directory
     result.start = path->start;
     ptr = path->current;
     if (ptr >= path->start) {
-        while (AM_TRUE) {
+        for (;;) {
             c = *ptr;
             if (c == '/' || c == '\\') {
                 if (ptr != path->start) {
@@ -403,7 +403,7 @@ MAGNA_API am_bool path_combine
     assert (output != NULL);
 
     va_start (args, output);
-    while (AM_TRUE) {
+    for (;;) {
         path = va_arg (args, Buffer*);
         if (path == NULL) {
             result = AM_TRUE;

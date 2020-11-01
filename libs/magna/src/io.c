@@ -163,7 +163,16 @@ MAGNA_API int MAGNA_CALL fastpack_32
     fputs ("value is too big", stderr);
     abort ();
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable: 4702)
+#endif
+
     return 0;
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 }
 
 MAGNA_API MAGNA_INLINE unsigned int MAGNA_CALL fastlength_32

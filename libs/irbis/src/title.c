@@ -22,35 +22,35 @@
  *
  * Заглавие книги/статьи.
  *
- * \struct TitleInfo
+ * \struct Title
  *      \brief Информация о заглавии, поле 200.
  *      \details Структура владеет собственной памятью
  *      (кроме поля `field`), для освобождения ресурсов
  *      необходимо вызвать `title_destroy`.
  *
- * \var TitleInfo::number
+ * \var Title::number
  *      \brief Обозначение и номер тома, подполе V.
  *
- * \var TitleInfo::title
+ * \var Title::title
  *      \brief Собственно заглавие, подполе A.
  *
- * \var TitleInfo::specific
+ * \var Title::specific
  *      \brief Нехарактерное заглавие, подполе U.
  *
- * \var TitleInfo::general
+ * \var Title::general
  *      \brief Общее обозначение материала, подполе B.
  *      \warning В современных версиях ИРБИС подполе не используется.
  *
- * \var TitleInfo::subtitle
+ * \var Title::subtitle
  *      \brief Сведения, относящиеся к заглавию, подполе E.
  *
- * \var TitleInfo::first
+ * \var Title::first
  *      \brief Первые сведения об ответственности, подполе F.
  *
- * \var TitleInfo::other
+ * \var Title::other
  *      \brief Поледующие сведения об ответственности, подполе G.
  *
- * \var TitleInfo::field
+ * \var Title::field
  *      \brief Поле, из которого была извлечена информация.
  *      \warning Структура не владеет этим указателем!
  */
@@ -73,7 +73,7 @@
  */
 MAGNA_API void MAGNA_CALL title_init
     (
-        TitleInfo *title
+            Title *title
     )
 {
     assert (title != NULL);
@@ -88,7 +88,7 @@ MAGNA_API void MAGNA_CALL title_init
  */
 MAGNA_API void MAGNA_CALL title_destroy
     (
-        TitleInfo *title
+            Title *title
     )
 {
     assert (title != NULL);
@@ -112,7 +112,7 @@ MAGNA_API void MAGNA_CALL title_destroy
  */
 MAGNA_API am_bool MAGNA_CALL title_apply
     (
-        const TitleInfo *title,
+        const Title *title,
         MarcField *field
     )
 {
@@ -138,8 +138,8 @@ MAGNA_API am_bool MAGNA_CALL title_apply
  */
 MAGNA_API am_bool MAGNA_CALL title_parse_field
     (
-        TitleInfo *title,
-        const MarcField *field
+            Title *title,
+            const MarcField *field
     )
 {
     assert (title != NULL);
@@ -163,7 +163,7 @@ MAGNA_API am_bool MAGNA_CALL title_parse_field
  */
 MAGNA_API am_bool MAGNA_CALL title_verify
     (
-        const TitleInfo *title
+        const Title *title
     )
 {
     assert (title != NULL);
@@ -179,7 +179,7 @@ MAGNA_API am_bool MAGNA_CALL title_verify
  */
 MAGNA_API void MAGNA_CALL title_to_console
     (
-        const TitleInfo *title
+        const Title *title
     )
 {
     am_bool first = AM_TRUE;
@@ -232,7 +232,7 @@ MAGNA_API void MAGNA_CALL title_to_console
  */
 MAGNA_API am_bool MAGNA_CALL title_to_string
     (
-        const TitleInfo *title,
+        const Title *title,
         Buffer *output
     )
 {

@@ -528,7 +528,7 @@ MAGNA_API am_bool MAGNA_CALL file_read_all
         return AM_FALSE;
     }
 
-    while (AM_TRUE) {
+    for (;;) {
         rc = file_read (handle, temp, sizeof (temp));
         if (rc < 0) {
             file_close (handle);
@@ -615,7 +615,7 @@ MAGNA_API am_bool MAGNA_CALL file_read_line
     assert (handle_is_good (handle));
     assert (buffer != NULL);
 
-    while (AM_TRUE) {
+    for (;;) {
         c = file_read_byte (handle);
         if (c < 0) {
             break;

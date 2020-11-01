@@ -53,7 +53,7 @@ MAGNA_API am_bool MAGNA_CALL same_text
     assert (first != NULL);
     assert (second != NULL);
 
-    while (1) {
+    for (;;) {
         c1 = *first++;
         c2 = *second++;
         result = toupper(c1) - toupper(c2);

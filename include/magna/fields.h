@@ -82,17 +82,17 @@ typedef struct
     Buffer other;     /* Последующие сведения об ответственности, подполе G. */
     MarcField *field; /* Поле, из которого была извлечена информация. */
 
-} TitleInfo;
+} Title;
 
 #define TITLE_TAG 200
 
-MAGNA_API am_bool MAGNA_CALL title_apply       (const TitleInfo *title, MarcField *field);
-MAGNA_API void    MAGNA_CALL title_destroy     (TitleInfo *title);
-MAGNA_API void    MAGNA_CALL title_init        (TitleInfo *title);
-MAGNA_API am_bool MAGNA_CALL title_parse_field (TitleInfo *title, const MarcField *field);
-MAGNA_API void    MAGNA_CALL title_to_console  (const TitleInfo *title);
-MAGNA_API am_bool MAGNA_CALL title_to_string   (const TitleInfo *title, Buffer *output);
-MAGNA_API am_bool MAGNA_CALL title_verify      (const TitleInfo *title);
+MAGNA_API am_bool MAGNA_CALL title_apply       (const Title *title, MarcField *field);
+MAGNA_API void    MAGNA_CALL title_destroy     (Title *title);
+MAGNA_API void    MAGNA_CALL title_init        (Title *title);
+MAGNA_API am_bool MAGNA_CALL title_parse_field (Title *title, const MarcField *field);
+MAGNA_API void    MAGNA_CALL title_to_console  (const Title *title);
+MAGNA_API am_bool MAGNA_CALL title_to_string   (const Title *title, Buffer *output);
+MAGNA_API am_bool MAGNA_CALL title_verify      (const Title *title);
 
 /*=========================================================*/
 
@@ -276,11 +276,13 @@ typedef struct
 #define EXEMPLAR_REPRODUCTION  "R"
 #define EXEMPLAR_SUMMARY       "U"
 
-MAGNA_API am_bool MAGNA_CALL exemplar_apply        (const Exemplar *exemplar, MarcField *field);
-MAGNA_API void    MAGNA_CALL exemplar_destroy      (Exemplar *exemplar);
-MAGNA_API void    MAGNA_CALL exemplar_init         (Exemplar *exemplar);
-MAGNA_API am_bool MAGNA_CALL exemplar_parse_field  (Exemplar *exemplar, const MarcField *field);
-MAGNA_API am_bool MAGNA_CALL exemplar_parse_record (const MarcRecord *record, Array *exemplars, am_uint32 tag);
+MAGNA_API am_bool MAGNA_CALL exemplar_apply         (const Exemplar *exemplar, MarcField *field);
+MAGNA_API void    MAGNA_CALL exemplay_array_destroy (Array *exemplars);
+MAGNA_API void MAGNA_CALL exemplar_array_init       (Array *exemplars);
+MAGNA_API void    MAGNA_CALL exemplar_destroy       (Exemplar *exemplar);
+MAGNA_API void    MAGNA_CALL exemplar_init          (Exemplar *exemplar);
+MAGNA_API am_bool MAGNA_CALL exemplar_parse_field   (Exemplar *exemplar, const MarcField *field);
+MAGNA_API am_bool MAGNA_CALL exemplar_parse_record  (const MarcRecord *record, Array *exemplars, am_uint32 tag);
 
 /*=========================================================*/
 
@@ -371,8 +373,8 @@ MAGNA_API am_bool MAGNA_CALL reader_parse_record (ReaderInfo *reader, const Marc
 
 typedef struct
 {
-    Array authors;   /* Авторы, поля 70x, */
-    TitleInfo title; /* Завглавие, поле 200. */
+    Array authors; /* Авторы, поля 70x, */
+    Title title;   /* Завглавие, поле 200. */
 
 } ArticleInfo;
 

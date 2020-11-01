@@ -48,7 +48,7 @@ MAGNA_API const am_byte* choose_string
 
     va_start (args, first);
 
-    while (AM_TRUE) {
+    for (;;) {
         next = va_arg (args, const am_byte*);
         if (next != NULL && *next) {
             va_end (args);
@@ -80,7 +80,7 @@ MAGNA_API Span choose_span
 
     va_start (args, first);
 
-    while (AM_TRUE) {
+    for (;;) {
         next = va_arg (args, Span);
         if (!span_is_empty (next)) {
             va_end (args);
@@ -130,7 +130,7 @@ MAGNA_API Buffer* choose_buffer
 
     va_start (args, first);
 
-    while (AM_TRUE) {
+    for (;;) {
         next = va_arg (args, const Buffer*);
         if (!buffer_is_empty (next)) {
             va_end (args);

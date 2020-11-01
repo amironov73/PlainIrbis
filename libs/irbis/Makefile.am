@@ -40,6 +40,7 @@ libsome_a_SOURCES =  src/address.c \
     src/search.c   \
     src/serializ.c \
     src/servstat.c \
+    src/source.c   \
     src/spec.c     \
     src/subfield.c \
     src/stw.c      \
