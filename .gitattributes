@@ -1,6 +1,7 @@
 ###############################################################################
 # for GitHub linguist
 ###############################################################################
+*.h   linguist-language=C
 *.svg linguist-vendored=true
 *.mst linguist-vendored=true
 *.fst linguist-vendored=true
