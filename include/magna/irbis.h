@@ -588,19 +588,19 @@ typedef struct
     Buffer text;     /* Собственно значение термина. */
     am_uint32 count; /* Количество постингов (вхождений) термина в поисковом словаре. */
 
-} TermInfo;
+} Term;
 
-MAGNA_API void    MAGNA_CALL term_array_destroy   (Array *array);
-MAGNA_API void    MAGNA_CALL term_array_init      (Array *array);
-MAGNA_API am_bool MAGNA_CALL term_decode_line     (TermInfo *term, Span line);
-MAGNA_API am_bool MAGNA_CALL term_decode_response (Array *array, Response *response);
-MAGNA_API void    MAGNA_CALL term_destroy         (TermInfo *term);
-MAGNA_API void    MAGNA_CALL term_destroy_array   (Array *terms);
-MAGNA_API void    MAGNA_CALL term_init            (TermInfo *term);
-MAGNA_API void    MAGNA_CALL term_init_array      (Array *terms);
-MAGNA_API am_bool MAGNA_CALL term_parse_line      (TermInfo *term, Span line);
-MAGNA_API am_bool MAGNA_CALL term_parse_response  (Array *terms, Response *response);
-MAGNA_API am_bool MAGNA_CALL term_to_string       (const TermInfo *term, Buffer *output);
+MAGNA_API void    MAGNA_CALL term_array_destroy    (Array *terms);
+MAGNA_API void    MAGNA_CALL term_array_init       (Array *terms);
+MAGNA_API void    MAGNA_CALL term_array_to_console (const Array *terms, const am_byte *separator);
+MAGNA_API void    MAGNA_CALL term_destroy          (Term *term);
+MAGNA_API void    MAGNA_CALL term_destroy_array    (Array *terms);
+MAGNA_API void    MAGNA_CALL term_init             (Term *term);
+MAGNA_API void    MAGNA_CALL term_init_array       (Array *terms);
+MAGNA_API am_bool MAGNA_CALL term_parse_line       (Term *term, Span line);
+MAGNA_API am_bool MAGNA_CALL term_parse_response   (Array *terms, Response *response);
+MAGNA_API void    MAGNA_CALL term_to_console       (const Term *term);
+MAGNA_API am_bool MAGNA_CALL term_to_string        (const Term *term, Buffer *output);
 
 /* Параметры извлечения терминов из поискового словаря */
 typedef struct
@@ -628,15 +628,17 @@ typedef struct
     am_uint32 occurrence; /* Повторение поля. */
     am_uint32 count;      /* Позиция в поле. */
 
-} TermPosting;
+} Posting;
 
-MAGNA_API void    MAGNA_CALL posting_array_destroy  (Array *postings);
-MAGNA_API void    MAGNA_CALL posting_array_init     (Array *postings);
-MAGNA_API void    MAGNA_CALL posting_destroy        (TermPosting *posting);
-MAGNA_API void    MAGNA_CALL posting_init           (TermPosting *posting);
-MAGNA_API am_bool MAGNA_CALL posting_parse_line     (TermPosting *posting, Span line);
-MAGNA_API am_bool MAGNA_CALL posting_parse_response (Array *postings, Response *response);
-MAGNA_API am_bool MAGNA_CALL posting_to_string      (const TermPosting *posting, Buffer *output);
+MAGNA_API void    MAGNA_CALL posting_array_destroy    (Array *postings);
+MAGNA_API void    MAGNA_CALL posting_array_init       (Array *postings);
+MAGNA_API void    MAGNA_CALL posting_array_to_console (const Array *postings, const am_byte *separator);
+MAGNA_API void    MAGNA_CALL posting_destroy          (Posting *posting);
+MAGNA_API void    MAGNA_CALL posting_init             (Posting *posting);
+MAGNA_API am_bool MAGNA_CALL posting_parse_line       (Posting *posting, Span line);
+MAGNA_API am_bool MAGNA_CALL posting_parse_response   (Array *postings, Response *response);
+MAGNA_API void    MAGNA_CALL posting_to_console       (const Posting *posting);
+MAGNA_API am_bool MAGNA_CALL posting_to_string        (const Posting *posting, Buffer *output);
 
 /* Параметры для запроса постингов с сервера. */
 typedef struct
@@ -649,6 +651,7 @@ typedef struct
 
 } PostingParameters;
 
+MAGNA_API am_bool MAGNA_CALL posting_parameters_create  (PostingParameters *parameters, const am_byte *term);
 MAGNA_API void    MAGNA_CALL posting_parameters_destroy (PostingParameters *parameters);
 MAGNA_API am_bool MAGNA_CALL posting_parameters_encode  (const PostingParameters *parameters, const Connection *connection, Query *query);
 MAGNA_API void    MAGNA_CALL posting_parameters_init    (PostingParameters *parameters);

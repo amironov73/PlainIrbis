@@ -20,11 +20,12 @@ int main (int argc, char **argv)
     MarcRecord record;
     am_mfn maxMfn;
     am_int32 count;
-    SearchParameters parameters;
+    SearchParameters searchParameters;
     Int32Array found;
-
-    (void) argc;
-    (void) argv;
+    TermParameters termParameters;
+    Array terms;
+    PostingParameters postingParameters;
+    Array postings;
 
 #ifdef HAVE_CONFIG_H
     printf ("Compiler: %s\n", MAKE_STR (CMAKE_C_COMPILER_ID));
@@ -44,6 +45,10 @@ int main (int argc, char **argv)
     connection_set_database (&connection, CBTEXT ("IBIS"));
     connection.workstation = CATALOGER;
     connection.port = 6666;
+
+    if (argc > 1) {
+        connection_set_host (&connection, CBTEXT (argv[1]));
+    }
 
     if (!irbis_connect (&connection)) {
         fputs ("Connection failed\n", stderr);
@@ -65,7 +70,7 @@ int main (int argc, char **argv)
 
     /* Поиск записей. */
     int32_array_create (&found, 10);
-    if (!search_parameters_create (&parameters, CBTEXT ("K=БЕТОН$"))) {
+    if (!search_parameters_create (&searchParameters, CBTEXT ("K=БЕТОН$"))) {
         fputs ("Can't create search parameters\n", stderr);
     }
     else {
@@ -77,9 +82,37 @@ int main (int argc, char **argv)
             puts ("\n");
         }
 
-        search_parameters_destroy (&parameters);
+        search_parameters_destroy (&searchParameters);
     }
     int32_array_destroy (&found);
+
+    /* Получение терминов. */
+    if (term_parameters_create (&termParameters, CBTEXT ("K=БЕТОН"))) {
+        termParameters.number = 10;
+        term_array_init (&terms);
+        if (connection_read_terms (&connection, &termParameters, &terms)) {
+            puts ("Термины:");
+            term_array_to_console (&terms, CBTEXT ("\n"));
+            puts ("\n");
+        }
+
+        term_array_destroy (&terms);
+    }
+    term_parameters_destroy (&termParameters);
+
+    /* Получение постингов. */
+    if (posting_parameters_create (&postingParameters, CBTEXT ("K=БЕТОН"))) {
+        postingParameters.number = 10;
+        posting_array_init (&postings);
+        if (connection_read_postings (&connection, &postingParameters, &postings)) {
+            puts ("Постинги:");
+            posting_array_to_console (&postings, CBTEXT ("\n"));
+            puts ("\n");
+        }
+
+        term_array_destroy (&postings);
+    }
+    posting_parameters_destroy (&postingParameters);
 
     /* Чтение текстового файла с сервера. */
     if (spec_create (&spec, PATH_MASTER, CBTEXT ("IBIS"), CBTEXT ("brief.pft"))) {

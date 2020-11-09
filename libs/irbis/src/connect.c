@@ -516,8 +516,8 @@ MAGNA_API am_bool MAGNA_CALL connection_create_dictionary
         const am_byte *database
     )
 {
-    am_bool result;
-    Response response;
+    am_bool result;    /* признак успеха */
+    Response response; /* ответ сервера */
 
     if (!database) {
         database = B2B (&connection->database);
@@ -550,7 +550,7 @@ MAGNA_API am_bool MAGNA_CALL connection_delete_database
         const am_byte *database
     )
 {
-    am_bool result;
+    am_bool result;    /* признак успеха */
     Response response; /* ответ сервера */
 
     if (!database) {
@@ -645,7 +645,7 @@ MAGNA_API am_bool MAGNA_CALL connection_disconnect
         Connection *connection
     )
 {
-    am_bool result;
+    am_bool result;    /* признак успеха */
     Response response; /* ответ сервера */
 
     LOG_ENTER;
@@ -723,10 +723,10 @@ MAGNA_API am_bool MAGNA_CALL connection_execute
         Response *response
     )
 {
-    am_bool result = 0;
-    Buffer prefix = BUFFER_INIT;
-    const am_byte *hostname;
-    am_int32 sockfd = -1;
+    am_bool result = AM_FALSE;    /* признак успеха */
+    Buffer header = BUFFER_INIT;  /* заголовок пакета с запросом (длина пакета в байтах) */
+    const am_byte *hostname;      /* имя хоста */
+    am_int32 sockfd = -1;         /* сокет */
 
     assert (connection != NULL);
     assert (query != NULL);
@@ -741,17 +741,17 @@ MAGNA_API am_bool MAGNA_CALL connection_execute
         goto DONE;
     }
 
-    connection->lastError = 0;
-    if (!query_encode (query, &prefix)) {
-        goto DONE;
-    }
-
     sockfd = tcp4_connect (hostname, connection->port);
     if (sockfd == -1) {
         goto DONE;
     }
 
-    if (!tcp4_send_buffer (sockfd, &prefix)
+    connection->lastError = 0;
+    if (!query_encode (query, &header)) {
+        goto DONE;
+    }
+
+    if (!tcp4_send_buffer (sockfd, &header)
         || !tcp4_send_buffer (sockfd, &query->buffer)) {
         goto DONE;
     }
@@ -782,7 +782,7 @@ MAGNA_API am_bool MAGNA_CALL connection_execute
         tcp4_disconnect (sockfd);
     }
 
-    buffer_destroy (&prefix);
+    buffer_destroy (&header);
 
     return result;
 }
@@ -804,11 +804,11 @@ MAGNA_API am_bool connection_execute_simple
         ...
     )
 {
-    int i;
-    va_list args;
-    const am_byte *line;
-    am_bool result = AM_FALSE;
-    Query query;
+    int index;                 /* индекс цикла */
+    va_list args;              /* бродилка по аргументам */
+    const am_byte *line;       /* строка */
+    am_bool result = AM_FALSE; /* признак успеха */
+    Query query;               /* клиенский запрос */
 
     assert (connection != NULL);
     assert (response != NULL);
@@ -821,7 +821,7 @@ MAGNA_API am_bool connection_execute_simple
 
     if (argCount != 0) {
         va_start (args, argCount);
-        for (i = 0; i < argCount; ++i) {
+        for (index = 0; index < argCount; ++index) {
             line = va_arg (args, const am_byte*);
             if (!query_add_ansi (&query, line)) {
                 va_end (args);
@@ -930,8 +930,8 @@ MAGNA_API am_bool MAGNA_CALL connection_get_server_version
         ServerVersion *version
     )
 {
-    am_bool result;
-    Response response;
+    am_bool result;    /* признак успеха */
+    Response response; /* ответ сервера */
 
     assert (connection != NULL);
     assert (version != NULL);
@@ -942,11 +942,9 @@ MAGNA_API am_bool MAGNA_CALL connection_get_server_version
             &response,
             CBTEXT (SERVER_INFO),
             0
-        );
+        )
 
-    if (result) {
-        result = version_parse_response (version, &response);
-    }
+        && version_parse_response (version, &response);
 
     response_destroy (&response);
 
@@ -965,8 +963,8 @@ MAGNA_API am_bool MAGNA_CALL connection_no_operation
         Connection *connection
     )
 {
-    am_bool result;
-    Response response;
+    am_bool result;    /* признак успеха */
+    Response response; /* ответ сервера */
 
     assert (connection != NULL);
 
@@ -1131,11 +1129,42 @@ MAGNA_API am_bool MAGNA_CALL connection_read_postings
         Array *postings
     )
 {
+    Query query;
+    Response response;
+    am_bool result = AM_FALSE;
+
     assert (connection != NULL);
     assert (parameters != NULL);
     assert (postings != NULL);
 
-    return AM_FALSE;
+    if (!connection_check (connection)) {
+        return AM_FALSE;
+    }
+
+    response_init (&response);
+    if (!query_create (&query, connection, CBTEXT (READ_POSTINGS))) {
+        return AM_FALSE;
+    }
+
+    if (!posting_parameters_encode (parameters, connection, &query)) {
+        goto DONE;
+    }
+
+    if (!connection_execute (connection, &query, &response)) {
+        goto DONE;
+    }
+
+    if (!response_check (&response, -202, -203, -204, 0)) {
+        goto DONE;
+    }
+
+    result = posting_parse_response (postings, &response);
+
+    DONE:
+    query_destroy (&query);
+    response_destroy (&response);
+
+    return result;
 }
 
 /**
@@ -1333,11 +1362,45 @@ MAGNA_API am_bool MAGNA_CALL connection_read_terms
         Array *terms
     )
 {
+    Query query;
+    Response response;
+    const am_byte *command;
+    am_bool result = AM_FALSE;
+
     assert (connection != NULL);
     assert (parameters != NULL);
     assert (terms != NULL);
 
-    return AM_FALSE;
+    if (!connection_check (connection)) {
+        return AM_FALSE;
+    }
+
+    command = CBTEXT (parameters->reverseOrder ? READ_TERMS_REVERSE : READ_TERMS);
+
+    response_init (&response);
+    if (!query_create (&query, connection, command)) {
+        return AM_FALSE;
+    }
+
+    if (!term_parameters_encode (parameters, connection, &query)) {
+        goto DONE;
+    }
+
+    if (!connection_execute (connection, &query, &response)) {
+        goto DONE;
+    }
+
+    if (!response_check (&response, -202, -203, -204, 0)) {
+        goto DONE;
+    }
+
+    result = term_parse_response (terms, &response);
+
+    DONE:
+    query_destroy (&query);
+    response_destroy (&response);
+
+    return result;
 }
 
 /**
@@ -1547,7 +1610,6 @@ MAGNA_API am_bool MAGNA_CALL connection_search_ex
     assert (response != NULL);
 
     response_init (response);
-
     if (!connection_check (connection)
         || !search_parameters_verify (parameters)
         || !query_create (&query, connection, CBTEXT (SEARCH))) {
@@ -1589,9 +1651,9 @@ MAGNA_API am_bool MAGNA_CALL connection_search_simple
         const am_byte *expression
     )
 {
-    am_bool result = AM_FALSE;
-    SearchParameters parameters;
-    Response response;
+    am_bool result = AM_FALSE;   /* признак успеха */
+    SearchParameters parameters; /* параметры поиска */
+    Response response;           /* ответ сервера */
 
     assert (connection != NULL);
     assert (expression != NULL);
@@ -1657,8 +1719,8 @@ MAGNA_API am_bool MAGNA_CALL connection_truncate_database
         const am_byte *database
     )
 {
-    am_bool result;
-    Response response;
+    am_bool result;    /* признак успеха */
+    Response response; /* ответ сервера */
 
     if (!database) {
         database = B2B (&connection->database);
@@ -1755,6 +1817,8 @@ MAGNA_API am_bool MAGNA_CALL connection_unlock_records
         assert (database != NULL);
     }
 
+    /* TODO: implement */
+
     return AM_FALSE;
 }
 
@@ -1823,17 +1887,63 @@ MAGNA_API am_bool MAGNA_CALL connection_write_raw_record
  * @param connection Активное подключение.
  * @param record Запись, подлежащая сохранению.
  * @param reparse Перегружать запись согласно полученной от сервера версии?
- * @return Признак успешного выполнения операции.
+ * @return Новый максимальный MFN либо код ошибки.
  */
-MAGNA_API am_bool MAGNA_CALL connection_write_record
+MAGNA_API am_int32 MAGNA_CALL connection_write_record
     (
         Connection *connection,
         MarcRecord *record,
         am_bool reparse
     )
 {
+    Query query;             /* клиентский запрос */
+    Response response;       /* ответ сервера */
+    am_int32 result = -1;    /* результат: новый макс. MFN либо ошибка */
+    const am_byte *database; /* имя базы данных */
+
     assert (connection != NULL);
     assert (record != NULL);
+
+    if (!connection_check (connection)) {
+        return result;
+    }
+
+    response_init (&response);
+    if (!query_create (&query, connection, CBTEXT (UPDATE_RECORD))) {
+        return result;
+    }
+
+    database = choose_string
+        (
+            B2B (&record->database),
+            B2B (&connection->database),
+            NULL
+        );
+    if (!query_add_ansi (&query, database)
+        || !query_add_uint32 (&query, 0)
+        || !query_add_uint32 (&query, 1)
+        || !record_encode (record, IRBIS_DELIMITER, &query.buffer)) {
+        goto DONE;
+    }
+
+    if (!connection_execute (connection, &query, &response)) {
+        goto DONE;
+    }
+
+    if (!response_check (&response, 0)) {
+        result = response.returnCode;
+        goto DONE;
+    }
+
+    result = response.returnCode;
+
+    if (reparse) {
+        /* TODO: implement */
+    }
+
+    DONE:
+    query_destroy (&query);
+    response_destroy (&response);
 
     return AM_FALSE;
 }
@@ -1851,8 +1961,35 @@ MAGNA_API am_bool MAGNA_CALL connection_write_text_file
         const Specification *specification
     )
 {
+    Query query;
+    Response response;
+    am_bool result = AM_FALSE;
+
     assert (connection != NULL);
     assert (specification != NULL);
+
+    if (!connection_check (connection)) {
+        return AM_FALSE;
+    }
+
+    response_init (&response);
+    if (!query_create (&query, connection, CBTEXT (READ_DOCUMENT))) {
+        return AM_FALSE;
+    }
+
+    if (!query_add_specification (&query, specification)) {
+        goto DONE;
+    }
+
+    if (!connection_execute (connection, &query, &response)) {
+        goto DONE;
+    }
+
+    result = response_check (&response, 0);
+
+    DONE:
+    query_destroy (&query);
+    response_destroy (&response);
 
     return AM_FALSE;
 }

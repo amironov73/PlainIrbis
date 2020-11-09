@@ -457,7 +457,9 @@ MAGNA_API am_bool MAGNA_CALL int32_array_to_console
     item = array->ptr;
     for (index = 0; index < array->len; ++index, ++item) {
         printf ("%d", *item);
-        puts (CCTEXT (delimiter));
+        if (delimiter != NULL) {
+            fputs(CCTEXT (delimiter), stdout);
+        }
     }
 
     return AM_TRUE;

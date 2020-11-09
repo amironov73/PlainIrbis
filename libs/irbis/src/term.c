@@ -26,13 +26,13 @@
 /*=========================================================*/
 
 /**
- * \struct TermInfo
+ * \struct Term
  *      \brief Информация о термине поискового словаря.
  *
- * \var TermInfo::count
+ * \var Term::count
  *      \brief Количество постингов (вхождений) термина в поисковом словаре.
  *
- * \var TermInfo::text
+ * \var Term::text
  *      \brief Собственно значение термина.
  */
 
@@ -44,7 +44,7 @@
  */
 MAGNA_API void MAGNA_CALL term_init
     (
-        TermInfo *term
+        Term *term
     )
 {
     assert (term != NULL);
@@ -59,7 +59,7 @@ MAGNA_API void MAGNA_CALL term_init
  */
 MAGNA_API void MAGNA_CALL term_destroy
     (
-        TermInfo *term
+        Term *term
     )
 {
     assert (term != NULL);
@@ -81,7 +81,7 @@ MAGNA_API void MAGNA_CALL term_init_array
 {
     assert (terms != NULL);
 
-    array_init (terms, sizeof (TermInfo));
+    array_init (terms, sizeof (Term));
 }
 
 /**
@@ -103,13 +103,13 @@ MAGNA_API void MAGNA_CALL term_destroy_array
 /**
  * Разбор строки с текстовым представлением термина.
  *
- * @param term Термин, подлежащий заполнению.
+ * @param term Термин, подлежащий заполнению (инициализированный).
  * @param line Строка с текстовым представлением.
  * @return Признак успешного завершения операции.
  */
 MAGNA_API am_bool MAGNA_CALL term_parse_line
     (
-        TermInfo *term,
+        Term *term,
         Span line
     )
 {
@@ -140,23 +140,25 @@ MAGNA_API am_bool MAGNA_CALL term_parse_response
     )
 {
     Span line;
-    TermInfo *term;
+    Term *term;
 
     assert (terms != NULL);
     assert (response != NULL);
 
     while (!response_eot (response)) {
         line = response_get_line (response);
-        if (!span_is_empty (line)) {
-            term = (TermInfo*) array_emplace_back (terms);
-            if (term != NULL) {
-                return AM_FALSE;
-            }
+        if (span_is_empty (line)) {
+            break;
+        }
 
-            term_init (term);
-            if (!term_parse_line (term, line)) {
-                return AM_FALSE;
-            }
+        term = (Term*) array_emplace_back (terms);
+        if (term == NULL) {
+            return AM_FALSE;
+        }
+
+        term_init (term);
+        if (!term_parse_line (term, line)) {
+            return AM_FALSE;
         }
     }
 
@@ -172,7 +174,7 @@ MAGNA_API am_bool MAGNA_CALL term_parse_response
  */
 MAGNA_API am_bool MAGNA_CALL term_to_string
     (
-        const TermInfo *term,
+        const Term *term,
         Buffer *output
     )
 {
@@ -185,18 +187,37 @@ MAGNA_API am_bool MAGNA_CALL term_to_string
 }
 
 /**
+ * Вывод термина в консоль.
+ *
+ * @param term Термин для вывода.
+ */
+MAGNA_API void MAGNA_CALL term_to_console
+    (
+        const Term *term
+    )
+{
+    am_byte temp[12];
+
+    assert (term != NULL);
+
+    sprintf ((char*) temp, "%u#", (unsigned) term->count);
+    fputs ((const char*) temp, stdout);
+    buffer_to_console (&term->text);
+}
+
+/**
  * Инициализация массива терминов.
  *
- * @param array Указатель на неинициализированный массив.
+ * @param terms Указатель на неинициализированный массив.
  */
 MAGNA_API void MAGNA_CALL term_array_init
     (
-        Array *array
+        Array *terms
     )
 {
-    assert (array != NULL);
+    assert (terms != NULL);
 
-    array_init (array, sizeof (TermInfo));
+    array_init (terms, sizeof (Term));
 }
 
 /**
@@ -206,79 +227,38 @@ MAGNA_API void MAGNA_CALL term_array_init
  */
 MAGNA_API void MAGNA_CALL term_array_destroy
     (
-        Array *array
+        Array *terms
     )
 {
-    assert (array != NULL);
+    assert (terms != NULL);
 
-    array_destroy (array, (Liberator) term_destroy);
+    array_destroy (terms, (Liberator) term_destroy);
 }
 
 /**
- * Разбор одной строки из ответа сервера.
+ * Вывод массива терминов на консоль.
  *
- * @param term Указатель на инициализированную структуру термина.
- * @param line Строка с текстовым представлением термина.
- * @return Признак успешного завершения операции.
+ * @param terms Массив терминов.
+ * @param separator Разделитель терминов.
  */
-MAGNA_API am_bool MAGNA_CALL term_decode_line
+MAGNA_API void MAGNA_CALL term_array_to_console
     (
-        TermInfo *term,
-        Span line
+        const Array *terms,
+        const am_byte *separator
     )
 {
-    Span parts[2];
+    size_t index;
+    const Term *term;
 
-    assert (term != NULL);
+    assert (terms != NULL);
 
-    if (span_split_n_by_char (line, parts, 2, '#') == 2) {
-        if (!buffer_assign_span (&term->text, parts[1])) {
-            return AM_FALSE;
+    for (index = 0; index < terms->len; ++index) {
+        term = (const Term*) array_get (terms, index);
+        term_to_console (term);
+        if (separator != NULL) {
+            fputs (CCTEXT (separator), stdout);
         }
     }
-
-    term->count = span_to_uint32 (parts[0]);
-
-    return AM_TRUE;
-}
-
-/**
- * Полное декодирование ответа сервера.
- *
- * @param array Инициализированный массив для заполнения.
- * @param response Ответ сервера.
- * @return Признак успешного завершения операции.
- */
-MAGNA_API am_bool MAGNA_CALL term_decode_response
-    (
-        Array *array,
-        Response *response
-    )
-{
-    Span line;
-    TermInfo *term;
-
-    assert (array != NULL);
-    assert (response != NULL);
-
-    while (!response_eot (response)) {
-        line = response_get_line (response);
-        if (span_is_empty (line)) {
-            break;
-        }
-
-        term = (TermInfo*) array_emplace_back (array);
-        if (term == NULL) {
-            return AM_FALSE;
-        }
-
-        term_init (term);
-        if (!term_parse_line (term, line)) {
-            return AM_FALSE;
-        }
-    }
-
-    return AM_TRUE;
 }
 
 /*=========================================================*/
@@ -411,22 +391,22 @@ MAGNA_API am_bool MAGNA_CALL term_parameters_verify
 /*=========================================================*/
 
 /**
- * \struct TermPosting
+ * \struct Posting
  *      \brief Постинг (вхождение) термина в поисковом индексе.
  *
- * \var TermPosting::mfn
+ * \var Posting::mfn
  *      \brief MFN записи с искомым термином.
  *
- * \var TermPosting::tag
+ * \var Posting::tag
  *      \brief Метка поля с искомым термином.
  *
- * \var TermPosting::occurrence
+ * \var Posting::occurrence
  *      \brief Номер повторения поля.
  *
- * \var TermPosting::count
+ * \var Posting::count
  *      \brief Смещение (номер слова) в повторении поля.
  *
- * \var TermPosting::text
+ * \var Posting::text
  *      \brief Результат расформатирования (если есть).
  */
 
@@ -438,7 +418,7 @@ MAGNA_API am_bool MAGNA_CALL term_parameters_verify
  */
 MAGNA_API void MAGNA_CALL posting_init
     (
-        TermPosting *posting
+        Posting *posting
     )
 {
     assert (posting != NULL);
@@ -459,7 +439,7 @@ MAGNA_API void MAGNA_CALL posting_array_init
 {
     assert (postings != NULL);
 
-    array_init (postings, sizeof (TermPosting));
+    array_init (postings, sizeof (Posting));
 }
 
 /**
@@ -469,7 +449,7 @@ MAGNA_API void MAGNA_CALL posting_array_init
  */
 MAGNA_API void MAGNA_CALL posting_destroy
     (
-        TermPosting *posting
+        Posting *posting
     )
 {
     assert (posting != NULL);
@@ -502,12 +482,12 @@ MAGNA_API void MAGNA_CALL posting_array_destroy
  */
 MAGNA_API am_bool MAGNA_CALL posting_parse_line
     (
-        TermPosting *posting,
+        Posting *posting,
         Span line
     )
 {
-    Span parts[5];
-    size_t nparts;
+    Span parts[5]; /* компоненты постинга */
+    size_t nparts; /* число компонент */
 
     assert (posting != NULL);
 
@@ -540,8 +520,8 @@ MAGNA_API am_bool MAGNA_CALL posting_parse_response
         Response *response
     )
 {
-    Span line;
-    TermPosting *posting;
+    Span line;        /* текущая строка */
+    Posting *posting; /* размещенный в массиве постинг */
 
     assert (postings != NULL);
     assert (response != NULL);
@@ -575,7 +555,7 @@ MAGNA_API am_bool MAGNA_CALL posting_parse_response
  */
 MAGNA_API am_bool MAGNA_CALL posting_to_string
     (
-        const TermPosting *posting,
+        const Posting *posting,
         Buffer *output
     )
 {
@@ -591,6 +571,51 @@ MAGNA_API am_bool MAGNA_CALL posting_to_string
         && buffer_put_uint32 (output, posting->count)
         && buffer_putc (output, '#')
         && buffer_concat (output, &posting->text);
+}
+
+/**
+ * Вывод постинга в консоль.
+ *
+ * @param posting Постинг для вывода.
+ */
+MAGNA_API void MAGNA_CALL posting_to_console
+    (
+        const Posting *posting
+    )
+{
+    am_byte temp [12]; /* временный буфер */
+
+    assert (posting != NULL);
+
+    sprintf ((char*) temp, "%u#", (unsigned) posting->mfn);
+    fputs ((const char*) temp, stdout);
+    sprintf ((char*) temp, "%u#", (unsigned) posting->tag);
+    fputs ((const char*) temp, stdout);
+    sprintf ((char*) temp, "%u#", (unsigned) posting->occurrence);
+    fputs ((const char*) temp, stdout);
+    sprintf ((char*) temp, "%u#", (unsigned) posting->count);
+    fputs ((const char*) temp, stdout);
+    buffer_to_console (&posting->text);
+}
+
+MAGNA_API void MAGNA_CALL posting_array_to_console
+    (
+        const Array *postings,
+        const am_byte *separator
+    )
+{
+    size_t index;           /* индекс в массиве */
+    const Posting *posting; /* указатель на постинг в массиве */
+
+    assert (postings != NULL);
+
+    for (index = 0; index < postings->len; ++index) {
+        posting = (const Posting*) array_get (postings, index);
+        posting_to_console (posting);
+        if (separator != NULL) {
+            fputs ((const char*) separator, stdout);
+        }
+    }
 }
 
 /*=========================================================*/
@@ -616,6 +641,36 @@ MAGNA_API am_bool MAGNA_CALL posting_to_string
  */
 
 /**
+ * Инициализация параметров постингов.
+ * Размещает в куче копию указанного термина.
+ *
+ * @param parameters Указатель на неинициализированную структуру.
+ * @param term Текст термина.
+ * @return Признак успешного завершения операции.
+ */
+MAGNA_API am_bool MAGNA_CALL posting_parameters_create
+    (
+        PostingParameters *parameters,
+        const am_byte *term
+    )
+{
+    Term *ptr; /* указатель на термин, размещенный в массиве */
+
+    assert (parameters != NULL);
+    assert (term != NULL);
+
+    posting_parameters_init (parameters);
+    ptr = (Term*) array_emplace_back (&parameters->terms);
+    if (ptr == NULL) {
+        return AM_FALSE;
+    }
+
+    term_init (ptr);
+
+    return buffer_assign_text (&ptr->text, term);
+}
+
+/**
  * Простая инициализация параметров постингов.
  * Не выделяет памяти в куче.
  *
@@ -629,7 +684,7 @@ MAGNA_API void MAGNA_CALL posting_parameters_init
     assert (parameters != NULL);
 
     mem_clear (parameters, sizeof (*parameters));
-    array_init (&parameters->terms, sizeof (TermInfo));
+    array_init (&parameters->terms, sizeof (Term));
     parameters->first = 1;
 }
 
@@ -666,7 +721,7 @@ MAGNA_API am_bool MAGNA_CALL posting_parameters_encode
 {
     const Buffer *database; /* имя базы данных */
     size_t index;           /* переменная цикла */
-    const TermInfo *term;   /* текущий термин */
+    const Term *term;       /* текущий термин */
 
     assert (parameters != NULL);
     assert (connection != NULL);
@@ -684,7 +739,7 @@ MAGNA_API am_bool MAGNA_CALL posting_parameters_encode
     }
 
     for (index = 0; index < parameters->terms.len; ++index) {
-        term = (const TermInfo*) array_get (&parameters->terms, index);
+        term = (const Term*) array_get (&parameters->terms, index);
         if (!query_add_utf_buffer (query, &term->text)) {
             return AM_FALSE;
         }
