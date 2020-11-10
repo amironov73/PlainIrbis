@@ -3,12 +3,13 @@
 
 #include "magna/core.h"
 
+// ReSharper disable StringLiteralTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable CommentTypo
+
 /*=========================================================*/
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable: 5045)
-#endif
+#include "warnpush.h"
 
 /*=========================================================*/
 
@@ -22,21 +23,37 @@
  *
  * Навигация по произвольному тексту.
  *
+ * \struct Navigator
+ *      \brief Навигатор по произвольному тексту.
+ *      \details Не владеет никакой памятью,
+ *      не требует освобождения ресурсов.
+ *
+ * \var Navigator::data
+ *      \brief Указатель на начало текста.
+ *      \details Невладеющий указатель.
+ *
+ * \var Navigator::length
+ *      \brief Длина данных в байтах.
+ *
+ * \var Navigator::position
+ *      \brief Текущая позиция (в байтах).
+ *
  */
 
 /*=========================================================*/
 
 /**
  * Инициализация навигатора.
+ * Не выделяет память в куче.
  *
  * @param nav Указатель на неинициализированную структуру.
  * @param data Указатель на начало данных.
  * @param dataSize Длина данных в байтах.
  * @return Указатель на инициализированную структуру.
  */
-MAGNA_API TextNavigator* MAGNA_CALL nav_init
+MAGNA_API Navigator* MAGNA_CALL nav_init
     (
-        TextNavigator* nav,
+        Navigator* nav,
         const am_byte *data,
         size_t dataSize
     )
@@ -44,26 +61,24 @@ MAGNA_API TextNavigator* MAGNA_CALL nav_init
     assert (nav != NULL);
     assert (data != NULL);
 
-    // mem_clear (nav, sizeof (TextNavigator));
     nav->data     = data;
     nav->length   = dataSize;
     nav->position = 0;
-    nav->line     = 1;
-    nav->column   = 1;
 
     return nav;
 }
 
 /**
  * Инициализация из фрагмента.
+ * Не выделяет память в куче.
  *
  * @param nav Указатель на неинициализированную структуру.
  * @param span Фрагмент.
  * @return Указатель на инициализированную структуру.
  */
-MAGNA_API TextNavigator* MAGNA_CALL nav_from_span
+MAGNA_API Navigator* MAGNA_CALL nav_from_span
     (
-        TextNavigator *nav,
+        Navigator *nav,
         Span span
     )
 {
@@ -75,14 +90,15 @@ MAGNA_API TextNavigator* MAGNA_CALL nav_from_span
 /**
  * Инициализация навигатора из буфера.
  * Навигатор воспримет данные от начала буфера до `position`.
+ * Не выделяет память в куче.
  *
  * @param nav Указатель на неинициализированную структуру.
  * @param buffer Указатель на буфер.
  * @return Указатель на инициализированную структуру.
  */
-MAGNA_API TextNavigator* MAGNA_CALL nav_from_buffer
+MAGNA_API Navigator* MAGNA_CALL nav_from_buffer
     (
-        TextNavigator *nav,
+        Navigator *nav,
         const Buffer *buffer
     )
 {
@@ -95,14 +111,15 @@ MAGNA_API TextNavigator* MAGNA_CALL nav_from_buffer
 /**
  * Инициализация навигатора строкой.
  * Стоп-символ в навигатор не помещается.
+ * Не выделяет память в куче.
  *
  * @param nav Указатель на неинициализированную структуру.
  * @param text Строка с текстом.
  * @return Указатель на инициализированную структуру.
  */
-MAGNA_API TextNavigator* MAGNA_CALL nav_from_text
+MAGNA_API Navigator* MAGNA_CALL nav_from_text
     (
-        TextNavigator *nav,
+        Navigator *nav,
         const am_byte *text
     )
 {
@@ -113,6 +130,37 @@ MAGNA_API TextNavigator* MAGNA_CALL nav_from_text
 }
 
 /**
+ * Определение текущей позиции в тексте.
+ *
+ * @param nav Навигатор.
+ * @return Позиция в тексте: номер колонки и номер строки (у обоих нумерация с 1).
+ */
+MAGNA_API NavigatorPosition MAGNA_CALL nav_position
+    (
+        const Navigator *nav
+    )
+{
+    am_byte *end; /* за концом фрагмента */
+    am_byte *ptr; /* переменная цикла */
+    NavigatorPosition result = { 1, 1 }; /* результат */
+
+    assert (nav != NULL);
+
+    end = (am_byte*) (nav->data + nav->position);
+    for (ptr = (am_byte*)nav->data; ptr != end; ++ptr) {
+        if (*ptr == '\n') {
+            ++result.line;
+            result.column = 1;
+        }
+        else {
+            ++result.column;
+        }
+    }
+
+    return result;
+}
+
+/**
  * Указатель прямо за последним байтом.
  *
  * @param nav Навигатор.
@@ -120,10 +168,10 @@ MAGNA_API TextNavigator* MAGNA_CALL nav_from_text
  */
 MAGNA_API MAGNA_INLINE const am_byte* MAGNA_CALL nav_end
     (
-        const TextNavigator *nav
+        const Navigator *nav
     )
 {
-    assert(nav != NULL);
+    assert (nav != NULL);
 
     return nav->data + nav->length;
 }
@@ -136,10 +184,10 @@ MAGNA_API MAGNA_INLINE const am_byte* MAGNA_CALL nav_end
  */
 MAGNA_API MAGNA_INLINE const am_byte* MAGNA_CALL nav_current
     (
-        const TextNavigator *nav
+        const Navigator *nav
     )
 {
-    assert(nav != NULL);
+    assert (nav != NULL);
 
     return nav->data + nav->position;
 }
@@ -152,7 +200,7 @@ MAGNA_API MAGNA_INLINE const am_byte* MAGNA_CALL nav_current
  */
 MAGNA_API MAGNA_INLINE am_bool MAGNA_CALL nav_eot
     (
-        const TextNavigator *nav
+        const Navigator *nav
     )
 {
     assert (nav != NULL);
@@ -172,7 +220,7 @@ MAGNA_API MAGNA_INLINE am_bool MAGNA_CALL nav_eot
  */
 MAGNA_API int MAGNA_CALL nav_at
     (
-        const TextNavigator *nav,
+        const Navigator *nav,
         size_t position
     )
 {
@@ -191,7 +239,7 @@ MAGNA_API int MAGNA_CALL nav_at
  */
 MAGNA_API MAGNA_INLINE int MAGNA_CALL nav_front
     (
-        const TextNavigator *nav
+        const Navigator *nav
     )
 {
     assert (nav != NULL);
@@ -207,7 +255,7 @@ MAGNA_API MAGNA_INLINE int MAGNA_CALL nav_front
  */
 MAGNA_API int MAGNA_CALL nav_back
     (
-        const TextNavigator *nav
+        const Navigator *nav
     )
 {
     assert (nav != NULL);
@@ -226,7 +274,7 @@ MAGNA_API int MAGNA_CALL nav_back
  */
 MAGNA_API int MAGNA_CALL nav_look_ahead
     (
-        const TextNavigator *nav,
+        const Navigator *nav,
         size_t distance
     )
 {
@@ -246,7 +294,7 @@ MAGNA_API int MAGNA_CALL nav_look_ahead
  */
 MAGNA_API int MAGNA_CALL nav_look_behind
     (
-        const TextNavigator *nav,
+        const Navigator *nav,
         size_t distance
     )
 {
@@ -263,16 +311,27 @@ MAGNA_API int MAGNA_CALL nav_look_behind
  * при движении вперед, отрицательное при движении назад).
  * @return Навигатор.
  */
-MAGNA_API TextNavigator* MAGNA_CALL nav_move
+MAGNA_API Navigator* MAGNA_CALL nav_move
     (
-        TextNavigator *nav,
+        Navigator *nav,
         ssize_t distance
     )
 {
     assert (nav != NULL);
 
-    /* TODO: some checks */
-    nav->column += distance;
+    if (distance < 0) {
+        if ((-distance) > ((ssize_t)nav->position)) {
+            nav->position = 0;
+            distance = 0;
+        }
+    }
+    else {
+        if ((nav->position + distance) > nav->length) {
+            nav->position = nav->length;
+            distance = 0;
+        }
+    }
+
     nav->position += distance;
 
     return nav;
@@ -288,7 +347,7 @@ MAGNA_API TextNavigator* MAGNA_CALL nav_move
  */
 MAGNA_API int MAGNA_CALL nav_peek
     (
-        const TextNavigator * nav
+        const Navigator * nav
     )
 {
     assert (nav != NULL);
@@ -306,11 +365,11 @@ MAGNA_API int MAGNA_CALL nav_peek
  */
 MAGNA_API int MAGNA_CALL nav_peek_no_crlf
     (
-        const TextNavigator *nav
+        const Navigator *nav
     )
 {
-    size_t distance = 0;
-    int result;
+    size_t distance = 0; /* смещение от текущего символа */
+    int result; /* результат */
 
     assert (nav != NULL);
 
@@ -328,27 +387,21 @@ MAGNA_API int MAGNA_CALL nav_peek_no_crlf
 /**
  * Считывание текущего символа, движение вперед по тексту.
  *
- * @param nav
- * @return
+ * @param nav Навигатор.
+ * @return Прочитанный символ либо `NAV_EOT`,
+ * если произошел выход за границы текста.
  */
 MAGNA_API int MAGNA_CALL nav_read
     (
-        TextNavigator *nav
+        Navigator *nav
     )
 {
-    int result;
+    int result; /* результат */
 
     assert (nav != NULL);
 
     result = nav_at (nav, nav->position);
     if (result >= 0) {
-        if (result == '\n') {
-            ++nav->line;
-            nav->column = 0;
-        } else {
-            ++nav->column;
-        }
-
         ++nav->position;
     }
 
@@ -364,10 +417,10 @@ MAGNA_API int MAGNA_CALL nav_read
  */
 MAGNA_API int MAGNA_CALL nav_read_no_crlf
     (
-        TextNavigator *nav
+        Navigator *nav
     )
 {
-    int result;
+    int result; /* результат */
 
     assert (nav != NULL);
 
@@ -391,20 +444,20 @@ MAGNA_API int MAGNA_CALL nav_read_no_crlf
  */
 MAGNA_API Span MAGNA_CALL nav_peek_string
     (
-        const TextNavigator *nav,
+        const Navigator *nav,
         size_t length
     )
 {
-    int c;
-    size_t i;
-    Span result;
+    int current;  /* текущий символ */
+    size_t index; /* индекс в цикле */
+    Span result;  /* результат */
 
     assert (nav != NULL);
 
     result.end = result.start = (am_byte*) nav_current (nav);
-    for (i = 0; i < length; ++i) {
-        c = nav_look_ahead (nav, i);
-        if ((c == NAV_EOT) || (c == '\r') || (c == '\n')) {
+    for (index = 0; index < length; ++index) {
+        current = nav_look_ahead (nav, index);
+        if ((current == NAV_EOT) || (current == '\r') || (current == '\n')) {
             break;
         }
 
@@ -424,22 +477,57 @@ MAGNA_API Span MAGNA_CALL nav_peek_string
  */
 MAGNA_API Span MAGNA_CALL nav_peek_to
     (
-        const TextNavigator *nav,
+        const Navigator *nav,
         am_byte stopChar
     )
 {
-    int c;
-    size_t distance, length;
-    Span result;
+    int current;    /* текущий символ */
+    size_t index;   /* индекс в цикле */
+    size_t length;  /* доступная часть фрагмента */
+    Span result;    /* результат */
 
     assert (nav != NULL);
 
     result.end = result.start = (am_byte*) nav->data + nav->position;
     length = nav->length - nav->position;
-    for (distance = 0; distance < length; ++distance) {
-        c = nav_look_ahead (nav, distance);
+    for (index = 0; index < length; ++index) {
+        current = nav_look_ahead (nav, index);
         ++result.end;
-        if (c == stopChar) {
+        if (current == stopChar) {
+            break;
+        }
+    }
+
+    return result;
+}
+
+/**
+ * Подглядывание вплоть до указанного символа (включая его).
+ * Движения по тексту не происходит.
+ *
+ * @param nav Навигатор.
+ * @param stopChars Стоп-символы.
+ * @return Подсмотренная строка (возможно, пустая).
+ */
+MAGNA_API Span MAGNA_CALL nav_peek_to_many
+    (
+        const Navigator *nav,
+        const am_byte *stopChars
+    )
+{
+    int current;    /* текущий символ */
+    size_t index;   /* индекс в цикле */
+    size_t length;  /* доступная часть фрагмента */
+    Span result;    /* результат */
+
+    assert (nav != NULL);
+
+    result.end = result.start = (am_byte*) nav->data + nav->position;
+    length = nav->length - nav->position;
+    for (index = 0; index < length; ++index) {
+        current = nav_look_ahead (nav, index);
+        ++result.end;
+        if (str_contains (stopChars, current)) {
             break;
         }
     }
@@ -457,21 +545,57 @@ MAGNA_API Span MAGNA_CALL nav_peek_to
  */
 MAGNA_API Span MAGNA_CALL nav_peek_until
     (
-        const TextNavigator *nav,
+        const Navigator *nav,
         am_byte stopChar
     )
 {
-    int c;
-    size_t distance, length;
-    Span result;
+    int current;   /* текущий символ */
+    size_t index;  /* индекс в цикле */
+    size_t length; /* доступная часть фрагмента */
+    Span result;   /* результат */
 
     assert (nav != NULL);
 
     result.end = result.start = (am_byte*) nav->data + nav->position;
     length = nav->length - nav->position;
-    for (distance = 0; distance < length; ++distance) {
-        c = nav_look_ahead (nav, distance);
-        if (c == stopChar) {
+    for (index = 0; index < length; ++index) {
+        current = nav_look_ahead (nav, index);
+        if (current == stopChar) {
+            break;
+        }
+
+        ++result.end;
+    }
+
+    return result;
+}
+
+/**
+ * Подглядывание вплоть до указанного символа (не включая его).
+ * Движения по тексту не происходит.
+ *
+ * @param nav Навигатор.
+ * @param stopChars Стоп-символы.
+ * @return Подсмотренная строка (возможно, пустая).
+ */
+MAGNA_API Span MAGNA_CALL nav_peek_until_many
+    (
+        const Navigator *nav,
+        const am_byte *stopChars
+    )
+{
+    int current;   /* текущий символ */
+    size_t index;  /* индекс в цикле */
+    size_t length; /* доступная часть фрагмента */
+    Span result;   /* результат */
+
+    assert (nav != NULL);
+
+    result.end = result.start = (am_byte*) nav->data + nav->position;
+    length = nav->length - nav->position;
+    for (index = 0; index < length; ++index) {
+        current = nav_look_ahead (nav, index);
+        if (str_contains (stopChars, current)) {
             break;
         }
 
@@ -491,18 +615,18 @@ MAGNA_API Span MAGNA_CALL nav_peek_until
  */
 MAGNA_API Span MAGNA_CALL nav_read_line
     (
-        TextNavigator *nav
+        Navigator *nav
     )
 {
-    am_byte c;
-    Span result;
+    am_byte current; /* текущий символ */
+    Span result;     /* результат */
 
     assert (nav != NULL);
 
     result.end = result.start = (am_byte*) nav->data + nav->position;
     while (nav->position < nav->length) {
-        c = nav->data[nav->position];
-        if (c == '\r' || c == '\n') {
+        current = nav->data[nav->position];
+        if (current == '\r' || current == '\n') {
             break;
         }
 
@@ -512,13 +636,13 @@ MAGNA_API Span MAGNA_CALL nav_read_line
 
     /* Проглатываем перевод строки */
     if (nav->position < nav->length) {
-        c = nav->data[nav->position];
-        if (c == '\r') {
+        current = nav->data[nav->position];
+        if (current == '\r') {
             (void) nav_read (nav);
-            c = nav->data[nav->position];
+            current = nav->data[nav->position];
         }
 
-        if (c == '\n') {
+        if (current == '\n') {
             (void) nav_read (nav);
         }
     }
@@ -536,20 +660,18 @@ MAGNA_API Span MAGNA_CALL nav_read_line
  */
 MAGNA_API Span MAGNA_CALL nav_read_irbis
     (
-        TextNavigator *nav
+        Navigator *nav
     )
 {
-    am_byte c;
-    size_t start;
-    Span result;
+    am_byte current; /* текущий символ */
+    Span result;     /* результат */
 
     assert (nav != NULL);
 
     result.end = result.start = (am_byte*) nav->data + nav->position;
-    start = nav->position;
     while (nav->position < nav->length) {
-        c = nav->data[nav->position];
-        if (c == '\x1F' || c == '\x1E') {
+        current = nav->data[nav->position];
+        if (current == 0x1F || current == 0x1E) {
             break;
         }
 
@@ -559,13 +681,13 @@ MAGNA_API Span MAGNA_CALL nav_read_irbis
 
     /* Проглатываем перевод строки */
     if (nav->position < nav->length) {
-        c = nav->data[nav->position];
-        if (c == '\x1F') {
+        current = nav->data[nav->position];
+        if (current == 0x1F) {
             (void) nav_read (nav);
-            c = nav->data[nav->position];
+            current = nav->data[nav->position];
         }
 
-        if (c == '\x1E') {
+        if (current == 0x1E) {
             (void) nav_read (nav);
         }
     }
@@ -583,7 +705,7 @@ MAGNA_API Span MAGNA_CALL nav_read_irbis
  */
 MAGNA_API am_bool MAGNA_CALL nav_is_control
     (
-        const TextNavigator *nav
+        const Navigator *nav
     )
 {
     int c;
@@ -605,14 +727,16 @@ MAGNA_API am_bool MAGNA_CALL nav_is_control
  */
 MAGNA_API am_bool MAGNA_CALL nav_is_digit
     (
-        const TextNavigator *nav
+        const Navigator *nav
     )
 {
-    int c;
+    int c; /* прочитанный символ */
 
     assert (nav != NULL);
 
     c = nav_peek (nav);
+
+    /* определяем сами, не полагаясь на ctype */
 
     return (c >= '0') && (c <= '9');
 }
@@ -627,14 +751,16 @@ MAGNA_API am_bool MAGNA_CALL nav_is_digit
  */
 MAGNA_API am_bool MAGNA_CALL nav_is_letter
     (
-        const TextNavigator *nav
+        const Navigator *nav
     )
 {
-    int c;
+    int c; /* прочитанный символ */
 
     assert (nav != NULL);
 
     c = nav_peek (nav);
+
+    /* определяем сами, не полагаясь на ctype */
 
     return ((c >= 'A') && (c <= 'Z')) || ((c >= 'a') && (c <= 'z'));
 }
@@ -649,14 +775,16 @@ MAGNA_API am_bool MAGNA_CALL nav_is_letter
  */
 MAGNA_API am_bool MAGNA_CALL nav_is_whitespace
     (
-        const TextNavigator *nav
+        const Navigator *nav
     )
 {
-    int c;
+    int c; /* прочитанный символ */
 
     assert (nav != NULL);
 
     c = nav_peek (nav);
+
+    /* определяем сами, не полагаясь на ctype */
 
     return (c == ' ') || (c == '\t') || (c == '\v') || (c == '\r')
         || (c == '\n');
@@ -672,10 +800,10 @@ MAGNA_API am_bool MAGNA_CALL nav_is_whitespace
  */
 MAGNA_API Span MAGNA_CALL nav_read_integer
     (
-        TextNavigator *nav
+        Navigator *nav
     )
 {
-    Span result;
+    Span result; /* результат */
 
     assert (nav != NULL);
 
@@ -699,7 +827,7 @@ MAGNA_API Span MAGNA_CALL nav_read_integer
  */
 MAGNA_API Span MAGNA_CALL nav_extract_integer
     (
-        TextNavigator *nav
+        Navigator *nav
     )
 {
     assert (nav != NULL);
@@ -721,20 +849,20 @@ MAGNA_API Span MAGNA_CALL nav_extract_integer
  */
 MAGNA_API Span MAGNA_CALL nav_read_string
     (
-        TextNavigator *nav,
+        Navigator *nav,
         size_t length
     )
 {
-    int c;
-    size_t i;
-    Span result;
+    int current;  /* текущий символ */
+    size_t index; /* индекс цикла */
+    Span result;  /* результат */
 
     assert (nav != NULL);
 
     result.end = result.start = (am_byte*) nav->data + nav->position;
-    for (i = 0; i < length; ++i) {
-        c = nav_read (nav);
-        if (c == NAV_EOT) {
+    for (index = 0; index < length; ++index) {
+        current = nav_read (nav);
+        if (current == NAV_EOT) {
             break;
         }
 
@@ -755,21 +883,55 @@ MAGNA_API Span MAGNA_CALL nav_read_string
  */
 MAGNA_API Span MAGNA_CALL nav_read_to
     (
-        TextNavigator *nav,
+        Navigator *nav,
         am_byte stopChar
     )
 {
-    int c;
-    Span result = SPAN_INIT;
+    int current; /* текущий символ */
+    Span result; /* результат */
 
     assert (nav != NULL);
 
     result.end = result.start = (am_byte*) nav->data + nav->position;
     for (;;) {
-        c = nav_read (nav);
-        if ((c == NAV_EOT) || (c == stopChar)) {
+        current = nav_read (nav);
+        if ((current == NAV_EOT) || (current == stopChar)) {
             break;
         }
+
+        ++result.end;
+    }
+
+    return result;
+}
+
+/**
+ * Считывание вплоть до указанного символа (не включая его).
+ * Сам стоп-символ считывается, но в результат не помещается.
+ * Происходит движение вперед по тексту.
+ *
+ * @param nav Навигатор.
+ * @param stopChars Стоп-символы.
+ * @return Прочитанная строка (возможно, пустая).
+ */
+MAGNA_API Span MAGNA_CALL nav_read_to_many
+    (
+        Navigator *nav,
+        const am_byte *stopChars
+    )
+{
+    int current; /* текущий символ */
+    Span result; /* результат */
+
+    assert (nav != NULL);
+
+    result.end = result.start = (am_byte*) nav->data + nav->position;
+    for (;;) {
+        current = nav_read (nav);
+        if ((current == NAV_EOT) || str_contains (stopChars, current)) {
+            break;
+        }
+
         ++result.end;
     }
 
@@ -787,19 +949,53 @@ MAGNA_API Span MAGNA_CALL nav_read_to
  */
 MAGNA_API Span MAGNA_CALL nav_read_until
     (
-        TextNavigator *nav,
+        Navigator *nav,
         am_byte stopChar
     )
 {
-    int c;
-    Span result = SPAN_INIT;
+    int current; /* текущий символ */
+    Span result; /* результат */
 
     assert (nav != NULL);
 
     result.end = result.start = (am_byte*) nav->data + nav->position;
     for (;;) {
-        c = nav_peek (nav);
-        if ((c == NAV_EOT) || (c == stopChar)) {
+        current = nav_peek (nav);
+        if ((current == NAV_EOT) || (current == stopChar)) {
+            break;
+        }
+
+        (void) nav_read (nav);
+        ++result.end;
+    }
+
+    return result;
+}
+
+/**
+ * Считывание вплоть до указанного символа (не включая его).
+ * Сам стоп-символ остается не прочитанным.
+ * Происходит движение вперед по тексту.
+ *
+ * @param nav Навигатор.
+ * @param stopChars Стоп-символы.
+ * @return Прочитанная строка (возможно, пустая).
+ */
+MAGNA_API Span MAGNA_CALL nav_read_until_many
+    (
+        Navigator *nav,
+        const am_byte *stopChars
+    )
+{
+    int current; /* текущий символ */
+    Span result; /* результат */
+
+    assert (nav != NULL);
+
+    result.end = result.start = (am_byte*) nav->data + nav->position;
+    for (;;) {
+        current = nav_peek (nav);
+        if ((current == NAV_EOT) || str_contains (stopChars, current)) {
             break;
         }
 
@@ -820,19 +1016,19 @@ MAGNA_API Span MAGNA_CALL nav_read_until
  */
 MAGNA_API Span MAGNA_CALL nav_read_while
     (
-        TextNavigator *nav,
+        Navigator *nav,
         am_byte goodChar
     )
 {
-    int c;
-    Span result = SPAN_INIT;
+    int current; /* текущий символ */
+    Span result; /* результат */
 
     assert (nav != NULL);
 
     result.end = result.start = (am_byte*) nav->data + nav->position;
     for (;;) {
-        c = nav_peek (nav);
-        if ((c == NAV_EOT) || (c != goodChar)) {
+        current = nav_peek (nav);
+        if ((current == NAV_EOT) || (current != goodChar)) {
             break;
         }
 
@@ -852,17 +1048,17 @@ MAGNA_API Span MAGNA_CALL nav_read_while
  */
 MAGNA_API Span MAGNA_CALL nav_read_word
     (
-        TextNavigator *nav
+        Navigator *nav
     )
 {
-    int c;
-    Span result = SPAN_INIT;
+    int current; /* текущий символ */
+    Span result; /* результат */
 
     assert (nav != NULL);
     result.end = result.start = (am_byte*) nav->data + nav->position;
     for (;;) {
-        c = nav_peek (nav);
-        if ((c == NAV_EOT) || !isalnum (c)) {
+        current = nav_peek (nav);
+        if ((current == NAV_EOT) || !isalnum (current)) {
             break;
         }
 
@@ -882,10 +1078,10 @@ MAGNA_API Span MAGNA_CALL nav_read_word
  */
 MAGNA_API Span MAGNA_CALL nav_remaining
     (
-        const TextNavigator *nav
+        const Navigator *nav
     )
 {
-    Span result;
+    Span result; /* результат */
 
     assert (nav != NULL);
 
@@ -904,10 +1100,10 @@ MAGNA_API Span MAGNA_CALL nav_remaining
  */
 MAGNA_API Span MAGNA_CALL nav_to_span
     (
-        const TextNavigator *nav
+        const Navigator *nav
     )
 {
-    Span result;
+    Span result; /* результат */
 
     assert (nav != NULL);
 
@@ -928,12 +1124,12 @@ MAGNA_API Span MAGNA_CALL nav_to_span
  */
 MAGNA_API Span MAGNA_CALL nav_slice
     (
-        const TextNavigator *nav,
+        const Navigator *nav,
         size_t offset,
         size_t size
     )
 {
-    Span result;
+    Span result; /* результат */
 
     assert (nav != NULL);
 
@@ -954,11 +1150,11 @@ MAGNA_API Span MAGNA_CALL nav_slice
  */
 MAGNA_API Span MAGNA_CALL nav_recent
     (
-        const TextNavigator *nav,
+        const Navigator *nav,
         ssize_t length
     )
 {
-    ssize_t start;
+    ssize_t start; /* смещение от начала, байты */
 
     assert (nav != NULL);
 
@@ -988,16 +1184,16 @@ MAGNA_API Span MAGNA_CALL nav_recent
  */
 MAGNA_API void MAGNA_CALL nav_skip_non_word
     (
-        TextNavigator *nav
+        Navigator *nav
     )
 {
-    int c;
+    int current; /* текущий символ */
 
     assert (nav != NULL);
 
     for (;;) {
-        c = nav_peek (nav);
-        if ((c == NAV_EOT) || isalnum (c)) {
+        current = nav_peek (nav);
+        if ((current == NAV_EOT) || isalnum (current)) {
             break;
         }
 
@@ -1013,16 +1209,16 @@ MAGNA_API void MAGNA_CALL nav_skip_non_word
  */
 MAGNA_API void MAGNA_CALL nav_skip_whitespace
     (
-        TextNavigator *nav
+        Navigator *nav
     )
 {
-    int c;
+    int current; /* текущий символ */
 
     assert (nav != NULL);
 
     for (;;) {
-        c = nav_peek (nav);
-        if ((c == NAV_EOT) || !isspace (c)) {
+        current = nav_peek (nav);
+        if ((current == NAV_EOT) || !isspace (current)) {
             break;
         }
 
@@ -1038,16 +1234,16 @@ MAGNA_API void MAGNA_CALL nav_skip_whitespace
  */
 MAGNA_API void MAGNA_CALL nav_skip_punctuation
     (
-        TextNavigator *nav
+        Navigator *nav
     )
 {
-    int c;
+    int current; /* текущий символ */
 
     assert (nav != NULL);
 
     for (;;) {
-        c = nav_peek (nav);
-        if ((c == NAV_EOT) || !ispunct (c)) {
+        current = nav_peek (nav);
+        if ((current == NAV_EOT) || !ispunct (current)) {
             break;
         }
 
@@ -1065,10 +1261,10 @@ MAGNA_API void MAGNA_CALL nav_skip_punctuation
  */
 MAGNA_API int MAGNA_CALL nav_read_utf8
     (
-        TextNavigator *nav
+        Navigator *nav
     )
 {
-    unsigned int chr, chr2;
+    unsigned int chr, chr2; /* текущие символы */
 
     assert (nav != NULL);
 
@@ -1141,8 +1337,6 @@ MAGNA_API int MAGNA_CALL nav_read_utf8
 
 /*=========================================================*/
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
+#include "warnpop.h"
 
 /*=========================================================*/

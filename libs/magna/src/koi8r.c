@@ -178,7 +178,7 @@ MAGNA_API am_bool MAGNA_CALL koi8r_buffer_from_utf8
         const Buffer *source
     )
 {
-    TextNavigator nav;
+    Navigator nav;
     int chr;
 
     assert (target != NULL);

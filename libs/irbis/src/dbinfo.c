@@ -53,7 +53,7 @@ static am_bool parse_line
     )
 {
     size_t count = span_count (line, '\x1E') + 1;
-    TextNavigator nav;
+    Navigator nav;
     Span item;
     am_mfn mfn;
 

@@ -151,6 +151,32 @@ MAGNA_API size_t MAGNA_CALL strocc
 }
 
 /**
+ * Содержит ли данная строка хотя бы один указанный символ?
+ *
+ * @param str Строка для проверки.
+ * @param chr Искомый символ.
+ * @return Результат проверки.
+ */
+MAGNA_API am_bool MAGNA_CALL str_contains
+    (
+        const am_byte *str,
+        am_byte chr
+    )
+{
+    assert (str != NULL);
+
+    while (*str) {
+        if (*str == chr) {
+            return AM_TRUE;
+        }
+
+        ++str;
+    }
+
+    return AM_FALSE;
+}
+
+/**
  * Быстрый грязный разбор 32-битного целого без знака.
  *
  * @param text
@@ -338,7 +364,7 @@ MAGNA_API am_bool MAGNA_CALL irbis_to_client
         Span input
     )
 {
-    TextNavigator navigator;
+    Navigator navigator;
     Span line;
     am_bool first = AM_TRUE;
 

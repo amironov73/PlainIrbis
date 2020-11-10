@@ -183,7 +183,7 @@ MAGNA_API am_bool MAGNA_CALL alpha_parse
 {
     am_bool result = AM_FALSE;
     Buffer buffer = BUFFER_INIT;
-    TextNavigator nav;
+    Navigator nav;
     Span number;
     am_int32 value;
     am_byte byteValue;
@@ -321,7 +321,7 @@ MAGNA_API am_bool MAGNA_CALL alpha_split
     )
 {
     Span accumulator;
-    TextNavigator nav;
+    Navigator nav;
     int chr;
 
     assert (table != NULL);

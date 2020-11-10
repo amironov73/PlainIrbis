@@ -441,7 +441,7 @@ struct IrbisResponse
     am_int32 answerSize;     /* Размер ответа сервера в байтах (может высылаться сервером). */
     Span serverVersion;      /* Интервал автоматического подтверждения в минутах. */
     Connection *connection;  /* Указатель на подключение */
-    TextNavigator navigator; /* Навигатор для считывания строк */
+    Navigator navigator; /* Навигатор для считывания строк */
 
 };
 

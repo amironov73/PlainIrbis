@@ -524,7 +524,7 @@ static am_bool read_memory_map
 {
     am_bool result = AM_FALSE;
     char line[256];
-    TextNavigator nav;
+    Navigator nav;
     Span from, to, flags;
     MME *mme;
     FILE *file = fopen ("/proc/self/maps", "rt");

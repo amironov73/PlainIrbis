@@ -225,7 +225,7 @@ MAGNA_API am_bool MAGNA_CALL field_decode_body
         Span span
     )
 {
-    TextNavigator nav;
+    Navigator nav;
     Span text;
     SubField *subfield;
 

@@ -538,7 +538,7 @@ MAGNA_API am_bool MAGNA_CALL int32_array_compress
 MAGNA_API am_bool MAGNA_CALL int32_array_parse
     (
         Int32Array *array,
-        TextNavigator *nav
+        Navigator *nav
     )
 {
     assert (array != NULL);

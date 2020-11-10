@@ -121,7 +121,7 @@ int main (int argc, const char **argv)
     printf ("sizeof (Buffer)        = %d\n", (int) sizeof (Buffer));
     printf ("sizeof (Array)         = %d\n", (int) sizeof (Array));
     printf ("sizeof (Vector)        = %d\n", (int) sizeof (Vector));
-    printf ("sizeof (TextNavigator) = %d\n", (int) sizeof (TextNavigator));
+    printf ("sizeof (TextNavigator) = %d\n", (int) sizeof (Navigator));
     printf ("sizeof (SubField)      = %d\n", (int) sizeof (SubField));
     printf ("sizeof (MarcField)     = %d\n", (int) sizeof (MarcField));
     printf ("sizeof (MarcRecord)    = %d\n", (int) sizeof (MarcRecord));

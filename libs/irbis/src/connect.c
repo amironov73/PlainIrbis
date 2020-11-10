@@ -994,7 +994,7 @@ MAGNA_API am_bool MAGNA_CALL connection_parse_string
         Span connectionString
     )
 {
-    TextNavigator navigator;
+    Navigator navigator;
     Span item, parts[2], key, value;
 
     assert (connection != NULL);
