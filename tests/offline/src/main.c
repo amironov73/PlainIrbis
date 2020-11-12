@@ -91,6 +91,7 @@ TESTER(magna_on_windows)
 
 int main (int argc, const char **argv)
 {
+    int result;
     Buffer tdp = BUFFER_INIT;
     Buffer td = BUFFER_INIT;
 
@@ -114,7 +115,9 @@ int main (int argc, const char **argv)
     }
 
     printf ("memory available       = %lld\n", mem_avail_physical());
+#ifdef HAVE_CONFIG_H
     printf ("size of size_t         = %d\n", (int) SIZEOF_SIZE_T);
+#endif
     printf ("sizeof (void*)         = %d\n", (int) sizeof (void*));
     printf ("sizeof (Span)          = %d\n", (int) sizeof (Span));
     printf ("sizeof (ChainSpan)     = %d\n", (int) sizeof (ChainSpan));
@@ -129,7 +132,7 @@ int main (int argc, const char **argv)
     printf ("sizeof (Response)      = %d\n", (int) sizeof (Response));
     printf ("sizeof (Connection)    = %d\n", (int) sizeof (Connection));
 
-    int result = tester_main (argc, argv);
+    result = tester_main (argc, argv);
 
     return result;
 }

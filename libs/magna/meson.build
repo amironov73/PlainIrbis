@@ -42,6 +42,7 @@ sources = [ 'src/array.c',
     'src/string.c',
     'src/tcp4.c',
     'src/thread.c',
+    'src/utf7.c',
     'src/utf8.c',
     'src/utils.c',
     'src/vector.c'

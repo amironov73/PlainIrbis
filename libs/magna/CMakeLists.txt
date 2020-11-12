@@ -55,6 +55,7 @@ set(CFiles
     src/string.c
     src/tcp4.c
     src/thread.c
+    src/utf7.c
     src/utf8.c
     src/utils.c
     src/vector.c
@@ -66,12 +67,12 @@ if(WITH_SHARED_LIBRARIES)
         SHARED
         ${HeaderFiles}
         ${CFiles}
-        )
+    )
 
     target_compile_definitions(${PROJECT_NAME}
         PRIVATE
         -DMAGNA_DYNAMIC_LIBRARY
-        )
+    )
 
 else()
 

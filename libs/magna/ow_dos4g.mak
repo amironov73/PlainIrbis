@@ -44,9 +44,10 @@ objects = obj\array.obj     &
 	obj\string.obj      &
 	obj\tcp4.obj        &
 	obj\thread.obj      &
+	obj\utf7.obj        &
 	obj\utf8.obj        &
 	obj\utils.obj       &
-	obj\vector.obj      
+	obj\vector.obj
 
 all: $(library)
 
@@ -171,6 +172,9 @@ obj\tcp4.obj: src\tcp4.c
 	$(CC) $(CFLAGS) -fo=$@ $<
 
 obj\thread.obj: src\thread.c
+	$(CC) $(CFLAGS) -fo=$@ $<
+
+obj\utf8.obj: src\utf7.c
 	$(CC) $(CFLAGS) -fo=$@ $<
 
 obj\utf8.obj: src\utf8.c

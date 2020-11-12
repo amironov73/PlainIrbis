@@ -40,6 +40,7 @@ libmagna_a_SOURCES = \
     src/string.c     \
     src/tcp4.c       \
     src/thread.c     \
+    src/utf7.c       \
     src/utf8.c       \
     src/utils.c      \
     src/varray.c     \
