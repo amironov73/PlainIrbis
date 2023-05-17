@@ -444,6 +444,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\variant.c"
+				>
+			</File>
+			<File
 				RelativePath=".\src\vector.c"
 				>
 			</File>

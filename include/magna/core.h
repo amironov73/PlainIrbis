@@ -469,6 +469,36 @@ MAGNA_API void      MAGNA_CALL random_init   (am_uint32 seed);
 
 /*=========================================================*/
 
+/* Вариант */
+
+#define VARIANT_IS_EMPTY   0
+#define VARIANT_IS_BOOL    1
+#define VARIANT_IS_INT16   2
+#define VARIANT_IS_INT32   3
+#define VARIANT_IS_INT64   4
+#define VARIANT_IS_FLOAT   5
+#define VARIANT_IS_DOUBLE  6
+#define VARIANT_IS_POINTER 7
+
+typedef struct
+{
+    int kind;
+    union {
+        am_bool  bool_value;
+        am_int16 int16_value;
+        am_int32 int32_value;
+        am_int64 int64_value;
+        float    float_value;
+        double   double_value;
+        void*    pointer_value;
+    } value;
+
+} AM_VARIANT;
+
+extern MAGNA_API AM_VARIANT* MAGNA_CALL variant_copy (AM_VARIANT *target, const AM_VARIANT *source);
+
+/*=========================================================*/
+
 /* Ввод-вывод */
 
 extern MAGNA_API MAGNA_INLINE am_uint16 MAGNA_CALL magna_ntohs     (am_uint16 value);

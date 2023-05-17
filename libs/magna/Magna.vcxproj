@@ -61,6 +61,7 @@
     <ClCompile Include="src\thread.c" />
     <ClCompile Include="src\utf7.c" />
     <ClCompile Include="src\utf8.c" />
+    <ClCompile Include="src\variant.c" />
     <ClCompile Include="src\vector.c" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

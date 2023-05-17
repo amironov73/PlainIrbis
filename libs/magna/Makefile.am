@@ -43,5 +43,5 @@ libmagna_a_SOURCES = \
     src/utf7.c       \
     src/utf8.c       \
     src/utils.c      \
-    src/varray.c     \
+    src/variant.c    \
     src/vector.c
